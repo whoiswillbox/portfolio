@@ -1,10 +1,11 @@
 /* ============================================================================
    Chat Q&A Repository
    The bot answers visitors by matching their question to an entry below.
-   EDIT THESE ANSWERS — most are placeholders. Each entry:
+   The bot speaks AS Will — always first person ("I", "my"), never "he"/"Will".
+   EDIT THESE ANSWERS — some are placeholders. Each entry:
      - question: the canonical question (shown as a suggestion chip)
      - keywords: terms/phrases that should trigger this answer (lowercase)
-     - answer:   what the bot replies
+     - answer:   what the bot replies (a string, or variants picked at random)
    ========================================================================== */
 
 export type QAEntry = {
@@ -17,9 +18,9 @@ export type QAEntry = {
 
 /** Shown when nothing matches — picked from at random to feel less canned. */
 export const fallbackAnswer = [
-  "Hmm, I'm not sure about that one 😅 — but I'm great on anything about Will. Try asking what he does, what he's built, or how to reach him.",
-  "That's a bit outside my wheelhouse! I can tell you about Will's work, his projects, or how to get in touch.",
-  "I don't have that one yet — ask me about Will's background, skills, or what he's built and I've got you.",
+  "Hmm, I'm not sure about that one 😅 — but ask me what I do, what I've built, or how to reach me.",
+  "That's a bit outside my wheelhouse! Ask me about my work, my projects, or how to get in touch.",
+  "I don't have that one yet — ask me about my background, skills, or what I've built and I've got you.",
 ];
 
 export const qaEntries: QAEntry[] = [
@@ -35,48 +36,63 @@ export const qaEntries: QAEntry[] = [
     question: "What do you do?",
     keywords: ["what do you do", "job", "role", "work", "profession", "title", "occupation"],
     answer:
-      "[TODO: describe your work — your current role, the kind of problems you solve, and what you enjoy building.]",
+      "I'm a UX designer at BARBRI in Dallas, leading design for the Bar Prep and SQE products across two teams. I partner closely with stakeholders, product owners, and engineering to take experiences from research to polished UI — and I ship the front-end code too. I'm also building BARBRI's unified design system and a new AI tutor for the PowerScore platform.",
   },
   {
     id: "skills",
     question: "What are your skills?",
-    keywords: ["skills", "tech", "stack", "technologies", "languages", "tools", "expertise", "good at"],
+    keywords: ["skills", "tech", "stack", "technologies", "languages", "tools", "expertise", "good at", "figma"],
     answer:
-      "[TODO: list your core skills — e.g. TypeScript, React, Next.js, Node, design systems, etc.]",
+      "My core is UX — Figma, wireframing, usability testing, and information architecture — grounded in real user research. I also code (Python, Java, and modern web), so I can take an idea from research all the way to a shipped product.",
   },
   {
     id: "experience",
     question: "What's your experience?",
-    keywords: ["experience", "background", "career", "history", "worked", "companies", "years"],
+    keywords: [
+      "experience", "background", "career", "history", "worked", "where has he worked",
+      "companies", "years", "barbri", "technergetics", "lightcert",
+      "past", "previous", "previously", "previous experience", "done in the past",
+      "before", "prior", "what have you done", "what has he done",
+    ],
     answer:
-      "[TODO: summarize your experience — previous roles, companies, and notable accomplishments.]",
+      "I'm a UX Designer at BARBRI (Jan 2025–present) in Dallas. Before that I spent ~2 years as a UX Designer at Technergetics in Utica, NY, and started out as a UX/UI design intern at Lightcert in LA. Fun fact: way back I was also a stunt double (SAG-AFTRA) — ask me about it. 🎬",
   },
   {
     id: "projects",
     question: "What have you built?",
-    keywords: ["projects", "built", "portfolio", "work samples", "made", "shipped", "apps"],
+    keywords: ["projects", "built", "portfolio", "work samples", "made", "shipped", "apps", "working on"],
     answer:
-      "[TODO: highlight a few projects. You can also point people to the Playground section of this site.]",
+      "A few things I'm driving right now: BARBRI's unified design system that ties all their products together, a new AI tutor for the PowerScore platform, and the Bar Prep & SQE product experiences. Oh — and this site you're on. Ask me how it was made!",
   },
   {
     id: "this-site",
     question: "How was this site made?",
     keywords: ["this site", "website", "built this", "made this", "tech behind", "how was this"],
     answer:
-      "This site is built with Next.js, Tailwind CSS, and shadcn/ui, on a custom design-token system. The chat you're using runs entirely client-side — no AI, just a curated Q&A.",
+      "I built this site with Next.js, Tailwind CSS, and shadcn/ui, on a custom design-token system. This chat runs entirely client-side — no AI, just my curated answers.",
   },
   {
     id: "contact",
     question: "How can I reach you?",
     keywords: ["contact", "reach", "email", "get in touch", "hire", "message", "connect", "linkedin"],
     answer:
-      "You can reach Will at boxjwilliam@gmail.com. [TODO: add LinkedIn / GitHub / other links.]",
+      "You can reach me at boxjwilliam@gmail.com, or connect with me on LinkedIn: linkedin.com/in/williamjbox.",
   },
   {
     id: "location",
     question: "Where are you based?",
     keywords: ["location", "based", "where", "live", "city", "country", "remote"],
-    answer: "[TODO: where you're based, and whether you're open to remote work.]",
+    answer: "I'm based in Dallas, Texas.",
+  },
+  {
+    id: "education",
+    question: "Where did you study?",
+    keywords: [
+      "education", "school", "degree", "study", "studied", "college", "university",
+      "ucsd", "uc san diego", "major", "graduate", "certification", "certified",
+    ],
+    answer:
+      "I studied Psychology with a Cognitive Science (Design + Interaction) minor at UC San Diego (2018–2022), after an AA in Communication at Santa Barbara City College. My UCSD coursework covered interaction design, prototyping, usability, and programming in Python and Java. I'm also certified in AI Product Design (ELVTR, 2024).",
   },
   {
     id: "overview",
@@ -89,9 +105,9 @@ export const qaEntries: QAEntry[] = [
       "what more", "keep going", "go on",
     ],
     answer: [
-      "Will's a product designer turned vibe coder (blame the robots 🤖). He designs and builds web things. Want the details on his work, his projects, or how to reach him?",
-      "Short version: designer brain, coder hands. Ask me about his skills, what he's built, or how to get in touch and I'll go deeper.",
-      "He's a designer who learned to ship code. There's a lot to cover — pick a lane: his work, his projects, or contact info?",
+      "I'm a product designer turned vibe coder (blame the robots 🤖). I design and build web things. Want the details on my work, my projects, or how to reach me?",
+      "Short version: designer brain, coder hands. Ask me about my skills, what I've built, or how to get in touch and I'll go deeper.",
+      "I'm a designer who learned to ship code. There's a lot to cover — pick a lane: my work, my projects, or contact info?",
     ],
   },
   {
@@ -104,9 +120,9 @@ export const qaEntries: QAEntry[] = [
       "films", "film", "what does he do",
     ],
     answer: [
-      "Plenty! Will surfs 🏄, snowboards 🏂, games a lot 🎮, and he's a serious music nerd and movie buff.",
-      "When he's not designing or coding: surfing, snowboarding, video games, and deep-diving into music and movies.",
-      "Outside work he's in the water surfing, on the mountain snowboarding, gaming, or geeking out over music and films.",
+      "Plenty! I surf 🏄, snowboard 🏂, game a lot 🎮, and I'm a serious music nerd and movie buff.",
+      "When I'm not designing or coding: surfing, snowboarding, video games, and deep-diving into music and movies.",
+      "Outside work I'm in the water surfing, on the mountain snowboarding, gaming, or geeking out over music and films.",
     ],
   },
   {
@@ -118,8 +134,8 @@ export const qaEntries: QAEntry[] = [
       "is he the best",
     ],
     answer: [
-      "Yes — he dominates the lineup 🏄 and makes buttons blue. 🔵",
-      "Top tier. He runs the lineup and ships pixel-perfect UI.",
+      "Yep — I dominate the lineup 🏄 and make buttons blue. 🔵",
+      "Top tier. I run the lineup and ship pixel-perfect UI.",
     ],
   },
   {
@@ -131,9 +147,20 @@ export const qaEntries: QAEntry[] = [
       "like as a person",
     ],
     answer: [
-      "Oh, he's cool 😎 — a product designer turned vibe coder with a sense of humor. Ask him anything.",
+      "Oh, I'm cool 😎 — a product designer turned vibe coder with a sense of humor. Ask me anything.",
       "Cool? Certified. 😎 Designer turned coder, low ego, high curiosity.",
     ],
+  },
+
+  {
+    id: "stunt",
+    question: "Stunt work",
+    keywords: [
+      "stunt", "stuntman", "stunt double", "acting", "actor", "imdb",
+      "cody fern", "tribes of palos verdes", "movie role", "film role",
+    ],
+    answer:
+      "Ha, you found it — I was a stunt double for Cody Fern on Tribes of Palos Verdes (SAG-AFTRA). It's on IMDb under William Box. 🎬",
   },
 
   /* --- Small talk (not shown as suggestions) -------------------------- */
@@ -146,8 +173,8 @@ export const qaEntries: QAEntry[] = [
     ],
     answer: [
       "Thank you, dog. 🐶",
-      "Appreciate it! 🙏 Will put a lot into this.",
-      "Haha thanks — wanna know what he built it with? Just ask.",
+      "Appreciate it! 🙏 I put a lot into this.",
+      "Haha thanks — wanna know what I built it with? Just ask.",
     ],
   },
   {
@@ -155,9 +182,9 @@ export const qaEntries: QAEntry[] = [
     question: "Greeting",
     keywords: ["hi", "hey", "hello", "yo", "sup", "howdy", "what's up", "whats up"],
     answer: [
-      "Hey! 👋 What do you want to know about Will?",
-      "Yo! Ask me anything about Will — his work, projects, whatever.",
-      "Hi there! I can tell you all about Will. What's up?",
+      "Hey! 👋 What do you want to know?",
+      "Yo! Ask me anything — my work, projects, whatever.",
+      "Hi there! Ask me anything. What's up?",
     ],
   },
   {

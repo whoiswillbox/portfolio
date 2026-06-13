@@ -29,18 +29,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
+      <body className="h-dvh overflow-hidden flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <TooltipProvider>
-            <SidebarProvider>
+            <SidebarProvider className="h-full min-h-0">
               <AppSidebar />
-              <SidebarInset>
+              <SidebarInset className="min-h-0">
                 <div className="flex flex-1 min-h-0">
                   <div className="flex flex-1 flex-col min-w-0">
                     <header className="flex h-12 items-center px-4 border-b">
                       <SidebarTrigger />
                     </header>
-                    <main className="flex-1 overflow-auto p-6">{children}</main>
+                    <main className="flex-1 min-h-0 overflow-auto p-6">{children}</main>
                   </div>
                   <ChatPanel />
                 </div>

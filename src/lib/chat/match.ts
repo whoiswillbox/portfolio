@@ -20,12 +20,41 @@ function tokenize(input: string): string[] {
 
 export const MATCH_THRESHOLD = 2;
 
+/* Whole-message follow-ups (e.g. "and?", "what else") — too short/common to be
+   keywords. Handled separately so they can walk through topics in order. */
+const CONTINUATIONS = new Set([
+  "and", "so", "ok", "okay", "k", "next", "then", "continue", "more", "go on",
+  "and then", "yeah", "right", "huh", "uh huh", "tell me more", "what else",
+  "anything else", "else", "what more",
+]);
+
+function normalize(input: string): string {
+  return input.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+export function isContinuation(input: string): boolean {
+  return CONTINUATIONS.has(normalize(input));
+}
+
+/* The "tour" — order topics are revealed when a visitor keeps saying "what
+   else". Each is shown once per conversation before we loop to a wrap-up. */
+export const PROGRESSION = [
+  "who", "what-do-you-do", "experience", "projects", "skills", "education", "hobbies", "contact",
+];
+
+const WRAPUP =
+  "That's the grand tour! 🎉 Ask me anything specific, or reach me at boxjwilliam@gmail.com.";
+
+function entryById(id: string): QAEntry | undefined {
+  return qaEntries.find((e) => e.id === id);
+}
+
 /**
  * Find the best Q&A entry for a visitor's question.
  * Scores each entry by phrase hits (strong) and token overlap (weak).
  * Returns the matched entry, or null when nothing clears the threshold.
  */
-export function findAnswer(input: string): { entry: QAEntry | null; score: number } {
+export function findEntry(input: string): QAEntry | null {
   const lower = input.toLowerCase();
   const tokens = tokenize(input);
 
@@ -52,7 +81,7 @@ export function findAnswer(input: string): { entry: QAEntry | null; score: numbe
     }
   }
 
-  return { entry: bestScore >= MATCH_THRESHOLD ? best : null, score: bestScore };
+  return bestScore >= MATCH_THRESHOLD ? best : null;
 }
 
 function pick(answer: string | string[]): string {
@@ -61,7 +90,22 @@ function pick(answer: string | string[]): string {
     : answer;
 }
 
-export function answerFor(input: string): string {
-  const entry = findAnswer(input).entry;
-  return pick(entry ? entry.answer : fallbackAnswer);
+export type Reply = { entryId: string | null; text: string };
+
+/**
+ * Produce a reply, using `shown` (topic ids already covered in this
+ * conversation) so that "what else"-style follow-ups walk through new topics
+ * instead of repeating. Returns the chosen entry id (to record) and the text.
+ */
+export function respondTo(input: string, shown: string[]): Reply {
+  if (isContinuation(input)) {
+    const nextId = PROGRESSION.find((id) => !shown.includes(id));
+    const entry = nextId ? entryById(nextId) : undefined;
+    if (entry) return { entryId: entry.id, text: pick(entry.answer) };
+    return { entryId: null, text: WRAPUP };
+  }
+
+  const entry = findEntry(input);
+  if (entry) return { entryId: entry.id, text: pick(entry.answer) };
+  return { entryId: null, text: pick(fallbackAnswer) };
 }

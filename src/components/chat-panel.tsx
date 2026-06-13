@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   Send,
-  Shuffle,
   User,
   Briefcase,
   LayoutGrid,
@@ -18,11 +17,17 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { answerFor } from "@/lib/chat/match";
+import { respondTo } from "@/lib/chat/match";
 import { qaEntries, suggestedQuestionIds } from "@/lib/chat/repository";
 
 type Message = { id: string; role: "user" | "bot"; text: string };
-type Conversation = { id: string; title: string; messages: Message[] };
+type Conversation = {
+  id: string;
+  title: string;
+  messages: Message[];
+  /** Topic ids already covered, so "what else" walks through new ones. */
+  shown: string[];
+};
 
 const STORAGE_KEY = "will-chat-conversations";
 
@@ -36,6 +41,22 @@ const suggestionIcons: Record<string, LucideIcon> = {
   projects: LayoutGrid,
   contact: Mail,
 };
+
+/* Fun, first-person headings for the empty state — picked at random. */
+const HEADINGS = [
+  "Ask me anything",
+  "Go on, pick my brain",
+  "What do you wanna know?",
+  "Interrogate me",
+  "Hit me with a question",
+  "Let's get acquainted",
+  "Curious about me?",
+  "What's on your mind?",
+  "Get to know me",
+  "Quiz me",
+];
+
+const randomHeading = () => HEADINGS[Math.floor(Math.random() * HEADINGS.length)];
 
 function uid(): string {
   return typeof crypto !== "undefined" && crypto.randomUUID
@@ -53,13 +74,20 @@ export function ChatPanel() {
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [input, setInput] = React.useState("");
   const [loaded, setLoaded] = React.useState(false);
+  const [heading, setHeading] = React.useState(HEADINGS[0]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  // Randomize the heading after mount (avoids SSR hydration mismatch).
+  React.useEffect(() => setHeading(randomHeading()), []);
 
   // Load persisted conversations on mount.
   React.useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setConversations(JSON.parse(raw));
+      if (raw) {
+        const parsed: Conversation[] = JSON.parse(raw);
+        setConversations(parsed.map((c) => ({ ...c, shown: c.shown ?? [] })));
+      }
     } catch {
       /* ignore corrupt storage */
     }
@@ -86,14 +114,20 @@ export function ChatPanel() {
   const send = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const shown = active?.shown ?? [];
+    const reply = respondTo(trimmed, shown);
     const userMsg: Message = { id: uid(), role: "user", text: trimmed };
-    const botMsg: Message = { id: uid(), role: "bot", text: answerFor(trimmed) };
+    const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
+    const nextShown =
+      reply.entryId && !shown.includes(reply.entryId) ? [...shown, reply.entryId] : shown;
     setInput("");
 
     if (active) {
       setConversations((prev) =>
         prev.map((c) =>
-          c.id === active.id ? { ...c, messages: [...c.messages, userMsg, botMsg] } : c
+          c.id === active.id
+            ? { ...c, messages: [...c.messages, userMsg, botMsg], shown: nextShown }
+            : c
         )
       );
     } else {
@@ -101,6 +135,7 @@ export function ChatPanel() {
         id: uid(),
         title: titleFrom(trimmed),
         messages: [userMsg, botMsg],
+        shown: reply.entryId ? [reply.entryId] : [],
       };
       setConversations((prev) => [convo, ...prev]);
       setActiveId(convo.id);
@@ -110,6 +145,7 @@ export function ChatPanel() {
   const goHome = () => {
     setActiveId(null);
     setInput("");
+    setHeading(randomHeading());
   };
 
   const deleteConversation = (id: string) => {
@@ -157,17 +193,13 @@ export function ChatPanel() {
       )}
       <div
         ref={scrollRef}
-        className={cn("flex-1 overflow-y-auto", !active && "flex flex-col justify-center")}
+        className={cn("flex-1 min-h-0 overflow-y-auto", !active && "flex flex-col justify-center")}
       >
         {!active ? (
           <div className="flex w-full flex-col gap-3 p-4 text-left">
             <Box className="size-8 text-white" strokeWidth={1.5} />
-            <h2 className="text-h5 font-semibold tracking-tight">Learn about Will</h2>
+            <h2 className="text-h5 font-semibold tracking-tight">{heading}</h2>
             {searchForm}
-            <div className="flex items-center gap-2 text-body-xs text-muted-foreground">
-              <Shuffle className="size-3.5" />
-              Pick a question, any question
-            </div>
             <div className="flex flex-col">
               {suggestions.map((s, i) => {
                 const Icon = suggestionIcons[s.id] ?? HelpCircle;
