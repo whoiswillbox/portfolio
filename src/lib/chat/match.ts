@@ -34,8 +34,10 @@ export function findAnswer(input: string): { entry: QAEntry | null; score: numbe
     let score = 0;
     for (const keyword of entry.keywords) {
       const k = keyword.toLowerCase();
-      // Strong signal: the full keyword/phrase appears in the question.
-      if (lower.includes(k)) score += 3;
+      // Strong signal: the keyword/phrase appears as a whole word (not a
+      // substring — so "hi" won't match inside "this").
+      const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`\\b${escaped}\\b`, "i").test(lower)) score += 3;
       // Weak signal: individual word overlap.
       const keywordTokens = tokenize(keyword);
       for (const t of tokens) {
@@ -51,6 +53,13 @@ export function findAnswer(input: string): { entry: QAEntry | null; score: numbe
   return { entry: bestScore >= MATCH_THRESHOLD ? best : null, score: bestScore };
 }
 
+function pick(answer: string | string[]): string {
+  return Array.isArray(answer)
+    ? answer[Math.floor(Math.random() * answer.length)]
+    : answer;
+}
+
 export function answerFor(input: string): string {
-  return findAnswer(input).entry?.answer ?? fallbackAnswer;
+  const entry = findAnswer(input).entry;
+  return pick(entry ? entry.answer : fallbackAnswer);
 }

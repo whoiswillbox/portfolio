@@ -11,14 +11,16 @@ export type QAEntry = {
   id: string;
   question: string;
   keywords: string[];
-  answer: string;
+  /** A single reply, or several variants picked from at random. */
+  answer: string | string[];
 };
 
-export const greeting =
-  "Hi! I'm Will's assistant. Ask me anything about him — or tap a question below to get started.";
-
-export const fallbackAnswer =
-  "I don't have an answer for that yet. Try one of the suggested questions, or reach out to Will directly at boxjwilliam@gmail.com.";
+/** Shown when nothing matches — picked from at random to feel less canned. */
+export const fallbackAnswer = [
+  "Hmm, I'm not sure about that one 😅 — but I'm great on anything about Will. Try asking what he does, what he's built, or how to reach him.",
+  "That's a bit outside my wheelhouse! I can tell you about Will's work, his projects, or how to get in touch.",
+  "I don't have that one yet — ask me about Will's background, skills, or what he's built and I've got you.",
+];
 
 export const qaEntries: QAEntry[] = [
   {
@@ -26,7 +28,7 @@ export const qaEntries: QAEntry[] = [
     question: "Who is Will?",
     keywords: ["who", "who are you", "who is will", "introduce", "about will", "yourself"],
     answer:
-      "I'm Will Box — [TODO: one-line intro, e.g. a software engineer based in ___ who builds web apps].",
+      "I'm Will — a product designer turned vibe coder due to the world takeover of robots.",
   },
   {
     id: "what-do-you-do",
@@ -75,6 +77,71 @@ export const qaEntries: QAEntry[] = [
     question: "Where are you based?",
     keywords: ["location", "based", "where", "live", "city", "country", "remote"],
     answer: "[TODO: where you're based, and whether you're open to remote work.]",
+  },
+  {
+    id: "overview",
+    question: "Overview",
+    keywords: [
+      "everything", "tell me something", "tell me more", "tell me about him",
+      "tell me about will", "anything", "rundown", "the rundown", "overview",
+      "summary", "summarize", "the gist", "his deal", "whats his deal",
+      "what's his deal", "more",
+    ],
+    answer: [
+      "Will's a product designer turned vibe coder (blame the robots 🤖). He designs and builds web things. Want the details on his work, his projects, or how to reach him?",
+      "Short version: designer brain, coder hands. Ask me about his skills, what he's built, or how to get in touch and I'll go deeper.",
+      "He's a designer who learned to ship code. There's a lot to cover — pick a lane: his work, his projects, or contact info?",
+    ],
+  },
+  {
+    id: "personality",
+    question: "Personality",
+    keywords: [
+      "is he cool", "he is cool", "cool guy", "what's he like", "whats he like",
+      "what is he like", "personality", "is he nice", "is he fun", "good guy",
+      "like as a person",
+    ],
+    answer: [
+      "Oh, he's cool 😎 — a product designer turned vibe coder with a sense of humor. Ask him anything.",
+      "Cool? Certified. 😎 Designer turned coder, low ego, high curiosity.",
+    ],
+  },
+
+  /* --- Small talk (not shown as suggestions) -------------------------- */
+  {
+    id: "compliment",
+    question: "Compliment",
+    keywords: [
+      "sick", "thats sick", "that's sick", "cool", "awesome", "nice", "dope",
+      "lit", "amazing", "love it", "love this", "fire", "slick", "clean", "rad",
+    ],
+    answer: [
+      "Thank you, dog. 🐶",
+      "Appreciate it! 🙏 Will put a lot into this.",
+      "Haha thanks — wanna know what he built it with? Just ask.",
+    ],
+  },
+  {
+    id: "greeting",
+    question: "Greeting",
+    keywords: ["hi", "hey", "hello", "yo", "sup", "howdy", "what's up", "whats up"],
+    answer: [
+      "Hey! 👋 What do you want to know about Will?",
+      "Yo! Ask me anything about Will — his work, projects, whatever.",
+      "Hi there! I can tell you all about Will. What's up?",
+    ],
+  },
+  {
+    id: "thanks",
+    question: "Thanks",
+    keywords: ["thanks", "thank you", "thx", "appreciate it", "cheers", "ty"],
+    answer: ["Anytime! 🙏", "You got it. 👊", "No problem — anything else you wanna know?"],
+  },
+  {
+    id: "bye",
+    question: "Goodbye",
+    keywords: ["bye", "goodbye", "see ya", "see you", "later", "cya", "peace"],
+    answer: ["Catch you later! 👋", "Peace! ✌️", "See ya — come back anytime."],
   },
 ];
 
