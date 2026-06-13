@@ -1,0 +1,33 @@
+/* ============================================================================
+   PRIMITIVES — Spacing & sizing
+   Raw spacing scale (Polaris-style numeric naming: the number ≈ px × 100,
+   e.g. --space-400 = 16px). Reference-only — semantics map these to layout
+   roles. Values are in rem (1rem = 16px) so they scale with root font-size.
+   ========================================================================== */
+:root {
+  --space-0: 0;
+  --space-025: 0.0625rem; /* 1px  */
+  --space-050: 0.125rem;  /* 2px  */
+  --space-100: 0.25rem;   /* 4px  */
+  --space-150: 0.375rem;  /* 6px  */
+  --space-200: 0.5rem;    /* 8px  */
+  --space-300: 0.75rem;   /* 12px */
+  --space-400: 1rem;      /* 16px */
+  --space-500: 1.25rem;   /* 20px */
+  --space-600: 1.5rem;    /* 24px */
+  --space-800: 2rem;      /* 32px */
+  --space-1000: 2.5rem;   /* 40px */
+  --space-1200: 3rem;     /* 48px */
+  --space-1600: 4rem;     /* 64px */
+  --space-2000: 5rem;     /* 80px */
+  --space-2400: 6rem;     /* 96px */
+  --space-2800: 7rem;     /* 112px */
+  --space-3200: 8rem;     /* 128px */
+
+  /* --- Layout widths (not on the spacing scale) ----------------------- */
+  --size-content: 42rem; /* readable text column */
+  --size-wide: 72rem;    /* wide layout cap */
+
+  /* --- Radius --------------------------------------------------------- */
+  --radius-base: 0.625rem;
+}

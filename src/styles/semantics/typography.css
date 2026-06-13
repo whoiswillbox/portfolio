@@ -1,0 +1,30 @@
+/* ============================================================================
+   SEMANTICS — Typography
+   Maps typography primitives to Tailwind font/text utilities.
+   ========================================================================== */
+
+/* Font families (inline: the underlying next/font vars resolve per request) */
+@theme inline {
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
+  --font-heading: var(--font-family-sans);
+}
+
+/* Display type scale -> text-display-sm / text-display / text-display-lg.
+   Each utility carries its own line-height, tracking, and weight. */
+@theme {
+  --text-display-sm: var(--font-size-display-sm);
+  --text-display-sm--line-height: 1.1;
+  --text-display-sm--letter-spacing: -0.02em;
+  --text-display-sm--font-weight: var(--font-weight-semibold);
+
+  --text-display: var(--font-size-display);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.025em;
+  --text-display--font-weight: var(--font-weight-semibold);
+
+  --text-display-lg: var(--font-size-display-lg);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.03em;
+  --text-display-lg--font-weight: var(--font-weight-bold);
+}

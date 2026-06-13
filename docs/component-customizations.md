@@ -33,9 +33,13 @@ component, period.**
 
 ---
 
-### `globals.css` — font variable fix
+### `globals.css` — restructured into layered design tokens
 **Date:** 2026-06-13
-**Why:** Leftover from the base-nova → radix style switch. `--font-sans` was
-self-referential (`var(--font-sans)`), so the Geist font wasn't applied.
-**What:** Pointed `--font-sans` and `--font-heading` at `var(--font-geist-sans)`
-(defined in `layout.tsx`).
+**Why:** Centralize design tokens into a scalable primitives → semantics
+architecture (see `docs/design-foundations.md`). Also fixed the self-referential
+`--font-sans` bug (base-nova → radix leftover) as part of the move.
+**What:** `globals.css` now only imports `src/styles/{primitives,semantics}/*`
+and defines the base layer. All color/type/spacing tokens live in those files.
+shadcn's semantic values are preserved exactly (now referencing primitives), so
+there is no visual change — except the dark `--sidebar-primary` stray blue,
+which was unified to the brand ramp (it is unused in the UI, so no-op).

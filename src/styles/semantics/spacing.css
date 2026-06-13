@@ -1,0 +1,21 @@
+/* ============================================================================
+   SEMANTICS — Spacing & sizing
+   Layout roles mapped to spacing primitives, exposed as Tailwind utilities.
+   (Tailwind's default p-4/gap-2 scale is still available for everything else.)
+   ========================================================================== */
+@theme {
+  --spacing-section: var(--space-2400); /* py-section  (96px) */
+  --spacing-gutter: var(--space-600);   /* px-gutter   (24px) */
+
+  --container-content: var(--size-content); /* max-w-content (42rem) */
+  --container-wide: var(--size-wide);       /* max-w-wide    (72rem) */
+
+  --radius: var(--radius-base);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
