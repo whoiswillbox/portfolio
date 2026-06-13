@@ -1,18 +1,33 @@
 /* ============================================================================
    PRIMITIVES — Typography
    Raw font families, sizes, and weights. Reference-only.
+   Sizes are in rem (1rem = 16px); px shown in comments for reference.
    ========================================================================== */
 :root {
   /* Font families (the --font-geist-* vars come from next/font in layout.tsx) */
   --font-family-sans: var(--font-geist-sans);
   --font-family-mono: var(--font-geist-mono);
 
-  /* Raw display sizes (oversized headings) */
-  --font-size-display-sm: 2.5rem;
-  --font-size-display: 3.5rem;
-  --font-size-display-lg: 4.5rem;
+  /* --- Body sizes ----------------------------------------------------- */
+  --font-size-body-xs: 0.75rem;  /* 12px */
+  --font-size-body-sm: 0.875rem; /* 14px */
+  --font-size-body-md: 1rem;     /* 16px (base) */
+  --font-size-body-lg: 1.125rem; /* 18px */
 
-  /* Weights */
+  /* --- Heading levels (h6 → h1) --------------------------------------- */
+  --font-size-h6: 1rem;       /* 16px */
+  --font-size-h5: 1.125rem;   /* 18px */
+  --font-size-h4: 1.25rem;    /* 20px */
+  --font-size-h3: 1.5rem;     /* 24px */
+  --font-size-h2: 1.875rem;   /* 30px */
+  --font-size-h1: 2.25rem;    /* 36px */
+
+  /* --- Display sizes (oversized hero headings, above h1) -------------- */
+  --font-size-display-sm: 2.5rem; /* 40px */
+  --font-size-display: 3.5rem;    /* 56px */
+  --font-size-display-lg: 4.5rem; /* 72px */
+
+  /* --- Weights -------------------------------------------------------- */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;

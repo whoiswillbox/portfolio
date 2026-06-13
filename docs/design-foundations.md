@@ -52,9 +52,32 @@ Neutral roles (background, foreground, muted, border, …) come from `core.css`
   (`--space-400` = 16px). Tailwind's default `p-4`/`gap-2` scale is untouched;
   semantic layout helpers are `py-section`, `px-gutter`, `max-w-content`,
   `max-w-wide`.
-- **Type**: Tailwind's default `text-sm`…`text-9xl` plus display sizes
-  `text-display-sm` / `text-display` / `text-display-lg`.
 - **Radius**: `--radius` (0.625rem) with `rounded-sm`…`rounded-4xl` derived.
+
+## Type scale
+
+Defined in `primitives/typography.css`, exposed as utilities in
+`semantics/typography.css`. Each heading/display utility carries its own
+line-height, letter-spacing, and weight — apply one class. Tailwind's default
+`text-sm`…`text-9xl` remain available too.
+
+| Tier | Utility | Size |
+|------|---------|------|
+| Body | `text-body-xs` | 12px |
+| Body | `text-body-sm` | 14px |
+| Body | `text-body-md` | 16px (base) |
+| Body | `text-body-lg` | 18px |
+| Heading | `text-h6` | 16px |
+| Heading | `text-h5` | 18px |
+| Heading | `text-h4` | 20px |
+| Heading | `text-h3` | 24px |
+| Heading | `text-h2` | 30px |
+| Heading | `text-h1` | 36px |
+| Display | `text-display-sm` | 40px |
+| Display | `text-display` | 56px |
+| Display | `text-display-lg` | 72px |
+
+Scale is monotonic: body → headings → display.
 
 ## Rules
 
