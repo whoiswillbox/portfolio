@@ -139,7 +139,14 @@ export function ChatPanel() {
   );
 
   return (
-    <aside className="hidden w-80 shrink-0 flex-col border-l bg-sidebar lg:flex">
+    <aside
+      className="hidden w-80 shrink-0 flex-col border-l bg-sidebar lg:flex"
+      style={{
+        backgroundImage:
+          "radial-gradient(color-mix(in oklch, var(--muted-foreground) 12%, transparent) 1px, transparent 1px)",
+        backgroundSize: "16px 16px",
+      }}
+    >
       {active && (
         <div className="border-b p-2">
           <Button variant="ghost" size="sm" onClick={goHome} className="text-muted-foreground">

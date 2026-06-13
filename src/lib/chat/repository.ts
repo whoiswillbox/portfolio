@@ -85,12 +85,41 @@ export const qaEntries: QAEntry[] = [
       "everything", "tell me something", "tell me more", "tell me about him",
       "tell me about will", "anything", "rundown", "the rundown", "overview",
       "summary", "summarize", "the gist", "his deal", "whats his deal",
-      "what's his deal", "more",
+      "what's his deal", "more", "what else", "anything else", "else",
+      "what more", "keep going", "go on",
     ],
     answer: [
       "Will's a product designer turned vibe coder (blame the robots 🤖). He designs and builds web things. Want the details on his work, his projects, or how to reach him?",
       "Short version: designer brain, coder hands. Ask me about his skills, what he's built, or how to get in touch and I'll go deeper.",
       "He's a designer who learned to ship code. There's a lot to cover — pick a lane: his work, his projects, or contact info?",
+    ],
+  },
+  {
+    id: "hobbies",
+    question: "What does he do for fun?",
+    keywords: [
+      "hobbies", "hobby", "for fun", "free time", "outside work", "interests",
+      "surf", "surfing", "surfs", "snowboard", "snowboarding", "snowboards",
+      "video games", "gaming", "games", "gamer", "music", "movies", "movie",
+      "films", "film", "what does he do",
+    ],
+    answer: [
+      "Plenty! Will surfs 🏄, snowboards 🏂, games a lot 🎮, and he's a serious music nerd and movie buff.",
+      "When he's not designing or coding: surfing, snowboarding, video games, and deep-diving into music and movies.",
+      "Outside work he's in the water surfing, on the mountain snowboarding, gaming, or geeking out over music and films.",
+    ],
+  },
+  {
+    id: "goat",
+    question: "Is he the best?",
+    keywords: [
+      "top rat", "top rated", "best", "the best", "goat", "the goat",
+      "number one", "top tier", "elite", "legit", "is he good", "any good",
+      "is he the best",
+    ],
+    answer: [
+      "Yes — he dominates the lineup 🏄 and makes buttons blue. 🔵",
+      "Top tier. He runs the lineup and ships pixel-perfect UI.",
     ],
   },
   {

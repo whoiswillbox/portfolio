@@ -5,7 +5,9 @@ const STOPWORDS = new Set([
   "a", "an", "the", "is", "are", "was", "do", "does", "did", "you", "your",
   "what", "who", "how", "when", "where", "why", "tell", "me", "about", "can",
   "could", "would", "i", "of", "to", "and", "with", "for", "on", "in", "at",
-  "have", "has", "be", "this", "that",
+  "have", "has", "be", "this", "that", "if", "or",
+  // Pronouns — common across many keywords, so they create false matches.
+  "he", "him", "his", "she", "her", "they", "them", "their", "we", "our", "us",
 ]);
 
 function tokenize(input: string): string[] {
