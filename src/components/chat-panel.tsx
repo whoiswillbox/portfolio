@@ -33,6 +33,11 @@ const STORAGE_KEY = "will-chat-conversations";
 const USAGE_KEY = "will-chat-usage";
 const DAILY_LIMIT = 20; // AI messages per visitor per day
 
+// Dev preview: when NEXT_PUBLIC_FORCE_USAGE_UI=1, show the usage counter and
+// count local (free) replies too — lets you design the "messages left" / limit
+// states without spending API credits. Off in production.
+const FORCE_USAGE_UI = process.env.NEXT_PUBLIC_FORCE_USAGE_UI === "1";
+
 const today = () => new Date().toISOString().slice(0, 10);
 
 const suggestions = suggestedQuestionIds
@@ -110,7 +115,9 @@ export function ChatPanel() {
 
   const usedToday = usage.date === today() ? usage.count : 0;
   const remaining = Math.max(0, DAILY_LIMIT - usedToday);
-  const atLimit = aiActive && remaining <= 0;
+  const showUsage = aiActive || FORCE_USAGE_UI;
+  const atLimit = showUsage && remaining <= 0;
+  const resetUsage = () => setUsage({ date: today(), count: 0 });
 
   // Randomize the heading after mount (avoids SSR hydration mismatch).
   React.useEffect(() => setHeading(randomHeading()), []);
@@ -200,9 +207,10 @@ export function ChatPanel() {
     const reply = await fetchReply(trimmed, [...priorMessages, userMsg], shown);
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
 
-    // Only paid (API) replies count toward the daily limit.
-    if (reply.fromApi) {
-      setAiActive(true);
+    // Only paid (API) replies count toward the daily limit — unless the dev
+    // preview toggle is on, which also counts free local replies.
+    if (reply.fromApi) setAiActive(true);
+    if (reply.fromApi || FORCE_USAGE_UI) {
       setUsage((prev) => {
         const t = today();
         const base = prev.date === t ? prev.count : 0;
@@ -265,11 +273,22 @@ export function ChatPanel() {
     </form>
   );
 
-  const usageNote = aiActive ? (
-    <p className="px-1 text-body-xs text-muted-foreground">
-      {atLimit
-        ? "Daily limit reached — back tomorrow, or email csswillbox@gmail.com."
-        : `${remaining} message${remaining === 1 ? "" : "s"} left today`}
+  const usageNote = showUsage ? (
+    <p className="flex items-center gap-2 px-1 text-body-xs text-muted-foreground">
+      <span>
+        {atLimit
+          ? "Daily limit reached — back tomorrow, or email csswillbox@gmail.com."
+          : `${remaining} message${remaining === 1 ? "" : "s"} left today`}
+      </span>
+      {FORCE_USAGE_UI && (
+        <button
+          type="button"
+          onClick={resetUsage}
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          reset
+        </button>
+      )}
     </p>
   ) : null;
 
