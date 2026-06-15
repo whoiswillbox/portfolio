@@ -79,7 +79,7 @@ export default function ChatLogPage() {
   }, [router]);
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-3xl p-6">
+    <div className="mx-auto w-full max-w-3xl">
       <h1 className="text-h3 font-semibold tracking-tight">Chat log</h1>
       <p className="mt-1 text-body-sm text-muted-foreground">
         What visitors have asked the AI assistant (most recent first).

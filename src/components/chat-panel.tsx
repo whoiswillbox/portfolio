@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import {
   Send,
   User,
@@ -79,6 +80,7 @@ function titleFrom(text: string): string {
 }
 
 export function ChatPanel() {
+  const pathname = usePathname();
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [input, setInput] = React.useState("");
@@ -293,6 +295,9 @@ export function ChatPanel() {
       )}
     </p>
   ) : null;
+
+  // No visitor chat panel in the admin view.
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <aside
