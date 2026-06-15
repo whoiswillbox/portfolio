@@ -158,13 +158,15 @@ export function ChatPanel() {
   const fetchReply = async (
     trimmed: string,
     history: Message[],
-    shown: string[]
+    shown: string[],
+    conversationId: string
   ): Promise<{ text: string; entryId: string | null; fromApi: boolean }> => {
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
+          conversationId,
           messages: history.map((m) => ({
             role: m.role === "bot" ? "assistant" : "user",
             content: m.text,
@@ -204,7 +206,7 @@ export function ChatPanel() {
       ]);
     }
 
-    const reply = await fetchReply(trimmed, [...priorMessages, userMsg], shown);
+    const reply = await fetchReply(trimmed, [...priorMessages, userMsg], shown, convoId!);
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
 
     // Only paid (API) replies count toward the daily limit — unless the dev

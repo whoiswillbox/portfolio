@@ -64,12 +64,14 @@ export async function POST(request: Request) {
     }
   }
 
-  let body: { messages?: ClientMessage[] };
+  let body: { messages?: ClientMessage[]; conversationId?: string };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "bad_request" }, { status: 400 });
   }
+  const conversationId =
+    typeof body.conversationId === "string" ? body.conversationId.slice(0, 64) : undefined;
 
   const messages = (body.messages ?? [])
     .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
@@ -109,6 +111,7 @@ export async function POST(request: Request) {
       country: request.headers.get("x-vercel-ip-country") ?? undefined,
       city: city ? decodeURIComponent(city) : undefined,
       ip: ipRaw ? await hashIp(ipRaw) : undefined,
+      c: conversationId,
     });
 
     return Response.json({ reply, usage: response.usage });

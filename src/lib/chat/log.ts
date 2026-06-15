@@ -18,6 +18,7 @@ export type ChatLogEntry = {
   country?: string;
   city?: string;
   ip?: string; // short hash, not the raw IP
+  c?: string; // conversation id — groups a visitor's back-and-forth into a thread
 };
 
 /** SHA-256 the IP so we can count unique visitors without storing the raw IP. */
