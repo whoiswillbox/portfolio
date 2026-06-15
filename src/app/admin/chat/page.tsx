@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 type Entry = {
   t: string;
@@ -13,49 +12,34 @@ type Entry = {
   ip?: string;
 };
 
-const KEY_STORAGE = "admin_key";
-
 export default function ChatLogPage() {
-  const [key, setKey] = React.useState("");
+  const router = useRouter();
   const [entries, setEntries] = React.useState<Entry[] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState(false);
-
-  const load = React.useCallback(async (k: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/chat-log?key=${encodeURIComponent(k)}`);
-      if (res.status === 401) {
-        setError("Wrong key.");
-        setEntries(null);
-        return;
-      }
-      if (res.status === 501) {
-        setError("ADMIN_KEY isn't set on the server.");
-        return;
-      }
-      if (!res.ok) {
-        setError("Couldn't load the log.");
-        return;
-      }
-      const data = await res.json();
-      setEntries(data.log ?? []);
-      localStorage.setItem(KEY_STORAGE, k);
-    } catch {
-      setError("Network error.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   React.useEffect(() => {
-    const saved = localStorage.getItem(KEY_STORAGE);
-    if (saved) {
-      setKey(saved);
-      load(saved);
-    }
-  }, [load]);
+    (async () => {
+      try {
+        const res = await fetch("/api/chat-log");
+        if (res.status === 401) {
+          router.replace("/admin/login?next=/admin/chat");
+          return;
+        }
+        if (res.status === 501) {
+          setError("ADMIN_KEY isn't set on the server.");
+          return;
+        }
+        if (!res.ok) {
+          setError("Couldn't load the log.");
+          return;
+        }
+        const data = await res.json();
+        setEntries(data.log ?? []);
+      } catch {
+        setError("Network error.");
+      }
+    })();
+  }, [router]);
 
   return (
     <div className="mx-auto min-h-dvh w-full max-w-3xl p-6">
@@ -64,27 +48,7 @@ export default function ChatLogPage() {
         What visitors have asked the AI assistant (most recent first).
       </p>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (key.trim()) load(key.trim());
-        }}
-        className="mt-4 flex items-center gap-2"
-      >
-        <Input
-          type="password"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          placeholder="Admin key"
-          aria-label="Admin key"
-          className="max-w-xs text-body-sm"
-        />
-        <Button type="submit" disabled={!key.trim() || loading}>
-          {loading ? "Loading…" : "Load"}
-        </Button>
-      </form>
-
-      {error && <p className="mt-3 text-body-sm text-critical">{error}</p>}
+      {error && <p className="mt-4 text-body-sm text-critical">{error}</p>}
 
       {entries && (
         <div className="mt-6 flex flex-col gap-3">

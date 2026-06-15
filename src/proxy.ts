@@ -1,25 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE, authToken } from "@/lib/auth";
+import { AUTH_COOKIE, ADMIN_COOKIE, authToken, adminToken } from "@/lib/auth";
 
-/* Password-gate the whole site. Disabled automatically when SITE_PASSWORD is
-   unset (e.g. local dev), so localhost stays open while production is gated. */
+/* Two independent gates:
+   - Admin area (/admin/*, /api/chat-log): requires the ADMIN_KEY cookie.
+   - Public site (everything else): requires the SITE_PASSWORD cookie (if set).
+   Each is auto-disabled when its env var is unset. */
 export async function proxy(request: NextRequest) {
-  const password = process.env.SITE_PASSWORD;
-  if (!password) return NextResponse.next(); // gate disabled
+  const path = request.nextUrl.pathname;
+  const isAdminArea = path.startsWith("/admin") || path === "/api/chat-log";
 
-  const cookie = request.cookies.get(AUTH_COOKIE)?.value;
-  if (cookie && cookie === (await authToken(password))) {
-    return NextResponse.next();
+  if (isAdminArea) {
+    const adminKey = process.env.ADMIN_KEY;
+    if (!adminKey) return NextResponse.next(); // not configured → routes return 501
+    const cookie = request.cookies.get(ADMIN_COOKIE)?.value;
+    if (cookie && cookie === (await adminToken(adminKey))) return NextResponse.next();
+    return redirectTo(request, "/admin/login", path);
   }
 
-  // Not authenticated → send to the unlock page, remembering where they wanted to go.
+  const sitePassword = process.env.SITE_PASSWORD;
+  if (!sitePassword) return NextResponse.next(); // gate disabled
+  const cookie = request.cookies.get(AUTH_COOKIE)?.value;
+  if (cookie && cookie === (await authToken(sitePassword))) return NextResponse.next();
+  return redirectTo(request, "/unlock", path);
+}
+
+function redirectTo(request: NextRequest, pathname: string, next: string) {
   const url = request.nextUrl.clone();
-  url.pathname = "/unlock";
-  url.search = `?next=${encodeURIComponent(request.nextUrl.pathname)}`;
+  url.pathname = pathname;
+  url.search = `?next=${encodeURIComponent(next)}`;
   return NextResponse.redirect(url);
 }
 
 export const config = {
-  // Protect everything except the unlock page/route and static assets.
-  matcher: ["/((?!unlock|api/unlock|_next/static|_next/image|favicon.ico).*)"],
+  // Run on everything except the auth endpoints/pages and static assets.
+  matcher: [
+    "/((?!unlock|api/unlock|admin/login|api/admin-login|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

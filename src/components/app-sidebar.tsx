@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { Gamepad2, CircleUser, Star, Moon, Sun, ChevronsUpDown, Lock } from "lucide-react"
+import { Gamepad2, CircleUser, Star, Moon, Sun, ChevronsUpDown, Lock, ShieldCheck } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -26,7 +26,13 @@ const items = [
   { title: "Reviews", href: "/reviews", icon: Star },
 ]
 
-export function AppSidebar({ showLock = false }: { showLock?: boolean }) {
+export function AppSidebar({
+  showLock = false,
+  isAdmin = false,
+}: {
+  showLock?: boolean
+  isAdmin?: boolean
+}) {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
@@ -89,6 +95,16 @@ export function AppSidebar({ showLock = false }: { showLock?: boolean }) {
               />
             </div>
           </SidebarMenuItem>
+          {isAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/admin/chat">
+                  <ShieldCheck className="size-4" />
+                  <span>Admin</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton size="lg">
               <Avatar className="size-8 rounded-lg">

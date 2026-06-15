@@ -1,14 +1,16 @@
+import { cookies } from "next/headers";
 import { getChatLog } from "@/lib/chat/log";
+import { ADMIN_COOKIE, adminToken } from "@/lib/auth";
 
-/* Owner-only: returns the chat log when the correct ?key= is supplied.
-   Set ADMIN_KEY in env to enable. */
-export async function GET(request: Request) {
+/* Owner-only: returns the chat log when a valid admin cookie is present
+   (set by logging in at /admin/login). */
+export async function GET() {
   const adminKey = process.env.ADMIN_KEY;
   if (!adminKey) {
     return Response.json({ error: "not_configured" }, { status: 501 });
   }
-  const key = new URL(request.url).searchParams.get("key");
-  if (key !== adminKey) {
+  const cookie = (await cookies()).get(ADMIN_COOKIE)?.value;
+  if (!cookie || cookie !== (await adminToken(adminKey))) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
   return Response.json({ log: await getChatLog(200) });
