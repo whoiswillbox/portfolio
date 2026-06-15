@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { Gamepad2, CircleUser, Star, Moon, Sun, ChevronsUpDown } from "lucide-react"
+import { Gamepad2, CircleUser, Star, Moon, Sun, ChevronsUpDown, Lock } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -26,12 +26,17 @@ const items = [
   { title: "Reviews", href: "/reviews", icon: Star },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({ showLock = false }: { showLock?: boolean }) {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
   const isDark = mounted && resolvedTheme === "dark"
+
+  const lock = async () => {
+    await fetch("/api/lock", { method: "POST" })
+    window.location.assign("/unlock") // full reload so the gate re-evaluates
+  }
 
   return (
     <Sidebar>
@@ -99,6 +104,14 @@ export function AppSidebar() {
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {showLock && (
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={lock} className="text-muted-foreground">
+                <Lock className="size-4" />
+                <span>Lock site (dev)</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

@@ -8,10 +8,15 @@ export default function SiteLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Show the lock button only in local dev (never on the deployed site), and
+  // only when the gate is actually active.
+  const showLock =
+    process.env.NODE_ENV === "development" && Boolean(process.env.SITE_PASSWORD);
+
   return (
     <TooltipProvider>
       <SidebarProvider className="h-full min-h-0">
-        <AppSidebar />
+        <AppSidebar showLock={showLock} />
         <SidebarInset className="min-h-0">
           <div className="flex flex-1 min-h-0">
             <div className="flex flex-1 flex-col min-w-0">
