@@ -92,7 +92,12 @@ export async function POST(request: Request) {
       .map((b) => b.text)
       .join("")
       .trim();
-    return Response.json({ reply });
+    // Track token usage server-side (not shown to visitors).
+    console.log("chat usage:", {
+      input_tokens: response.usage.input_tokens,
+      output_tokens: response.usage.output_tokens,
+    });
+    return Response.json({ reply, usage: response.usage });
   } catch (err) {
     console.error("chat api error:", err);
     return Response.json({ error: "upstream" }, { status: 502 });

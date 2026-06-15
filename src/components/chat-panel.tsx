@@ -30,6 +30,10 @@ type Conversation = {
 };
 
 const STORAGE_KEY = "will-chat-conversations";
+const USAGE_KEY = "will-chat-usage";
+const DAILY_LIMIT = 20; // AI messages per visitor per day
+
+const today = () => new Date().toISOString().slice(0, 10);
 
 const suggestions = suggestedQuestionIds
   .map((id) => qaEntries.find((e) => e.id === id))
@@ -76,7 +80,37 @@ export function ChatPanel() {
   const [loaded, setLoaded] = React.useState(false);
   const [heading, setHeading] = React.useState(HEADINGS[0]);
   const [sending, setSending] = React.useState(false);
+  const [usage, setUsage] = React.useState<{ date: string; count: number }>({
+    date: today(),
+    count: 0,
+  });
+  const [aiActive, setAiActive] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  // Daily AI-message counter, persisted per browser. Resets each calendar day.
+  React.useEffect(() => {
+    try {
+      const raw = localStorage.getItem(USAGE_KEY);
+      if (raw) {
+        const u = JSON.parse(raw);
+        if (u.date === today()) setUsage(u);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(USAGE_KEY, JSON.stringify(usage));
+    } catch {
+      /* ignore */
+    }
+  }, [usage]);
+
+  const usedToday = usage.date === today() ? usage.count : 0;
+  const remaining = Math.max(0, DAILY_LIMIT - usedToday);
+  const atLimit = aiActive && remaining <= 0;
 
   // Randomize the heading after mount (avoids SSR hydration mismatch).
   React.useEffect(() => setHeading(randomHeading()), []);
@@ -118,7 +152,7 @@ export function ChatPanel() {
     trimmed: string,
     history: Message[],
     shown: string[]
-  ): Promise<{ text: string; entryId: string | null }> => {
+  ): Promise<{ text: string; entryId: string | null; fromApi: boolean }> => {
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -133,15 +167,15 @@ export function ChatPanel() {
       if (!res.ok) throw new Error("api");
       const data = await res.json();
       if (typeof data.reply !== "string" || !data.reply.trim()) throw new Error("empty");
-      return { text: data.reply, entryId: null };
+      return { text: data.reply, entryId: null, fromApi: true };
     } catch {
-      return respondTo(trimmed, shown); // local fallback
+      return { ...respondTo(trimmed, shown), fromApi: false }; // local fallback (free)
     }
   };
 
   const send = async (text: string) => {
     const trimmed = text.trim();
-    if (!trimmed || sending) return;
+    if (!trimmed || sending || atLimit) return;
     const shown = active?.shown ?? [];
     const priorMessages = active?.messages ?? [];
     const userMsg: Message = { id: uid(), role: "user", text: trimmed };
@@ -165,6 +199,16 @@ export function ChatPanel() {
 
     const reply = await fetchReply(trimmed, [...priorMessages, userMsg], shown);
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
+
+    // Only paid (API) replies count toward the daily limit.
+    if (reply.fromApi) {
+      setAiActive(true);
+      setUsage((prev) => {
+        const t = today();
+        const base = prev.date === t ? prev.count : 0;
+        return { date: t, count: base + 1 };
+      });
+    }
 
     setConversations((prev) =>
       prev.map((c) =>
@@ -205,15 +249,29 @@ export function ChatPanel() {
       <Input
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Ask a question…"
+        placeholder={atLimit ? "Daily limit reached" : "Ask a question…"}
         aria-label="Ask a question about Will"
         className="text-body-sm"
+        disabled={atLimit}
       />
-      <Button type="submit" size="icon" disabled={!input.trim() || sending} aria-label="Send">
+      <Button
+        type="submit"
+        size="icon"
+        disabled={!input.trim() || sending || atLimit}
+        aria-label="Send"
+      >
         <Send className="size-4" />
       </Button>
     </form>
   );
+
+  const usageNote = aiActive ? (
+    <p className="px-1 text-body-xs text-muted-foreground">
+      {atLimit
+        ? "Daily limit reached — back tomorrow, or email csswillbox@gmail.com."
+        : `${remaining} message${remaining === 1 ? "" : "s"} left today`}
+    </p>
+  ) : null;
 
   return (
     <aside
@@ -241,6 +299,7 @@ export function ChatPanel() {
             <Box className="size-8 text-white" strokeWidth={1.5} />
             <h2 className="text-h5 font-semibold tracking-tight">{heading}</h2>
             {searchForm}
+            {usageNote}
             <div className="flex flex-col">
               {suggestions.map((s, i) => {
                 const Icon = suggestionIcons[s.id] ?? HelpCircle;
@@ -248,8 +307,9 @@ export function ChatPanel() {
                   <button
                     key={s.id}
                     onClick={() => send(s.question)}
+                    disabled={atLimit}
                     className={cn(
-                      "flex items-center gap-3 px-1 py-3 text-left transition-colors hover:bg-muted/60",
+                      "flex items-center gap-3 px-1 py-3 text-left transition-colors hover:bg-muted/60 disabled:opacity-50",
                       i !== 0 && "border-t"
                     )}
                   >
@@ -319,7 +379,12 @@ export function ChatPanel() {
       </div>
 
       {/* Active-conversation input pinned to the bottom */}
-      {active && <div className="border-t p-3">{searchForm}</div>}
+      {active && (
+        <div className="flex flex-col gap-1 border-t p-3">
+          {searchForm}
+          {usageNote}
+        </div>
+      )}
     </aside>
   );
 }
