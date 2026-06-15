@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { qaEntries } from "@/lib/chat/repository";
+import { logChat, hashIp } from "@/lib/chat/log";
 
 /* ============================================================================
    Chat API — grounded LLM replies as Will, with per-IP rate limiting.
@@ -97,6 +98,19 @@ export async function POST(request: Request) {
       input_tokens: response.usage.input_tokens,
       output_tokens: response.usage.output_tokens,
     });
+
+    // Log the exchange (question, reply, rough location, hashed IP).
+    const ipRaw = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+    const city = request.headers.get("x-vercel-ip-city");
+    await logChat({
+      t: new Date().toISOString(),
+      q: messages[messages.length - 1].content.slice(0, 300),
+      a: reply.slice(0, 300),
+      country: request.headers.get("x-vercel-ip-country") ?? undefined,
+      city: city ? decodeURIComponent(city) : undefined,
+      ip: ipRaw ? await hashIp(ipRaw) : undefined,
+    });
+
     return Response.json({ reply, usage: response.usage });
   } catch (err) {
     console.error("chat api error:", err);
