@@ -43,3 +43,14 @@ and defines the base layer. All color/type/spacing tokens live in those files.
 shadcn's semantic values are preserved exactly (now referencing primitives), so
 there is no visual change — except the dark `--sidebar-primary` stray blue,
 which was unified to the brand ramp (it is unused in the UI, so no-op).
+
+---
+
+### `calendar.tsx` — fix react-day-picker v10 type error
+**Date:** 2026-06-15
+**Why:** The vendored calendar used the `table` classNames key, which was
+removed in react-day-picker v10 (the project uses `^10.0.1`). It compiled under
+Turbopack dev but failed `next build`'s TypeScript check, breaking the Vercel
+deploy.
+**What:** Renamed the `table` key to `month_grid` (the v10 equivalent for the
+grid `<table>` element). Same styling, just the correct key name.
