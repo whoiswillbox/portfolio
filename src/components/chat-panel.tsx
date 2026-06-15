@@ -75,6 +75,7 @@ export function ChatPanel() {
   const [input, setInput] = React.useState("");
   const [loaded, setLoaded] = React.useState(false);
   const [heading, setHeading] = React.useState(HEADINGS[0]);
+  const [sending, setSending] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   // Randomize the heading after mount (avoids SSR hydration mismatch).
@@ -111,35 +112,75 @@ export function ChatPanel() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages.length]);
 
-  const send = (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    const shown = active?.shown ?? [];
-    const reply = respondTo(trimmed, shown);
-    const userMsg: Message = { id: uid(), role: "user", text: trimmed };
-    const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
-    const nextShown =
-      reply.entryId && !shown.includes(reply.entryId) ? [...shown, reply.entryId] : shown;
-    setInput("");
+  // Ask the grounded LLM via /api/chat; fall back to local matching if the API
+  // isn't configured, is rate-limited, or errors.
+  const fetchReply = async (
+    trimmed: string,
+    history: Message[],
+    shown: string[]
+  ): Promise<{ text: string; entryId: string | null }> => {
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          messages: history.map((m) => ({
+            role: m.role === "bot" ? "assistant" : "user",
+            content: m.text,
+          })),
+        }),
+      });
+      if (!res.ok) throw new Error("api");
+      const data = await res.json();
+      if (typeof data.reply !== "string" || !data.reply.trim()) throw new Error("empty");
+      return { text: data.reply, entryId: null };
+    } catch {
+      return respondTo(trimmed, shown); // local fallback
+    }
+  };
 
+  const send = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || sending) return;
+    const shown = active?.shown ?? [];
+    const priorMessages = active?.messages ?? [];
+    const userMsg: Message = { id: uid(), role: "user", text: trimmed };
+    setInput("");
+    setSending(true);
+
+    // Add the user message immediately (create the conversation if needed).
+    let convoId = activeId;
     if (active) {
       setConversations((prev) =>
-        prev.map((c) =>
-          c.id === active.id
-            ? { ...c, messages: [...c.messages, userMsg, botMsg], shown: nextShown }
-            : c
-        )
+        prev.map((c) => (c.id === active.id ? { ...c, messages: [...c.messages, userMsg] } : c))
       );
     } else {
-      const convo: Conversation = {
-        id: uid(),
-        title: titleFrom(trimmed),
-        messages: [userMsg, botMsg],
-        shown: reply.entryId ? [reply.entryId] : [],
-      };
-      setConversations((prev) => [convo, ...prev]);
-      setActiveId(convo.id);
+      convoId = uid();
+      setActiveId(convoId);
+      setConversations((prev) => [
+        { id: convoId!, title: titleFrom(trimmed), messages: [userMsg], shown: [] },
+        ...prev,
+      ]);
     }
+
+    const reply = await fetchReply(trimmed, [...priorMessages, userMsg], shown);
+    const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
+
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.id === convoId
+          ? {
+              ...c,
+              messages: [...c.messages, botMsg],
+              shown:
+                reply.entryId && !c.shown.includes(reply.entryId)
+                  ? [...c.shown, reply.entryId]
+                  : c.shown,
+            }
+          : c
+      )
+    );
+    setSending(false);
   };
 
   const goHome = () => {
@@ -168,7 +209,7 @@ export function ChatPanel() {
         aria-label="Ask a question about Will"
         className="text-body-sm"
       />
-      <Button type="submit" size="icon" disabled={!input.trim()} aria-label="Send">
+      <Button type="submit" size="icon" disabled={!input.trim() || sending} aria-label="Send">
         <Send className="size-4" />
       </Button>
     </form>
@@ -263,6 +304,15 @@ export function ChatPanel() {
                   {m.text}
                 </div>
               )
+            )}
+            {sending && (
+              <div className="max-w-[85%] rounded-lg rounded-bl-sm bg-muted px-3 py-2 text-body-sm text-muted-foreground">
+                <span className="inline-flex gap-1">
+                  <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+                  <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+                  <span className="size-1.5 animate-bounce rounded-full bg-current" />
+                </span>
+              </div>
             )}
           </div>
         )}

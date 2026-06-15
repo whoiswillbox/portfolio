@@ -44,7 +44,7 @@ export function AppSidebar() {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">Will Box</span>
-                <span className="truncate text-xs text-muted-foreground">Portfolio</span>
+                <span className="truncate text-xs text-muted-foreground">Product Designer</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -93,7 +93,7 @@ export function AppSidebar() {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">Will Box</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  boxjwilliam@gmail.com
+                  csswillbox@gmail.com
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />

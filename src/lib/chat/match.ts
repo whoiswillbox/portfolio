@@ -43,7 +43,7 @@ export const PROGRESSION = [
 ];
 
 const WRAPUP =
-  "That's the grand tour! 🎉 Ask me anything specific, or reach me at boxjwilliam@gmail.com.";
+  "That's the grand tour! 🎉 Ask me anything specific, or reach me at csswillbox@gmail.com.";
 
 function entryById(id: string): QAEntry | undefined {
   return qaEntries.find((e) => e.id === id);
