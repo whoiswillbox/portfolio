@@ -62,7 +62,7 @@ export default function Upgrade() {
         {/* Body: metadata sidebar + sections */}
         <div className="mt-20 grid gap-10 md:grid-cols-[180px_1fr]">
           {/* Metadata */}
-          <aside className="flex flex-col gap-6 md:sticky md:top-6 md:self-start">
+          <aside className="flex flex-col gap-6 md:sticky md:top-20 md:self-start">
             {META.map((m) => (
               <div key={m.label} className="flex flex-col gap-1">
                 <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-foreground">
