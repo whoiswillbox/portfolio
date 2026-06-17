@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
 import { ShieldCheckIcon } from "@heroicons/react/24/solid";
 import { ContentCard } from "@/components/content-card";
@@ -70,9 +71,17 @@ export default function Jetdash() {
           </a>
         </header>
 
-        {/* Hero image — drop the real asset in /public/projects/jetdash/ and
-            swap this placeholder for next/image. */}
-        <div className="mt-8 aspect-[16/7] w-full rounded-xl bg-gradient-to-br from-muted to-muted-foreground/30" />
+        {/* Hero image */}
+        <div className="relative mt-8 aspect-[16/7] w-full overflow-hidden rounded-xl ring-1 ring-border">
+          <Image
+            src="/projects/jetdash/hero.jpg"
+            alt="Airmen reviewing a JetDash equipment request on a shop display at McChord Air Force Base"
+            fill
+            priority
+            sizes="(min-width: 1024px) 56rem, 100vw"
+            className="object-cover"
+          />
+        </div>
 
         {/* Body: metadata sidebar + sections */}
         <div className="mt-20 grid gap-10 md:grid-cols-[180px_1fr]">
@@ -121,6 +130,33 @@ export default function Jetdash() {
                 ))}
               </section>
             ))}
+
+            {/* JetDash in the field */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                {
+                  src: "/projects/jetdash/catalog.webp",
+                  alt: "An Airman browsing the JetDash AGE equipment catalog by category",
+                },
+                {
+                  src: "/projects/jetdash/confirmation.jpg",
+                  alt: "JetDash order confirmation screen after submitting an equipment request",
+                },
+              ].map((img) => (
+                <div
+                  key={img.src}
+                  className="relative aspect-[3/2] w-full overflow-hidden rounded-xl ring-1 ring-border"
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    sizes="(min-width: 640px) 28rem, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
 
             <Alert variant="success">
               <ShieldCheckIcon />

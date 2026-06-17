@@ -34,7 +34,10 @@ function redirectTo(request: NextRequest, pathname: string, next: string) {
 
 export const config = {
   // Run on everything except the auth endpoints/pages and static assets.
+  // Static image files are excluded too: the image optimizer fetches the
+  // source asset with an internal (cookie-less) request, so gating those paths
+  // would block optimization ("isn't a valid image / received null").
   matcher: [
-    "/((?!unlock|api/unlock|admin/login|api/admin-login|_next/static|_next/image|favicon.ico).*)",
+    "/((?!unlock|api/unlock|admin/login|api/admin-login|_next/static|_next/image|favicon.ico|.*\\.(?:jpg|jpeg|png|webp|avif|gif|svg|ico)$).*)",
   ],
 };
