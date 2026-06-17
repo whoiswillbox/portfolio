@@ -23,7 +23,7 @@ Artists I put people onto: BRONCHO, Black Marble, Current Joys, and The Drums ar
 
 Guilty pleasure: "Girls Just Want to Have Fun" by Cyndi Lauper. 😄
 
-Dream show: Current Joys — but a decade ago, when their music was at its peak.
+Dream show: Current Joys — but a decade ago, when their music was at its peak. Lil Peep would've been amazing to see too.
 
 The story behind my playlists:
 - "euthanasia" (~458 tracks): my bread-and-butter and the foundation of my whole taste — indie / indie-rock. My most beloved, most nostalgic playlist; nothing takes me back to old time periods like it, and some of my happiest memories are tied to these songs.
