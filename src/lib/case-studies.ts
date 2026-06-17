@@ -54,6 +54,34 @@ export const caseStudies: Record<string, CaseStudy> = {
     ],
     href: "/projects/next-gen-bar",
   },
+  jetdash: {
+    slug: "jetdash",
+    title: "Jet Dash",
+    meta: "Lead UX Designer · Technergetics · 2023–24",
+    summary:
+      "Modernizing maintenance efficiency for Air Force aerospace ground equipment teams — replacing radio-and-landline equipment requests with an e-commerce web and delivery mobile app.",
+    metrics: [],
+    sections: [
+      {
+        heading: "The problem",
+        body: "For decades, getting aerospace ground equipment to the flightline was slow and opaque. AGE maintainers and dispatchers coordinated solely over radios and landlines, which created barriers, removed supervision visibility, and degraded maintenance efficiency.",
+      },
+      {
+        heading: "What I did",
+        body: "Worked closely with SMEs, engineering, management, and stakeholders to translate customer requirements and user research into experiences that mitigate AGE personnel's communication barriers when getting equipment to the flight line.",
+      },
+      {
+        heading: "The outcome",
+        body: "Jet Dash is an e-commerce web and delivery mobile app that modernizes day-to-day operations through equipment ordering, delivery, and tracking. Shipped and field-tested at Andersen AFB (Guam) and Joint Base Lewis-McChord, it has modernized delivery of 650+ equipment pieces for thousands of AGE personnel.",
+      },
+    ],
+    prompts: [
+      "What problem were you solving?",
+      "What was your process?",
+      "What was the outcome?",
+    ],
+    href: "/technergetics/jetdash",
+  },
   upgrade: {
     slug: "upgrade",
     title: "Upgrade",

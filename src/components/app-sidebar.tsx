@@ -82,7 +82,9 @@ export function AppSidebar({
   isAdmin?: boolean
 }) {
   const pathname = usePathname()
-  const convoParam = useSearchParams().get("c")
+  const searchParams = useSearchParams()
+  const convoParam = searchParams.get("c")
+  const boxParam = searchParams.get("box")
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
@@ -175,7 +177,10 @@ export function AppSidebar({
                       <SidebarMenuSub>
                         {group.items.map((sub) => (
                           <SidebarMenuSubItem key={sub.title}>
-                            <SidebarMenuSubButton asChild isActive={pathname === sub.href}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={pathname === sub.href && !boxParam}
+                            >
                               <Link href={sub.href}>
                                 <span>{sub.title}</span>
                               </Link>
@@ -215,7 +220,7 @@ export function AppSidebar({
                   const study = caseStudyForConversation(c)
                   const href = study ? `${study.href}?box=${c.id}` : `/who?c=${c.id}`
                   const active = study
-                    ? pathname === study.href
+                    ? pathname === study.href && boxParam === c.id
                     : pathname === "/who" && convoParam === c.id
                   return (
                   <SidebarMenuItem key={c.id}>

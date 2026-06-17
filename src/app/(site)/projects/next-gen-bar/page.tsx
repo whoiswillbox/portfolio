@@ -1,9 +1,11 @@
 import { ContentCard } from "@/components/content-card";
+import { CaseStudyArticle } from "@/components/case-study-article";
+import { caseStudies } from "@/lib/case-studies";
 
 export default function NextGenBar() {
   return (
-    <ContentCard className="h-full overflow-auto p-6">
-      <h1 className="text-2xl font-bold uppercase tracking-tight">Next Gen Bar</h1>
+    <ContentCard className="h-full overflow-auto">
+      <CaseStudyArticle study={caseStudies["next-gen-bar"]} />
     </ContentCard>
   );
 }

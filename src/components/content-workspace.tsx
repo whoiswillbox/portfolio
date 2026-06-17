@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CubeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { BoxAI } from "@/components/box-ai";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
@@ -47,6 +47,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (boxParam) setOpen(true);
   }, [boxParam]);
+  // Closing Box AI drops the ?box=<id> param so the sidebar returns to the
+  // project's own nav item (we've cancelled out of the conversation).
+  const router = useRouter();
+  const closeDrawer = () => {
+    setOpen(false);
+    if (boxParam) router.replace(pathname);
+  };
   // Mount the panel when opening (it unmounts itself after the exit animation).
   React.useEffect(() => {
     if (open) setRendered(true);
@@ -114,7 +121,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             >
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={closeDrawer}
                 aria-label="Close Box"
                 className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
               >

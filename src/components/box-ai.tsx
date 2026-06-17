@@ -146,14 +146,6 @@ export function BoxAI({
   // Project context (from the page) that seeds the opener + follow-up chips
   // when the launcher is opened — without docking the side case-study panel.
   const [contextStudy, setContextStudy] = React.useState<CaseStudy | null>(null);
-  // Drives the case study panel's exit animation; it stays mounted until the
-  // animation ends, then we actually clear openCaseStudy.
-  const [closingStudy, setClosingStudy] = React.useState(false);
-  const closeCaseStudy = () => setClosingStudy(true);
-  // Opening a (new) case study cancels any in-flight close.
-  React.useEffect(() => {
-    if (openCaseStudy) setClosingStudy(false);
-  }, [openCaseStudy]);
   // Side-by-side split resizes horizontally on desktop, vertically on mobile.
   const [isDesktop, setIsDesktop] = React.useState(true);
   React.useEffect(() => {
@@ -334,6 +326,19 @@ export function BoxAI({
   const send = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || sending || atLimit) return;
+    // From the empty state, re-asking a prompt that already has a conversation
+    // (e.g. clicking the same chip twice) reopens it instead of spawning a
+    // duplicate.
+    if (!active) {
+      const existing = conversations.find(
+        (c) => c.messages[0]?.role === "user" && c.messages[0].text === trimmed
+      );
+      if (existing) {
+        openConversation(existing.id);
+        setInput("");
+        return;
+      }
+    }
     const shown = active?.shown ?? [];
     const priorMessages = active?.messages ?? [];
     const userMsg: Message = { id: uid(), role: "user", text: trimmed };
@@ -648,21 +653,8 @@ export function BoxAI({
         className="min-h-0 min-w-0"
         style={{ overflow: "visible" }}
       >
-        <ContentCard
-          className={cn(
-            "flex h-full w-full min-w-0 flex-col duration-300 ease-out",
-            closingStudy
-              ? "animate-out fade-out slide-out-to-right-4"
-              : "animate-in fade-in slide-in-from-right-4"
-          )}
-          onAnimationEnd={() => {
-            if (closingStudy) {
-              setOpenCaseStudy(null);
-              setClosingStudy(false);
-            }
-          }}
-        >
-          <CaseStudyPanel study={openCaseStudy} onClose={closeCaseStudy} />
+        <ContentCard className="flex h-full w-full min-w-0 flex-col duration-300 ease-out animate-in fade-in slide-in-from-right-4">
+          <CaseStudyPanel study={openCaseStudy} />
         </ContentCard>
       </ResizablePanel>
     </ResizablePanelGroup>
