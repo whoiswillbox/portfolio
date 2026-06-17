@@ -60,7 +60,7 @@ export default function Upgrade() {
         <div className="mt-8 aspect-[16/7] w-full rounded-xl bg-gradient-to-br from-muted to-muted-foreground/30" />
 
         {/* Body: metadata sidebar + sections */}
-        <div className="mt-10 grid gap-10 md:grid-cols-[180px_1fr]">
+        <div className="mt-20 grid gap-10 md:grid-cols-[180px_1fr]">
           {/* Metadata */}
           <aside className="flex flex-col gap-6 md:sticky md:top-6 md:self-start">
             {META.map((m) => (
