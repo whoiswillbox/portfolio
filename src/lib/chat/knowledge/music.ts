@@ -11,6 +11,12 @@ export const MUSIC_NOTES = `How I think about music: my taste mirrors my design 
 
 Signature: if you had to name my taste in one artist, it's Black Marble. One song: "Iron Lung".
 
+Making music: I tried making EDM back in 2016 and failed miserably 😅. I was inspired by the SoundCloud EDM era where people would take normal songs and add drops to them.
+
+Best live shows: Flume in 2016 and Black Marble in 2022 are my favorites I've seen.
+
+How I discover music: through people, videos/films, or just browsing.
+
 The story behind my playlists:
 - "euthanasia" (~458 tracks): my bread-and-butter and the foundation of my whole taste — indie / indie-rock. My most beloved, most nostalgic playlist; nothing takes me back to old time periods like it, and some of my happiest memories are tied to these songs.
 - "radio": my repository of broadly-appealing, radio-friendly crowd-pleasers — songs that cater to any audience, the kind you'd actually hear on the radio.
