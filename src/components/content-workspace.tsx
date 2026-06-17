@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CubeIcon, XMarkIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { BoxAI } from "@/components/box-ai";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { findCaseStudyByPath } from "@/lib/case-studies";
 import { cn } from "@/lib/utils";
 
@@ -95,14 +96,19 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
             {showTrigger && <SidebarTrigger />}
             {!open && launcherEnabled && (
-              <button
-                type="button"
-                onClick={() => setOpen(true)}
-                aria-label="Ask Box"
-                className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
-              >
-                <CubeIcon className="size-5" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    aria-label="Ask Box"
+                    className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
+                  >
+                    <CubeIcon className="size-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Ask Box</TooltipContent>
+              </Tooltip>
             )}
             {backTo && (
               <button
