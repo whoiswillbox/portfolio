@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CubeIcon, XMarkIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { BoxAI } from "@/components/box-ai";
@@ -37,7 +36,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // Detail pages get a Back link in the top-left cluster (next to the box icon),
   // matching the convention across the site.
   const backTo = pathname.startsWith("/extracurriculars/music/")
-    ? { href: "/extracurriculars/music", label: "Music" }
+    ? { href: "/extracurriculars/music", label: "Back" }
     : null;
   // Keep a stable BoxAI element across open/close toggles. Without this, every
   // setOpen() re-creates and reconciles the whole chat tree synchronously on
@@ -106,13 +105,20 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               </button>
             )}
             {backTo && (
-              <Link
-                href={backTo.href}
+              <button
+                type="button"
+                onClick={() => {
+                  // Prefer client history so we return to the already-rendered
+                  // Music page instantly (data + scroll intact) instead of a
+                  // fresh RSC navigation; fall back to a push on a cold deep link.
+                  if (window.history.length > 1) router.back();
+                  else router.push(backTo.href);
+                }}
                 className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <ArrowLeftIcon className="size-4" />
                 {backTo.label}
-              </Link>
+              </button>
             )}
           </div>
 
