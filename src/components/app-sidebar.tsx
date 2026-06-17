@@ -218,7 +218,7 @@ export function AppSidebar({
                 { title: "Music", href: "/extracurriculars/music", icon: MusicalNoteIcon },
               ].map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                  <SidebarMenuButton asChild isActive={pathname === item.href && !boxParam}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.title}</span>
