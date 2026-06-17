@@ -37,6 +37,13 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `tooltip.tsx` — remove the arrow
+**Date:** 2026-06-17
+**Why:** Preferred a clean tooltip bubble with no pointer arrow.
+**What:** Removed the `<TooltipPrimitive.Arrow>` element from `TooltipContent`
+and bumped the default `sideOffset` from `0` to `4` so the bubble keeps a small
+gap from the trigger now that the arrow no longer spaces it.
+
 ### `sidebar.tsx` — `SidebarTrigger` tooltip + state-aware label
 **Date:** 2026-06-17
 **Why:** The trigger was an unlabeled panel icon; needed a hover tooltip
