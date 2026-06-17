@@ -5,8 +5,8 @@ import { ContentCard } from "@/components/content-card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { EMAIL } from "@/lib/contact";
 
-// TODO: replace with the real published field-test article URL.
-const ARTICLE_URL = "#";
+const ARTICLE_URL =
+  "https://www.mcchord.af.mil/News/Article-Display/Article/3760946/";
 
 const META = [
   { label: "Company", value: "Technergetics" },
