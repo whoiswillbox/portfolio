@@ -40,14 +40,14 @@ export function SpotifyNowPlaying() {
   // Loading
   if (!data) {
     return (
-      <div className="h-[88px] w-full max-w-md animate-pulse rounded-xl border bg-muted/40" />
+      <div className="h-[88px] w-full animate-pulse rounded-xl border bg-background shadow-lg" />
     );
   }
 
   // Not configured / nothing to show
   if (!data.configured || !data.title) {
     return (
-      <div className="flex w-full max-w-md items-center gap-3 rounded-xl border bg-muted/40 px-4 py-3">
+      <div className="flex w-full items-center gap-3 rounded-xl border bg-background px-4 py-3 shadow-lg">
         <SpotifyMark className="size-6 shrink-0 text-muted-foreground" />
         <p className="text-body-sm text-muted-foreground">
           {data.configured
@@ -59,7 +59,7 @@ export function SpotifyNowPlaying() {
   }
 
   const card = (
-    <div className="flex w-full max-w-md items-center gap-4 rounded-xl border bg-muted/40 p-3 transition-colors hover:bg-muted/70">
+    <div className="flex w-full items-center gap-4 rounded-xl border bg-background p-3 shadow-lg transition-colors hover:bg-muted">
       {data.albumImageUrl ? (
         <Image
           src={data.albumImageUrl}
@@ -73,10 +73,10 @@ export function SpotifyNowPlaying() {
         <div className="size-14 shrink-0 rounded-md bg-muted" />
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="flex items-center gap-2 font-mono text-body-xs uppercase tracking-wide text-muted-foreground">
-          <SpotifyMark className="size-3.5 text-[#1DB954]" />
+        <span className="flex items-center gap-2 whitespace-nowrap font-mono text-body-xs uppercase tracking-wide text-muted-foreground">
+          <SpotifyMark className="size-3.5 shrink-0 text-[#1DB954]" />
           {data.isPlaying ? <Equalizer /> : null}
-          {data.isPlaying ? "Now playing" : "Last played"}
+          {data.isPlaying ? "Will is currently listening" : "Will last listened to"}
         </span>
         <span className="truncate text-body-sm font-semibold text-foreground">
           {data.title}
@@ -89,7 +89,7 @@ export function SpotifyNowPlaying() {
   );
 
   return data.songUrl ? (
-    <a href={data.songUrl} target="_blank" rel="noopener noreferrer" className="block w-fit">
+    <a href={data.songUrl} target="_blank" rel="noopener noreferrer" className="block">
       {card}
     </a>
   ) : (

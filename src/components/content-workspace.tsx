@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CubeIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { CubeIcon, XMarkIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { BoxAI } from "@/components/box-ai";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { findCaseStudyByPath } from "@/lib/case-studies";
@@ -33,6 +34,11 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const showTrigger = state === "collapsed" || isMobile;
   // If this page is a project with a case study, seed the chat about it.
   const contextSlug = findCaseStudyByPath(pathname)?.slug;
+  // Detail pages get a Back link in the top-left cluster (next to the box icon),
+  // matching the convention across the site.
+  const backTo = pathname.startsWith("/extracurriculars/music/")
+    ? { href: "/extracurriculars/music", label: "Music" }
+    : null;
   // Keep a stable BoxAI element across open/close toggles. Without this, every
   // setOpen() re-creates and reconciles the whole chat tree synchronously on
   // the click — that heavy reconcile is what stutters the start of the exit
@@ -98,6 +104,15 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               >
                 <CubeIcon className="size-5" />
               </button>
+            )}
+            {backTo && (
+              <Link
+                href={backTo.href}
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <ArrowLeftIcon className="size-4" />
+                {backTo.label}
+              </Link>
             )}
           </div>
 

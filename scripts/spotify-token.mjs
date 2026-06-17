@@ -12,7 +12,8 @@ const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || process.argv[2];
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || process.argv[3];
 const PORT = 8888;
 const REDIRECT = `http://127.0.0.1:${PORT}/callback`;
-const SCOPE = "user-read-currently-playing user-read-recently-played";
+const SCOPE =
+  "user-read-currently-playing user-read-recently-played user-top-read playlist-read-private";
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error("Usage: node scripts/spotify-token.mjs <CLIENT_ID> <CLIENT_SECRET>");
