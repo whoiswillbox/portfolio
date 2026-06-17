@@ -1,4 +1,4 @@
-import { qaEntries, fallbackAnswer, type QAEntry } from "./repository";
+import { qaEntries, fallbackAnswer, type QAEntry } from "./knowledge";
 
 /* Common words ignored when scoring, so they don't create false matches. */
 const STOPWORDS = new Set([
