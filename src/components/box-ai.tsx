@@ -449,7 +449,7 @@ export function BoxAI({
   }, [loaded, requestedConvo, conversations, openConversation]);
 
   const usageNote = showUsage ? (
-    <p className="flex items-center gap-2 text-body-xs text-muted-foreground">
+    <p className="flex items-center gap-2 text-body-xs text-muted-foreground/60">
       <span>
         {atLimit
           ? "Daily limit reached — back tomorrow, or email csswillbox@gmail.com."
