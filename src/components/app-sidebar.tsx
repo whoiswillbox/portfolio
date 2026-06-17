@@ -67,7 +67,6 @@ const groups = [
     items: [
       { title: "Jetdash", href: "/technergetics/jetdash" },
       { title: "Upgrade", href: "/technergetics/upgrade" },
-      { title: "Manifast", href: "/technergetics/manifast" },
       { title: "Web Standards", href: "/technergetics/web-standards" },
       { title: "Mobile Standards", href: "/technergetics/mobile-standards" },
     ],
