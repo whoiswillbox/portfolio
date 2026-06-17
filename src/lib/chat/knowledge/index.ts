@@ -13,7 +13,7 @@
 import { PERSONA } from "./persona";
 import { MUSIC_NOTES, musicEntries } from "./music";
 import { bioEntries } from "./bio";
-import { projectEntries } from "./projects";
+import { projectEntries, PROJECT_NOTES } from "./projects";
 import { personalEntries } from "./personal";
 import { smalltalkEntries } from "./smalltalk";
 import type { QAEntry } from "./types";
@@ -52,6 +52,9 @@ export function buildSystemPrompt(musicSummary?: string | null): string {
 
 MUSIC NOTES:
 ${MUSIC_NOTES}
+
+PROJECT NOTES:
+${PROJECT_NOTES}
 
 KNOWLEDGE BASE:
 ${KNOWLEDGE_BASE}`;
