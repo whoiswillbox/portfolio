@@ -21,6 +21,8 @@ Music while working: I can't work without it — music is always on while I desi
 
 Artists I put people onto: BRONCHO, Black Marble, Current Joys, and The Drums are the ones I usually show people.
 
+Guilty pleasure: "Girls Just Want to Have Fun" by Cyndi Lauper. 😄
+
 The story behind my playlists:
 - "euthanasia" (~458 tracks): my bread-and-butter and the foundation of my whole taste — indie / indie-rock. My most beloved, most nostalgic playlist; nothing takes me back to old time periods like it, and some of my happiest memories are tied to these songs.
 - "radio": my repository of broadly-appealing, radio-friendly crowd-pleasers — songs that cater to any audience, the kind you'd actually hear on the radio.
