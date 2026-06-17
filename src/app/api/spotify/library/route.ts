@@ -23,7 +23,7 @@ export async function GET() {
   if (!token) return { configured: true, error: "auth" };
 
   const [topT, topA, recent, playlists] = await Promise.all([
-    spotifyGet("/me/top/tracks?limit=10&time_range=short_term", token).then(json),
+    spotifyGet("/me/top/tracks?limit=10&time_range=long_term", token).then(json),
     spotifyGet("/me/top/artists?limit=8&time_range=short_term", token).then(json),
     spotifyGet("/me/player/recently-played?limit=10", token).then(json),
     spotifyGet("/me/playlists?limit=12", token).then(json),
