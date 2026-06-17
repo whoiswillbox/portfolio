@@ -37,6 +37,15 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `sidebar.tsx` — `SidebarTrigger` tooltip + state-aware label
+**Date:** 2026-06-17
+**Why:** The trigger was an unlabeled panel icon; needed a hover tooltip
+("Collapse sidebar" / "Expand sidebar") so its action is discoverable.
+**What:** Wrapped the trigger `Button` in `Tooltip`/`TooltipTrigger`/
+`TooltipContent` (side="bottom"), pulled `state` from `useSidebar`, and derived
+a `label` ("Expand sidebar" when collapsed, else "Collapse sidebar") used for
+both the tooltip and the `sr-only` text (was the static "Toggle Sidebar").
+
 ### `alert.tsx` — add `success` (green) variant
 **Date:** 2026-06-16
 **Why:** Needed a green success alert (the "designs are protected" note on the
