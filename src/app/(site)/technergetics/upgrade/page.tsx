@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ShieldCheckIcon } from "@heroicons/react/24/solid";
 import { ContentCard } from "@/components/content-card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -55,9 +56,17 @@ export default function Upgrade() {
           </p>
         </header>
 
-        {/* Hero image — drop the real asset in /public/projects/upgrade/ and
-            swap this placeholder for next/image. */}
-        <div className="mt-8 aspect-[16/7] w-full rounded-xl bg-gradient-to-br from-muted to-muted-foreground/30" />
+        {/* Hero image */}
+        <div className="relative mt-8 aspect-[16/7] w-full overflow-hidden rounded-xl ring-1 ring-border">
+          <Image
+            src="/projects/upgrade/hero.jpg"
+            alt="Space Available passengers in line to board a Boeing 747-400 on the flightline, with C-17s in the background"
+            fill
+            priority
+            sizes="(min-width: 1024px) 56rem, 100vw"
+            className="object-cover"
+          />
+        </div>
 
         {/* Body: metadata sidebar + sections */}
         <div className="mt-20 grid gap-10 md:grid-cols-[180px_1fr]">
