@@ -4,6 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Squares2X2Icon, ListBulletIcon } from "@heroicons/react/24/outline";
+import { MusicLibrarySkeleton, BrowseSkeleton } from "@/components/music-skeletons";
 import { cn } from "@/lib/utils";
 
 type Track = { name: string; artist: string; image: string | null; url: string | null };
@@ -55,7 +56,7 @@ export function SpotifyLibrary() {
   }, [playlistView, previews]);
 
   if (!data) {
-    return <div className="mt-8 h-64 w-full animate-pulse rounded-xl border bg-muted/40" />;
+    return <MusicLibrarySkeleton />;
   }
   if (!data.configured) return null;
 
@@ -154,7 +155,7 @@ export function SpotifyLibrary() {
               ))}
             </div>
           ) : previews === null ? (
-            <div className="h-64 w-full animate-pulse rounded-xl border bg-muted/40" />
+            <BrowseSkeleton />
           ) : (
             <div className="flex flex-col gap-8">
               {previews.map((p) => (
