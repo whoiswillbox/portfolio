@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
   FolderIcon as FolderSolid,
@@ -206,14 +206,44 @@ export function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
 
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+            Extracurriculars
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {[
+                { title: "Surfing", href: "/extracurriculars/surfing", icon: LifebuoyIcon },
+                { title: "Gaming", href: "/extracurriculars/gaming", icon: PuzzlePieceIcon },
+              ].map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {conversations.length > 0 && (
-          <SidebarGroup>
+          <SidebarGroup className="group/conv mt-auto">
             <SidebarGroupLabel className="font-mono uppercase tracking-wide">
               Conversations
+              <Link
+                href="/conversations"
+                className="ml-auto inline-flex items-center gap-0.5 rounded px-1 text-muted-foreground opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover/conv:opacity-100"
+              >
+                View all
+                <ChevronRightIcon className="size-3" />
+              </Link>
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {conversations.map((c) => {
+                {conversations.slice(0, 5).map((c) => {
                   // A case-study conversation reopens on its project page with
                   // Box AI toggled on (conversation beside the case study);
                   // everything else opens on the full /who page.

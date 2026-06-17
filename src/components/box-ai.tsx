@@ -253,7 +253,9 @@ export function BoxAI({
         const botMsg: Message = {
           id: uid(),
           role: "bot",
-          text: `You're checking out ${study.title}. What would you like to know about it? 👇`,
+          text:
+            study.opener ??
+            `You're checking out ${study.title}. What would you like to know about it? 👇`,
         };
         setConversations([
           {

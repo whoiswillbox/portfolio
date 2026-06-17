@@ -21,7 +21,12 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
-  const enabled = pathname !== "/who";
+  // /who and /conversations own their own top bar (sidebar trigger + Back), so
+  // ContentWorkspace doesn't overlay its controls there.
+  const enabled = pathname !== "/who" && pathname !== "/conversations";
+  // The Box AI launcher is also hidden in the admin area (the sidebar trigger
+  // still shows via `enabled`).
+  const launcherEnabled = enabled && !pathname.startsWith("/admin");
   // Expose the sidebar trigger inside the content card when the sidebar is
   // collapsed / on mobile (the sidebar's own header carries it when expanded).
   const { state, isMobile } = useSidebar();
@@ -84,7 +89,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               (when collapsed), then the Box AI launcher. */}
           <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
             {showTrigger && <SidebarTrigger />}
-            {!open && (
+            {!open && launcherEnabled && (
               <button
                 type="button"
                 onClick={() => setOpen(true)}

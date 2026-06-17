@@ -19,6 +19,9 @@ export type CaseStudy = {
   /** Suggested follow-up questions shown as chips when the study is open. */
   prompts: string[];
   href?: string; // optional link to the full project page
+  /** Custom Box AI opener when seeded from this page (defaults to the case
+      study phrasing). Used by lightweight topic seeds like extracurriculars. */
+  opener?: string;
 };
 
 export const caseStudies: Record<string, CaseStudy> = {
@@ -109,6 +112,39 @@ export const caseStudies: Record<string, CaseStudy> = {
       "What was the outcome?",
     ],
     href: "/technergetics/upgrade",
+  },
+
+  // Lightweight topic seeds (extracurriculars) — no case-study body; they just
+  // give their page a Box AI context with a custom opener + prompts.
+  surfing: {
+    slug: "surfing",
+    title: "Surfing",
+    meta: "",
+    summary: "",
+    metrics: [],
+    sections: [],
+    opener: "Wanna talk surfing? 🏄 Ask me anything about it 👇",
+    prompts: [
+      "How long have you been surfing?",
+      "Where do you surf?",
+      "Does surfing influence your design?",
+    ],
+    href: "/extracurriculars/surfing",
+  },
+  gaming: {
+    slug: "gaming",
+    title: "Gaming",
+    meta: "",
+    summary: "",
+    metrics: [],
+    sections: [],
+    opener: "Wanna talk gaming? 🎮 Ask me anything about it 👇",
+    prompts: [
+      "What games are you playing?",
+      "All-time favorite game?",
+      "PC or console?",
+    ],
+    href: "/extracurriculars/gaming",
   },
 };
 
