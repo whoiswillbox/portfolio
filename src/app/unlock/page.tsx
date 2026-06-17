@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Box, Lock } from "lucide-react";
+import { CubeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -60,7 +60,7 @@ function UnlockForm() {
         className="flex w-full max-w-sm flex-col gap-4 rounded-xl border bg-background p-6 shadow-sm"
       >
         <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Box className="size-5" strokeWidth={1.5} />
+          <CubeIcon className="size-5" />
         </div>
         <div className="flex flex-col gap-1">
           <h1 className="text-h4 font-semibold tracking-tight">This site is private</h1>
@@ -86,7 +86,7 @@ function UnlockForm() {
           )}
         </div>
         <Button type="submit" disabled={!password.trim() || submitting} className="w-full">
-          <Lock className="size-4" />
+          <LockClosedIcon className="size-4" />
           {submitting ? "Unlocking…" : "Enter"}
         </Button>
       </form>

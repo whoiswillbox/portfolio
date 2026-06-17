@@ -6,19 +6,23 @@
    (bg-surface, text-critical, border-info, and so on).
    ========================================================================== */
 :root {
-  /* --- Neutral ramp (grayscale) --------------------------------------- */
+  /* --- Neutral ramp (taupe) ------------------------------------------- */
+  /* Warm "taupe" greige: same lightness ramp as Tailwind's neutral, with a
+     low chroma at a warm hue (~55–75°) so the grays read brown rather than
+     true gray. Var names stay --neutral-* (the semantic layer references
+     them by name). Pure-white/black endpoints stay achromatic. */
   --neutral-0: oklch(1 0 0);
-  --neutral-50: oklch(0.985 0 0);
-  --neutral-100: oklch(0.97 0 0);
-  --neutral-200: oklch(0.922 0 0);
-  --neutral-300: oklch(0.87 0 0);
-  --neutral-400: oklch(0.708 0 0);
-  --neutral-500: oklch(0.556 0 0);
-  --neutral-600: oklch(0.439 0 0);
-  --neutral-700: oklch(0.371 0 0);
-  --neutral-800: oklch(0.269 0 0);
-  --neutral-900: oklch(0.205 0 0);
-  --neutral-950: oklch(0.145 0 0);
+  --neutral-50: oklch(0.985 0.003 75);
+  --neutral-100: oklch(0.97 0.005 75);
+  --neutral-200: oklch(0.922 0.008 72);
+  --neutral-300: oklch(0.87 0.011 70);
+  --neutral-400: oklch(0.708 0.014 68);
+  --neutral-500: oklch(0.556 0.016 65);
+  --neutral-600: oklch(0.439 0.016 62);
+  --neutral-700: oklch(0.371 0.015 60);
+  --neutral-800: oklch(0.269 0.013 58);
+  --neutral-900: oklch(0.205 0.011 55);
+  --neutral-950: oklch(0.145 0.009 52);
   --neutral-1000: oklch(0 0 0);
 
   /* --- Brand ramp ----------------------------------------------------- */

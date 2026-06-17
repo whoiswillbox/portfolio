@@ -11,6 +11,9 @@ const redis =
 const KEY = "chat:log";
 const MAX = 500; // keep the most recent N entries
 
+const FEEDBACK_KEY = "chat:feedback";
+const FEEDBACK_MAX = 500;
+
 export type ChatLogEntry = {
   t: string; // ISO timestamp
   q: string; // visitor's question
@@ -45,6 +48,37 @@ export async function getChatLog(limit = 200): Promise<ChatLogEntry[]> {
   if (!redis) return [];
   try {
     return await redis.lrange<ChatLogEntry>(KEY, 0, limit - 1);
+  } catch {
+    return [];
+  }
+}
+
+export type FeedbackEntry = {
+  t: string; // ISO timestamp
+  c?: string; // conversation id
+  q?: string; // the question that prompted the rated answer
+  a: string; // the rated answer
+  rating: "up" | "down";
+  country?: string;
+  city?: string;
+  ip?: string; // short hash, not the raw IP
+};
+
+/** Record a thumbs up/down on an AI answer. No-ops if Upstash isn't set. */
+export async function logFeedback(entry: FeedbackEntry): Promise<void> {
+  if (!redis) return;
+  try {
+    await redis.lpush(FEEDBACK_KEY, entry);
+    await redis.ltrim(FEEDBACK_KEY, 0, FEEDBACK_MAX - 1);
+  } catch {
+    /* feedback logging must never break the chat */
+  }
+}
+
+export async function getFeedback(limit = 200): Promise<FeedbackEntry[]> {
+  if (!redis) return [];
+  try {
+    return await redis.lrange<FeedbackEntry>(FEEDBACK_KEY, 0, limit - 1);
   } catch {
     return [];
   }

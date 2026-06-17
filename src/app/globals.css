@@ -24,4 +24,11 @@
   html {
     @apply font-sans;
   }
+  /* Tailwind v4 defaults interactive elements to cursor:default. Restore the
+     pointer for actionable controls (disabled ones keep the default arrow). */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  label[for] {
+    cursor: pointer;
+  }
 }

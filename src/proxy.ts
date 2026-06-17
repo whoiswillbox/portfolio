@@ -7,7 +7,8 @@ import { AUTH_COOKIE, ADMIN_COOKIE, authToken, adminToken } from "@/lib/auth";
    Each is auto-disabled when its env var is unset. */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const isAdminArea = path.startsWith("/admin") || path === "/api/chat-log";
+  const isAdminArea =
+    path.startsWith("/admin") || path === "/api/chat-log" || path === "/api/feedback-log";
 
   if (isAdminArea) {
     const adminKey = process.env.ADMIN_KEY;

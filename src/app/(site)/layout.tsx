@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { ChatPanel } from "@/components/chat-panel";
+import { ContentWorkspace } from "@/components/content-workspace";
 import { ADMIN_COOKIE, adminToken } from "@/lib/auth";
 
 export default async function SiteLayout({
@@ -22,18 +22,16 @@ export default async function SiteLayout({
 
   return (
     <TooltipProvider>
-      <SidebarProvider className="h-full min-h-0">
+      <SidebarProvider className="h-full min-h-0 bg-background">
         <AppSidebar showLock={showLock} isAdmin={isAdmin} />
-        <SidebarInset className="min-h-0">
-          <div className="flex flex-1 min-h-0">
-            <div className="flex flex-1 flex-col min-w-0">
-              <header className="flex h-12 items-center px-4 border-b">
-                <SidebarTrigger />
-              </header>
-              <main className="flex-1 min-h-0 overflow-auto p-6">{children}</main>
-            </div>
-            <ChatPanel />
-          </div>
+        <SidebarInset className="min-h-0 m-2 bg-transparent">
+          {/* No overflow-hidden here: it would clip the content cards' drop
+              shadows and rounded corners. The cards manage their own scroll.
+              ContentWorkspace surfaces the sidebar trigger + Box AI launcher
+              inside the content card. */}
+          <main className="flex flex-1 flex-col min-w-0 min-h-0">
+            <ContentWorkspace>{children}</ContentWorkspace>
+          </main>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

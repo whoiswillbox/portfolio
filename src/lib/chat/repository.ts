@@ -62,6 +62,17 @@ export const qaEntries: QAEntry[] = [
       "Besides my current role at BARBRI, I spent two years at Technergetics — ending as Lead UX Designer, the sole designer on the mobile logistics team, shipping web, mobile, and PWA platforms used by 250,000+ airmen and partnering with ML engineers on LLM-powered recommendation features. Before that I was a UX/UI design intern at Lightcert. All of it remote. (And way back, a stunt double — ask me. 🎬)",
   },
   {
+    id: "favorite-project",
+    question: "What's your favorite project?",
+    keywords: [
+      "favorite project", "favourite project", "favorite", "favourite",
+      "best project", "proudest", "favorite work", "favorite thing",
+      "case study", "next gen bar", "bar prep",
+    ],
+    answer:
+      "My favorite is Next Gen Bar Prep — the adaptive bar-exam platform I led at BARBRI. I opened the case study on the right. What would you like to know about it? 👇 [[case-study:next-gen-bar]]",
+  },
+  {
     id: "projects",
     question: "What have you built?",
     keywords: ["projects", "built", "portfolio", "work samples", "made", "shipped", "apps", "working on"],
@@ -73,7 +84,7 @@ export const qaEntries: QAEntry[] = [
     question: "How was this site made?",
     keywords: ["this site", "website", "built this", "made this", "tech behind", "how was this"],
     answer:
-      "I built this site with Next.js, Tailwind CSS, and shadcn/ui, on a custom design-token system. This chat runs entirely client-side — no AI, just my curated answers.",
+      "I built this site with Next.js, Tailwind CSS, and shadcn/ui, on a custom design-token system. This chat is powered by Claude, grounded on a knowledge base I curated — so it answers in my voice using only the facts I've given it.",
   },
   {
     id: "contact",
@@ -82,8 +93,7 @@ export const qaEntries: QAEntry[] = [
       "contact", "reach", "email", "get in touch", "hire", "message", "connect",
       "linkedin", "website", "site url", "portfolio site",
     ],
-    answer:
-      "You can reach me at csswillbox@gmail.com, see more at whoiswillbox.com, or connect on LinkedIn: linkedin.com/in/williamjbox.",
+    answer: "Here are some ways you can reach me! 👇 [[contact]]",
   },
   {
     id: "location",
