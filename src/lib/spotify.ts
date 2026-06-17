@@ -73,11 +73,28 @@ export function spotifyGet(path: string, token: string): Promise<Response> {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const names = (a: any[]) => (a ?? []).map((x) => x.name).join(", ");
 
+/** A few tracks from a playlist (current /items endpoint, /tracks fallback). */
+async function summaryTracksFor(id: string, token: string, limit = 8): Promise<string[]> {
+  for (const ep of ["items", "tracks"]) {
+    const r = await spotifyGet(`/playlists/${id}/${ep}?limit=${limit}`, token);
+    if (r.ok) {
+      const d = await r.json();
+      if (d?.items) {
+        return d.items
+          .map((i: any) => i.track ?? i.item)
+          .filter(Boolean)
+          .map((t: any) => `"${t.name}" by ${names(t.artists)}`);
+      }
+    }
+  }
+  return [];
+}
+
 /**
- * A compact, plain-text summary of my real listening (top artists/tracks,
- * recently played, playlists, what's playing now) for grounding Box AI's
- * music answers. Cached ~5m so a chat session doesn't re-hit Spotify per turn.
- * Returns null when Spotify isn't configured.
+ * A compact, plain-text summary of my real listening (top artists/tracks with
+ * genres, recently played, playlists *and a sample of their tracks*, what's
+ * playing now) for grounding Box AI's music answers. Cached ~5m so a chat
+ * session doesn't re-hit Spotify per turn. Returns null when not configured.
  */
 export async function getMusicSummary(): Promise<string | null> {
   if (!spotifyConfigured()) return null;
@@ -117,16 +134,47 @@ export async function getMusicSummary(): Promise<string | null> {
     if (topTracksLong.length)
       lines.push(`Top tracks of all time (past year and beyond): ${topTracksLong.join("; ")}.`);
 
+    // Genres I actually listen to — aggregated from my top artists' genre
+    // tags, most common first. NOTE: as of late 2024 Spotify returns empty
+    // `genres` arrays on artist objects, so this currently adds nothing; kept
+    // so it lights up automatically if/when Spotify restores the data.
+    const genreCounts = new Map<string, number>();
+    for (const list of [topA, topAMid, topALong]) {
+      for (const a of list?.items ?? []) {
+        for (const g of a.genres ?? []) genreCounts.set(g, (genreCounts.get(g) ?? 0) + 1);
+      }
+    }
+    const topGenres = [...genreCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 12)
+      .map(([g]) => g);
+    if (topGenres.length) lines.push(`Genres I actually listen to (most to least): ${topGenres.join(", ")}.`);
+
     const recentTracks = (recent?.items ?? [])
       .map((i: any) => i.track)
       .filter(Boolean)
       .map((t: any) => `"${t.name}" by ${names(t.artists)}`);
     if (recentTracks.length) lines.push(`Recently played: ${recentTracks.join("; ")}.`);
 
-    const playlistNames = (playlists?.items ?? [])
-      .filter((p: any) => p && !HIDDEN_PLAYLIST_IDS.has(p.id))
-      .map((p: any) => p.name);
-    if (playlistNames.length) lines.push(`My playlists: ${playlistNames.join(", ")}.`);
+    // Playlists with a sample of their tracks, so Box AI can talk about what's
+    // actually on each one (not just the names).
+    const visiblePlaylists = (playlists?.items ?? []).filter(
+      (p: any) => p && !HIDDEN_PLAYLIST_IDS.has(p.id)
+    );
+    if (visiblePlaylists.length) {
+      const withTracks = await Promise.all(
+        visiblePlaylists.map(async (p: any) => {
+          const total = p.tracks?.total ?? p.items?.total ?? 0;
+          const sample = await summaryTracksFor(p.id, token);
+          const more = total > sample.length ? ` (+${total - sample.length} more)` : "";
+          return sample.length
+            ? `Playlist "${p.name}" (${total} tracks): ${sample.join("; ")}${more}.`
+            : `Playlist "${p.name}" (${total} tracks).`;
+        })
+      );
+      lines.push("My playlists and a sample of what's on them:");
+      lines.push(...withTracks);
+    }
 
     if (now?.item && now.currently_playing_type === "track") {
       lines.push(`Right now I'm playing "${now.item.name}" by ${names(now.item.artists)}.`);
