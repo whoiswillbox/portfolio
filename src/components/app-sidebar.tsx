@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
   FolderIcon as FolderSolid,
@@ -215,6 +215,7 @@ export function AppSidebar({
               {[
                 { title: "Surfing", href: "/extracurriculars/surfing", icon: LifebuoyIcon },
                 { title: "Gaming", href: "/extracurriculars/gaming", icon: PuzzlePieceIcon },
+                { title: "Music", href: "/extracurriculars/music", icon: MusicalNoteIcon },
               ].map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton asChild isActive={pathname === item.href}>

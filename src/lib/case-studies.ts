@@ -146,6 +146,21 @@ export const caseStudies: Record<string, CaseStudy> = {
     ],
     href: "/extracurriculars/gaming",
   },
+  music: {
+    slug: "music",
+    title: "Music",
+    meta: "",
+    summary: "",
+    metrics: [],
+    sections: [],
+    opener: "Wanna talk music? 🎧 Ask me anything about it 👇",
+    prompts: [
+      "What are you listening to?",
+      "Favorite artists?",
+      "Does music shape your work?",
+    ],
+    href: "/extracurriculars/music",
+  },
 };
 
 /** Find the case study whose project page matches the given path, if any. */
