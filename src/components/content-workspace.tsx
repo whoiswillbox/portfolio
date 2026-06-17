@@ -28,6 +28,15 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const showTrigger = state === "collapsed" || isMobile;
   // If this page is a project with a case study, seed the chat about it.
   const contextSlug = findCaseStudyByPath(pathname)?.slug;
+  // Keep a stable BoxAI element across open/close toggles. Without this, every
+  // setOpen() re-creates and reconciles the whole chat tree synchronously on
+  // the click — that heavy reconcile is what stutters the start of the exit
+  // animation. Memoizing pins its identity so React bails out of re-rendering
+  // it when only `open` changes; it only rebuilds if the seeded study changes.
+  const boxAI = React.useMemo(
+    () => <BoxAI embedded seedSlug={contextSlug} />,
+    [contextSlug]
+  );
 
   // Close when navigating between pages.
   React.useEffect(() => setOpen(false), [pathname]);
@@ -38,11 +47,18 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative h-full min-h-0">
-      {/* Page content — shrinks on desktop to make room for the panel. */}
+      {/* Page content — shrinks on desktop to make room for the panel. It
+          animates in BOTH directions, in sync with the panel, so the exit is a
+          true mirror of the entrance (page + panel move together). Easing is
+          asymmetric on purpose — decelerate in (ease-out), accelerate out
+          (ease-in) — the standard enter/exit pattern, which avoids the lingering
+          tail a single ease-out leaves on the way out. */}
       <div
         className={cn(
-          "h-full transition-[padding] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
-          open && "lg:pl-[452px]"
+          "h-full transition-[padding]",
+          open
+            ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] lg:pl-[452px]"
+            : "duration-300 ease-in lg:pl-0"
         )}
       >
         {children}
@@ -71,10 +87,19 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           {rendered && (
             <div
               className={cn(
-                "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
                 open
-                  ? "animate-in slide-in-from-left"
-                  : "pointer-events-none animate-out slide-out-to-left"
+                  ? // Enter: ease-out — decelerate gently into place, fading in.
+                    "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in slide-in-from-left fade-in"
+                  : // Exit: ease-in — accelerate away cleanly while fading out,
+                    // so the card dissolves rather than hard-cutting at the end.
+                    // The previous ease-out left a long tail where the card's
+                    // shadow edge crept off-screen for ~285ms, which read as exit
+                    // "lag". fill-mode-forwards holds the off-screen + faded end
+                    // state until React unmounts; without it the keyframe
+                    // (fill-mode: none) snaps the card back to visible for one
+                    // frame at the end — the end "glitch".
+                    "pointer-events-none duration-300 ease-in animate-out slide-out-to-left fade-out fill-mode-forwards"
               )}
               onAnimationEnd={() => {
                 if (!open) setRendered(false);
@@ -88,7 +113,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               >
                 <XMarkIcon className="size-4" />
               </button>
-              <BoxAI embedded seedSlug={contextSlug} />
+              {boxAI}
             </div>
           )}
         </>
