@@ -1,7 +1,8 @@
-import Image from "next/image";
 import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
 import { ShieldCheckIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
 import { ContentCard } from "@/components/content-card";
+import { CaseStudyLayout } from "@/components/case-study-layout";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { EMAIL } from "@/lib/contact";
 
@@ -49,129 +50,75 @@ const SECTIONS = [
   },
 ];
 
+function ArticleLink() {
+  return (
+    <a
+      href={ARTICLE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex w-fit items-center gap-1 font-mono text-body-xs font-medium uppercase tracking-wide text-foreground transition-colors hover:text-muted-foreground"
+    >
+      Field Test Article
+      <ArrowUpRightIcon className="size-3.5" />
+    </a>
+  );
+}
+
 export default function Jetdash() {
   return (
     <ContentCard className="h-full overflow-auto">
-      <article className="mx-auto w-full max-w-4xl px-6 pb-10 pt-28">
-        {/* Hero */}
-        <header className="flex flex-col gap-3">
-          <h1 className="text-h1 font-bold tracking-tight">Jet Dash</h1>
-          <p className="max-w-xl text-body-lg text-muted-foreground">
-            Modernizing maintenance efficiency by eliminating archaic
-            communication processes.
-          </p>
-          <a
-            href={ARTICLE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-fit items-center gap-1 font-mono text-body-xs font-medium uppercase tracking-wide text-foreground transition-colors hover:text-muted-foreground"
-          >
-            Field Test Article
-            <ArrowUpRightIcon className="size-3.5" />
-          </a>
-        </header>
-
-        {/* Hero image */}
-        <div className="relative mt-8 aspect-[16/7] w-full overflow-hidden rounded-xl ring-1 ring-border">
-          <Image
-            src="/projects/jetdash/hero.jpg"
-            alt="Airmen reviewing a JetDash equipment request on a shop display at McChord Air Force Base"
-            fill
-            priority
-            sizes="(min-width: 1024px) 56rem, 100vw"
-            className="object-cover"
-          />
-        </div>
-
-        {/* Body: metadata sidebar + sections */}
-        <div className="mt-20 grid gap-10 md:grid-cols-[180px_1fr]">
-          {/* Metadata */}
-          <aside className="flex flex-col gap-6 md:sticky md:top-20 md:self-start">
-            {META.map((m) => (
-              <div key={m.label} className="flex flex-col gap-1">
-                <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-foreground">
-                  {m.label}
-                </p>
-                <p className="text-body-sm text-muted-foreground">{m.value}</p>
-              </div>
-            ))}
-            <div className="flex flex-col gap-1">
-              <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-foreground">
-                Contributions
-              </p>
-              <ul className="flex flex-col gap-0.5">
-                {CONTRIBUTIONS.map((c) => (
-                  <li key={c} className="text-body-sm text-muted-foreground">
-                    {c}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <a
-              href={ARTICLE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-fit items-center gap-1 font-mono text-body-xs font-medium uppercase tracking-wide text-foreground transition-colors hover:text-muted-foreground"
+      <CaseStudyLayout
+        title="Jet Dash"
+        summary="Modernizing maintenance efficiency by eliminating archaic communication processes."
+        hero={{
+          src: "/projects/jetdash/hero.jpg",
+          alt: "Airmen reviewing a JetDash equipment request on a shop display at McChord Air Force Base",
+        }}
+        headerExtra={<ArticleLink />}
+        meta={META}
+        contributions={CONTRIBUTIONS}
+        sidebarExtra={<ArticleLink />}
+        sections={SECTIONS}
+      >
+        {/* JetDash in the field */}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            {
+              src: "/projects/jetdash/catalog.webp",
+              alt: "An Airman browsing the JetDash AGE equipment catalog by category",
+            },
+            {
+              src: "/projects/jetdash/confirmation.jpg",
+              alt: "JetDash order confirmation screen after submitting an equipment request",
+            },
+          ].map((img) => (
+            <div
+              key={img.src}
+              className="relative aspect-[3/2] w-full overflow-hidden rounded-xl ring-1 ring-border"
             >
-              Field Test Article
-              <ArrowUpRightIcon className="size-3.5" />
-            </a>
-          </aside>
-
-          {/* Sections */}
-          <div className="flex flex-col gap-16">
-            {SECTIONS.map((s) => (
-              <section key={s.heading} className="flex flex-col gap-3">
-                <h2 className="text-h3 font-semibold tracking-tight">{s.heading}</h2>
-                {s.paragraphs.map((p, i) => (
-                  <p key={i} className="text-body-md leading-relaxed text-foreground">
-                    {p}
-                  </p>
-                ))}
-              </section>
-            ))}
-
-            {/* JetDash in the field */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                {
-                  src: "/projects/jetdash/catalog.webp",
-                  alt: "An Airman browsing the JetDash AGE equipment catalog by category",
-                },
-                {
-                  src: "/projects/jetdash/confirmation.jpg",
-                  alt: "JetDash order confirmation screen after submitting an equipment request",
-                },
-              ].map((img) => (
-                <div
-                  key={img.src}
-                  className="relative aspect-[3/2] w-full overflow-hidden rounded-xl ring-1 ring-border"
-                >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    sizes="(min-width: 640px) 28rem, 100vw"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                sizes="(min-width: 640px) 28rem, 100vw"
+                className="object-cover"
+              />
             </div>
-
-            <Alert variant="success">
-              <ShieldCheckIcon />
-              <AlertTitle>These designs are protected</AlertTitle>
-              <AlertDescription>
-                Please feel free to reach out to me{" "}
-                <a href={`mailto:${EMAIL}`} className="underline underline-offset-2">
-                  {EMAIL}
-                </a>
-                , as I would be more than happy to discuss my experiences.
-              </AlertDescription>
-            </Alert>
-          </div>
+          ))}
         </div>
-      </article>
+
+        <Alert variant="success">
+          <ShieldCheckIcon />
+          <AlertTitle>These designs are protected</AlertTitle>
+          <AlertDescription>
+            Please feel free to reach out to me{" "}
+            <a href={`mailto:${EMAIL}`} className="underline underline-offset-2">
+              {EMAIL}
+            </a>
+            , as I would be more than happy to discuss my experiences.
+          </AlertDescription>
+        </Alert>
+      </CaseStudyLayout>
     </ContentCard>
   );
 }

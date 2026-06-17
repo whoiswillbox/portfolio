@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { ShieldCheckIcon } from "@heroicons/react/24/solid";
 import { ContentCard } from "@/components/content-card";
+import { CaseStudyLayout } from "@/components/case-study-layout";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { EMAIL } from "@/lib/contact";
 
@@ -46,81 +46,29 @@ const SECTIONS = [
 export default function Upgrade() {
   return (
     <ContentCard className="h-full overflow-auto">
-      <article className="mx-auto w-full max-w-4xl px-6 pb-10 pt-28">
-        {/* Hero */}
-        <header className="flex flex-col gap-3">
-          <h1 className="text-h1 font-bold tracking-tight">Upgrade</h1>
-          <p className="max-w-xl text-body-lg text-muted-foreground">
-            Modernizing the Space-A passenger experience by reducing the surplus
-            resource strain.
-          </p>
-        </header>
-
-        {/* Hero image */}
-        <div className="relative mt-8 aspect-[16/7] w-full overflow-hidden rounded-xl ring-1 ring-border">
-          <Image
-            src="/projects/upgrade/hero.jpg"
-            alt="Space Available passengers in line to board a Boeing 747-400 on the flightline, with C-17s in the background"
-            fill
-            priority
-            sizes="(min-width: 1024px) 56rem, 100vw"
-            className="object-cover"
-          />
-        </div>
-
-        {/* Body: metadata sidebar + sections */}
-        <div className="mt-20 grid gap-10 md:grid-cols-[180px_1fr]">
-          {/* Metadata */}
-          <aside className="flex flex-col gap-6 md:sticky md:top-20 md:self-start">
-            {META.map((m) => (
-              <div key={m.label} className="flex flex-col gap-1">
-                <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-foreground">
-                  {m.label}
-                </p>
-                <p className="text-body-sm text-muted-foreground">{m.value}</p>
-              </div>
-            ))}
-            <div className="flex flex-col gap-1">
-              <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-foreground">
-                Contributions
-              </p>
-              <ul className="flex flex-col gap-0.5">
-                {CONTRIBUTIONS.map((c) => (
-                  <li key={c} className="text-body-sm text-muted-foreground">
-                    {c}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-
-          {/* Sections */}
-          <div className="flex flex-col gap-16">
-            {SECTIONS.map((s) => (
-              <section key={s.heading} className="flex flex-col gap-3">
-                <h2 className="text-h3 font-semibold tracking-tight">{s.heading}</h2>
-                {s.paragraphs.map((p, i) => (
-                  <p key={i} className="text-body-md leading-relaxed text-foreground">
-                    {p}
-                  </p>
-                ))}
-              </section>
-            ))}
-
-            <Alert variant="success">
-              <ShieldCheckIcon />
-              <AlertTitle>These designs are protected</AlertTitle>
-              <AlertDescription>
-                Please feel free to reach out to me{" "}
-                <a href={`mailto:${EMAIL}`} className="underline underline-offset-2">
-                  {EMAIL}
-                </a>
-                , as I would be more than happy to discuss my experiences.
-              </AlertDescription>
-            </Alert>
-          </div>
-        </div>
-      </article>
+      <CaseStudyLayout
+        title="Upgrade"
+        summary="Modernizing the Space-A passenger experience by reducing the surplus resource strain."
+        hero={{
+          src: "/projects/upgrade/hero.jpg",
+          alt: "Space Available passengers in line to board a Boeing 747-400 on the flightline, with C-17s in the background",
+        }}
+        meta={META}
+        contributions={CONTRIBUTIONS}
+        sections={SECTIONS}
+      >
+        <Alert variant="success">
+          <ShieldCheckIcon />
+          <AlertTitle>These designs are protected</AlertTitle>
+          <AlertDescription>
+            Please feel free to reach out to me{" "}
+            <a href={`mailto:${EMAIL}`} className="underline underline-offset-2">
+              {EMAIL}
+            </a>
+            , as I would be more than happy to discuss my experiences.
+          </AlertDescription>
+        </Alert>
+      </CaseStudyLayout>
     </ContentCard>
   );
 }

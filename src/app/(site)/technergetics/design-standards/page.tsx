@@ -3,6 +3,10 @@
 import * as React from "react";
 import { ComputerDesktopIcon, DevicePhoneMobileIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
+import {
+  CaseStudyLayout,
+  type CaseStudySectionData,
+} from "@/components/case-study-layout";
 import { cn } from "@/lib/utils";
 
 type Platform = "web" | "mobile";
@@ -12,33 +16,58 @@ const TABS = [
   { id: "mobile", label: "Mobile", Icon: DevicePhoneMobileIcon },
 ] as const;
 
-const COPY: Record<Platform, { subtitle: string; body: string }> = {
+const META = [
+  { label: "Company", value: "Technergetics" },
+  { label: "Timeline", value: "2022–24" },
+  { label: "Role", value: "Lead UX Designer" },
+];
+
+const CONTRIBUTIONS = ["Design Tokens", "Component Library", "Documentation", "Handoff"];
+
+// Per-platform summary + sections. Placeholder copy — ready to fill with the
+// real web/mobile standards content and assets.
+const CONTENT: Record<Platform, { summary: string; sections: CaseStudySectionData[] }> = {
   web: {
-    subtitle: "The conventions and components behind Technergetics' web experiences.",
-    body: "Layout grids and breakpoints, the typography scale, color and spacing tokens, and the shared component patterns that keep Technergetics' web products consistent.",
+    summary: "The conventions and components behind Technergetics' web experiences.",
+    sections: [
+      {
+        heading: "Foundations",
+        paragraphs: [
+          "Layout grids and breakpoints, the typography scale, and color and spacing tokens that keep Technergetics' web products consistent.",
+        ],
+      },
+    ],
   },
   mobile: {
-    subtitle: "The conventions and components behind Technergetics' mobile experiences.",
-    body: "Touch targets, navigation patterns, iOS/Android platform conventions, and the shared component patterns that keep Technergetics' mobile apps consistent.",
+    summary: "The conventions and components behind Technergetics' mobile experiences.",
+    sections: [
+      {
+        heading: "Foundations",
+        paragraphs: [
+          "Touch targets, navigation patterns, and iOS/Android platform conventions that keep Technergetics' mobile apps consistent.",
+        ],
+      },
+    ],
   },
 };
 
 export default function DesignStandards() {
   const [platform, setPlatform] = React.useState<Platform>("web");
-  const copy = COPY[platform];
+  const content = CONTENT[platform];
 
   return (
     <ContentCard className="h-full overflow-auto">
-      <article className="mx-auto w-full max-w-4xl px-6 pb-10 pt-28">
-        <header className="flex flex-col gap-4">
-          <h1 className="text-h1 font-bold tracking-tight">Design Standards</h1>
-          <p className="max-w-xl text-body-lg text-muted-foreground">{copy.subtitle}</p>
-
-          {/* Web / Mobile toggle */}
+      <CaseStudyLayout
+        title="Design Standards"
+        summary={content.summary}
+        meta={META}
+        contributions={CONTRIBUTIONS}
+        sections={content.sections}
+        headerExtra={
           <div
             role="tablist"
             aria-label="Platform"
-            className="inline-flex w-fit items-center gap-0.5 rounded-lg border p-0.5"
+            className="mt-1 inline-flex w-fit items-center gap-0.5 rounded-lg border p-0.5"
           >
             {TABS.map(({ id, label, Icon }) => (
               <button
@@ -59,12 +88,8 @@ export default function DesignStandards() {
               </button>
             ))}
           </div>
-        </header>
-
-        <div className="mt-12">
-          <p className="max-w-2xl text-body-md leading-relaxed text-foreground">{copy.body}</p>
-        </div>
-      </article>
+        }
+      />
     </ContentCard>
   );
 }
