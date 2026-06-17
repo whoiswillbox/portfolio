@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { ContentCard } from "@/components/content-card";
 import { PlaylistTracks, type PlaylistTrack } from "@/components/playlist-tracks";
+import { RegisterBoxSeed } from "@/components/box-seed";
+import { playlistSeed } from "@/lib/case-studies";
 import { getAccessToken, spotifyGet, cached } from "@/lib/spotify";
 
 export const dynamic = "force-dynamic";
@@ -72,6 +74,8 @@ export default async function PlaylistPage({
 
   return (
     <ContentCard className="h-full overflow-auto">
+      {/* Seed Box AI to talk about this specific playlist when opened here. */}
+      <RegisterBoxSeed seed={playlistSeed(meta?.name ?? "this playlist", id)} />
       <article className="mx-auto w-full max-w-3xl px-6 pb-10 pt-28">
         {/* Header */}
         <header className="flex items-end gap-5">

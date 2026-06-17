@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ContentWorkspace } from "@/components/content-workspace";
+import { BoxSeedProvider } from "@/components/box-seed";
 import { ADMIN_COOKIE, adminToken } from "@/lib/auth";
 
 export default async function SiteLayout({
@@ -30,7 +31,9 @@ export default async function SiteLayout({
               ContentWorkspace surfaces the sidebar trigger + Box AI launcher
               inside the content card. */}
           <main className="flex flex-1 flex-col min-w-0 min-h-0">
-            <ContentWorkspace>{children}</ContentWorkspace>
+            <BoxSeedProvider>
+              <ContentWorkspace>{children}</ContentWorkspace>
+            </BoxSeedProvider>
           </main>
         </SidebarInset>
       </SidebarProvider>

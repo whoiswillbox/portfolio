@@ -16,7 +16,7 @@ import { ChatInput } from "@/components/chat-input";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { ContactCard } from "@/components/contact-card";
 import { showContactCard, stripContactMarker } from "@/lib/contact";
-import { caseStudies, caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
+import { caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
 import { ContentCard } from "@/components/content-card";
 import { CaseStudyPanel } from "@/components/case-study-panel";
 import {
@@ -120,13 +120,14 @@ function titleFrom(text: string): string {
 
 export function BoxAI({
   embedded = false,
-  seedSlug,
+  seed,
 }: {
   /** Rendered inside the launcher panel (which has its own close control), so
    *  the internal top bar (sidebar trigger + Back) is suppressed. */
   embedded?: boolean;
-  /** Seed a fresh project-framed conversation on mount (by case-study slug). */
-  seedSlug?: string;
+  /** Seed a fresh project/topic-framed conversation on mount (opener +
+   *  follow-up prompts). May be a static case study or a dynamic seed. */
+  seed?: CaseStudy | null;
 } = {}) {
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [activeId, setActiveId] = React.useState<string | null>(null);
@@ -239,7 +240,7 @@ export function BoxAI({
       return true;
     });
 
-    const study = seedSlug ? caseStudies[seedSlug] : undefined;
+    const study = seed ?? undefined;
     if (study) {
       // Reuse an existing conversation about this project if the visitor already
       // has one; otherwise seed a single fresh one. Either way there's only ever

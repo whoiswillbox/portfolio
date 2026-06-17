@@ -168,6 +168,28 @@ export function findCaseStudyByPath(path: string): CaseStudy | null {
   return Object.values(caseStudies).find((c) => c.href === path) ?? null;
 }
 
+/** Build a Box AI seed for a specific Spotify playlist page. Playlists are
+    dynamic (by id), so this isn't part of the static `caseStudies` registry —
+    the playlist page registers it at runtime (see RegisterBoxSeed). */
+export function playlistSeed(name: string, id: string): CaseStudy {
+  return {
+    slug: `playlist:${id}`,
+    title: name,
+    meta: "",
+    summary: "",
+    metrics: [],
+    sections: [],
+    href: `/extracurriculars/music/${id}`,
+    opener: `That's my “${name}” playlist 🎧 — ask me anything about it 👇`,
+    prompts: [
+      "Why did you make this playlist?",
+      "What's the vibe?",
+      "When do you put this on?",
+      "Got a favorite track on here?",
+    ],
+  };
+}
+
 /** Resolve the case study a conversation is framed around: by its stored slug,
     or (for conversations seeded before the slug existed) by its "About <title>"
     title. */
@@ -176,6 +198,12 @@ export function caseStudyForConversation(c: {
   caseStudySlug?: string;
 }): CaseStudy | null {
   if (c.caseStudySlug && caseStudies[c.caseStudySlug]) return caseStudies[c.caseStudySlug];
+  // Dynamic playlist conversations ("playlist:<id>") reopen on the playlist
+  // page; reconstruct their seed from the stored slug + title (the name).
+  if (c.caseStudySlug?.startsWith("playlist:")) {
+    const name = c.title.replace(/^About\s+/i, "");
+    return playlistSeed(name, c.caseStudySlug.slice("playlist:".length));
+  }
   return Object.values(caseStudies).find((s) => c.title === `About ${s.title}`) ?? null;
 }
 

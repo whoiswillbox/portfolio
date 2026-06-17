@@ -7,6 +7,7 @@ import { BoxAI } from "@/components/box-ai";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { findCaseStudyByPath } from "@/lib/case-studies";
+import { useBoxSeed } from "@/components/box-seed";
 import { cn } from "@/lib/utils";
 
 /**
@@ -32,8 +33,10 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // collapsed / on mobile (the sidebar's own header carries it when expanded).
   const { state, isMobile } = useSidebar();
   const showTrigger = state === "collapsed" || isMobile;
-  // If this page is a project with a case study, seed the chat about it.
-  const contextSlug = findCaseStudyByPath(pathname)?.slug;
+  // Seed the chat about this page: a dynamically-registered seed (e.g. a
+  // specific playlist) wins, otherwise the project/case-study for this path.
+  const dynamicSeed = useBoxSeed();
+  const contextSeed = dynamicSeed ?? findCaseStudyByPath(pathname);
   // Detail pages get a Back link in the top-left cluster (next to the box icon),
   // matching the convention across the site.
   const backTo = pathname.startsWith("/extracurriculars/music/")
@@ -45,8 +48,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // animation. Memoizing pins its identity so React bails out of re-rendering
   // it when only `open` changes; it only rebuilds if the seeded study changes.
   const boxAI = React.useMemo(
-    () => <BoxAI embedded seedSlug={contextSlug} />,
-    [contextSlug]
+    () => <BoxAI embedded seed={contextSeed} />,
+    [contextSeed]
   );
 
   // Close when navigating between pages.
