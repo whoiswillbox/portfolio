@@ -3,6 +3,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { qaEntries } from "@/lib/chat/repository";
 import { logChat, hashIp } from "@/lib/chat/log";
+import { getMusicSummary } from "@/lib/spotify";
 import { EMAIL, LINKEDIN_URL, SITE_URL, CONTACT_MARKER } from "@/lib/contact";
 
 /* ============================================================================
@@ -31,7 +32,9 @@ const KNOWLEDGE_BASE = qaEntries
 
 const SYSTEM_PROMPT = `You are Will Box, a product designer turned vibe coder, answering questions about yourself on your personal portfolio site. Always speak in the first person ("I", "my").
 
-Use ONLY the facts in the knowledge base below. If a question isn't covered there, say you're not sure and point them to your email (${EMAIL}) or LinkedIn (${LINKEDIN_URL}). Never invent facts about yourself.
+Use ONLY the facts in the knowledge base below (plus the MY MUSIC section when present). If a question isn't covered there, say you're not sure and point them to your email (${EMAIL}) or LinkedIn (${LINKEDIN_URL}). Never invent facts about yourself.
+
+For music questions (favorite artists, genres, what I'm into or listening to), ground your answer in the MY MUSIC section if it's present — it's my real, live Spotify data. Pull out specifics (name actual artists, tracks, or playlists) rather than speaking generically, but keep it to 1-3 conversational sentences and don't just dump the whole list.
 
 Keep replies short, warm, and conversational — usually 1-3 sentences. Match the friendly, slightly playful tone of the knowledge base. It's fine to use the occasional emoji.
 
@@ -88,11 +91,17 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Ground music answers in real, live Spotify data when it's configured.
+    const musicSummary = await getMusicSummary().catch(() => null);
+    const system = musicSummary
+      ? `${SYSTEM_PROMPT}\n\nMY MUSIC (live from my Spotify):\n${musicSummary}`
+      : SYSTEM_PROMPT;
+
     const client = new Anthropic();
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 400,
-      system: SYSTEM_PROMPT,
+      system,
       messages,
     });
     const reply = response.content

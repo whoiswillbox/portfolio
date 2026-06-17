@@ -69,3 +69,53 @@ export function spotifyGet(path: string, token: string): Promise<Response> {
     cache: "no-store",
   });
 }
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const names = (a: any[]) => (a ?? []).map((x) => x.name).join(", ");
+
+/**
+ * A compact, plain-text summary of my real listening (top artists/tracks,
+ * recently played, playlists, what's playing now) for grounding Box AI's
+ * music answers. Cached ~5m so a chat session doesn't re-hit Spotify per turn.
+ * Returns null when Spotify isn't configured.
+ */
+export async function getMusicSummary(): Promise<string | null> {
+  if (!spotifyConfigured()) return null;
+  return cached("music-summary", 300_000, async () => {
+    const token = await getAccessToken();
+    if (!token) return null;
+
+    const get = (p: string) => spotifyGet(p, token).then((r) => (r.ok ? r.json() : null));
+    const [topT, topA, recent, playlists, now] = await Promise.all([
+      get("/me/top/tracks?limit=10&time_range=short_term"),
+      get("/me/top/artists?limit=10&time_range=short_term"),
+      get("/me/player/recently-played?limit=10"),
+      get("/me/playlists?limit=20"),
+      get("/me/player/currently-playing"),
+    ]);
+
+    const lines: string[] = [];
+    const topArtists = (topA?.items ?? []).map((a: any) => a.name);
+    if (topArtists.length) lines.push(`Top artists lately: ${topArtists.join(", ")}.`);
+
+    const topTracks = (topT?.items ?? []).map((t: any) => `"${t.name}" by ${names(t.artists)}`);
+    if (topTracks.length) lines.push(`Top tracks lately: ${topTracks.join("; ")}.`);
+
+    const recentTracks = (recent?.items ?? [])
+      .map((i: any) => i.track)
+      .filter(Boolean)
+      .map((t: any) => `"${t.name}" by ${names(t.artists)}`);
+    if (recentTracks.length) lines.push(`Recently played: ${recentTracks.join("; ")}.`);
+
+    const playlistNames = (playlists?.items ?? [])
+      .filter((p: any) => p && !HIDDEN_PLAYLIST_IDS.has(p.id))
+      .map((p: any) => p.name);
+    if (playlistNames.length) lines.push(`My playlists: ${playlistNames.join(", ")}.`);
+
+    if (now?.item && now.currently_playing_type === "track") {
+      lines.push(`Right now I'm playing "${now.item.name}" by ${names(now.item.artists)}.`);
+    }
+
+    return lines.length ? lines.join("\n") : null;
+  });
+}
