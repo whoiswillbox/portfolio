@@ -86,7 +86,7 @@ export default function Upgrade() {
           </aside>
 
           {/* Sections */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-16">
             {SECTIONS.map((s) => (
               <section key={s.heading} className="flex flex-col gap-3">
                 <h2 className="text-h3 font-semibold tracking-tight">{s.heading}</h2>

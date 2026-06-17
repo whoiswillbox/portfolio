@@ -41,7 +41,7 @@ export function CaseStudyArticle({ study }: { study: CaseStudy }) {
         </aside>
 
         {/* Sections */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-16">
           {study.metrics.length > 0 && (
             <div className="grid grid-cols-3 gap-2">
               {study.metrics.map((m) => (
