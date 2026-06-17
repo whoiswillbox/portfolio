@@ -448,6 +448,25 @@ export function BoxAI({
     }
   }, [loaded, requestedConvo, conversations, openConversation]);
 
+  const usageNote = showUsage ? (
+    <p className="flex items-center gap-2 text-body-xs text-muted-foreground">
+      <span>
+        {atLimit
+          ? "Daily limit reached — back tomorrow, or email csswillbox@gmail.com."
+          : `${remaining} message${remaining === 1 ? "" : "s"} left today`}
+      </span>
+      {FORCE_USAGE_UI && (
+        <button
+          type="button"
+          onClick={resetUsage}
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          reset
+        </button>
+      )}
+    </p>
+  ) : null;
+
   const searchForm = (
     <ChatInput
       value={input}
@@ -457,6 +476,7 @@ export function BoxAI({
       ariaLabel="Ask Box a question about Will"
       disabled={atLimit}
       sending={sending}
+      footerLeft={usageNote}
       attachedSection={
         showNotice ? (
           <Alert className="border-0 bg-transparent p-0 text-left text-info">
@@ -480,25 +500,6 @@ export function BoxAI({
       }
     />
   );
-
-  const usageNote = showUsage ? (
-    <p className="flex items-center gap-2 px-1 text-body-xs text-muted-foreground">
-      <span>
-        {atLimit
-          ? "Daily limit reached — back tomorrow, or email csswillbox@gmail.com."
-          : `${remaining} message${remaining === 1 ? "" : "s"} left today`}
-      </span>
-      {FORCE_USAGE_UI && (
-        <button
-          type="button"
-          onClick={resetUsage}
-          className="underline underline-offset-2 hover:text-foreground"
-        >
-          reset
-        </button>
-      )}
-    </p>
-  ) : null;
 
   const disclaimer = (
     <p className="mt-2 px-1 text-center text-body-xs text-muted-foreground">
@@ -540,7 +541,6 @@ export function BoxAI({
             <h1 className="text-h1 font-bold uppercase tracking-tight">{heading}</h1>
             <div className="mt-3">{searchForm}</div>
             {disclaimer}
-            {usageNote}
             <div className="flex flex-wrap justify-center gap-2">
               {CHIPS.map((chip) => (
                 <button
@@ -619,7 +619,6 @@ export function BoxAI({
           <div className="mx-auto flex w-full max-w-xl flex-col gap-1">
             {searchForm}
             {disclaimer}
-            {usageNote}
           </div>
         </div>
       )}

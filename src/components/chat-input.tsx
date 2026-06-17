@@ -19,6 +19,7 @@ export function ChatInput({
   disabled = false,
   sending = false,
   attachedSection,
+  footerLeft,
 }: {
   value: string;
   onValueChange: (value: string) => void;
@@ -28,6 +29,7 @@ export function ChatInput({
   disabled?: boolean;
   sending?: boolean;
   attachedSection?: React.ReactNode;
+  footerLeft?: React.ReactNode;
 }) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -66,7 +68,8 @@ export function ChatInput({
         disabled={disabled}
         className="max-h-40 w-full resize-none bg-transparent px-2 py-1.5 text-body-sm text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-50"
       />
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0 pl-1">{footerLeft}</div>
         <Button
           type="submit"
           size="icon"
