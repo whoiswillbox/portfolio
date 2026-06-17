@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { usePathname } from "next/navigation";
-import { SparklesIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { usePathname, useSearchParams } from "next/navigation";
+import { CubeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { BoxAI } from "@/components/box-ai";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { findCaseStudyByPath } from "@/lib/case-studies";
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Wraps page content and lets Box AI slide into the content area as a docked
- * card (not an overlay) from any page. A magic button in the top-left toggles
+ * card (not an overlay) from any page. A box button in the top-left toggles
  * it; the page content shrinks to make room so the two cards sit side by side,
  * mirroring the /who experience. Hidden on /who, which already is Box AI.
  *
@@ -40,6 +40,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   // Close when navigating between pages.
   React.useEffect(() => setOpen(false), [pathname]);
+  // Auto-open when arrived at via a conversation in the sidebar
+  // (/<project>?box=<id>): Box AI docks beside the case study. Runs after the
+  // pathname-close effect above, so it wins on a fresh navigation.
+  const boxParam = useSearchParams().get("box");
+  React.useEffect(() => {
+    if (boxParam) setOpen(true);
+  }, [boxParam]);
   // Mount the panel when opening (it unmounts itself after the exit animation).
   React.useEffect(() => {
     if (open) setRendered(true);
@@ -67,17 +74,17 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {enabled && (
         <>
           {/* Top-left controls inside the content card: sidebar trigger first
-              (when collapsed), then the magic launcher. */}
+              (when collapsed), then the Box AI launcher. */}
           <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
             {showTrigger && <SidebarTrigger />}
             {!open && (
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                aria-label="Ask TopRat"
+                aria-label="Ask Box"
                 className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
               >
-                <SparklesIcon className="size-5" />
+                <CubeIcon className="size-5" />
               </button>
             )}
           </div>
@@ -108,7 +115,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Close TopRat"
+                aria-label="Close Box"
                 className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
               >
                 <XMarkIcon className="size-4" />

@@ -2,13 +2,13 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, UserCircleIcon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import {
+  CubeIcon as CubeSolid,
   FolderIcon as FolderSolid,
   BuildingOffice2Icon as BuildingOffice2Solid,
-  UserCircleIcon as UserCircleSolid,
   DocumentTextIcon as DocumentTextSolid,
 } from "@heroicons/react/24/solid"
 import { Switch } from "@/components/ui/switch"
@@ -23,8 +23,10 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -32,9 +34,16 @@ import {
   SidebarMenuSubItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import {
+  loadConversations,
+  saveConversations,
+  subscribeConversations,
+  type Conversation,
+} from "@/lib/chat/store"
+import { caseStudyForConversation } from "@/lib/case-studies"
 
 const items = [
-  { title: "Will who?", href: "/who", icon: UserCircleIcon, iconActive: UserCircleSolid },
+  { title: "Box", href: "/who", icon: CubeIcon, iconActive: CubeSolid },
 ]
 
 // Collapsible company groups, each with its own nested projects.
@@ -73,10 +82,24 @@ export function AppSidebar({
   isAdmin?: boolean
 }) {
   const pathname = usePathname()
+  const convoParam = useSearchParams().get("c")
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
   const isDark = mounted && resolvedTheme === "dark"
+
+  // Box AI conversations, kept in sync with the chat (same localStorage store).
+  const [conversations, setConversations] = React.useState<Conversation[]>([])
+  React.useEffect(() => {
+    const sync = () => setConversations(loadConversations())
+    sync()
+    return subscribeConversations(sync)
+  }, [])
+  const removeConversation = (id: string) => {
+    const next = conversations.filter((c) => c.id !== id)
+    setConversations(next)
+    saveConversations(next)
+  }
 
   const lock = async () => {
     await fetch("/api/lock", { method: "POST" })
@@ -90,7 +113,9 @@ export function AppSidebar({
     >
       <SidebarHeader>
         <div className="flex items-center justify-between">
-          <CubeIcon className="size-5 text-foreground" />
+          <span className="font-mono text-sm font-semibold uppercase tracking-wide text-foreground">
+            Will
+          </span>
           <SidebarTrigger />
         </div>
       </SidebarHeader>
@@ -99,7 +124,11 @@ export function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const active = pathname === item.href
+                // BOX (/who) is the chat home — not active when a specific
+                // conversation is being viewed there (/who?c=...).
+                const active =
+                  pathname === item.href &&
+                  !(item.href === "/who" && convoParam !== null)
                 const Icon = active ? item.iconActive : item.icon
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -112,7 +141,16 @@ export function AppSidebar({
                   </SidebarMenuItem>
                 )
               })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+            Experience
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               {groups.map((group) => {
                 const sectionActive = group.items.some(
                   (i) => pathname === i.href || pathname.startsWith(`${i.href}/`)
@@ -162,6 +200,44 @@ export function AppSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {conversations.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+              Conversations
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {conversations.map((c) => {
+                  // A case-study conversation reopens on its project page with
+                  // Box AI toggled on (conversation beside the case study);
+                  // everything else opens on the full /who page.
+                  const study = caseStudyForConversation(c)
+                  const href = study ? `${study.href}?box=${c.id}` : `/who?c=${c.id}`
+                  const active = study
+                    ? pathname === study.href
+                    : pathname === "/who" && convoParam === c.id
+                  return (
+                  <SidebarMenuItem key={c.id}>
+                    <SidebarMenuButton asChild isActive={active} tooltip={c.title}>
+                      <Link href={href}>
+                        <span>{c.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    <SidebarMenuAction
+                      showOnHover
+                      onClick={() => removeConversation(c.id)}
+                      aria-label="Delete conversation"
+                    >
+                      <XMarkIcon />
+                    </SidebarMenuAction>
+                  </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

@@ -89,6 +89,17 @@ export function findCaseStudyByPath(path: string): CaseStudy | null {
   return Object.values(caseStudies).find((c) => c.href === path) ?? null;
 }
 
+/** Resolve the case study a conversation is framed around: by its stored slug,
+    or (for conversations seeded before the slug existed) by its "About <title>"
+    title. */
+export function caseStudyForConversation(c: {
+  title: string;
+  caseStudySlug?: string;
+}): CaseStudy | null {
+  if (c.caseStudySlug && caseStudies[c.caseStudySlug]) return caseStudies[c.caseStudySlug];
+  return Object.values(caseStudies).find((s) => c.title === `About ${s.title}`) ?? null;
+}
+
 /** Matches [[case-study:some-slug]] and captures the slug. */
 const MARKER_RE = /\[\[case-study:([a-z0-9-]+)\]\]/i;
 

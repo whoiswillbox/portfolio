@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeftIcon,
-  ChatBubbleLeftIcon,
   XMarkIcon,
   CubeIcon,
   HandThumbUpIcon,
@@ -16,7 +16,7 @@ import { ChatInput } from "@/components/chat-input";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { ContactCard } from "@/components/contact-card";
 import { showContactCard, stripContactMarker } from "@/lib/contact";
-import { caseStudies, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
+import { caseStudies, caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
 import { ContentCard } from "@/components/content-card";
 import { CaseStudyPanel } from "@/components/case-study-panel";
 import {
@@ -26,17 +26,13 @@ import {
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 import { respondTo } from "@/lib/chat/match";
+import {
+  loadConversations,
+  saveConversations,
+  type Message,
+  type Conversation,
+} from "@/lib/chat/store";
 
-type Message = { id: string; role: "user" | "bot"; text: string };
-type Conversation = {
-  id: string;
-  title: string;
-  messages: Message[];
-  /** Topic ids already covered, so "what else" walks through new ones. */
-  shown: string[];
-};
-
-const STORAGE_KEY = "will-chat-conversations";
 const USAGE_KEY = "will-chat-usage";
 const NOTICE_KEY = "will-chat-notice-dismissed";
 
@@ -145,7 +141,6 @@ export function BoxAI({
   });
   const [aiActive, setAiActive] = React.useState(false);
   const [showNotice, setShowNotice] = React.useState(false);
-  const [showAllConvos, setShowAllConvos] = React.useState(false);
   // Case study opened in the right-hand content card (null = single column).
   const [openCaseStudy, setOpenCaseStudy] = React.useState<CaseStudy | null>(null);
   // Project context (from the page) that seeds the opener + follow-up chips
@@ -234,32 +229,52 @@ export function BoxAI({
   React.useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
-    let loadedConvos: Conversation[] = [];
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        loadedConvos = (JSON.parse(raw) as Conversation[]).map((c) => ({
-          ...c,
-          shown: c.shown ?? [],
-        }));
-      }
-    } catch {
-      /* ignore corrupt storage */
-    }
+    let loadedConvos = loadConversations();
+
+    // Collapse duplicate empty seeds: a conversation that's only the bot opener
+    // with no user reply. The launcher used to create one on every mount, so
+    // they piled up (dozens of identical empty "About <project>"). Keep at most
+    // one empty seed per title so it still shows in the sidebar and stays
+    // clickable; conversations with a real reply are always kept (real ones
+    // start with a user message, so this can't delete anything written).
+    const isEmptySeed = (c: Conversation) =>
+      c.messages.length === 1 && c.messages[0].role === "bot";
+    const seenEmptyTitles = new Set<string>();
+    loadedConvos = loadedConvos.filter((c) => {
+      if (!isEmptySeed(c)) return true;
+      if (seenEmptyTitles.has(c.title)) return false;
+      seenEmptyTitles.add(c.title);
+      return true;
+    });
 
     const study = seedSlug ? caseStudies[seedSlug] : undefined;
     if (study) {
-      const id = uid();
-      const botMsg: Message = {
-        id: uid(),
-        role: "bot",
-        text: `You're checking out ${study.title}. What would you like to know about it? 👇`,
-      };
-      setConversations([
-        { id, title: `About ${study.title}`, messages: [botMsg], shown: [] },
-        ...loadedConvos,
-      ]);
-      setActiveId(id);
+      // Reuse an existing conversation about this project if the visitor already
+      // has one; otherwise seed a single fresh one. Either way there's only ever
+      // one "About <project>".
+      const existing = loadedConvos.find((c) => c.title === `About ${study.title}`);
+      if (existing) {
+        setConversations(loadedConvos);
+        setActiveId(existing.id);
+      } else {
+        const id = uid();
+        const botMsg: Message = {
+          id: uid(),
+          role: "bot",
+          text: `You're checking out ${study.title}. What would you like to know about it? 👇`,
+        };
+        setConversations([
+          {
+            id,
+            title: `About ${study.title}`,
+            messages: [botMsg],
+            shown: [],
+            caseStudySlug: study.slug,
+          },
+          ...loadedConvos,
+        ]);
+        setActiveId(id);
+      }
       setContextStudy(study);
     } else {
       setConversations(loadedConvos);
@@ -268,14 +283,11 @@ export function BoxAI({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Persist whenever conversations change (after initial load).
+  // Persist whenever conversations change (after initial load). saveConversations
+  // also notifies the sidebar so its list stays in sync.
   React.useEffect(() => {
     if (!loaded) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-    } catch {
-      /* ignore quota errors */
-    }
+    saveConversations(conversations);
   }, [conversations, loaded]);
 
   const active = conversations.find((c) => c.id === activeId) ?? null;
@@ -389,35 +401,53 @@ export function BoxAI({
     setSending(false);
   };
 
+  const router = useRouter();
   const goHome = () => {
     setActiveId(null);
     setInput("");
     setHeading(randomHeading());
     setOpenCaseStudy(null); // close the case study panel when leaving the chat
     setContextStudy(null);
+    // Drop the ?c=<id> param so the sidebar returns to the BOX home item
+    // (this conversation was opened from there).
+    if (!embedded) router.replace("/who");
   };
 
-  // Open a conversation and restore its case study panel (if any message in it
-  // references one), so recent conversations reopen the same side-by-side view.
-  const openConversation = (id: string) => {
-    setActiveId(id);
-    const convo = conversations.find((c) => c.id === id);
-    const cs = convo?.messages.map((m) => findCaseStudy(m.text)).find(Boolean) ?? null;
-    setOpenCaseStudy(cs);
-  };
+  // Open a conversation and restore its case study panel, so reopening it (from
+  // the sidebar) brings back the same side-by-side view. A study-framed
+  // conversation carries its slug; otherwise fall back to scanning its messages
+  // for a case-study marker.
+  const openConversation = React.useCallback(
+    (id: string) => {
+      setActiveId(id);
+      const convo = conversations.find((c) => c.id === id);
+      const cs =
+        (convo ? caseStudyForConversation(convo) : null) ??
+        convo?.messages.map((m) => findCaseStudy(m.text)).find(Boolean) ??
+        null;
+      setOpenCaseStudy(cs);
+      if (cs) setContextStudy(cs);
+    },
+    [conversations]
+  );
 
-  const deleteConversation = (id: string) => {
-    setConversations((prev) => prev.filter((c) => c.id !== id));
-    if (activeId === id) setActiveId(null);
-  };
+  // When arrived at via the sidebar (/who?c=<id>), open that conversation once
+  // conversations have loaded.
+  const requestedConvo = useSearchParams().get("c");
+  React.useEffect(() => {
+    if (!loaded || !requestedConvo) return;
+    if (conversations.some((c) => c.id === requestedConvo)) {
+      openConversation(requestedConvo);
+    }
+  }, [loaded, requestedConvo, conversations, openConversation]);
 
   const searchForm = (
     <ChatInput
       value={input}
       onValueChange={setInput}
       onSend={() => send(input)}
-      placeholder={atLimit ? "Daily limit reached" : "Ask TopRat…"}
-      ariaLabel="Ask TopRatGPT a question about Will"
+      placeholder={atLimit ? "Daily limit reached" : "Ask Box…"}
+      ariaLabel="Ask Box a question about Will"
       disabled={atLimit}
       sending={sending}
       attachedSection={
@@ -425,7 +455,7 @@ export function BoxAI({
           <Alert className="border-0 bg-transparent p-0 text-left text-info">
             <InformationCircleIcon className="size-4" />
             <AlertDescription className="text-info/90">
-              Conversations are saved to help improve TopRatGPT&apos;s answers over time.
+              Conversations are saved to help improve Box&apos;s answers over time.
               Please don&apos;t share anything sensitive.
             </AlertDescription>
             <AlertAction>
@@ -465,7 +495,7 @@ export function BoxAI({
 
   const disclaimer = (
     <p className="mt-2 px-1 text-center text-body-xs text-muted-foreground">
-      TopRatGPT never makes mistakes, no need to cross-check.
+      Box never makes mistakes, no need to cross-check.
     </p>
   );
 
@@ -499,7 +529,7 @@ export function BoxAI({
       >
         {!active ? (
           <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">
-            <CubeIcon className="size-12 self-center text-foreground" strokeWidth={1} />
+            <CubeIcon className="mb-4 size-12 self-center text-foreground" strokeWidth={1} />
             <h1 className="text-h1 font-bold uppercase tracking-tight">{heading}</h1>
             <div className="mt-3">{searchForm}</div>
             {disclaimer}
@@ -510,52 +540,13 @@ export function BoxAI({
                   key={chip.prompt}
                   onClick={() => send(chip.prompt)}
                   disabled={atLimit}
-                  className="rounded-full border bg-muted/40 px-3 py-1.5 font-mono text-body-xs uppercase tracking-wide text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                  className="rounded-lg border bg-muted/40 px-3 py-1.5 font-mono text-body-xs uppercase tracking-wide text-foreground transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   {chip.label}
                 </button>
               ))}
             </div>
 
-            {conversations.length > 0 && (
-              <div className="mt-4 flex flex-col gap-1 text-left">
-                <p className="px-2 pb-1 font-mono text-body-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                  Recent conversations
-                </p>
-                {(showAllConvos ? conversations : conversations.slice(0, 5)).map((c) => (
-                  <div
-                    key={c.id}
-                    className="group flex items-center rounded-lg transition-colors hover:bg-muted/60"
-                  >
-                    <button
-                      onClick={() => openConversation(c.id)}
-                      className="flex min-w-0 flex-1 items-center gap-3 px-2 py-2 text-left"
-                    >
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-muted text-muted-foreground">
-                        <ChatBubbleLeftIcon className="size-4" />
-                      </span>
-                      <span className="truncate text-body-sm">{c.title}</span>
-                    </button>
-                    <button
-                      onClick={() => deleteConversation(c.id)}
-                      aria-label="Delete conversation"
-                      className="mr-1 shrink-0 rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
-                    >
-                      <XMarkIcon className="size-3.5" />
-                    </button>
-                  </div>
-                ))}
-                {conversations.length > 5 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllConvos((v) => !v)}
-                    className="mt-1 self-start rounded-md px-2 py-1 text-body-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {showAllConvos ? "Show less" : `View all (${conversations.length})`}
-                  </button>
-                )}
-              </div>
-            )}
           </div>
         ) : (
           <div className="mx-auto flex w-full max-w-xl flex-col gap-3 p-6">
@@ -604,7 +595,7 @@ export function BoxAI({
                       key={p}
                       onClick={() => send(p)}
                       disabled={atLimit}
-                      className="rounded-full border bg-muted/40 px-3 py-1.5 font-mono text-body-xs uppercase tracking-wide text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                      className="rounded-lg border bg-muted/40 px-3 py-1.5 font-mono text-body-xs uppercase tracking-wide text-foreground transition-colors hover:bg-muted disabled:opacity-50"
                     >
                       {p}
                     </button>

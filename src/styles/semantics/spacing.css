@@ -10,12 +10,17 @@
   --container-content: var(--size-content); /* max-w-content (42rem) */
   --container-wide: var(--size-wide);       /* max-w-wide    (72rem) */
 
-  --radius: var(--radius-base);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Whole scale stepped DOWN 2 values from the original ladder
+     (.6 .8 1 1.4 1.8 2.2 2.6): each utility now renders what sat two rungs
+     below it, so every container/component reads tighter. Multipliers are
+     based on --radius-base (not --radius) so the shifted DEFAULT below doesn't
+     compound into the named steps. */
+  --radius: calc(var(--radius-base) * 0.6);
+  --radius-sm: calc(var(--radius-base) * 0.2);
+  --radius-md: calc(var(--radius-base) * 0.4);
+  --radius-lg: calc(var(--radius-base) * 0.6);
+  --radius-xl: calc(var(--radius-base) * 0.8);
+  --radius-2xl: calc(var(--radius-base) * 1);
+  --radius-3xl: calc(var(--radius-base) * 1.4);
+  --radius-4xl: calc(var(--radius-base) * 1.8);
 }
