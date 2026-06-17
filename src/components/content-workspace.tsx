@@ -95,8 +95,16 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {enabled && (
         <>
           {/* Top-left controls inside the content card: sidebar trigger first
-              (when collapsed), then the Box AI launcher. */}
-          <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
+              (when collapsed), then the Box AI launcher / Back. When Box AI is
+              open the content card slides right to make room, so the controls
+              shift with it (in sync with the page padding) and keep living on
+              the card rather than floating over the docked panel. */}
+          <div
+            className={cn(
+              "absolute top-3 z-30 flex items-center gap-1 transition-[left] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+              open ? "left-3 lg:left-[468px]" : "left-3"
+            )}
+          >
             {showTrigger && <SidebarTrigger />}
             {!open && launcherEnabled && (
               <Tooltip>
