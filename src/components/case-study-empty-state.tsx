@@ -40,8 +40,8 @@ export function CaseStudyEmptyState() {
 
       </svg>
 
-      <div className="flex flex-col gap-1.5">
-        <p className="text-body-md font-semibold text-foreground">Being packed up</p>
+      <div className="flex flex-col gap-3">
+        <p className="font-heading text-h3 font-semibold text-foreground">Being packed up</p>
         <p className="max-w-xs text-body-sm text-muted-foreground">
           This case study is being carefully put together — check back soon.
         </p>

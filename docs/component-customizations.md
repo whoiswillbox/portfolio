@@ -106,6 +106,13 @@ tokens: `border-info bg-surface-info text-info`, with the description tinted
 
 ---
 
+### `button.tsx` — no font override (inherits sans)
+**Date:** 2026-06-18
+**Why:** Buttons inherit the app's sans font (currently EB Garamond for testing). No explicit font class needed.
+**What:** No change from shadcn default — buttons use inherited `font-sans`.
+
+---
+
 ### `calendar.tsx` — fix react-day-picker v10 type error
 **Date:** 2026-06-15
 **Why:** The vendored calendar used the `table` classNames key, which was
@@ -114,3 +121,10 @@ Turbopack dev but failed `next build`'s TypeScript check, breaking the Vercel
 deploy.
 **What:** Renamed the `table` key to `month_grid` (the v10 equivalent for the
 grid `<table>` element). Same styling, just the correct key name.
+
+---
+
+### `alert.tsx` — reduce alert action right padding
+**Date:** 2026-06-18
+**Why:** `pr-18` (72px) left too much space between alert text and the dismiss button.
+**What:** Changed `has-data-[slot=alert-action]:pr-18` to `has-data-[slot=alert-action]:pr-10`.

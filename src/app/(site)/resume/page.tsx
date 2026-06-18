@@ -98,7 +98,7 @@ export default function Resume() {
         <div className="mb-10 grid items-center gap-4 md:grid-cols-[1fr_200px]">
           <div>
             <h1 className="text-h1 font-bold tracking-tight">William Box</h1>
-            <p className="text-body-lg text-muted-foreground">Product Designer</p>
+            <p className="font-heading text-body-lg text-muted-foreground">Product Designer</p>
           </div>
           <div className="font-mono text-body-xs text-muted-foreground">
             <p>www.whoiswillbox.com</p>
@@ -125,7 +125,7 @@ export default function Resume() {
                   </div>
                   <ul className="flex flex-col gap-1.5">
                     {job.bullets.map((b, i) => (
-                      <li key={i} className="text-body-sm leading-relaxed text-muted-foreground">
+                      <li key={i} className="font-heading text-body-sm leading-relaxed text-muted-foreground">
                         {b}
                       </li>
                     ))}

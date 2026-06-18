@@ -28,7 +28,7 @@ export const projectEntries: QAEntry[] = [
       "case study", "next gen bar", "bar prep",
     ],
     answer:
-      "My favorite is Next Gen Bar Prep — the adaptive bar-exam platform I led at BARBRI. I opened the case study on the right. What would you like to know about it? 👇 [[case-study:next-gen-bar]]",
+      "My favorite is Next Gen Bar Prep — the adaptive bar-exam platform I led at BARBRI. It's still being put together on the right, but I'm happy to talk through it. What would you like to know? 👇 [[case-study:next-gen-bar]]",
   },
   {
     id: "projects",

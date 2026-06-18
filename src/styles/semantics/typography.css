@@ -8,7 +8,7 @@
 @theme inline {
   --font-sans: var(--font-family-sans);
   --font-mono: var(--font-family-mono);
-  --font-heading: var(--font-family-sans);
+  --font-heading: var(--font-family-heading);
 }
 
 @theme {

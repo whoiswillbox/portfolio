@@ -40,7 +40,7 @@ export default function DesignStandards() {
           <div
             role="tablist"
             aria-label="Platform"
-            className="mt-1 inline-flex w-fit items-center gap-0.5 rounded-lg border bg-background p-1"
+            className="inline-flex w-fit items-center gap-0.5 rounded-lg border bg-background p-1"
           >
             {TABS.map(({ id, label, Icon }) => (
               <button

@@ -144,6 +144,9 @@ export function BoxAI({
   const [showNotice, setShowNotice] = React.useState(false);
   // Case study opened in the right-hand content card (null = single column).
   const [openCaseStudy, setOpenCaseStudy] = React.useState<CaseStudy | null>(null);
+  // Skip the case study panel enter animation when switching between conversations
+  // while the panel is already visible.
+  const skipCaseStudyAnim = React.useRef(false);
   // Project context (from the page) that seeds the opener + follow-up chips
   // when the launcher is opened — without docking the side case-study panel.
   const [contextStudy, setContextStudy] = React.useState<CaseStudy | null>(null);
@@ -402,6 +405,9 @@ export function BoxAI({
                 reply.entryId && !c.shown.includes(reply.entryId)
                   ? [...c.shown, reply.entryId]
                   : c.shown,
+              // If this reply introduced a case study, bind it to the conversation
+              // so revisiting from the sidebar routes to the project page.
+              ...(cs && !c.caseStudySlug ? { caseStudySlug: cs.slug } : {}),
             }
           : c
       )
@@ -433,10 +439,12 @@ export function BoxAI({
         (convo ? caseStudyForConversation(convo) : null) ??
         convo?.messages.map((m) => findCaseStudy(m.text)).find(Boolean) ??
         null;
+      // If panel is already showing, skip the enter animation on the new study.
+      skipCaseStudyAnim.current = openCaseStudy !== null;
       setOpenCaseStudy(cs);
       if (cs) setContextStudy(cs);
     },
-    [conversations]
+    [conversations, openCaseStudy]
   );
 
   // When arrived at via the sidebar (/who?c=<id>), open that conversation once
@@ -510,9 +518,20 @@ export function BoxAI({
 
   const chatCard = (
     <ContentCard className="flex h-full w-full min-w-0 flex-col">
-      {!embedded && (showTrigger || openCaseStudy) && (
+      {!embedded && (showTrigger || openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
           {showTrigger && <SidebarTrigger />}
+          {activeId && !openCaseStudy && (
+            <button
+              type="button"
+              onClick={goHome}
+              aria-label="Back"
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <ArrowLeftIcon className="size-4" />
+              Back
+            </button>
+          )}
           {openCaseStudy && (
             <button
               type="button"
@@ -551,7 +570,7 @@ export function BoxAI({
                   key={chip.prompt}
                   onClick={() => send(chip.prompt)}
                   disabled={atLimit}
-                  className="rounded-lg border bg-muted/40 px-3 py-1.5 font-mono text-body-xs uppercase tracking-wide text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                  className="rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   {chip.label}
                 </button>
@@ -606,7 +625,7 @@ export function BoxAI({
                       key={p}
                       onClick={() => send(p)}
                       disabled={atLimit}
-                      className="rounded-lg border bg-muted/40 px-3 py-1.5 font-mono text-body-xs uppercase tracking-wide text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                      className="rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground transition-colors hover:bg-muted disabled:opacity-50"
                     >
                       {p}
                     </button>
@@ -634,7 +653,7 @@ export function BoxAI({
     return <div className="h-full w-full">{chatCard}</div>;
   }
 
-  // Side-by-side, resizable. Defaults to chat 40 / case study 60.
+  // Side-by-side, resizable. Defaults to chat 30 / case study 70.
   return (
     <ResizablePanelGroup
       orientation={isDesktop ? "horizontal" : "vertical"}
@@ -642,7 +661,7 @@ export function BoxAI({
       style={{ overflow: "visible" }}
     >
       <ResizablePanel
-        defaultSize="40%"
+        defaultSize="30%"
         minSize="30%"
         maxSize="70%"
         className="min-h-0 min-w-0"
@@ -658,7 +677,7 @@ export function BoxAI({
         className="min-h-0 min-w-0"
         style={{ overflow: "visible" }}
       >
-        <ContentCard className="flex h-full w-full min-w-0 flex-col duration-300 ease-out animate-in fade-in slide-in-from-right-4">
+        <ContentCard className={cn("flex h-full w-full min-w-0 flex-col", !skipCaseStudyAnim.current && "duration-300 ease-out animate-in fade-in slide-in-from-right-4")}>
           <CaseStudyPanel study={openCaseStudy} />
         </ContentCard>
       </ResizablePanel>
@@ -694,7 +713,7 @@ function BotBubble({
 
   return (
     <div className="group flex max-w-[85%] flex-col gap-1">
-      <div className="rounded-lg rounded-bl-sm bg-muted px-3 py-2 text-body-sm text-foreground">
+      <div className="rounded-lg rounded-bl-sm bg-muted px-3 py-2 font-heading text-body-sm text-foreground">
         {stripCaseStudyMarker(stripContactMarker(text))}
       </div>
       {showContactCard(text) && <ContactCard />}

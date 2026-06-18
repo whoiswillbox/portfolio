@@ -10,6 +10,9 @@ import {
   FolderIcon as FolderSolid,
   BuildingOffice2Icon as BuildingOffice2Solid,
   DocumentTextIcon as DocumentTextSolid,
+  LifebuoyIcon as LifebuoySolid,
+  PuzzlePieceIcon as PuzzlePieceSolid,
+  MusicalNoteIcon as MusicalNoteSolid,
 } from "@heroicons/react/24/solid"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
@@ -111,7 +114,7 @@ export function AppSidebar({
   return (
     <Sidebar
       variant="floating"
-      className="[&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-menu-button]_span]:font-mono [&_[data-slot=sidebar-menu-button]_span]:uppercase [&_[data-slot=sidebar-menu-button]_span]:tracking-wide [&_[data-slot=sidebar-menu-sub-button]_span]:font-mono [&_[data-slot=sidebar-menu-sub-button]_span]:uppercase [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-wide"
+      className="[&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
     >
       <SidebarHeader>
         <div className="flex items-center justify-between">
@@ -216,19 +219,23 @@ export function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               {[
-                { title: "Surfing", href: "/extracurriculars/surfing", icon: LifebuoyIcon },
-                { title: "Gaming", href: "/extracurriculars/gaming", icon: PuzzlePieceIcon },
-                { title: "Music", href: "/extracurriculars/music", icon: MusicalNoteIcon },
-              ].map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href && !boxParam}>
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                { title: "Surfing", href: "/extracurriculars/surfing", icon: LifebuoyIcon, iconActive: LifebuoySolid },
+                { title: "Gaming", href: "/extracurriculars/gaming", icon: PuzzlePieceIcon, iconActive: PuzzlePieceSolid },
+                { title: "Music", href: "/extracurriculars/music", icon: MusicalNoteIcon, iconActive: MusicalNoteSolid },
+              ].map((item) => {
+                const active = pathname === item.href && !boxParam;
+                const Icon = active ? item.iconActive : item.icon;
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={active}>
+                      <Link href={item.href}>
+                        <Icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -307,6 +314,15 @@ export function AppSidebar({
               <SidebarMenuButton onClick={lock} className="text-muted-foreground">
                 <LockClosedIcon className="size-4" />
                 <span>Lock site (dev)</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          {showLock && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild className="text-muted-foreground">
+                <Link href="/">
+                  <span>Landing page (dev)</span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}

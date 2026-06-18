@@ -19,6 +19,7 @@ export type CaseStudy = {
   /** Suggested follow-up questions shown as chips when the study is open. */
   prompts: string[];
   href?: string; // optional link to the full project page
+  inProgress?: boolean; // case study content not yet built
   /** Custom Box AI opener when seeded from this page (defaults to the case
       study phrasing). Used by lightweight topic seeds like extracurriculars. */
   opener?: string;
@@ -67,10 +68,12 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
     ],
     prompts: [
-      "How did you solve the problem?",
-      "What was your design process?",
-      "What was the measurable impact?",
+      "When's this going live?",
+      "What's the hold up?",
+      "Can you give me a sneak peek?",
     ],
+    href: "/projects/next-gen-bar",
+    inProgress: true,
   },
   jetdash: {
     slug: "jetdash",

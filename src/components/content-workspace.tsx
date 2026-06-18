@@ -26,7 +26,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const [rendered, setRendered] = React.useState(false);
   // /who and /conversations own their own top bar (sidebar trigger + Back), so
   // ContentWorkspace doesn't overlay its controls there.
-  const enabled = pathname !== "/who" && pathname !== "/conversations";
+  const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/";
+  const boxParam = useSearchParams().get("box");
   // The Box AI launcher is also hidden in the admin area (the sidebar trigger
   // still shows via `enabled`).
   const inProgressPaths = [
@@ -36,7 +37,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     "/projects/onebarbri",
     "/projects/deborah",
   ];
-  const launcherEnabled = enabled && !pathname.startsWith("/admin") && !inProgressPaths.includes(pathname);
+  const launcherEnabled = enabled && !pathname.startsWith("/admin") && (!inProgressPaths.includes(pathname) || !!boxParam);
   // Expose the sidebar trigger inside the content card when the sidebar is
   // collapsed / on mobile (the sidebar's own header carries it when expanded).
   const { state, isMobile } = useSidebar();
@@ -64,8 +65,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // Auto-open when arrived at via a conversation in the sidebar
   // (/<project>?box=<id>): Box AI docks beside the case study. Runs after the
   // pathname-close effect above, so it wins on a fresh navigation.
-  const boxParam = useSearchParams().get("box");
-
   // Keep a stable BoxAI element across open/close toggles. Without this, every
   // setOpen() re-creates and reconciles the whole chat tree synchronously on
   // the click — that heavy reconcile is what stutters the start of the exit
@@ -112,10 +111,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {backTo && (
         <button
           type="button"
-          onClick={() => {
-            if (window.history.length > 1) router.back();
-            else router.push(backTo.href);
-          }}
+          onClick={() => router.push(backTo.href)}
           className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <ArrowLeftIcon className="size-4" />

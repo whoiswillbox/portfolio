@@ -67,10 +67,10 @@ export function CaseStudyLayout({
   return (
     <article className="@container mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 pb-10 pt-28">
       {/* Hero */}
-      <header className="flex flex-col gap-3">
+      <header className="relative flex flex-col gap-3">
         <h1 className="text-h1 font-bold tracking-tight">{title}</h1>
-        <p className="max-w-xl text-body-lg text-muted-foreground">{summary}</p>
-        {headerExtra}
+        {summary && <p className="max-w-xl font-heading text-body-lg text-muted-foreground">{summary}</p>}
+        {headerExtra && <div className="absolute right-0 top-0">{headerExtra}</div>}
       </header>
 
       {/* Hero image / content (or gradient placeholder) */}
@@ -138,7 +138,7 @@ export function CaseStudyLayout({
             <section key={s.heading} className="flex flex-col gap-3">
               <h2 className="text-h3 font-semibold tracking-tight">{s.heading}</h2>
               {s.paragraphs.map((p, i) => (
-                <p key={i} className="text-body-md leading-relaxed text-foreground">
+                <p key={i} className="font-heading text-body-md leading-relaxed text-foreground">
                   {p}
                 </p>
               ))}
@@ -155,13 +155,13 @@ export function CaseStudyLayout({
         <div className="mt-32 flex flex-col gap-32">
           {groups.map((g) => (
             <div key={g.label} className="grid gap-10 @md:grid-cols-[180px_1fr]">
-              <h2 className="text-body-lg font-medium tracking-tight text-foreground @md:sticky @md:top-20 @md:self-start">
+              <h2 className="text-h3 font-semibold tracking-tight text-foreground @md:sticky @md:top-20 @md:self-start">
                 {g.label}
               </h2>
               <div className="flex flex-col gap-20">
                 {g.items.map((item) => (
                   <div key={item.heading} className="flex flex-col gap-3">
-                    <h3 className="text-body-md font-semibold text-foreground">{item.heading}</h3>
+                    <h3 className="text-body-lg font-medium tracking-tight text-foreground">{item.heading}</h3>
                     {item.paragraphs.map((p, i) => (
                       <p key={i} className="text-body-sm leading-relaxed text-muted-foreground">
                         {p}

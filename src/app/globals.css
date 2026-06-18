@@ -24,6 +24,9 @@
   html {
     @apply font-sans;
   }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
   /* Tailwind v4 defaults interactive elements to cursor:default. Restore the
      pointer for actionable controls (disabled ones keep the default arrow). */
   button:not(:disabled),

@@ -18,12 +18,18 @@ export default async function SiteLayout({
 
   // Only the owner (valid admin cookie) sees the Admin nav item.
   const adminKey = process.env.ADMIN_KEY;
-  const adminCookie = (await cookies()).get(ADMIN_COOKIE)?.value;
+  const cookieStore = await cookies();
+  const adminCookie = cookieStore.get(ADMIN_COOKIE)?.value;
   const isAdmin = Boolean(adminKey) && adminCookie === (await adminToken(adminKey!));
+
+  // Respect the persisted sidebar state; default closed so the landing page
+  // starts without the sidebar, and opens once the user enters the app.
+  const sidebarCookie = cookieStore.get("sidebar_state")?.value;
+  const sidebarDefaultOpen = sidebarCookie === undefined ? false : sidebarCookie === "true";
 
   return (
     <TooltipProvider>
-      <SidebarProvider className="h-full min-h-0 bg-background">
+      <SidebarProvider defaultOpen={sidebarDefaultOpen} className="h-full min-h-0 bg-background">
         <AppSidebar showLock={showLock} isAdmin={isAdmin} />
         <SidebarInset className="min-h-0 m-2 bg-transparent">
           {/* No overflow-hidden here: it would clip the content cards' drop
