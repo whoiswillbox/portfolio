@@ -3,7 +3,7 @@ import { AUTH_COOKIE, ADMIN_COOKIE, authToken, adminToken } from "@/lib/auth";
 
 export const ENTERED_COOKIE = "entered_at";
 // How long (ms) before the landing page shows again. 4 hours.
-const ENTERED_TTL_MS = 4 * 60 * 60 * 1000;
+export const ENTERED_TTL_MS = 4 * 60 * 60 * 1000;
 
 /* Three independent gates (evaluated in order):
    - Admin area (/admin/*, /api/chat-log): requires the ADMIN_KEY cookie.
