@@ -1,4 +1,10 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ArrowUpRightIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 /**
  * The canonical case-study article layout: hero (title + summary + optional
@@ -68,8 +74,34 @@ export function CaseStudyLayout({
   /** Appended after the sections (e.g. an image gallery or an Alert). */
   children?: React.ReactNode;
 }) {
+  type LightboxItem = { src: string; alt: string; isGif?: boolean; wide?: boolean; size?: string };
+  const [lightbox, setLightbox] = useState<LightboxItem | null>(null);
+
   return (
-    <article className="@container mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 pb-10 pt-28">
+    <>
+      <Dialog open={!!lightbox} onOpenChange={(open) => !open && setLightbox(null)}>
+        <DialogContent className={`gap-3 p-4 ${lightbox?.isGif && !lightbox.wide ? "sm:max-w-md" : "sm:max-w-[min(90vw,72rem)]"}`}>
+          <DialogTitle className="text-sm font-medium">{lightbox?.alt}</DialogTitle>
+          {lightbox && (
+            <div className="relative w-full">
+              {lightbox.isGif ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={lightbox.src} alt={lightbox.alt} className={`rounded-lg ${lightbox.wide ? "h-auto w-full" : "mx-auto h-[580px] w-auto"}`} />
+              ) : (
+                <Image
+                  src={lightbox.src}
+                  alt={lightbox.alt}
+                  width={(lightbox as CaseStudyGroupImage).width}
+                  height={(lightbox as CaseStudyGroupImage).height}
+                  quality={95}
+                  className="h-auto w-full rounded-lg"
+                />
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    <article className="@container mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 pb-40 pt-28">
       {/* Hero */}
       <header className="relative flex flex-col gap-3">
         <h1 className="text-h1 font-bold tracking-tight">{title}</h1>
@@ -176,7 +208,16 @@ export function CaseStudyLayout({
                       </p>
                     ))}
                     {item.image && (
-                      <div className="mt-1 overflow-hidden rounded-xl bg-muted p-4 ring-1 ring-border">
+                      <button
+                        type="button"
+                        className="group relative mt-1 block w-full cursor-pointer overflow-hidden rounded-xl bg-muted p-4 ring-1 ring-border transition hover:scale-[1.02] hover:shadow-md"
+                        onClick={() => setLightbox(item.image!)}
+                      >
+                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl backdrop-blur-[0px] transition-[backdrop-filter] duration-200 group-hover:backdrop-blur-sm">
+                          <Badge variant="outline" className="opacity-0 transition-opacity duration-200 group-hover:opacity-100 bg-background/80 font-mono uppercase tracking-wide shadow-sm gap-1.5">
+                            Take a closer look <ArrowUpRightIcon className="size-3" />
+                          </Badge>
+                        </div>
                         <Image
                           src={item.image.src}
                           alt={item.image.alt}
@@ -186,17 +227,26 @@ export function CaseStudyLayout({
                           sizes="(min-width: 768px) 42rem, 100vw"
                           className="h-auto w-full rounded-lg"
                         />
-                      </div>
+                      </button>
                     )}
                     {item.gif && (
-                      <div className={`mt-1 flex items-center justify-center overflow-hidden rounded-xl bg-muted dark:bg-white ring-1 ring-border ${item.gif.wide ? "" : "p-6"}`}>
+                      <button
+                        type="button"
+                        className={`group relative mt-1 flex w-full cursor-pointer items-center justify-center rounded-xl bg-muted dark:bg-white ring-1 ring-border transition hover:scale-[1.02] hover:shadow-md ${item.gif.wide ? "" : "p-6"}`}
+                        onClick={() => setLightbox({ src: item.gif!.src, alt: item.gif!.alt, isGif: true, wide: item.gif!.wide, size: item.gif!.size })}
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={item.gif.src}
                           alt={item.gif.alt}
                           className={`h-auto rounded-lg mix-blend-multiply ${item.gif.wide ? "w-full" : (item.gif.size ?? "w-64")}`}
                         />
-                      </div>
+                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl backdrop-blur-[0px] transition-[backdrop-filter] duration-200 group-hover:backdrop-blur-sm">
+                          <Badge variant="outline" className="opacity-0 transition-opacity duration-200 group-hover:opacity-100 bg-background/80 font-mono uppercase tracking-wide shadow-sm gap-1.5">
+                            Take a closer look <ArrowUpRightIcon className="size-3" />
+                          </Badge>
+                        </div>
+                      </button>
                     )}
                   </div>
                 ))}
@@ -206,6 +256,7 @@ export function CaseStudyLayout({
         </div>
       )}
     </article>
+    </>
   );
 }
 

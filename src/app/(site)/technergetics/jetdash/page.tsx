@@ -3,6 +3,7 @@ import { ShieldCheckIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { ContentCard } from "@/components/content-card";
 import { CaseStudyLayout } from "@/components/case-study-layout";
+import { ImageLightbox } from "@/components/image-lightbox";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { EMAIL } from "@/lib/contact";
 
@@ -94,11 +95,13 @@ export default function Jetdash() {
           ].map((img) => (
             <div
               key={img.src}
-              className="relative aspect-[3/2] w-full overflow-hidden rounded-xl ring-1 ring-border"
+              className="relative aspect-[3/2] w-full overflow-hidden rounded-xl ring-1 ring-border transition hover:scale-[1.02] hover:shadow-md"
             >
-              <Image
+              <ImageLightbox
                 src={img.src}
                 alt={img.alt}
+                width={1200}
+                height={800}
                 fill
                 sizes="(min-width: 640px) 28rem, 100vw"
                 className="object-cover"
