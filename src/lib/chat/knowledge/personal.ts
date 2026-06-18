@@ -46,6 +46,20 @@ export const personalEntries: QAEntry[] = [
     ],
   },
   {
+    id: "recommendations",
+    question: "What do coworkers say about working with Will?",
+    keywords: [
+      "recommend", "recommendation", "coworker", "colleague", "teammates", "team",
+      "work with", "worked with", "working with", "collaborate", "collaboration",
+      "what do people say", "references", "reference", "feedback", "reviews",
+      "testimonial", "testimonials", "what others say", "peers", "manager",
+    ],
+    answer: [
+      "People I've worked with have been kind enough to share their thoughts:\n\n\"Will has a talent for working in Figma and attention to detail that makes him someone you always want to collaborate with. His mock-ups are always visually stunning and considerate of what users' need. His creative energy will be truly missed, and a lucky addition for any team!\" — Robin Jeng, Software Engineer III, Technergetics\n\n\"Will consistently delivered high-quality work, balancing design with user-centric principles and patterns. His designs not only met our immediate needs but also laid the foundation for scalable, future solutions in the DoD space.\" — Alisa Ferrara, Creative Director, Technergetics\n\n\"His ability to translate complex requirements into intuitive, user friendly interfaces contributed to the success of multiple projects. Will was proactive, responsive to feedback, and collaborated seamlessly with our team.\" — Mark Evener, Technical Project Manager, Technergetics",
+    ],
+  },
+
+  {
     id: "stunt",
     question: "Stunt work",
     keywords: [

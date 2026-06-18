@@ -36,7 +36,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     prompts: [
       "What kind of work do you do best?",
       "Tell me about your time at Technergetics.",
-      "What's your design process like?",
+      "What have coworkers said about you?",
     ],
     opener: "You're looking at my resume. What would you like to dive into? 👇",
     href: "/resume",
@@ -99,7 +99,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     prompts: [
       "What problem were you solving?",
       "What was your process?",
-      "What was the outcome?",
+      "What have coworkers said about you?",
     ],
     href: "/technergetics/jetdash",
   },
@@ -127,7 +127,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     prompts: [
       "What patterns did you document?",
       "How did this impact development?",
-      "What was your process for building this?",
+      "What have coworkers said about you?",
     ],
     href: "/technergetics/design-standards",
   },
@@ -156,7 +156,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     prompts: [
       "What problem were you solving?",
       "What patterns did you define?",
-      "What was the outcome?",
+      "What have coworkers said about you?",
     ],
     href: "/technergetics/reusable-table",
   },
@@ -214,7 +214,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     prompts: [
       "What problem were you solving?",
       "What was your process?",
-      "What was the outcome?",
+      "What have coworkers said about you?",
     ],
     href: "/technergetics/upgrade",
   },
