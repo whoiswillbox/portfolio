@@ -3,10 +3,8 @@
 import * as React from "react";
 import { ComputerDesktopIcon, DevicePhoneMobileIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
-import {
-  CaseStudyLayout,
-  type CaseStudySectionData,
-} from "@/components/case-study-layout";
+import { CaseStudyLayout } from "@/components/case-study-layout";
+import { WEB_SUMMARY, WEB_CONTRIBUTIONS, WEB_SECTIONS, WEB_GROUPS } from "./web-content";
 import { cn } from "@/lib/utils";
 
 type Platform = "web" | "mobile";
@@ -22,47 +20,23 @@ const META = [
   { label: "Role", value: "Lead UX Designer" },
 ];
 
-const CONTRIBUTIONS = ["Design Tokens", "Component Library", "Documentation", "Handoff"];
-
-// Per-platform summary + sections. Placeholder copy — ready to fill with the
-// real web/mobile standards content and assets.
-const CONTENT: Record<Platform, { summary: string; sections: CaseStudySectionData[] }> = {
-  web: {
-    summary: "The conventions and components behind Technergetics' web experiences.",
-    sections: [
-      {
-        heading: "Foundations",
-        paragraphs: [
-          "Layout grids and breakpoints, the typography scale, and color and spacing tokens that keep Technergetics' web products consistent.",
-        ],
-      },
-    ],
-  },
-  mobile: {
-    summary: "The conventions and components behind Technergetics' mobile experiences.",
-    sections: [
-      {
-        heading: "Foundations",
-        paragraphs: [
-          "Touch targets, navigation patterns, and iOS/Android platform conventions that keep Technergetics' mobile apps consistent.",
-        ],
-      },
-    ],
-  },
-};
-
 export default function DesignStandards() {
   const [platform, setPlatform] = React.useState<Platform>("web");
-  const content = CONTENT[platform];
+  const isWeb = platform === "web";
 
   return (
     <ContentCard className="h-full overflow-auto">
       <CaseStudyLayout
         title="Design Standards"
-        summary={content.summary}
+        summary={
+          isWeb
+            ? WEB_SUMMARY
+            : "The conventions and components behind Technergetics' mobile experiences."
+        }
         meta={META}
-        contributions={CONTRIBUTIONS}
-        sections={content.sections}
+        contributions={isWeb ? WEB_CONTRIBUTIONS : undefined}
+        sections={isWeb ? WEB_SECTIONS : []}
+        groups={isWeb ? WEB_GROUPS : []}
         headerExtra={
           <div
             role="tablist"
@@ -89,7 +63,13 @@ export default function DesignStandards() {
             ))}
           </div>
         }
-      />
+      >
+        {!isWeb && (
+          <p className="text-body-md leading-relaxed text-muted-foreground">
+            Mobile standards coming soon.
+          </p>
+        )}
+      </CaseStudyLayout>
     </ContentCard>
   );
 }

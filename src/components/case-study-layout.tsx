@@ -17,6 +17,15 @@ import Image from "next/image";
 export type CaseStudyMeta = { label: string; value: string };
 export type CaseStudySectionData = { heading: string; paragraphs: string[] };
 export type CaseStudyMetric = { value: string; label: string };
+export type CaseStudyGroupImage = { src: string; alt: string; width: number; height: number };
+export type CaseStudyGroupItem = {
+  heading: string;
+  paragraphs: string[];
+  image?: CaseStudyGroupImage;
+};
+/** A labelled group of pattern sub-sections (left category label + right
+    content), e.g. the Design Standards pattern docs. */
+export type CaseStudyGroup = { label: string; items: CaseStudyGroupItem[] };
 
 export function CaseStudyLayout({
   title,
@@ -28,6 +37,7 @@ export function CaseStudyLayout({
   sidebarExtra,
   metrics,
   sections = [],
+  groups = [],
   children,
 }: {
   title: string;
@@ -42,6 +52,8 @@ export function CaseStudyLayout({
   sidebarExtra?: React.ReactNode;
   metrics?: CaseStudyMetric[];
   sections?: CaseStudySectionData[];
+  /** Labelled pattern groups rendered below the intro (left label + content). */
+  groups?: CaseStudyGroup[];
   /** Appended after the sections (e.g. an image gallery or an Alert). */
   children?: React.ReactNode;
 }) {
@@ -125,6 +137,42 @@ export function CaseStudyLayout({
           {children}
         </div>
       </div>
+
+      {/* Labelled pattern groups: left category label + right sub-sections,
+          aligned to the same columns as the metadata above. */}
+      {groups.length > 0 && (
+        <div className="mt-16 flex flex-col gap-16">
+          {groups.map((g) => (
+            <div key={g.label} className="grid gap-10 md:grid-cols-[180px_1fr]">
+              <h2 className="text-body-lg font-medium tracking-tight text-foreground">
+                {g.label}
+              </h2>
+              <div className="flex flex-col gap-10">
+                {g.items.map((item) => (
+                  <div key={item.heading} className="flex flex-col gap-3">
+                    <h3 className="text-body-md font-semibold text-foreground">{item.heading}</h3>
+                    {item.paragraphs.map((p, i) => (
+                      <p key={i} className="text-body-sm leading-relaxed text-muted-foreground">
+                        {p}
+                      </p>
+                    ))}
+                    {item.image && (
+                      <Image
+                        src={item.image.src}
+                        alt={item.image.alt}
+                        width={item.image.width}
+                        height={item.image.height}
+                        sizes="(min-width: 768px) 42rem, 100vw"
+                        className="mt-1 h-auto w-full rounded-lg ring-1 ring-border"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </article>
   );
 }
