@@ -20,7 +20,7 @@ const ebGaramond = EB_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Will Box",
+  title: "Will Box - Product Designer",
   description: "Personal portfolio",
 };
 
