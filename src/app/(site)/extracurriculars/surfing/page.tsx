@@ -55,11 +55,15 @@ function AutoplayVideo({ src }: { src: string }) {
     // If already in viewport when mounted, play immediately
     const rect = video.getBoundingClientRect();
     const inView = rect.top < window.innerHeight && rect.bottom > 0;
-    if (inView) video.play().catch(() => {});
+    if (inView) {
+      const tryPlay = () => video.play().catch(() => {});
+      if (video.readyState >= 3) tryPlay();
+      else video.addEventListener("canplay", tryPlay, { once: true });
+    }
     return () => observer.disconnect();
   }, [src]);
 
-  return <video ref={ref} src={src} loop muted playsInline className="w-full rounded-xl aspect-video bg-muted" />;
+  return <video ref={ref} src={src} loop muted playsInline preload="auto" className="w-full rounded-xl aspect-video bg-muted" />;
 }
 
 function MediaBlock({ item }: { item: MediaItem }) {
