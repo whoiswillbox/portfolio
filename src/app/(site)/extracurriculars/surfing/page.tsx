@@ -52,6 +52,10 @@ function AutoplayVideo({ src }: { src: string }) {
       { threshold: 0.5 }
     );
     observer.observe(video);
+    // If already in viewport when mounted, play immediately
+    const rect = video.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
+    if (inView) video.play().catch(() => {});
     return () => observer.disconnect();
   }, [src]);
 
