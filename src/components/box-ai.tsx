@@ -510,19 +510,22 @@ export function BoxAI({
 
   const chatCard = (
     <ContentCard className="flex h-full w-full min-w-0 flex-col">
-      {!embedded && (showTrigger || active) && (
+      {!embedded && (showTrigger || openCaseStudy) && (
         <div className="flex items-center gap-1 p-2">
           {showTrigger && <SidebarTrigger />}
-          {active && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goHome}
-              className="font-mono text-body-xs uppercase tracking-wide text-muted-foreground"
+          {openCaseStudy && (
+            <button
+              type="button"
+              onClick={() => {
+                const href = openCaseStudy.href;
+                setOpenCaseStudy(null);
+                if (href) router.push(href);
+              }}
+              aria-label="Go to case study"
+              className="ml-auto rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
             >
-              <ArrowLeftIcon className="size-4" />
-              Back
-            </Button>
+              <XMarkIcon className="size-4" />
+            </button>
           )}
         </div>
       )}

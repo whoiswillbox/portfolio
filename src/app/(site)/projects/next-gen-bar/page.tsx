@@ -1,11 +1,10 @@
 import { ContentCard } from "@/components/content-card";
-import { CaseStudyArticle } from "@/components/case-study-article";
-import { caseStudies } from "@/lib/case-studies";
+import { CaseStudyEmptyState } from "@/components/case-study-empty-state";
 
 export default function NextGenBar() {
   return (
-    <ContentCard className="h-full overflow-auto">
-      <CaseStudyArticle study={caseStudies["next-gen-bar"]} />
+    <ContentCard className="flex h-full items-center justify-center">
+      <CaseStudyEmptyState />
     </ContentCard>
   );
 }

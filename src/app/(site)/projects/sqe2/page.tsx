@@ -1,9 +1,10 @@
 import { ContentCard } from "@/components/content-card";
+import { CaseStudyEmptyState } from "@/components/case-study-empty-state";
 
 export default function Sqe2() {
   return (
-    <ContentCard className="h-full overflow-auto p-6">
-      <h1 className="text-2xl font-bold uppercase tracking-tight">SQE2</h1>
+    <ContentCard className="flex h-full items-center justify-center">
+      <CaseStudyEmptyState />
     </ContentCard>
   );
 }

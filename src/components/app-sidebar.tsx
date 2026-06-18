@@ -11,6 +11,7 @@ import {
   BuildingOffice2Icon as BuildingOffice2Solid,
   DocumentTextIcon as DocumentTextSolid,
 } from "@heroicons/react/24/solid"
+import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import {
   Collapsible,
@@ -50,14 +51,15 @@ const items = [
 const groups = [
   {
     title: "BARBRI",
+    comingSoon: true,
     icon: FolderIcon,
     iconActive: FolderSolid,
     items: [
-      { title: "Next Gen Bar", href: "/projects/next-gen-bar" },
+      { title: "Next Gen", href: "/projects/next-gen-bar" },
       { title: "SQE2", href: "/projects/sqe2" },
-      { title: "Powerscore AI Tutor", href: "/projects/powerscore-ai-tutor" },
-      { title: "OneBarbri", href: "/projects/onebarbri" },
-      { title: "Deborah", href: "/projects/deborah" },
+      { title: "AI Tutor", href: "/projects/powerscore-ai-tutor" },
+      { title: "OneUX", href: "/projects/onebarbri" },
+      { title: "Debora", href: "/projects/deborah" },
     ],
   },
   {
@@ -168,6 +170,9 @@ export function AppSidebar({
                       <SidebarMenuButton tooltip={group.title}>
                         <GroupIcon />
                         <span>{group.title}</span>
+                        {"comingSoon" in group && group.comingSoon && (
+                          <Badge variant="warning" className="ml-1 font-mono tracking-wide">PACKAGING</Badge>
+                        )}
                         <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>

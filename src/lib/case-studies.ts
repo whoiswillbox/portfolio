@@ -25,6 +25,22 @@ export type CaseStudy = {
 };
 
 export const caseStudies: Record<string, CaseStudy> = {
+  resume: {
+    slug: "resume",
+    title: "William Box",
+    meta: "Product Designer",
+    summary: "You're looking at my resume. Ask me anything — I'm happy to go deeper on my experience, skills, or background.",
+    metrics: [],
+    sections: [],
+    prompts: [
+      "What kind of work do you do best?",
+      "Tell me about your time at Technergetics.",
+      "What's your design process like?",
+    ],
+    opener: "You're looking at my resume. What would you like to dive into? 👇",
+    href: "/resume",
+  },
+
   "next-gen-bar": {
     slug: "next-gen-bar",
     title: "Next Gen Bar Prep",
@@ -55,7 +71,6 @@ export const caseStudies: Record<string, CaseStudy> = {
       "What was your design process?",
       "What was the measurable impact?",
     ],
-    href: "/projects/next-gen-bar",
   },
   jetdash: {
     slug: "jetdash",
@@ -85,6 +100,35 @@ export const caseStudies: Record<string, CaseStudy> = {
     ],
     href: "/technergetics/jetdash",
   },
+  "design-standards": {
+    slug: "design-standards",
+    title: "Design Standards",
+    meta: "Lead UX Designer · Technergetics · 2022–24",
+    summary:
+      "A design documentation initiative to unify Technergetics' web and mobile product portfolio — establishing shared patterns, specs, and interaction standards to accelerate development and ensure cohesion.",
+    metrics: [],
+    sections: [
+      {
+        heading: "The problem",
+        body: "Technergetics operates in an extremely fast-paced agile environment. Technical debt was kept at a minimum but design consistency suffered — no shared language meant developers made design decisions ad hoc across products.",
+      },
+      {
+        heading: "What I did",
+        body: "Partnered weekly with a UX engineer to identify recurring patterns across current and previous products, then researched best practices to document web and mobile standards covering navigation, tables, typography, controls, modalities, notifications, and forms.",
+      },
+      {
+        heading: "The outcome",
+        body: "A living design standards library covering web table patterns (row selection, scroll, toolbar, typography, workflow status) and mobile patterns (navigation, controls, modalities, notifications, tap targets, and forms) — giving development training wheels to make design decisions confidently and consistently.",
+      },
+    ],
+    prompts: [
+      "What patterns did you document?",
+      "How did this impact development?",
+      "What was your process for building this?",
+    ],
+    href: "/technergetics/design-standards",
+  },
+
   upgrade: {
     slug: "upgrade",
     title: "Upgrade",

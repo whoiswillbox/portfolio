@@ -140,7 +140,7 @@ export function SpotifyLibrary() {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
               {playlists.map((p) => (
                 <Link key={p.id} href={`/extracurriculars/music/${p.id}`} className="group flex flex-col gap-2">
-                  <div className="aspect-square overflow-hidden rounded-lg ring-1 ring-border transition duration-200 group-hover:scale-[1.04] group-hover:shadow-2xl">
+                  <div className="aspect-square overflow-hidden rounded-lg ring-1 ring-border transition duration-200 group-hover:scale-[1.04] group-hover:shadow-xl">
                     {p.image ? (
                       <img src={p.image} alt={p.name} className="size-full object-cover" />
                     ) : (

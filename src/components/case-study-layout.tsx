@@ -31,19 +31,26 @@ export function CaseStudyLayout({
   title,
   summary,
   hero,
+  heroContent,
   headerExtra,
   meta = [],
   contributions,
   sidebarExtra,
   metrics,
   sections = [],
+  noHero = false,
   groups = [],
   children,
 }: {
   title: string;
   summary: string;
   /** Real hero image; when omitted a gradient placeholder is shown. */
-  hero?: { src: string; alt: string };
+  hero?: { src: string; alt: string; contain?: boolean };
+  /** Arbitrary JSX rendered inside the hero container (overrides `hero`). */
+  heroContent?: React.ReactNode;
+  /** Suppress the gradient placeholder when no hero image is available yet. */
+  noHero?: boolean;
+
   /** Rendered in the header under the summary (e.g. a link or a toggle). */
   headerExtra?: React.ReactNode;
   meta?: CaseStudyMeta[];
@@ -58,7 +65,7 @@ export function CaseStudyLayout({
   children?: React.ReactNode;
 }) {
   return (
-    <article className="mx-auto w-full max-w-4xl px-6 pb-10 pt-28">
+    <article className="@container mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 pb-10 pt-28">
       {/* Hero */}
       <header className="flex flex-col gap-3">
         <h1 className="text-h1 font-bold tracking-tight">{title}</h1>
@@ -66,26 +73,30 @@ export function CaseStudyLayout({
         {headerExtra}
       </header>
 
-      {/* Hero image (or gradient placeholder) */}
-      {hero ? (
-        <div className="relative mt-8 aspect-[16/7] w-full overflow-hidden rounded-xl ring-1 ring-border">
+      {/* Hero image / content (or gradient placeholder) */}
+      {heroContent ? (
+        <div className="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-xl bg-background ring-1 ring-border">
+          {heroContent}
+        </div>
+      ) : hero ? (
+        <div className="relative aspect-[16/7] w-full overflow-hidden rounded-xl ring-1 ring-border">
           <Image
             src={hero.src}
             alt={hero.alt}
             fill
             priority
             sizes="(min-width: 1024px) 56rem, 100vw"
-            className="object-cover"
+            className={hero.contain ? "object-contain p-8" : "object-cover"}
           />
         </div>
-      ) : (
-        <div className="mt-8 aspect-[16/7] w-full rounded-xl bg-gradient-to-br from-muted to-muted-foreground/30" />
-      )}
+      ) : !noHero ? (
+        <div className="aspect-[16/7] w-full rounded-xl bg-gradient-to-br from-muted to-muted-foreground/30" />
+      ) : null}
 
       {/* Body: metadata sidebar + sections. The sidebar pins right as the hero
           leaves the viewport (md:top-20). */}
-      <div className="mt-20 grid gap-10 md:grid-cols-[180px_1fr]">
-        <aside className="flex flex-col gap-6 md:sticky md:top-20 md:self-start">
+      <div className="grid gap-10 @md:grid-cols-[180px_1fr]">
+        <aside className="flex flex-col gap-6 @md:sticky @md:top-20 @md:self-start">
           {meta.map((m) => (
             <Field key={m.label} label={m.label} value={m.value} />
           ))}
@@ -141,13 +152,13 @@ export function CaseStudyLayout({
       {/* Labelled pattern groups: left category label + right sub-sections,
           aligned to the same columns as the metadata above. */}
       {groups.length > 0 && (
-        <div className="mt-16 flex flex-col gap-16">
+        <div className="mt-32 flex flex-col gap-32">
           {groups.map((g) => (
-            <div key={g.label} className="grid gap-10 md:grid-cols-[180px_1fr]">
-              <h2 className="text-body-lg font-medium tracking-tight text-foreground md:sticky md:top-20 md:self-start">
+            <div key={g.label} className="grid gap-10 @md:grid-cols-[180px_1fr]">
+              <h2 className="text-body-lg font-medium tracking-tight text-foreground @md:sticky @md:top-20 @md:self-start">
                 {g.label}
               </h2>
-              <div className="flex flex-col gap-10">
+              <div className="flex flex-col gap-20">
                 {g.items.map((item) => (
                   <div key={item.heading} className="flex flex-col gap-3">
                     <h3 className="text-body-md font-semibold text-foreground">{item.heading}</h3>
@@ -164,7 +175,7 @@ export function CaseStudyLayout({
                         height={item.image.height}
                         quality={90}
                         sizes="(min-width: 768px) 42rem, 100vw"
-                        className="mt-1 h-auto w-full rounded-lg ring-1 ring-border"
+                        className="mt-1 h-auto w-full rounded-lg"
                       />
                     )}
                   </div>

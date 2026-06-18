@@ -8,6 +8,7 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { findCaseStudyByPath } from "@/lib/case-studies";
 import { useBoxSeed } from "@/components/box-seed";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,7 +29,14 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const enabled = pathname !== "/who" && pathname !== "/conversations";
   // The Box AI launcher is also hidden in the admin area (the sidebar trigger
   // still shows via `enabled`).
-  const launcherEnabled = enabled && !pathname.startsWith("/admin");
+  const inProgressPaths = [
+    "/projects/next-gen-bar",
+    "/projects/sqe2",
+    "/projects/powerscore-ai-tutor",
+    "/projects/onebarbri",
+    "/projects/deborah",
+  ];
+  const launcherEnabled = enabled && !pathname.startsWith("/admin") && !inProgressPaths.includes(pathname);
   // Expose the sidebar trigger inside the content card when the sidebar is
   // collapsed / on mobile (the sidebar's own header carries it when expanded).
   const { state, isMobile } = useSidebar();
@@ -42,6 +50,15 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const backTo = pathname.startsWith("/extracurriculars/music/")
     ? { href: "/extracurriculars/music", label: "Back" }
     : null;
+  const [isDesktop, setIsDesktop] = React.useState(true);
+  React.useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   // Keep a stable BoxAI element across open/close toggles. Without this, every
   // setOpen() re-creates and reconciles the whole chat tree synchronously on
   // the click — that heavy reconcile is what stutters the start of the exit
@@ -73,20 +90,76 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     if (open) setRendered(true);
   }, [open]);
 
+  const controls = enabled && (
+    <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
+      {!open && showTrigger && <SidebarTrigger />}
+      {!open && launcherEnabled && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-label="Ask Box"
+              className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
+            >
+              <CubeIcon className="size-5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Ask Box</TooltipContent>
+        </Tooltip>
+      )}
+      {backTo && (
+        <button
+          type="button"
+          onClick={() => {
+            if (window.history.length > 1) router.back();
+            else router.push(backTo.href);
+          }}
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <ArrowLeftIcon className="size-4" />
+          {backTo.label}
+        </button>
+      )}
+    </div>
+  );
+
+  // Desktop + open: resizable side-by-side panels (Box AI left, page right).
+  if (open && isDesktop && rendered) {
+    return (
+      <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize="30%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in slide-in-from-left fade-in" style={{ overflow: "visible" }}>
+          <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+            {showTrigger && <SidebarTrigger />}
+          </div>
+          <button
+            type="button"
+            onClick={closeDrawer}
+            aria-label="Close Box"
+            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+          >
+            <XMarkIcon className="size-4" />
+          </button>
+          {boxAI}
+        </ResizablePanel>
+        <ResizableHandle withHandle className="bg-transparent" />
+        <ResizablePanel defaultSize="70%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in fade-in" style={{ overflow: "visible" }}>
+          {controls}
+          {children}
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    );
+  }
+
+  // Mobile or closed: original slide-over behaviour.
   return (
     <div className="relative h-full min-h-0">
-      {/* Page content — shrinks on desktop to make room for the panel. It
-          animates in BOTH directions, in sync with the panel, so the exit is a
-          true mirror of the entrance (page + panel move together). Easing is
-          asymmetric on purpose — decelerate in (ease-out), accelerate out
-          (ease-in) — the standard enter/exit pattern, which avoids the lingering
-          tail a single ease-out leaves on the way out. */}
       <div
         className={cn(
           "h-full transition-[padding]",
-          open
-            ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] lg:pl-[452px]"
-            : "duration-300 ease-in lg:pl-0"
+          open && !isDesktop
+            ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]"
+            : "duration-300 ease-in pl-0"
         )}
       >
         {children}
@@ -94,69 +167,14 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
       {enabled && (
         <>
-          {/* Top-left controls inside the content card: sidebar trigger first
-              (when collapsed), then the Box AI launcher / Back. When Box AI is
-              open the content card slides right to make room, so the controls
-              shift with it (in sync with the page padding) and keep living on
-              the card rather than floating over the docked panel. */}
-          <div
-            className={cn(
-              "absolute top-3 z-30 flex items-center gap-1 transition-[left] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
-              open ? "left-3 lg:left-[468px]" : "left-3"
-            )}
-          >
-            {showTrigger && <SidebarTrigger />}
-            {!open && launcherEnabled && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(true)}
-                    aria-label="Ask Box"
-                    className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
-                  >
-                    <CubeIcon className="size-5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Ask Box</TooltipContent>
-              </Tooltip>
-            )}
-            {backTo && (
-              <button
-                type="button"
-                onClick={() => {
-                  // Prefer client history so we return to the already-rendered
-                  // Music page instantly (data + scroll intact) instead of a
-                  // fresh RSC navigation; fall back to a push on a cold deep link.
-                  if (window.history.length > 1) router.back();
-                  else router.push(backTo.href);
-                }}
-                className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <ArrowLeftIcon className="size-4" />
-                {backTo.label}
-              </button>
-            )}
-          </div>
-
-          {/* Slide-in Box AI content card — docks on the left. Mounted only
-              while open / animating out; slides via transform (GPU). */}
+          {controls}
           {rendered && (
             <div
               className={cn(
                 "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
                 open
-                  ? // Enter: ease-out — decelerate gently into place, fading in.
-                    "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in slide-in-from-left fade-in"
-                  : // Exit: ease-in — accelerate away cleanly while fading out,
-                    // so the card dissolves rather than hard-cutting at the end.
-                    // The previous ease-out left a long tail where the card's
-                    // shadow edge crept off-screen for ~285ms, which read as exit
-                    // "lag". fill-mode-forwards holds the off-screen + faded end
-                    // state until React unmounts; without it the keyframe
-                    // (fill-mode: none) snaps the card back to visible for one
-                    // frame at the end — the end "glitch".
-                    "pointer-events-none duration-300 ease-in animate-out slide-out-to-left fade-out fill-mode-forwards"
+                  ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in slide-in-from-left fade-in"
+                  : "pointer-events-none duration-300 ease-in animate-out slide-out-to-left fade-out fill-mode-forwards"
               )}
               onAnimationEnd={() => {
                 if (!open) setRendered(false);

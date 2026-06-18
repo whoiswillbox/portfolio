@@ -81,7 +81,7 @@ export default function Jetdash() {
         sections={SECTIONS}
       >
         {/* JetDash in the field */}
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 @sm:grid-cols-2">
           {[
             {
               src: "/projects/jetdash/catalog.webp",
