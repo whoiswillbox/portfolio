@@ -132,6 +132,35 @@ export const caseStudies: Record<string, CaseStudy> = {
     href: "/technergetics/design-standards",
   },
 
+  "reusable-table": {
+    slug: "reusable-table",
+    title: "Reusable Table",
+    meta: "Lead UX Designer · Technergetics · 2023–24",
+    summary:
+      "A reusable, standardized table component built to eliminate code duplication, reduce maintenance complexity, and deliver cohesive experiences across Technergetics products.",
+    metrics: [],
+    sections: [
+      {
+        heading: "The problem",
+        body: "Technergetics operates in a fast-paced agile environment where technical debt is kept low, but experience consistency suffered — toolbar attributes and table behaviors had significant gaps across products.",
+      },
+      {
+        heading: "What I did",
+        body: "Worked closely with engineering to identify the highest-priority starting point. Through secondary research and cross-product audits, I compiled recurring themes and functionality to define a reusable table standard covering toolbar (search, actions, view toggle, pagination) and interaction patterns (split view, nested, perform action).",
+      },
+      {
+        heading: "The outcome",
+        body: "The Technergetics reusable table shipped with interchangeable functionality depending on application use case, streamlining familiarity across experiences and shaping users' mental models. Technical debt reduced, experiences improved.",
+      },
+    ],
+    prompts: [
+      "What problem were you solving?",
+      "What patterns did you define?",
+      "What was the outcome?",
+    ],
+    href: "/technergetics/reusable-table",
+  },
+
   lightcert: {
     slug: "lightcert",
     title: "Lightcert",

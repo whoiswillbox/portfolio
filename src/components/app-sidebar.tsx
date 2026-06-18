@@ -73,6 +73,7 @@ const groups = [
     items: [
       { title: "Jetdash", href: "/technergetics/jetdash" },
       { title: "Upgrade", href: "/technergetics/upgrade" },
+      { title: "Reusable Table", href: "/technergetics/reusable-table" },
       { title: "Design Standards", href: "/technergetics/design-standards" },
     ],
   },
