@@ -59,25 +59,26 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  // Keep a stable BoxAI element across open/close toggles. Without this, every
-  // setOpen() re-creates and reconciles the whole chat tree synchronously on
-  // the click — that heavy reconcile is what stutters the start of the exit
-  // animation. Memoizing pins its identity so React bails out of re-rendering
-  // it when only `open` changes; it only rebuilds if the seeded study changes.
-  const boxAI = React.useMemo(
-    () => <BoxAI embedded seed={contextSeed} />,
-    [contextSeed]
-  );
-
   // Close when navigating between pages.
   React.useEffect(() => setOpen(false), [pathname]);
   // Auto-open when arrived at via a conversation in the sidebar
   // (/<project>?box=<id>): Box AI docks beside the case study. Runs after the
   // pathname-close effect above, so it wins on a fresh navigation.
   const boxParam = useSearchParams().get("box");
+
+  // Keep a stable BoxAI element across open/close toggles. Without this, every
+  // setOpen() re-creates and reconciles the whole chat tree synchronously on
+  // the click — that heavy reconcile is what stutters the start of the exit
+  // animation. Memoizing pins its identity so React bails out of re-rendering
+  // it when only `open` changes; it only rebuilds if the seeded study changes.
+  const boxAI = React.useMemo(
+    () => <BoxAI key={boxParam ?? "default"} embedded seed={contextSeed} />,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [contextSeed, boxParam]
+  );
   React.useEffect(() => {
-    if (boxParam) setOpen(true);
-  }, [boxParam]);
+    if (boxParam && launcherEnabled) setOpen(true);
+  }, [boxParam, launcherEnabled]);
   // Closing Box AI drops the ?box=<id> param so the sidebar returns to the
   // project's own nav item (we've cancelled out of the conversation).
   const router = useRouter();
