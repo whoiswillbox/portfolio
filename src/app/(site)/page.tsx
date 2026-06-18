@@ -100,7 +100,9 @@ export default function LandingPage() {
     fetch("/api/enter", { method: "POST" });
     setExiting(true);
     setOpen(true);
-    router.push(path);
+    // Small delay lets the sidebar open animation start before the route
+    // changes, so the content card doesn't flash blank during the transition.
+    setTimeout(() => router.push(path), 150);
   };
 
   return (
