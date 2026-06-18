@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# surfing originals — commit only compressed versions
+public/projects/surfing/*.mov
+public/projects/surfing/*.MP4
+public/projects/surfing/revo-trimmed.mp4
+!public/projects/surfing/*-compressed.mp4
