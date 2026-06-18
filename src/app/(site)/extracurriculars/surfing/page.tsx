@@ -49,11 +49,11 @@ function AutoplayVideo({ src }: { src: string }) {
         if (entry.isIntersecting) video.play().catch(() => {});
         else video.pause();
       },
-      { threshold: 0.75 }
+      { threshold: 0.5 }
     );
     observer.observe(video);
     return () => observer.disconnect();
-  }, []);
+  }, [src]);
 
   return <video ref={ref} src={src} loop muted playsInline className="w-full rounded-xl aspect-video bg-muted" />;
 }
