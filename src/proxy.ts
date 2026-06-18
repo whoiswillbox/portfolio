@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE, ADMIN_COOKIE, authToken, adminToken } from "@/lib/auth";
 
-/* Two independent gates:
+export const ENTERED_COOKIE = "entered_at";
+// How long (ms) before the landing page shows again. 4 hours.
+const ENTERED_TTL_MS = 4 * 60 * 60 * 1000;
+
+/* Three independent gates (evaluated in order):
    - Admin area (/admin/*, /api/chat-log): requires the ADMIN_KEY cookie.
    - Public site (everything else): requires the SITE_PASSWORD cookie (if set).
-   Each is auto-disabled when its env var is unset. */
+   - Landing page: non-/ paths require a fresh entered_at cookie; otherwise
+     redirect to / so the landing page is shown again. */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAdminArea =
@@ -19,10 +24,31 @@ export async function proxy(request: NextRequest) {
   }
 
   const sitePassword = process.env.SITE_PASSWORD;
-  if (!sitePassword) return NextResponse.next(); // gate disabled
-  const cookie = request.cookies.get(AUTH_COOKIE)?.value;
-  if (cookie && cookie === (await authToken(sitePassword))) return NextResponse.next();
-  return redirectTo(request, "/unlock", path);
+  if (sitePassword) {
+    const cookie = request.cookies.get(AUTH_COOKIE)?.value;
+    if (!cookie || cookie !== (await authToken(sitePassword))) {
+      return redirectTo(request, "/unlock", path);
+    }
+  }
+
+  // Landing-page gate: skip for /, /unlock, /api/*, /admin/*.
+  if (
+    path !== "/" &&
+    !path.startsWith("/unlock") &&
+    !path.startsWith("/api/") &&
+    !path.startsWith("/admin")
+  ) {
+    const enteredCookie = request.cookies.get(ENTERED_COOKIE)?.value;
+    const enteredAt = enteredCookie ? parseInt(enteredCookie, 10) : NaN;
+    if (isNaN(enteredAt) || Date.now() - enteredAt >= ENTERED_TTL_MS) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  return NextResponse.next();
 }
 
 function redirectTo(request: NextRequest, pathname: string, next: string) {

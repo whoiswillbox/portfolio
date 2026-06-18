@@ -94,6 +94,9 @@ export default function LandingPage() {
   useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const enter = (path: string) => {
+    // Mark entry time so middleware lets the user skip the landing on refresh
+    // for the next 4 hours (matches ENTERED_TTL_MS in middleware.ts).
+    document.cookie = `entered_at=${Date.now()}; path=/; max-age=${4 * 60 * 60}`;
     setExiting(true);
     setOpen(true);
     router.push(path);
