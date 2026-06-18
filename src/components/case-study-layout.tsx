@@ -144,7 +144,7 @@ export function CaseStudyLayout({
         <div className="mt-16 flex flex-col gap-16">
           {groups.map((g) => (
             <div key={g.label} className="grid gap-10 md:grid-cols-[180px_1fr]">
-              <h2 className="text-body-lg font-medium tracking-tight text-foreground">
+              <h2 className="text-body-lg font-medium tracking-tight text-foreground md:sticky md:top-20 md:self-start">
                 {g.label}
               </h2>
               <div className="flex flex-col gap-10">
