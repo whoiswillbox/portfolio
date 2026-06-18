@@ -162,6 +162,7 @@ export function CaseStudyLayout({
                         alt={item.image.alt}
                         width={item.image.width}
                         height={item.image.height}
+                        quality={90}
                         sizes="(min-width: 768px) 42rem, 100vw"
                         className="mt-1 h-auto w-full rounded-lg ring-1 ring-border"
                       />
