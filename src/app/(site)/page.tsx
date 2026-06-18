@@ -93,11 +93,12 @@ export default function LandingPage() {
 
   useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const enter = async (path: string) => {
+  const enter = (path: string) => {
+    // Set cookie client-side immediately (proxy reads it on the next request),
+    // and fire the server route in parallel to ensure it's set for SSR too.
+    document.cookie = `entered_at=${Date.now()}; path=/; max-age=${4 * 60 * 60}`;
+    fetch("/api/enter", { method: "POST" });
     setExiting(true);
-    // Set the entered_at cookie server-side so proxy.ts sees it before the
-    // navigation lands (client document.cookie write is not reliable enough).
-    await fetch("/api/enter", { method: "POST" });
     setOpen(true);
     router.push(path);
   };
