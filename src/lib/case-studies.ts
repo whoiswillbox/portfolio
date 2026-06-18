@@ -219,6 +219,26 @@ export const caseStudies: Record<string, CaseStudy> = {
     href: "/technergetics/upgrade",
   },
 
+  "swiperight-ai": {
+    slug: "swiperight-ai",
+    title: "SwipeRight.ai",
+    meta: "Product Designer · School · 2024",
+    summary: "Leveraging GenAI to enhance profile optimization within dating app users.",
+    metrics: [],
+    sections: [
+      {
+        heading: "Coming soon",
+        body: "This case study is still being written.",
+      },
+    ],
+    prompts: [
+      "What was swiperight.ai?",
+      "What was your role?",
+      "What was the outcome?",
+    ],
+    href: "/school/swiperight-ai",
+  },
+
   // Lightweight topic seeds (extracurriculars) — no case-study body; they just
   // give their page a Box AI context with a custom opener + prompts.
   surfing: {

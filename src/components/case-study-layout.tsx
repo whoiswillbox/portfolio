@@ -20,6 +20,8 @@ export type CaseStudyMetric = { value: string; label: string };
 export type CaseStudyGroupImage = { src: string; alt: string; width: number; height: number };
 export type CaseStudyGroupItem = {
   heading: string;
+  /** Smaller label rendered above the heading — used for category sub-headings within a group. */
+  subheading?: string;
   paragraphs: string[];
   image?: CaseStudyGroupImage;
   /** Animated GIF — rendered with <img> so it plays (Next/Image doesn't animate). Constrained to w-64 for phone mockups; pass wide:true for landscape assets; pass size to override width class. */
@@ -27,7 +29,7 @@ export type CaseStudyGroupItem = {
 };
 /** A labelled group of pattern sub-sections (left category label + right
     content), e.g. the Design Standards pattern docs. */
-export type CaseStudyGroup = { label: string; items: CaseStudyGroupItem[] };
+export type CaseStudyGroup = { label: string; items: CaseStudyGroupItem[]; compact?: boolean };
 
 export function CaseStudyLayout({
   title,
@@ -161,9 +163,12 @@ export function CaseStudyLayout({
               <h2 className="text-h3 font-semibold tracking-tight text-foreground @md:sticky @md:top-20 @md:self-start">
                 {g.label}
               </h2>
-              <div className="flex flex-col gap-20">
-                {g.items.map((item) => (
-                  <div key={item.heading} className="flex flex-col gap-3">
+              <div className={`flex flex-col ${g.compact ? "gap-8" : "gap-20"}`}>
+                {g.items.map((item, i) => (
+                  <div key={item.heading} className={`flex flex-col gap-3${item.subheading && i > 0 ? " mt-8" : ""}`}>
+                    {item.subheading && (
+                      <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-muted-foreground">{item.subheading}</p>
+                    )}
                     <h3 className="text-body-lg font-medium tracking-tight text-foreground">{item.heading}</h3>
                     {item.paragraphs.map((p, i) => (
                       <p key={i} className="text-body-sm leading-relaxed text-muted-foreground">
@@ -171,15 +176,17 @@ export function CaseStudyLayout({
                       </p>
                     ))}
                     {item.image && (
-                      <Image
-                        src={item.image.src}
-                        alt={item.image.alt}
-                        width={item.image.width}
-                        height={item.image.height}
-                        quality={90}
-                        sizes="(min-width: 768px) 42rem, 100vw"
-                        className="mt-1 h-auto w-full rounded-lg"
-                      />
+                      <div className="mt-1 overflow-hidden rounded-xl bg-muted p-4 ring-1 ring-border">
+                        <Image
+                          src={item.image.src}
+                          alt={item.image.alt}
+                          width={item.image.width}
+                          height={item.image.height}
+                          quality={90}
+                          sizes="(min-width: 768px) 42rem, 100vw"
+                          className="h-auto w-full rounded-lg"
+                        />
+                      </div>
                     )}
                     {item.gif && (
                       <div className={`mt-1 flex items-center justify-center overflow-hidden rounded-xl bg-muted dark:bg-white ring-1 ring-border ${item.gif.wide ? "" : "p-6"}`}>
@@ -208,7 +215,7 @@ function Field({ label, value }: { label: string; value: string }) {
       <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-foreground">
         {label}
       </p>
-      <p className="text-body-sm text-muted-foreground">{value}</p>
+      <p className="whitespace-pre-line text-body-sm text-muted-foreground">{value}</p>
     </div>
   );
 }

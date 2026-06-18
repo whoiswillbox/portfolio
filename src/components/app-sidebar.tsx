@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
   FolderIcon as FolderSolid,
@@ -14,6 +14,7 @@ import {
   PuzzlePieceIcon as PuzzlePieceSolid,
   MusicalNoteIcon as MusicalNoteSolid,
   BoltIcon as BoltSolid,
+  AcademicCapIcon as AcademicCapSolid,
 } from "@heroicons/react/24/solid"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
@@ -216,6 +217,24 @@ export function AppSidebar({
                   <Link href="/resume">
                     {pathname === "/resume" ? <DocumentTextSolid /> : <DocumentTextIcon />}
                     <span>Resume</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+            School
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/school/swiperight-ai" && !boxParam}>
+                  <Link href="/school/swiperight-ai">
+                    {pathname === "/school/swiperight-ai" && !boxParam ? <AcademicCapSolid /> : <AcademicCapIcon />}
+                    <span>SwipeRight.ai</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
