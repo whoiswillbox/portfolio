@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
   FolderIcon as FolderSolid,
@@ -13,6 +13,7 @@ import {
   LifebuoyIcon as LifebuoySolid,
   PuzzlePieceIcon as PuzzlePieceSolid,
   MusicalNoteIcon as MusicalNoteSolid,
+  BoltIcon as BoltSolid,
 } from "@heroicons/react/24/solid"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
@@ -199,6 +200,15 @@ export function AppSidebar({
                 </Collapsible>
                 )
               })}
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/technergetics/lightcert"}>
+                  <Link href="/technergetics/lightcert">
+                    {pathname === "/technergetics/lightcert" ? <BoltSolid /> : <BoltIcon />}
+                    <span>Lightcert</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/resume"}>

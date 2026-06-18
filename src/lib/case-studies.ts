@@ -132,6 +132,35 @@ export const caseStudies: Record<string, CaseStudy> = {
     href: "/technergetics/design-standards",
   },
 
+  lightcert: {
+    slug: "lightcert",
+    title: "Lightcert",
+    meta: "UX/UI Design Intern · Lightcert · 2022",
+    summary:
+      "A fan engagement app crafted to enhance live music experiences by orchestrating audience-wide light displays — connecting fans and artists through immersive, interactive concert experiences.",
+    metrics: [],
+    sections: [
+      {
+        heading: "The problem",
+        body: "Concert goers lacked a way to feel truly engaged with their community and artist. Existing fan participation was passive — Lightcert aimed to transform the audience into part of the show itself.",
+      },
+      {
+        heading: "What I did",
+        body: "As a UX/UI Design Intern, I led a heuristic evaluation of the original MVP, translated user research into design solutions, iterated based on feedback from users and founders, built new components for the Lightcert design system, and delivered final assets for the Q2 production release.",
+      },
+      {
+        heading: "The outcome",
+        body: "Lightcert v.2 shipped with a clearer onboarding flow, a streamlined happy path for venue/artist/song selection, and a new share feature — demonstrated live at the Louis Tomlinson show at Youtube Theatre 2022, where Lightcert users lit up the entire venue.",
+      },
+    ],
+    prompts: [
+      "What was the v.2 redesign like?",
+      "What was your process?",
+      "What was the outcome?",
+    ],
+    href: "/technergetics/lightcert",
+  },
+
   upgrade: {
     slug: "upgrade",
     title: "Upgrade",

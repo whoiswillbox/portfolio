@@ -22,6 +22,8 @@ export type CaseStudyGroupItem = {
   heading: string;
   paragraphs: string[];
   image?: CaseStudyGroupImage;
+  /** Animated GIF — rendered with <img> so it plays (Next/Image doesn't animate). Constrained to w-64 for phone mockups; pass wide:true for landscape assets; pass size to override width class. */
+  gif?: { src: string; alt: string; wide?: boolean; size?: string };
 };
 /** A labelled group of pattern sub-sections (left category label + right
     content), e.g. the Design Standards pattern docs. */
@@ -45,7 +47,7 @@ export function CaseStudyLayout({
   title: string;
   summary: string;
   /** Real hero image; when omitted a gradient placeholder is shown. */
-  hero?: { src: string; alt: string; contain?: boolean };
+  hero?: { src: string; alt: string; contain?: boolean; position?: string };
   /** Arbitrary JSX rendered inside the hero container (overrides `hero`). */
   heroContent?: React.ReactNode;
   /** Suppress the gradient placeholder when no hero image is available yet. */
@@ -70,16 +72,16 @@ export function CaseStudyLayout({
       <header className="relative flex flex-col gap-3">
         <h1 className="text-h1 font-bold tracking-tight">{title}</h1>
         {summary && <p className="max-w-xl font-heading text-body-lg text-muted-foreground">{summary}</p>}
-        {headerExtra && <div className="absolute right-0 top-0">{headerExtra}</div>}
+        {headerExtra && <div className="absolute right-0 top-0 flex h-full items-center">{headerExtra}</div>}
       </header>
 
       {/* Hero image / content (or gradient placeholder) */}
       {heroContent ? (
-        <div className="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-xl bg-background ring-1 ring-border">
+        <div className="relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl bg-muted ring-1 ring-border">
           {heroContent}
         </div>
       ) : hero ? (
-        <div className="relative aspect-[16/7] w-full overflow-hidden rounded-xl ring-1 ring-border">
+        <div className={`relative aspect-[16/9] w-full overflow-hidden rounded-xl ring-1 ring-border ${hero.contain ? "bg-muted" : ""}`}>
           <Image
             src={hero.src}
             alt={hero.alt}
@@ -87,6 +89,7 @@ export function CaseStudyLayout({
             priority
             sizes="(min-width: 1024px) 56rem, 100vw"
             className={hero.contain ? "object-contain p-8" : "object-cover"}
+            style={hero.position ? { objectPosition: hero.position } : undefined}
           />
         </div>
       ) : !noHero ? (
@@ -138,7 +141,7 @@ export function CaseStudyLayout({
             <section key={s.heading} className="flex flex-col gap-3">
               <h2 className="text-h3 font-semibold tracking-tight">{s.heading}</h2>
               {s.paragraphs.map((p, i) => (
-                <p key={i} className="font-heading text-body-md leading-relaxed text-foreground">
+                <p key={i} className="whitespace-pre-line font-heading text-body-md leading-relaxed text-foreground">
                   {p}
                 </p>
               ))}
@@ -177,6 +180,16 @@ export function CaseStudyLayout({
                         sizes="(min-width: 768px) 42rem, 100vw"
                         className="mt-1 h-auto w-full rounded-lg"
                       />
+                    )}
+                    {item.gif && (
+                      <div className={`mt-1 flex items-center justify-center overflow-hidden rounded-xl bg-muted dark:bg-white ring-1 ring-border ${item.gif.wide ? "" : "p-6"}`}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={item.gif.src}
+                          alt={item.gif.alt}
+                          className={`h-auto rounded-lg mix-blend-multiply ${item.gif.wide ? "w-full" : (item.gif.size ?? "w-64")}`}
+                        />
+                      </div>
                     )}
                   </div>
                 ))}
