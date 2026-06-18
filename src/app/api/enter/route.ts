@@ -8,5 +8,11 @@ export async function POST() {
     maxAge: ENTERED_TTL_MS / 1000,
     sameSite: "lax",
   });
+  // Pre-open the sidebar so the layout SSRs with it open on the next request.
+  res.cookies.set("sidebar_state", "true", {
+    path: "/",
+    maxAge: ENTERED_TTL_MS / 1000,
+    sameSite: "lax",
+  });
   return res;
 }

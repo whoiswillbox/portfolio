@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
-import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 interface Box {
@@ -88,21 +87,14 @@ function FallingBox({ box }: { box: Box }) {
 
 export default function LandingPage() {
   const router = useRouter();
-  const { setOpen } = useSidebar();
   const [exiting, setExiting] = useState(false);
 
-  useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const enter = (path: string) => {
-    // Set cookie client-side immediately (proxy reads it on the next request),
-    // and fire the server route in parallel to ensure it's set for SSR too.
-    document.cookie = `entered_at=${Date.now()}; path=/; max-age=${4 * 60 * 60}`;
-    fetch("/api/enter", { method: "POST" });
+  const enter = async (path: string) => {
     setExiting(true);
-    setOpen(true);
-    // Small delay lets the sidebar open animation start before the route
-    // changes, so the content card doesn't flash blank during the transition.
-    setTimeout(() => router.push(path), 150);
+    // Set both cookies server-side before navigating so the layout SSRs
+    // with the sidebar already open — no flash or layout shift on arrival.
+    await fetch("/api/enter", { method: "POST" });
+    router.push(path);
   };
 
   return (
