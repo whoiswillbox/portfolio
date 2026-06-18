@@ -55,7 +55,7 @@ function AutoplayVideo({ src }: { src: string }) {
     return () => observer.disconnect();
   }, []);
 
-  return <video ref={ref} src={src} loop muted playsInline className="w-full rounded-xl" />;
+  return <video ref={ref} src={src} loop muted playsInline className="w-full rounded-xl aspect-video bg-muted" />;
 }
 
 function MediaBlock({ item }: { item: MediaItem }) {
