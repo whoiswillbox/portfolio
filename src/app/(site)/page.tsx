@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
-import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 interface Box {
@@ -88,14 +87,12 @@ function FallingBox({ box }: { box: Box }) {
 
 export default function LandingPage() {
   const router = useRouter();
-  const { setOpen } = useSidebar();
 
   const enter = (path: string) => {
     const maxAge = 4 * 60 * 60;
     document.cookie = `entered_at=${Date.now()}; path=/; max-age=${maxAge}; samesite=lax`;
     document.cookie = `sidebar_state=true; path=/; max-age=${maxAge}; samesite=lax`;
     fetch("/api/enter", { method: "POST" });
-    setOpen(true);
     router.push(path);
   };
 
