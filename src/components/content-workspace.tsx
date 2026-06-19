@@ -61,8 +61,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (open) {
       setRendered(true);
-      // Tell ChatInput to re-measure after the panel slides in
-      requestAnimationFrame(() => window.dispatchEvent(new Event("boxai:opened")));
+      // Tell ChatInput to re-measure after the panel finishes sliding in (300ms)
+      setTimeout(() => window.dispatchEvent(new Event("boxai:opened")), 350);
     }
   }, [open]);
 
