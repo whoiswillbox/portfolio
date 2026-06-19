@@ -41,7 +41,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  React.useEffect(() => { setOpen(false); setExiting(false); setRendered(false); }, [pathname]);
+  React.useEffect(() => { setOpen(false); setExiting(false); setRendered(false); setSplitPct(30); }, [pathname]);
 
   const boxAI = React.useMemo(
     () => <BoxAI key={boxParam ?? "default"} embedded seed={contextSeed} />,
