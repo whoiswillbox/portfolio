@@ -126,19 +126,24 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   if (open && isDesktop && rendered) {
     return (
       <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
-        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className="relative min-h-0 min-w-0 animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
-          <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
-            {showTrigger && <SidebarTrigger />}
-          </div>
-          <button
-            type="button"
-            onClick={closeDrawer}
-            aria-label="Close Box"
-            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
+          <div
+            className="h-full animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            style={{ overflow: "visible" }}
           >
-            <XMarkIcon className="size-4" />
-          </button>
-          {boxAI}
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+              {showTrigger && <SidebarTrigger />}
+            </div>
+            <button
+              type="button"
+              onClick={closeDrawer}
+              aria-label="Close Box"
+              className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            >
+              <XMarkIcon className="size-4" />
+            </button>
+            {boxAI}
+          </div>
         </ResizablePanel>
         <ResizableHandle withHandle className="bg-transparent" />
         <ResizablePanel defaultSize={70} minSize={70} maxSize={70} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
