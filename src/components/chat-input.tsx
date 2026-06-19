@@ -41,7 +41,11 @@ export function ChatInput({
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
   }, []);
   React.useEffect(() => { resize(); }, [value, resize]);
-  React.useLayoutEffect(() => { resize(); }, [resize]);
+  React.useLayoutEffect(() => {
+    resize();
+    const id = requestAnimationFrame(resize);
+    return () => cancelAnimationFrame(id);
+  }, [resize]);
 
   // Keep the attached section mounted through its collapse animation. When the
   // parent clears `attachedSection`, we hold onto the last content and animate
