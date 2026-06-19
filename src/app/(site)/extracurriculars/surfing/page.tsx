@@ -112,7 +112,7 @@ export default function Surfing() {
             aria-label="Year"
             className="absolute right-0 top-0 flex h-full items-center"
           >
-          <div className="inline-flex w-fit items-center gap-0.5 rounded-lg border bg-background p-1">
+          <div className="inline-flex w-fit flex-wrap items-center gap-0.5 rounded-lg border bg-background p-1">
             <button
               type="button"
               role="tab"
