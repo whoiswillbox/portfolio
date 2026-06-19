@@ -83,7 +83,11 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // project's own nav item (we've cancelled out of the conversation).
   const router = useRouter();
   const closeDrawer = () => {
-    setExiting(true);
+    if (isDesktop) {
+      setExiting(true);
+    } else {
+      setOpen(false);
+    }
     if (boxParam) router.replace(pathname);
   };
   // Mount the panel when opening (it unmounts itself after the exit animation).
@@ -122,69 +126,79 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  // Desktop open: ResizablePanelGroup for correct height containment.
-  // The whole group fades+slides in so BoxAI card entrance feels smooth.
-  if ((open || exiting) && isDesktop && rendered) {
-    return (
-      <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
-        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className={cn("relative min-h-0 min-w-0", exiting ? "animate-out slide-out-to-left fade-out duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] fill-mode-forwards" : "animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]")} style={{ overflow: "visible" }} onAnimationEnd={() => { if (exiting) { setExiting(false); setOpen(false); setRendered(false); } }}>
-          <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
-            {showTrigger && <SidebarTrigger />}
-          </div>
-          <button
-            type="button"
-            onClick={closeDrawer}
-            aria-label="Close Box"
-            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-          >
-            <XMarkIcon className="size-4" />
-          </button>
-          {boxAI}
-        </ResizablePanel>
-        <ResizableHandle withHandle className="bg-transparent" />
-        <ResizablePanel defaultSize={70} minSize={70} maxSize={70} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
-          {controls}
-          {children}
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    );
-  }
+  const desktopOpen = isDesktop && (open || exiting);
 
-  // Mobile overlay or closed state.
+  // Single persistent grid — columns transition smoothly, no DOM swap ever.
   return (
-    <div className="relative h-full min-h-0">
+    <div
+      className="h-full min-h-0 transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      style={{
+        display: "grid",
+        gridTemplateColumns: desktopOpen && rendered ? "30% 8px 1fr" : "0px 0px 1fr",
+        overflow: "visible",
+      }}
+    >
+      {/* Box AI column */}
+      <div
+        className="relative min-h-0 min-w-0 overflow-hidden"
+        onTransitionEnd={() => {
+          if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
+        }}
+      >
+        {rendered && (
+          <div className="absolute inset-0">
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+              {showTrigger && <SidebarTrigger />}
+            </div>
+            <button
+              type="button"
+              onClick={closeDrawer}
+              aria-label="Close Box"
+              className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            >
+              <XMarkIcon className="size-4" />
+            </button>
+            {boxAI}
+          </div>
+        )}
+      </div>
+
+      {/* Gap column (only visible on desktop open) */}
+      <div />
+
+      {/* Content column */}
       <div
         className={cn(
-          "h-full transition-[padding]",
-          open && !isDesktop
-            ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]"
-            : "duration-300 ease-in pl-0",
+          "relative min-h-0 min-w-0",
+          // Mobile: overlay push
+          !isDesktop && open && "transition-[padding] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]",
         )}
+        style={{ overflow: "visible" }}
       >
+        {!isDesktop && enabled && rendered && (
+          <div
+            className={cn(
+              "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
+              open
+                ? "animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                : "pointer-events-none animate-out slide-out-to-left duration-300 ease-in fill-mode-forwards",
+            )}
+            onAnimationEnd={() => { if (!open && !exiting) setRendered(false); }}
+          >
+            <button
+              type="button"
+              onClick={closeDrawer}
+              aria-label="Close Box"
+              className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            >
+              <XMarkIcon className="size-4" />
+            </button>
+            {boxAI}
+          </div>
+        )}
         {controls}
         {children}
       </div>
-      {enabled && rendered && (
-        <div
-          className={cn(
-            "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
-            open
-              ? "animate-in slide-in-from-left duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
-              : "pointer-events-none animate-out slide-out-to-left duration-300 ease-in fill-mode-forwards",
-          )}
-          onAnimationEnd={() => { if (!open) setRendered(false); }}
-        >
-          <button
-            type="button"
-            onClick={closeDrawer}
-            aria-label="Close Box"
-            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-          >
-            <XMarkIcon className="size-4" />
-          </button>
-          {boxAI}
-        </div>
-      )}
     </div>
   );
 }
