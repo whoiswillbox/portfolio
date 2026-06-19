@@ -113,7 +113,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       if (!dragging.current || !gridRef.current) return;
       const rect = gridRef.current.getBoundingClientRect();
       const pct = ((ev.clientX - rect.left) / rect.width) * 100;
-      setSplitPct(Math.min(50, Math.max(20, pct)));
+      setSplitPct(Math.min(30, Math.max(20, pct)));
     };
     const onUp = () => { dragging.current = false; setIsDragging(false); window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
     window.addEventListener("mousemove", onMove);
