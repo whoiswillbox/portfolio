@@ -24,7 +24,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
-  const [exiting, setExiting] = React.useState(false);
   // /who and /conversations own their own top bar (sidebar trigger + Back), so
   // ContentWorkspace doesn't overlay its controls there.
   const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/";
@@ -62,7 +61,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Close when navigating between pages.
-  React.useEffect(() => { setOpen(false); setExiting(false); }, [pathname]);
+  React.useEffect(() => { setOpen(false); }, [pathname]);
   // Auto-open when arrived at via a conversation in the sidebar
   // (/<project>?box=<id>): Box AI docks beside the case study. Runs after the
   // pathname-close effect above, so it wins on a fresh navigation.
@@ -99,7 +98,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           <TooltipTrigger asChild>
             <button
               type="button"
-              onClick={() => { setExiting(true); setTimeout(() => { setExiting(false); setOpen(true); }, 200); }}
+              onClick={() => { setRendered(true); setOpen(true); }}
               aria-label="Ask Box"
               className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
             >
@@ -122,76 +121,50 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  // Desktop + open: resizable side-by-side panels (Box AI left, page right).
-  if (open && isDesktop && rendered) {
-    return (
-      <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
-        <ResizablePanel defaultSize="30%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 animate-in slide-in-from-left fade-in duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
-          <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
-            {showTrigger && <SidebarTrigger />}
-          </div>
-          <button
-            type="button"
-            onClick={closeDrawer}
-            aria-label="Close Box"
-            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-          >
-            <XMarkIcon className="size-4" />
-          </button>
-          {boxAI}
-        </ResizablePanel>
-        <ResizableHandle withHandle className="bg-transparent" />
-        <ResizablePanel defaultSize="70%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 animate-in fade-in duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
-          {controls}
-          {children}
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    );
-  }
-
-  // Mobile or closed: original slide-over behaviour.
+  // Single persistent layout — Box AI panel slides in from left pushing content right.
+  // On mobile it overlays; on desktop it pushes via width transition (no DOM swap).
   return (
-    <div className="relative h-full min-h-0">
+    <div className="flex h-full min-h-0 gap-2 overflow-visible">
+      {/* Box AI panel */}
+      {enabled && rendered && (
+        <div
+          className={cn(
+            "relative shrink-0 overflow-hidden transition-[width] ease-[cubic-bezier(0.32,0.72,0,1)]",
+            isDesktop
+              ? open ? "w-[30%] duration-300" : "w-0 duration-300"
+              : "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
+            !isDesktop && !open && "pointer-events-none",
+          )}
+          onTransitionEnd={() => { if (!open) setRendered(false); }}
+        >
+          <div className="absolute inset-0">
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+              {showTrigger && <SidebarTrigger />}
+            </div>
+            <button
+              type="button"
+              onClick={closeDrawer}
+              aria-label="Close Box"
+              className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            >
+              <XMarkIcon className="size-4" />
+            </button>
+            {boxAI}
+          </div>
+        </div>
+      )}
+
+      {/* Content panel */}
       <div
         className={cn(
-          "h-full transition-[padding]",
-          open && !isDesktop
-            ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]"
-            : "duration-300 ease-in pl-0",
-          exiting && "animate-out fade-out duration-200 fill-mode-forwards"
+          "relative min-h-0 min-w-0 flex-1 overflow-visible",
+          // Mobile overlay push
+          !isDesktop && open && "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]",
         )}
       >
+        {controls}
         {children}
       </div>
-
-      {enabled && (
-        <>
-          {controls}
-          {rendered && (
-            <div
-              className={cn(
-                "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
-                open
-                  ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in slide-in-from-left fade-in"
-                  : "pointer-events-none duration-300 ease-in animate-out slide-out-to-left fade-out fill-mode-forwards"
-              )}
-              onAnimationEnd={() => {
-                if (!open) setRendered(false);
-              }}
-            >
-              <button
-                type="button"
-                onClick={closeDrawer}
-                aria-label="Close Box"
-                className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-              >
-                <XMarkIcon className="size-4" />
-              </button>
-              {boxAI}
-            </div>
-          )}
-        </>
-      )}
     </div>
   );
 }
