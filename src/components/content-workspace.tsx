@@ -121,57 +121,69 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  // Single persistent layout — CSS width transition pushes content card right smoothly.
-  return (
-    <div className="flex h-full min-h-0 gap-2" style={{ overflow: "visible" }}>
-      {/* Box AI panel — width transitions from 0 to 30% */}
-      {enabled && (
-        <div
-          className={cn(
-            "relative h-full min-h-0 shrink-0 transition-[width] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
-            isDesktop
-              ? open && rendered ? "w-[30%]" : "w-0"
-              : "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
-            !isDesktop && !open && "pointer-events-none",
-          )}
-          onTransitionEnd={() => { if (!open) setRendered(false); }}
-          style={{ overflow: "visible" }}
-        >
-          {rendered && (
-            <div
-              className={cn(
-                "h-full min-h-0 transition-opacity duration-300",
-                open ? "opacity-100" : "opacity-0",
-              )}
-            >
-              <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
-                {showTrigger && <SidebarTrigger />}
-              </div>
-              <button
-                type="button"
-                onClick={closeDrawer}
-                aria-label="Close Box"
-                className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-              >
-                <XMarkIcon className="size-4" />
-              </button>
-              {boxAI}
-            </div>
-          )}
-        </div>
-      )}
+  // Desktop open: ResizablePanelGroup for correct height containment.
+  // The whole group fades+slides in so BoxAI card entrance feels smooth.
+  if (open && isDesktop && rendered) {
+    return (
+      <ResizablePanelGroup orientation="horizontal" className="h-full gap-2 animate-in fade-in slide-in-from-left-4 duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
+          <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+            {showTrigger && <SidebarTrigger />}
+          </div>
+          <button
+            type="button"
+            onClick={closeDrawer}
+            aria-label="Close Box"
+            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+          >
+            <XMarkIcon className="size-4" />
+          </button>
+          {boxAI}
+        </ResizablePanel>
+        <ResizableHandle withHandle className="bg-transparent" />
+        <ResizablePanel defaultSize={70} minSize={70} maxSize={70} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
+          {controls}
+          {children}
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    );
+  }
 
-      {/* Content panel */}
+  // Mobile overlay or closed state.
+  return (
+    <div className="relative h-full min-h-0">
       <div
         className={cn(
-          "relative min-h-0 min-w-0 flex-1",
-          !isDesktop && open && "transition-[padding] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]",
+          "h-full transition-[padding]",
+          open && !isDesktop
+            ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]"
+            : "duration-300 ease-in pl-0",
         )}
-        style={{ overflow: "visible" }}
       >
         {controls}
         {children}
       </div>
+      {enabled && rendered && (
+        <div
+          className={cn(
+            "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
+            open
+              ? "animate-in slide-in-from-left duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+              : "pointer-events-none animate-out slide-out-to-left duration-300 ease-in fill-mode-forwards",
+          )}
+          onAnimationEnd={() => { if (!open) setRendered(false); }}
+        >
+          <button
+            type="button"
+            onClick={closeDrawer}
+            aria-label="Close Box"
+            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+          >
+            <XMarkIcon className="size-4" />
+          </button>
+          {boxAI}
+        </div>
+      )}
     </div>
   );
 }
