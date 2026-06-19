@@ -99,13 +99,34 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   );
 
   const desktopOpen = isDesktop && (open || exiting);
+  const [splitPct, setSplitPct] = React.useState(30);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const gridRef = React.useRef<HTMLDivElement>(null);
+  const dragging = React.useRef(false);
+
+  const onHandleMouseDown = (e: React.MouseEvent) => {
+    if (!desktopOpen) return;
+    dragging.current = true;
+    setIsDragging(true);
+    e.preventDefault();
+    const onMove = (ev: MouseEvent) => {
+      if (!dragging.current || !gridRef.current) return;
+      const rect = gridRef.current.getBoundingClientRect();
+      const pct = ((ev.clientX - rect.left) / rect.width) * 100;
+      setSplitPct(Math.min(50, Math.max(20, pct)));
+    };
+    const onUp = () => { dragging.current = false; setIsDragging(false); window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
 
   return (
     <div
-      className="h-full min-h-0 transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      ref={gridRef}
+      className={cn("h-full min-h-0", !isDragging && "transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]")}
       style={{
         display: "grid",
-        gridTemplateColumns: desktopOpen && rendered ? "30% 8px 1fr" : "0px 0px 1fr",
+        gridTemplateColumns: desktopOpen && rendered ? `${splitPct}% 8px 1fr` : "0px 0px 1fr",
         overflow: "visible",
       }}
     >
@@ -141,8 +162,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         )}
       </div>
 
-      {/* Gap column */}
-      <div />
+      {/* Drag handle */}
+      <div
+        className="group flex cursor-col-resize items-center justify-center"
+        onMouseDown={onHandleMouseDown}
+      >
+        <div className="h-12 w-1 rounded-full bg-sidebar-border transition-colors group-hover:bg-muted-foreground/40" />
+      </div>
 
       {/* Content column */}
       <div
