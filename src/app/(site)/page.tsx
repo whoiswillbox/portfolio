@@ -89,6 +89,7 @@ function FallingBox({ box }: { box: Box }) {
 export default function LandingPage() {
   const router = useRouter();
   const { setOpen } = useSidebar();
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -97,9 +98,9 @@ export default function LandingPage() {
     document.cookie = `entered_at=${Date.now()}; path=/; max-age=${maxAge}; samesite=lax`;
     document.cookie = `sidebar_state=true; path=/; max-age=${maxAge}; samesite=lax`;
     fetch("/api/enter", { method: "POST" });
+    setExiting(true);
     setOpen(true);
-    // Wait for sidebar open animation (200ms) then navigate.
-    setTimeout(() => router.push(path), 200);
+    setTimeout(() => router.push(path), 300);
   };
 
   return (
@@ -119,7 +120,8 @@ export default function LandingPage() {
       <ContentCard
         className={cn(
           "relative h-full overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
-          "duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in fade-in slide-in-from-bottom-4"
+          "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          exiting && "animate-out fade-out duration-200 fill-mode-forwards"
         )}
       >
         <FallingBoxes />
