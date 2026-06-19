@@ -125,8 +125,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // The whole group fades+slides in so BoxAI card entrance feels smooth.
   if (open && isDesktop && rendered) {
     return (
-      <ResizablePanelGroup orientation="horizontal" className="h-full gap-2 animate-in fade-in slide-in-from-left-4 duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
-        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
+      <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className="relative min-h-0 min-w-0 animate-in fade-in slide-in-from-left-4 duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
           <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
             {showTrigger && <SidebarTrigger />}
           </div>
