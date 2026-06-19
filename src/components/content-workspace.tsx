@@ -141,7 +141,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {/* Box AI column */}
       <div
         className="relative min-h-0 min-w-0 flex flex-col"
-        style={{ overflow: "visible" }}
+        style={{ overflow: "visible", height: "100%" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
