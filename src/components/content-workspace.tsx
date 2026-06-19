@@ -139,7 +139,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     >
       {/* Box AI column — absolutely positioned inside grid cell for correct height */}
       <div
-        className="relative"
+        className="relative h-full overflow-hidden"
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
