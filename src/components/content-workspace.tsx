@@ -131,16 +131,15 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // Single persistent grid — columns transition smoothly, no DOM swap ever.
   return (
     <div
-      className="h-full min-h-0 transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      className="relative h-full min-h-0 transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
       style={{
         display: "grid",
         gridTemplateColumns: desktopOpen && rendered ? "30% 8px 1fr" : "0px 0px 1fr",
-        overflow: "visible",
       }}
     >
-      {/* Box AI column */}
+      {/* Box AI column — absolutely positioned inside grid cell for correct height */}
       <div
-        className="relative min-h-0 min-w-0 overflow-hidden"
+        className="relative"
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
@@ -148,7 +147,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         {rendered && (
           <div
             className={cn(
-              "h-full transition-opacity duration-150",
+              "absolute inset-0 transition-opacity duration-150",
               exiting ? "opacity-0" : "opacity-100",
             )}
             style={{ overflow: "visible" }}
