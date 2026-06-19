@@ -128,7 +128,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {enabled && (
         <div
           className={cn(
-            "relative h-full shrink-0 transition-[width] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+            "relative h-full min-h-0 shrink-0 transition-[width] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
             isDesktop
               ? open && rendered ? "w-[30%]" : "w-0"
               : "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
@@ -140,7 +140,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           {rendered && (
             <div
               className={cn(
-                "h-full transition-opacity duration-300",
+                "h-full min-h-0 transition-opacity duration-300",
                 open ? "opacity-100" : "opacity-0",
               )}
             >
