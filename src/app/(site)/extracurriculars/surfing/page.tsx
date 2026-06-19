@@ -100,7 +100,7 @@ export default function Surfing() {
   return (
     <ContentCard className="h-full overflow-auto">
       <article className="mx-auto w-full max-w-4xl px-6 pb-32 pt-28">
-        <header className="relative flex flex-col gap-3">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-3">
             <h1 className="text-h1 font-bold tracking-tight">Surfing</h1>
             <p className="max-w-xl text-body-lg text-muted-foreground">
@@ -110,7 +110,7 @@ export default function Surfing() {
           <div
             role="tablist"
             aria-label="Year"
-            className="absolute right-0 top-0 flex h-full items-center"
+            className="shrink-0 sm:pt-1"
           >
           <div className="inline-flex w-fit flex-wrap items-center gap-0.5 rounded-lg border bg-background p-1">
             <button
