@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
+import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 interface Box {
@@ -87,14 +88,18 @@ function FallingBox({ box }: { box: Box }) {
 
 export default function LandingPage() {
   const router = useRouter();
+  const { setOpen } = useSidebar();
   const [exiting, setExiting] = useState(false);
 
   const enter = async (path: string) => {
     setExiting(true);
-    // Set both cookies server-side before navigating so the layout SSRs
-    // with the sidebar already open — no flash or layout shift on arrival.
+    // Open sidebar immediately so the card slides right as part of the exit
+    // animation, then set cookies + navigate once the animation completes.
+    setOpen(true);
     await fetch("/api/enter", { method: "POST" });
-    router.push(path);
+    // Wait for sidebar open animation (200ms) before pushing the route so
+    // the new page SSRs with sidebar already open — seamless, no flash.
+    setTimeout(() => router.push(path), 200);
   };
 
   return (
