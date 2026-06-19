@@ -67,7 +67,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const outerRef = React.useRef<HTMLDivElement>(null);
   const [colHeight, setColHeight] = React.useState<number | undefined>(undefined);
   React.useEffect(() => {
-    const el = outerRef.current;
+    // Measure the nearest bounded ancestor (main) not the grid itself
+    const el = outerRef.current?.closest("main") as HTMLElement | null;
     if (!el) return;
     const ro = new ResizeObserver(() => setColHeight(el.clientHeight));
     ro.observe(el);
