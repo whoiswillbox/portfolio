@@ -141,13 +141,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     >
       {/* Box AI column — same structure as /who page: h-full div wrapping BoxAI */}
       <div
-        className="relative h-full min-w-0 overflow-visible"
+        className="relative min-w-0 flex flex-col overflow-visible" style={{ height: "100%" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
       >
         {rendered && (
-          <div className={cn("h-full transition-opacity duration-150", exiting ? "opacity-0" : "opacity-100")}>
+          <div className={cn("flex-1 min-h-0 transition-opacity duration-150", exiting ? "opacity-0" : "opacity-100")}>
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
               {showTrigger && <SidebarTrigger />}
             </div>
