@@ -140,8 +140,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     >
       {/* Box AI column */}
       <div
-        className="relative min-h-0 min-w-0 flex flex-col"
-        style={{ overflow: "visible", height: "100%" }}
+        className="relative min-h-0 min-w-0"
+        style={{ overflow: "visible" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
@@ -149,10 +149,10 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         {rendered && (
           <div
             className={cn(
-              "relative flex-1 min-h-0 transition-opacity duration-150",
+              "absolute inset-0 transition-opacity duration-150",
               exiting ? "opacity-0" : "opacity-100",
             )}
-            style={{ overflow: "visible", maxHeight: "100%" }}
+            style={{ overflow: "visible" }}
           >
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
               {showTrigger && <SidebarTrigger />}
