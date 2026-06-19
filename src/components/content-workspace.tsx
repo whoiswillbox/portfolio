@@ -125,7 +125,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   if (open && isDesktop && rendered) {
     return (
       <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
-        <ResizablePanel defaultSize={30} minSize={20} maxSize={70} className="relative min-h-0 min-w-0 animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className="relative min-h-0 min-w-0 animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
           <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
             {showTrigger && <SidebarTrigger />}
           </div>
@@ -140,7 +140,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           {boxAI}
         </ResizablePanel>
         <ResizableHandle withHandle className="bg-transparent" />
-        <ResizablePanel defaultSize={70} minSize={30} maxSize={80} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize={70} minSize={70} maxSize={70} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
           {controls}
           {children}
         </ResizablePanel>
