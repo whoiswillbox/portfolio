@@ -141,7 +141,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     >
       {/* Box AI column — same structure as /who page: h-full div wrapping BoxAI */}
       <div
-        className="relative min-w-0 flex flex-col overflow-visible" style={{ height: "100%" }}
+        className="relative min-w-0 flex flex-col" style={{ height: "100%", overflow: "hidden" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
