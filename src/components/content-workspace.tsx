@@ -135,11 +135,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       style={{
         display: "grid",
         gridTemplateColumns: desktopOpen && rendered ? "30% 8px 1fr" : "0px 0px 1fr",
+        gridTemplateRows: "1fr",
       }}
     >
       {/* Box AI column — absolutely positioned inside grid cell for correct height */}
       <div
-        className="relative h-full overflow-hidden"
+        className="relative"
+        style={{ overflow: "visible" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
