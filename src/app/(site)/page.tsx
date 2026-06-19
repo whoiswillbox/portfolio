@@ -91,14 +91,16 @@ export default function LandingPage() {
   const { setOpen } = useSidebar();
   const [exiting, setExiting] = useState(false);
 
-  const enter = async (path: string) => {
+  const enter = (path: string) => {
+    // Set cookies client-side instantly so the next SSR sees them immediately.
+    const maxAge = 4 * 60 * 60;
+    document.cookie = `entered_at=${Date.now()}; path=/; max-age=${maxAge}; samesite=lax`;
+    document.cookie = `sidebar_state=true; path=/; max-age=${maxAge}; samesite=lax`;
     setExiting(true);
-    // Open sidebar immediately so the card slides right as part of the exit
-    // animation, then set cookies + navigate once the animation completes.
     setOpen(true);
-    await fetch("/api/enter", { method: "POST" });
-    // Wait for sidebar open animation (200ms) before pushing the route so
-    // the new page SSRs with sidebar already open — seamless, no flash.
+    // Fire server cookie sync in background — no await, don't block navigation.
+    fetch("/api/enter", { method: "POST" });
+    // Navigate after sidebar animation completes (200ms).
     setTimeout(() => router.push(path), 200);
   };
 
