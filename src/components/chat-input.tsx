@@ -34,12 +34,14 @@ export function ChatInput({
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   // Auto-grow the textarea up to a max height as the visitor types.
-  React.useEffect(() => {
+  const resize = React.useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
-    el.style.height = "auto";
+    el.style.height = "0px";
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
-  }, [value]);
+  }, []);
+  React.useEffect(() => { resize(); }, [value, resize]);
+  React.useLayoutEffect(() => { resize(); }, [resize]);
 
   // Keep the attached section mounted through its collapse animation. When the
   // parent clears `attachedSection`, we hold onto the last content and animate
