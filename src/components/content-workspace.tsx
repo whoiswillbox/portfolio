@@ -138,9 +138,9 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         gridTemplateRows: "1fr",
       }}
     >
-      {/* Box AI column — absolutely positioned inside grid cell for correct height */}
+      {/* Box AI column */}
       <div
-        className="relative"
+        className="relative min-h-0 min-w-0 flex flex-col"
         style={{ overflow: "visible" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
@@ -149,7 +149,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         {rendered && (
           <div
             className={cn(
-              "absolute inset-0 transition-opacity duration-150",
+              "relative flex-1 min-h-0 transition-opacity duration-150",
               exiting ? "opacity-0" : "opacity-100",
             )}
             style={{ overflow: "visible" }}
