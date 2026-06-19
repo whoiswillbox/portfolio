@@ -8,14 +8,13 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { findCaseStudyByPath } from "@/lib/case-studies";
 import { useBoxSeed } from "@/components/box-seed";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 
 export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
-  const [visible, setVisible] = React.useState(false);
+  const [exiting, setExiting] = React.useState(false);
   const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/";
   const boxParam = useSearchParams().get("box");
   const inProgressPaths = [
@@ -42,7 +41,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  React.useEffect(() => { setOpen(false); setRendered(false); setVisible(false); }, [pathname]);
+  React.useEffect(() => { setOpen(false); setExiting(false); setRendered(false); }, [pathname]);
 
   const boxAI = React.useMemo(
     () => <BoxAI key={boxParam ?? "default"} embedded seed={contextSeed} />,
@@ -54,26 +53,27 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   }, [boxParam, launcherEnabled]);
 
   const router = useRouter();
-
-  const openDrawer = () => {
-    setRendered(true);
-    setOpen(true);
-    // Let DOM mount first, then fade in
-    requestAnimationFrame(() => setVisible(true));
-  };
-
   const closeDrawer = () => {
-    setVisible(false);
-    setTimeout(() => {
-      setOpen(false);
-      setRendered(false);
-    }, 250);
+    if (isDesktop) setExiting(true);
+    else setOpen(false);
     if (boxParam) router.replace(pathname);
   };
-
   React.useEffect(() => {
-    if (open && !visible) setVisible(true);
-  }, [open, visible]);
+    if (open) setRendered(true);
+  }, [open]);
+
+  // Measure the outer container height and set it explicitly on the column
+  // so BoxAI's h-full resolves to a real pixel value, not scroll height.
+  const outerRef = React.useRef<HTMLDivElement>(null);
+  const [colHeight, setColHeight] = React.useState<number | undefined>(undefined);
+  React.useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setColHeight(el.clientHeight));
+    ro.observe(el);
+    setColHeight(el.clientHeight);
+    return () => ro.disconnect();
+  }, []);
 
   const controls = enabled && (
     <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
@@ -83,7 +83,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           <TooltipTrigger asChild>
             <button
               type="button"
-              onClick={openDrawer}
+              onClick={() => { setRendered(true); setOpen(true); }}
               aria-label="Ask Box"
               className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
             >
@@ -106,81 +106,85 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  // Desktop: ResizablePanelGroup for correct BoxAI height containment.
-  // visible drives opacity so enter/exit both animate smoothly.
-  if (isDesktop && rendered) {
-    return (
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="h-full gap-2"
-        style={{ overflow: "visible" }}
-      >
-        <ResizablePanel
-          defaultSize={30} minSize={30} maxSize={30}
-          className="relative min-h-0 min-w-0"
-          style={{ overflow: "visible", transition: "opacity 250ms ease", opacity: visible ? 1 : 0 }}
-        >
-          <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
-            {showTrigger && <SidebarTrigger />}
-          </div>
-          <button
-            type="button"
-            onClick={closeDrawer}
-            aria-label="Close Box"
-            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-          >
-            <XMarkIcon className="size-4" />
-          </button>
-          {boxAI}
-        </ResizablePanel>
-        <ResizableHandle withHandle className="bg-transparent" />
-        <ResizablePanel
-          defaultSize={70} minSize={70} maxSize={70}
-          className="relative min-h-0 min-w-0"
-          style={{ overflow: "visible" }}
-        >
-          {controls}
-          {children}
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    );
-  }
+  const desktopOpen = isDesktop && (open || exiting);
 
-  // Mobile overlay or closed state.
   return (
-    <div className="relative h-full min-h-0">
+    <div
+      ref={outerRef}
+      className="h-full min-h-0 transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      style={{
+        display: "grid",
+        gridTemplateColumns: desktopOpen && rendered ? "30% 8px 1fr" : "0px 0px 1fr",
+        overflow: "visible",
+      }}
+    >
+      {/* Box AI column — explicit pixel height so BoxAI's h-full resolves correctly */}
+      <div
+        className="relative min-w-0"
+        style={{ overflow: "visible", height: colHeight }}
+        onTransitionEnd={() => {
+          if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
+        }}
+      >
+        {rendered && (
+          <div
+            className={cn(
+              "absolute inset-0 transition-opacity duration-150",
+              exiting ? "opacity-0" : "opacity-100",
+            )}
+            style={{ overflow: "visible" }}
+          >
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+              {showTrigger && <SidebarTrigger />}
+            </div>
+            <button
+              type="button"
+              onClick={closeDrawer}
+              aria-label="Close Box"
+              className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            >
+              <XMarkIcon className="size-4" />
+            </button>
+            {boxAI}
+          </div>
+        )}
+      </div>
+
+      {/* Gap column */}
+      <div />
+
+      {/* Content column */}
       <div
         className={cn(
-          "h-full transition-[padding]",
-          open && !isDesktop
-            ? "duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]"
-            : "duration-300 ease-in pl-0",
+          "relative min-h-0 min-w-0",
+          !isDesktop && open && "transition-[padding] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]",
         )}
+        style={{ overflow: "visible" }}
       >
+        {!isDesktop && enabled && rendered && (
+          <div
+            className={cn(
+              "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
+              open
+                ? "animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                : "pointer-events-none animate-out slide-out-to-left duration-300 ease-in fill-mode-forwards",
+            )}
+            onAnimationEnd={() => { if (!open && !exiting) setRendered(false); }}
+          >
+            <button
+              type="button"
+              onClick={closeDrawer}
+              aria-label="Close Box"
+              className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            >
+              <XMarkIcon className="size-4" />
+            </button>
+            {boxAI}
+          </div>
+        )}
         {controls}
         {children}
       </div>
-      {enabled && rendered && (
-        <div
-          className={cn(
-            "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
-            open
-              ? "animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
-              : "pointer-events-none animate-out slide-out-to-left duration-300 ease-in fill-mode-forwards",
-          )}
-          onAnimationEnd={() => { if (!open) setRendered(false); }}
-        >
-          <button
-            type="button"
-            onClick={closeDrawer}
-            aria-label="Close Box"
-            className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
-          >
-            <XMarkIcon className="size-4" />
-          </button>
-          {boxAI}
-        </div>
-      )}
     </div>
   );
 }
