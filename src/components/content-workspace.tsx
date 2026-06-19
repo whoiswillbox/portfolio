@@ -59,7 +59,11 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     if (boxParam) router.replace(pathname);
   };
   React.useEffect(() => {
-    if (open) setRendered(true);
+    if (open) {
+      setRendered(true);
+      // Tell ChatInput to re-measure after the panel slides in
+      requestAnimationFrame(() => window.dispatchEvent(new Event("boxai:opened")));
+    }
   }, [open]);
 
   // Measure the outer container height and set it explicitly on the column

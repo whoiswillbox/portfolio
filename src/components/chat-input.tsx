@@ -46,6 +46,10 @@ export function ChatInput({
     const id = requestAnimationFrame(resize);
     return () => cancelAnimationFrame(id);
   }, [resize]);
+  React.useEffect(() => {
+    window.addEventListener("boxai:opened", resize);
+    return () => window.removeEventListener("boxai:opened", resize);
+  }, [resize]);
 
   // Keep the attached section mounted through its collapse animation. When the
   // parent clears `attachedSection`, we hold onto the last content and animate
