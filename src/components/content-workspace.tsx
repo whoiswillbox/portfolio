@@ -64,17 +64,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   // Measure the outer container height and set it explicitly on the column
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
-  const outerRef = React.useRef<HTMLDivElement>(null);
-  const [colHeight, setColHeight] = React.useState<number | undefined>(undefined);
-  React.useEffect(() => {
-    // Measure the nearest bounded ancestor (main) not the grid itself
-    const el = outerRef.current?.closest("main") as HTMLElement | null;
-    if (!el) return;
-    const ro = new ResizeObserver(() => setColHeight(el.clientHeight));
-    ro.observe(el);
-    setColHeight(el.clientHeight);
-    return () => ro.disconnect();
-  }, []);
 
   const controls = enabled && (
     <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
@@ -111,7 +100,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      ref={outerRef}
       className="h-full min-h-0 transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
       style={{
         display: "grid",
@@ -122,7 +110,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {/* Box AI column — explicit pixel height so BoxAI's h-full resolves correctly */}
       <div
         className="relative min-w-0 flex flex-col"
-        style={{ overflow: "visible", height: colHeight, maxHeight: colHeight }}
+        style={{ overflow: "visible", height: "calc(100vh - 1rem)", maxHeight: "calc(100vh - 1rem)" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
