@@ -135,7 +135,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       style={{
         display: "grid",
         gridTemplateColumns: desktopOpen && rendered ? "30% 8px 1fr" : "0px 0px 1fr",
-        gridTemplateRows: "1fr",
+        gridTemplateRows: "100%",
+        alignItems: "stretch",
       }}
     >
       {/* Box AI column */}
