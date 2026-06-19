@@ -129,7 +129,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {enabled && rendered && (
         <div
           className={cn(
-            "relative shrink-0 overflow-hidden transition-[width] ease-[cubic-bezier(0.32,0.72,0,1)]",
+            "relative shrink-0 transition-[width] ease-[cubic-bezier(0.32,0.72,0,1)]",
             isDesktop
               ? open ? "w-[30%] duration-300" : "w-0 duration-300"
               : "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
@@ -137,7 +137,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           )}
           onTransitionEnd={() => { if (!open) setRendered(false); }}
         >
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 overflow-hidden">
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
               {showTrigger && <SidebarTrigger />}
             </div>
