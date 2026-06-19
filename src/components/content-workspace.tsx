@@ -140,13 +140,19 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     >
       {/* Box AI column */}
       <div
-        className="relative min-h-0 min-w-0 overflow-hidden"
+        className="relative min-h-0 min-w-0"
+        style={{ overflow: "visible" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
       >
         {rendered && (
-          <div className="absolute inset-0">
+          <div
+            className={cn(
+              "h-full transition-opacity duration-150",
+              exiting ? "opacity-0" : "opacity-100",
+            )}
+          >
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
               {showTrigger && <SidebarTrigger />}
             </div>
