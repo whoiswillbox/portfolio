@@ -37,19 +37,16 @@ export function ChatInput({
   const resize = React.useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
+    if (!el.value) {
+      // Empty: use fixed single-line height to avoid scrollHeight reading container size
+      el.style.height = "36px";
+      return;
+    }
     el.style.height = "0px";
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
   }, []);
   React.useEffect(() => { resize(); }, [value, resize]);
-  React.useLayoutEffect(() => {
-    resize();
-    const id = requestAnimationFrame(resize);
-    return () => cancelAnimationFrame(id);
-  }, [resize]);
-  React.useEffect(() => {
-    window.addEventListener("boxai:opened", resize);
-    return () => window.removeEventListener("boxai:opened", resize);
-  }, [resize]);
+  React.useLayoutEffect(() => { resize(); }, [resize]);
 
   // Keep the attached section mounted through its collapse animation. When the
   // parent clears `attachedSection`, we hold onto the last content and animate
