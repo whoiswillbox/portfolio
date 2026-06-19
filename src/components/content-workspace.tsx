@@ -152,7 +152,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               "relative flex-1 min-h-0 transition-opacity duration-150",
               exiting ? "opacity-0" : "opacity-100",
             )}
-            style={{ overflow: "visible" }}
+            style={{ overflow: "visible", maxHeight: "100%" }}
           >
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
               {showTrigger && <SidebarTrigger />}
