@@ -11,6 +11,14 @@ export const MUSIC_NOTES = `How I think about music: my taste mirrors my design 
 
 Signature: if you had to name my taste in one artist, it's Black Marble. One song: "Iron Lung".
 
+Current rotation: "euthanasia" is always the baseline — it's the playlist I come back to most and is essentially the foundation of my taste. It's always on.
+
+Music while working: I rotate playlists depending on what I'm working on — no single playlist, just whatever fits the mode.
+
+Dream shows: I would have loved to see any artist from my "euthanasia" or "neutral" playlists live — those two represent the music that means the most to me. Current Joys and Lil Peep are the two I think about most.
+
+Surfing and music: I can't listen to music while surfing (no waterproof setup), but I joke that I'd surf way better if I could.
+
 Making music: I tried making EDM back in 2016 and failed miserably 😅. I was inspired by the SoundCloud EDM era where people would take normal songs and add drops to them.
 
 Best live shows: Flume in 2016 and Black Marble in 2022 are my favorites I've seen.
