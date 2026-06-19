@@ -24,6 +24,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
+  const [exiting, setExiting] = React.useState(false);
   // /who and /conversations own their own top bar (sidebar trigger + Back), so
   // ContentWorkspace doesn't overlay its controls there.
   const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/";
@@ -61,7 +62,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Close when navigating between pages.
-  React.useEffect(() => setOpen(false), [pathname]);
+  React.useEffect(() => { setOpen(false); setExiting(false); }, [pathname]);
   // Auto-open when arrived at via a conversation in the sidebar
   // (/<project>?box=<id>): Box AI docks beside the case study. Runs after the
   // pathname-close effect above, so it wins on a fresh navigation.
@@ -98,7 +99,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           <TooltipTrigger asChild>
             <button
               type="button"
-              onClick={() => setOpen(true)}
+              onClick={() => { setExiting(true); setTimeout(() => { setExiting(false); setOpen(true); }, 200); }}
               aria-label="Ask Box"
               className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
             >
@@ -125,7 +126,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   if (open && isDesktop && rendered) {
     return (
       <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
-        <ResizablePanel defaultSize="30%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in slide-in-from-left fade-in" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize="30%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 animate-in slide-in-from-left fade-in duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
           <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
             {showTrigger && <SidebarTrigger />}
           </div>
@@ -140,7 +141,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           {boxAI}
         </ResizablePanel>
         <ResizableHandle withHandle className="bg-transparent" />
-        <ResizablePanel defaultSize="70%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in fade-in" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize="70%" minSize="30%" maxSize="70%" className="relative min-h-0 min-w-0 animate-in fade-in duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
           {controls}
           {children}
         </ResizablePanel>
@@ -156,7 +157,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           "h-full transition-[padding]",
           open && !isDesktop
             ? "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]"
-            : "duration-300 ease-in pl-0"
+            : "duration-300 ease-in pl-0",
+          exiting && "animate-out fade-out duration-200 fill-mode-forwards"
         )}
       >
         {children}
