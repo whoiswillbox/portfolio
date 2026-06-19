@@ -139,10 +139,10 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         alignItems: "stretch",
       }}
     >
-      {/* Box AI column — overflow hidden bounds height; negative margin lets card shadow bleed */}
+      {/* Box AI column */}
       <div
         className="relative min-h-0 min-w-0"
-        style={{ overflow: "hidden", height: "100%", margin: "-2px", padding: "2px" }}
+        style={{ overflow: "hidden", height: "100%" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
