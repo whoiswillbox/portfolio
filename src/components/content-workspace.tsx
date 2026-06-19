@@ -139,10 +139,10 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         alignItems: "stretch",
       }}
     >
-      {/* Box AI column */}
+      {/* Box AI column — overflow hidden bounds height; negative margin lets card shadow bleed */}
       <div
         className="relative min-h-0 min-w-0"
-        style={{ overflow: "clip", height: "100%" }}
+        style={{ overflow: "hidden", height: "100%", margin: "-2px", padding: "2px" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
@@ -153,7 +153,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               "absolute inset-0 transition-opacity duration-150",
               exiting ? "opacity-0" : "opacity-100",
             )}
-            style={{ overflow: "visible" }}
           >
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
               {showTrigger && <SidebarTrigger />}
