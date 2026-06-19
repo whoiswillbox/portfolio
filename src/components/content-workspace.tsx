@@ -140,10 +140,9 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           {rendered && (
             <div
               className={cn(
-                "absolute inset-0 transition-opacity duration-300",
+                "h-full transition-opacity duration-300",
                 open ? "opacity-100" : "opacity-0",
               )}
-              style={{ overflow: "visible" }}
             >
               <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
                 {showTrigger && <SidebarTrigger />}
