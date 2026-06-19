@@ -89,19 +89,14 @@ function FallingBox({ box }: { box: Box }) {
 export default function LandingPage() {
   const router = useRouter();
   const { setOpen } = useSidebar();
-  const [exiting, setExiting] = useState(false);
 
   const enter = (path: string) => {
-    // Set cookies client-side instantly so the next SSR sees them immediately.
     const maxAge = 4 * 60 * 60;
     document.cookie = `entered_at=${Date.now()}; path=/; max-age=${maxAge}; samesite=lax`;
     document.cookie = `sidebar_state=true; path=/; max-age=${maxAge}; samesite=lax`;
-    setExiting(true);
-    setOpen(true);
-    // Fire server cookie sync in background — no await, don't block navigation.
     fetch("/api/enter", { method: "POST" });
-    // Navigate after sidebar animation completes (200ms).
-    setTimeout(() => router.push(path), 200);
+    setOpen(true);
+    router.push(path);
   };
 
   return (
@@ -121,8 +116,7 @@ export default function LandingPage() {
       <ContentCard
         className={cn(
           "relative h-full overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
-          "duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in fade-in slide-in-from-bottom-4",
-          exiting && "duration-200 animate-out fade-out fill-mode-forwards"
+          "duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] animate-in fade-in slide-in-from-bottom-4"
         )}
       >
         <FallingBoxes />
@@ -133,10 +127,10 @@ export default function LandingPage() {
           </h1>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button size="lg" className="flex-1 py-6 text-base" disabled={exiting} onClick={() => enter("/who")}>
+            <Button size="lg" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
               I&apos;m a recruiter / hiring manager
             </Button>
-            <Button size="lg" variant="outline" className="flex-1 py-6 text-base" disabled={exiting} onClick={() => enter("/who")}>
+            <Button size="lg" variant="outline" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
               I&apos;m a friend
             </Button>
           </div>
