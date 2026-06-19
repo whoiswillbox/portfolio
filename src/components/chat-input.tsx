@@ -77,7 +77,7 @@ export function ChatInput({
         aria-label={ariaLabel}
         disabled={disabled}
         className="max-h-40 w-full resize-none bg-transparent px-2 py-1.5 text-body-sm text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-50"
-        style={{ minHeight: 0 }}
+        style={{ minHeight: 0, height: "0px" }}
       />
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 pl-1">{footerLeft}</div>
