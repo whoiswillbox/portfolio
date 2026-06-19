@@ -126,7 +126,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       className={cn("h-full min-h-0", !isDragging && "transition-[grid-template-columns] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]")}
       style={{
         display: "grid",
-        gridTemplateColumns: desktopOpen && rendered ? `${splitPct}% 8px 1fr` : "0px 0px 1fr",
+        gridTemplateColumns: desktopOpen && rendered ? `${splitPct}% 16px 1fr` : "0px 0px 1fr",
         overflow: "visible",
       }}
     >
