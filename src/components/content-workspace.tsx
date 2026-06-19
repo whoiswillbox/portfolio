@@ -24,6 +24,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
+  const [settled, setSettled] = React.useState(false);
   // /who and /conversations own their own top bar (sidebar trigger + Back), so
   // ContentWorkspace doesn't overlay its controls there.
   const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/";
@@ -61,7 +62,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Close when navigating between pages.
-  React.useEffect(() => { setOpen(false); }, [pathname]);
+  React.useEffect(() => { setOpen(false); setSettled(false); }, [pathname]);
   // Auto-open when arrived at via a conversation in the sidebar
   // (/<project>?box=<id>): Box AI docks beside the case study. Runs after the
   // pathname-close effect above, so it wins on a fresh navigation.
@@ -83,6 +84,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const closeDrawer = () => {
     setOpen(false);
+    setSettled(false);
     if (boxParam) router.replace(pathname);
   };
   // Mount the panel when opening (it unmounts itself after the exit animation).
@@ -121,21 +123,56 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  // Single persistent layout — Box AI panel slides in from left pushing content right.
-  // On mobile it overlays; on desktop it pushes via width transition (no DOM swap).
+  const boxPanel = enabled && rendered && (
+    <div className="relative h-full">
+      <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+        {showTrigger && <SidebarTrigger />}
+      </div>
+      <button
+        type="button"
+        onClick={closeDrawer}
+        aria-label="Close Box"
+        className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+      >
+        <XMarkIcon className="size-4" />
+      </button>
+      {boxAI}
+    </div>
+  );
+
+  // Desktop settled: hand off to resizable panels so user can drag the divider.
+  if (open && settled && isDesktop && rendered) {
+    return (
+      <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize={30} minSize={20} maxSize={70} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
+          {boxPanel}
+        </ResizablePanel>
+        <ResizableHandle withHandle className="bg-transparent" />
+        <ResizablePanel defaultSize={70} minSize={30} maxSize={80} className="relative min-h-0 min-w-0" style={{ overflow: "visible" }}>
+          {controls}
+          {children}
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    );
+  }
+
+  // Sliding transition layout (opening/closing on desktop, or mobile overlay).
   return (
     <div className="flex h-full min-h-0 gap-2 overflow-visible">
-      {/* Box AI panel */}
+      {/* Box AI panel — CSS width transition */}
       {enabled && rendered && (
         <div
           className={cn(
-            "relative shrink-0 transition-[width] ease-[cubic-bezier(0.32,0.72,0,1)] overflow-visible",
+            "relative shrink-0 overflow-visible transition-[width] ease-[cubic-bezier(0.32,0.72,0,1)]",
             isDesktop
               ? open ? "w-[30%] duration-300" : "w-0 duration-300"
               : "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
             !isDesktop && !open && "pointer-events-none",
           )}
-          onTransitionEnd={() => { if (!open) setRendered(false); }}
+          onTransitionEnd={() => {
+            if (!open) setRendered(false);
+            else if (isDesktop) setSettled(true);
+          }}
         >
           <div className="relative h-full">
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
@@ -158,7 +195,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "relative min-h-0 min-w-0 flex-1 overflow-visible",
-          // Mobile overlay push
           !isDesktop && open && "duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]",
         )}
       >
