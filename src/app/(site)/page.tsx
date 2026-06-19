@@ -100,7 +100,7 @@ export default function LandingPage() {
     fetch("/api/enter", { method: "POST" });
     setExiting(true);
     setOpen(true);
-    setTimeout(() => router.push(path), 150);
+    router.push(path);
   };
 
   return (
@@ -121,7 +121,7 @@ export default function LandingPage() {
         className={cn(
           "relative h-full overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
           "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-          exiting && "animate-out fade-out duration-150 fill-mode-forwards"
+          exiting && "animate-out fade-out duration-300 fill-mode-forwards"
         )}
       >
         <FallingBoxes />
