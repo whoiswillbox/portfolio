@@ -110,7 +110,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {/* Box AI column — explicit pixel height so BoxAI's h-full resolves correctly */}
       <div
         className="relative min-w-0 flex flex-col"
-        style={{ overflow: "visible", height: "calc(100vh - 1rem)", maxHeight: "calc(100vh - 1rem)" }}
+        style={{ overflow: "hidden", height: "calc(100vh - 1rem)", maxHeight: "calc(100vh - 1rem)" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
@@ -121,7 +121,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               "relative flex flex-col flex-1 min-h-0 transition-opacity duration-150",
               exiting ? "opacity-0" : "opacity-100",
             )}
-            style={{ overflow: "visible" }}
+            style={{ filter: "drop-shadow(0 4px 12px rgb(0 0 0 / 0.08))" }}
           >
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
               {showTrigger && <SidebarTrigger />}
