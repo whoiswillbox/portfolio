@@ -97,7 +97,8 @@ export default function LandingPage() {
     document.cookie = `entered_at=${Date.now()}; path=/; max-age=${maxAge}; samesite=lax`;
     document.cookie = `sidebar_state=true; path=/; max-age=${maxAge}; samesite=lax`;
     fetch("/api/enter", { method: "POST" });
-    router.push(path);
+    // Hard navigate so the layout SSRs fresh with sidebar_state=true cookie.
+    window.location.href = path;
   };
 
   return (
