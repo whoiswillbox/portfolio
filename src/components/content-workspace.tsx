@@ -24,6 +24,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
+  const [exiting, setExiting] = React.useState(false);
   // /who and /conversations own their own top bar (sidebar trigger + Back), so
   // ContentWorkspace doesn't overlay its controls there.
   const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/";
@@ -61,7 +62,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Close when navigating between pages.
-  React.useEffect(() => { setOpen(false); }, [pathname]);
+  React.useEffect(() => { setOpen(false); setExiting(false); setRendered(false); }, [pathname]);
   // Auto-open when arrived at via a conversation in the sidebar
   // (/<project>?box=<id>): Box AI docks beside the case study. Runs after the
   // pathname-close effect above, so it wins on a fresh navigation.
@@ -82,7 +83,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // project's own nav item (we've cancelled out of the conversation).
   const router = useRouter();
   const closeDrawer = () => {
-    setOpen(false);
+    setExiting(true);
     if (boxParam) router.replace(pathname);
   };
   // Mount the panel when opening (it unmounts itself after the exit animation).
@@ -123,10 +124,10 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   // Desktop open: ResizablePanelGroup for correct height containment.
   // The whole group fades+slides in so BoxAI card entrance feels smooth.
-  if (open && isDesktop && rendered) {
+  if ((open || exiting) && isDesktop && rendered) {
     return (
       <ResizablePanelGroup orientation="horizontal" className="h-full gap-2" style={{ overflow: "visible" }}>
-        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className="relative min-h-0 min-w-0 animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ overflow: "visible" }}>
+        <ResizablePanel defaultSize={30} minSize={30} maxSize={30} className={cn("relative min-h-0 min-w-0", exiting ? "animate-out slide-out-to-left fade-out duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] fill-mode-forwards" : "animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]")} style={{ overflow: "visible" }} onAnimationEnd={() => { if (exiting) { setExiting(false); setOpen(false); setRendered(false); } }}>
           <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
             {showTrigger && <SidebarTrigger />}
           </div>
