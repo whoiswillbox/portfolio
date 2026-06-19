@@ -103,10 +103,12 @@ export function CaseStudyLayout({
       </Dialog>
     <article className="@container mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 pb-40 pt-28">
       {/* Hero */}
-      <header className="relative flex flex-col gap-3">
-        <h1 className="text-h1 font-bold tracking-tight">{title}</h1>
-        {summary && <p className="max-w-xl font-heading text-body-lg text-muted-foreground">{summary}</p>}
-        {headerExtra && <div className="absolute right-0 top-0 flex h-full items-center">{headerExtra}</div>}
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-h1 font-bold tracking-tight">{title}</h1>
+          {summary && <p className="max-w-xl font-heading text-body-lg text-muted-foreground">{summary}</p>}
+        </div>
+        {headerExtra && <div className="shrink-0">{headerExtra}</div>}
       </header>
 
       {/* Hero image / content (or gradient placeholder) */}
