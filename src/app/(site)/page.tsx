@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
+import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 interface Box {
@@ -87,6 +88,9 @@ function FallingBox({ box }: { box: Box }) {
 
 export default function LandingPage() {
   const router = useRouter();
+  const { setOpen } = useSidebar();
+
+  useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const enter = (path: string) => {
     const maxAge = 4 * 60 * 60;
