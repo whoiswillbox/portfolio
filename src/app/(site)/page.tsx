@@ -97,8 +97,9 @@ export default function LandingPage() {
     document.cookie = `entered_at=${Date.now()}; path=/; max-age=${maxAge}; samesite=lax`;
     document.cookie = `sidebar_state=true; path=/; max-age=${maxAge}; samesite=lax`;
     fetch("/api/enter", { method: "POST" });
-    // Hard navigate so the layout SSRs fresh with sidebar_state=true cookie.
-    window.location.href = path;
+    setOpen(true);
+    // Wait for sidebar open animation (200ms) then navigate.
+    setTimeout(() => router.push(path), 200);
   };
 
   return (
