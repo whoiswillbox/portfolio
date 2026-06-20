@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -38,7 +39,9 @@ export default async function SiteLayout({
               inside the content card. */}
           <main className="flex flex-1 flex-col min-w-0 min-h-0">
             <BoxSeedProvider>
-              <ContentWorkspace>{children}</ContentWorkspace>
+              <Suspense fallback={null}>
+                <ContentWorkspace>{children}</ContentWorkspace>
+              </Suspense>
             </BoxSeedProvider>
           </main>
         </SidebarInset>

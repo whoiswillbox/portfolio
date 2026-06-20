@@ -93,13 +93,10 @@ export default function LandingPage() {
 
   useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const enter = (path: string) => {
-    const maxAge = 4 * 60 * 60;
-    document.cookie = `entered_at=${Date.now()}; path=/; max-age=${maxAge}; samesite=lax`;
-    document.cookie = `sidebar_state=true; path=/; max-age=${maxAge}; samesite=lax`;
-    fetch("/api/enter", { method: "POST" });
+  const enter = async (path: string) => {
     setExiting(true);
     setOpen(true);
+    await fetch("/api/enter", { method: "POST" });
     router.push(path);
   };
 
