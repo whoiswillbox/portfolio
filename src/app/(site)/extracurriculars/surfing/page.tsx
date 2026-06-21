@@ -115,7 +115,7 @@ function MediaBlock({ item }: { item: MediaItem }) {
 export default function Surfing() {
   const [year, setYear] = useState<2026 | 2023 | 2020 | 2019 | 2018 | null>(null);
 
-  const filtered = year ? MEDIA.filter((m) => m.year === year) : MEDIA;
+  const filtered = (year ? MEDIA.filter((m) => m.year === year) : [...MEDIA].sort((a, b) => b.year - a.year));
 
   return (
     <ContentCard className="h-full overflow-auto">
