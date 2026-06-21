@@ -1,20 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef } from "react";
 import { BoxAI } from "@/components/box-ai";
 import { cn } from "@/lib/utils";
 
 export default function Who() {
-  const [entered, setEntered] = useState(false);
-
-  useEffect(() => {
-    if (sessionStorage.getItem("entered") === "1") {
-      setEntered(true);
-    }
-  }, []);
+  // Read flag synchronously on first render — before any effects (including
+  // content-workspace's pathname effect) can remove it from sessionStorage.
+  const entered = useRef(
+    typeof window !== "undefined" && sessionStorage.getItem("entered") === "1"
+  );
 
   return (
-    <div className={cn("h-full", entered && "animate-in fade-in duration-500")}>
+    <div className={cn("h-full", entered.current && "animate-in fade-in duration-500")}>
       <BoxAI />
     </div>
   );

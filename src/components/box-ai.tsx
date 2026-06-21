@@ -416,8 +416,12 @@ export function BoxAI({
 
   // Persist whenever conversations change (after initial load). saveConversations
   // also notifies the sidebar so its list stays in sync.
+  // savingRef prevents the subscribe below from echo-looping back into setConversations
+  // when the event was triggered by our own save.
+  const savingRef = React.useRef(false);
   React.useEffect(() => {
     if (!loaded) return;
+    savingRef.current = true;
     saveConversations(conversations);
   }, [conversations, loaded]);
 
@@ -427,8 +431,8 @@ export function BoxAI({
   React.useEffect(() => {
     if (!loaded) return;
     return subscribeConversations(() => {
-      const fresh = loadConversations();
-      setConversations(fresh);
+      if (savingRef.current) { savingRef.current = false; return; }
+      setConversations(loadConversations());
     });
   }, [loaded]);
 
@@ -492,15 +496,31 @@ export function BoxAI({
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let fullText = "";
+      let emitted = 0; // chars already sent to onToken
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
         fullText += chunk;
-        // Stream visible text only — strip sentinel suffix as it arrives
-        const sentinelIdx = fullText.indexOf("\n\n__SUGGESTIONS__");
-        onToken(sentinelIdx === -1 ? chunk : fullText.slice(0, sentinelIdx).slice(fullText.length - chunk.length));
+        // Only emit text that precedes any sentinel prefix.
+        // We conservatively hold back the last 20 chars in case the sentinel
+        // is split across chunks — flush them once we know they're clean.
+        const SENTINEL = "\n\n__SUGGESTIONS__";
+        const sentinelIdx = fullText.indexOf(SENTINEL);
+        const safeEnd = sentinelIdx !== -1
+          ? sentinelIdx                              // sentinel found — stop here
+          : Math.max(emitted, fullText.length - SENTINEL.length); // hold back potential prefix
+        if (safeEnd > emitted) {
+          onToken(fullText.slice(emitted, safeEnd));
+          emitted = safeEnd;
+        }
+      }
+      // Flush any remaining safe text (no sentinel found)
+      const sentinelIdx2 = fullText.indexOf("\n\n__SUGGESTIONS__");
+      const finalEnd = sentinelIdx2 !== -1 ? sentinelIdx2 : fullText.length;
+      if (finalEnd > emitted) {
+        onToken(fullText.slice(emitted, finalEnd));
       }
 
       // Split out suggestions sentinel

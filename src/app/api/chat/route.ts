@@ -88,57 +88,61 @@ export async function POST(request: Request) {
         const encoder = new TextEncoder();
         let fullText = "";
 
-        for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
-            const chunk = event.delta.text;
-            fullText += chunk;
-            controller.enqueue(encoder.encode(chunk));
-          }
-        }
-
-        const finalMessage = await stream.finalMessage();
-        console.log("chat usage:", {
-          input_tokens: finalMessage.usage.input_tokens,
-          output_tokens: finalMessage.usage.output_tokens,
-        });
-
-        // Generate follow-up suggestions based on the conversation
         try {
-          const suggestionMsg = await client.messages.create({
-            model: MODEL,
-            max_tokens: 100,
-            system: "Reply with ONLY a JSON array of 2-3 short follow-up questions (under 8 words each) the visitor might ask next. Output only the raw JSON array, nothing else.",
-            messages: [
-              ...messages,
-              { role: "assistant", content: fullText },
-              { role: "user", content: "JSON array of 2-3 follow-up questions:" },
-            ],
-          });
-          const raw = suggestionMsg.content[0].type === "text" ? suggestionMsg.content[0].text.trim() : "[]";
-          // Strip markdown code fences if model wraps it
-          const cleaned = raw.replace(/^```json?\n?/, "").replace(/\n?```$/, "").trim();
-          const parsed = JSON.parse(cleaned);
-          if (Array.isArray(parsed)) {
-            controller.enqueue(encoder.encode(`\n\n__SUGGESTIONS__${JSON.stringify(parsed)}`));
+          for await (const event of stream) {
+            if (
+              event.type === "content_block_delta" &&
+              event.delta.type === "text_delta"
+            ) {
+              const chunk = event.delta.text;
+              fullText += chunk;
+              controller.enqueue(encoder.encode(chunk));
+            }
           }
-        } catch {
-          // suggestions are best-effort
+
+          const finalMessage = await stream.finalMessage();
+          console.log("chat usage:", {
+            input_tokens: finalMessage.usage.input_tokens,
+            output_tokens: finalMessage.usage.output_tokens,
+          });
+
+          // Generate follow-up suggestions based on the conversation
+          try {
+            const suggestionMsg = await client.messages.create({
+              model: MODEL,
+              max_tokens: 100,
+              system: "Reply with ONLY a JSON array of 2-3 short follow-up questions (under 8 words each) the visitor might ask next. Output only the raw JSON array, nothing else.",
+              messages: [
+                ...messages,
+                { role: "assistant", content: fullText },
+                { role: "user", content: "JSON array of 2-3 follow-up questions:" },
+              ],
+            });
+            const raw = suggestionMsg.content[0].type === "text" ? suggestionMsg.content[0].text.trim() : "[]";
+            // Strip markdown code fences if model wraps it
+            const cleaned = raw.replace(/^```json?\n?/, "").replace(/\n?```$/, "").trim();
+            const parsed = JSON.parse(cleaned);
+            if (Array.isArray(parsed)) {
+              controller.enqueue(encoder.encode(`\n\n__SUGGESTIONS__${JSON.stringify(parsed)}`));
+            }
+          } catch {
+            // suggestions are best-effort
+          }
+
+          await logChat({
+            t: new Date().toISOString(),
+            q: question,
+            a: fullText.slice(0, 300),
+            country: request.headers.get("x-vercel-ip-country") ?? undefined,
+            city: city ? decodeURIComponent(city) : undefined,
+            ip: ipRaw ? await hashIp(ipRaw) : undefined,
+            c: conversationId,
+          });
+        } catch (err) {
+          console.error("stream error:", err);
+        } finally {
+          controller.close();
         }
-
-        await logChat({
-          t: new Date().toISOString(),
-          q: question,
-          a: fullText.slice(0, 300),
-          country: request.headers.get("x-vercel-ip-country") ?? undefined,
-          city: city ? decodeURIComponent(city) : undefined,
-          ip: ipRaw ? await hashIp(ipRaw) : undefined,
-          c: conversationId,
-        });
-
-        controller.close();
       },
     });
 
