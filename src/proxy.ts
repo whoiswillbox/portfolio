@@ -31,9 +31,10 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Landing-page gate: skip for /, /unlock, /api/*, /admin/*.
+  // Landing-page gate: skip for /, /who (now hosts the landing overlay), /unlock, /api/*, /admin/*.
   if (
     path !== "/" &&
+    path !== "/who" &&
     !path.startsWith("/unlock") &&
     !path.startsWith("/api/") &&
     !path.startsWith("/admin")
