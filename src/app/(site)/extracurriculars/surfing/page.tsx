@@ -18,6 +18,7 @@ type MediaItem = {
   width?: number;
   height?: number;
   fullWidth?: boolean;
+  aspect?: string;
 };
 
 const MEDIA: MediaItem[] = [
@@ -36,7 +37,7 @@ const MEDIA: MediaItem[] = [
 
   { type: "image", src: "/projects/surfing/DSCF3790.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
   { type: "image", src: "/projects/surfing/DSCF3770.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
-  { type: "video", src: "/projects/surfing/blacks-beach-2018-compressed.mp4", label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
+  { type: "video", src: "/projects/surfing/blacks-beach-2018-compressed.mp4", label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018, aspect: "aspect-[4/3]" },
   { type: "video", src: "/projects/surfing/revo-trimmed-slo-compressed.mp4",                    label: "Pacific Beach · PB Drive",  year: 2019 },
   { type: "video", src: "/projects/surfing/will-snap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-almost-combo-compressed.mp4",                   label: "Leucadia · Grandview",      year: 2019 },
@@ -45,7 +46,7 @@ const MEDIA: MediaItem[] = [
 
 const YEARS = [2026, 2023, 2020, 2019, 2018] as const;
 
-function AutoplayVideo({ src }: { src: string }) {
+function AutoplayVideo({ src, aspect }: { src: string; aspect?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -70,7 +71,7 @@ function AutoplayVideo({ src }: { src: string }) {
     return () => observer.disconnect();
   }, [src]);
 
-  return <video ref={ref} src={src} loop muted playsInline preload="auto" className="w-full rounded-xl aspect-video bg-muted" />;
+  return <video ref={ref} src={src} loop muted playsInline preload="auto" className={cn("w-full rounded-xl bg-muted", aspect ?? "aspect-video")} />;
 }
 
 function MediaBlock({ item }: { item: MediaItem }) {
@@ -94,7 +95,7 @@ function MediaBlock({ item }: { item: MediaItem }) {
           <img src={item.src} alt={item.alt!} className="h-auto w-full object-cover object-top" />
         </div>
       )}
-      {item.type === "video" && <AutoplayVideo src={item.src} />}
+      {item.type === "video" && <AutoplayVideo src={item.src} aspect={item.aspect} />}
       {item.type === "sequence" && (
         <div className="flex flex-col gap-4">
           {[item.src, ...(item.srcs ?? [])].map((s, i) => (
