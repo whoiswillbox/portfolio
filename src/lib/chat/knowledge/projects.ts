@@ -43,10 +43,10 @@ export const projectEntries: QAEntry[] = [
     keywords: [
       "favorite project", "favourite project", "favorite", "favourite",
       "best project", "proudest", "favorite work", "favorite thing",
-      "case study", "next gen bar", "bar prep",
+      "case study", "design standards",
     ],
     answer:
-      "My favorite is Next Gen Bar Prep — the adaptive bar-exam platform I led at BARBRI. It's still being put together on the right, but I'm happy to talk through it. What would you like to know? 👇 [[case-study:next-gen-bar]]",
+      "My favorite is Design Standards — I was responsible for shaping the internal design language at Technergetics that benefited customers externally through curated patterns. Check it out 👇 [[case-study:design-standards]]",
   },
   {
     id: "projects",
