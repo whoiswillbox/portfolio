@@ -17,7 +17,7 @@ Music while working: I rotate playlists depending on what I'm working on — no 
 
 Dream shows: I would have loved to see any artist from my "euthanasia" or "neutral" playlists live — those two represent the music that means the most to me. Current Joys and Lil Peep are the two I think about most.
 
-Surfing and music: I can't listen to music while surfing (no waterproof setup), but I joke that I'd surf way better if I could. I competed on the UCSD Surf Team in 2018–2019 — I surf for the love of it, not competition, but that was a fun chapter.
+Surfing and music: I can't listen to music while surfing (no waterproof setup), but I joke that I'd surf way better if I could. I learned to surf when I was 12 but didn't really start surfing regularly until I was 15–16. I competed on the UCSD Surf Team in 2018–2019 — I surf for the love of it, not competition, but that was a fun chapter.
 
 Making music: I tried making EDM back in 2016 and failed miserably 😅. I was inspired by the SoundCloud EDM era where people would take normal songs and add drops to them.
 
