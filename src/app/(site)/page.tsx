@@ -101,7 +101,7 @@ export default function LandingPage() {
 
   const enter = (path: string) => {
     setLoading(true);
-    setTimeout(() => { sessionStorage.setItem("entered", "1"); setOpen(true); router.push(path); }, 2000);
+    setTimeout(() => { sessionStorage.setItem("entered", "1"); router.push(path); }, 2000);
   };
 
   return (
