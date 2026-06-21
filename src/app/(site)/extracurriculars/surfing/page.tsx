@@ -10,7 +10,7 @@ type MediaItem = {
   src: string;
   alt?: string;
   label: string;
-  year: 2026 | 2023 | 2020 | 2019;
+  year: 2026 | 2023 | 2020 | 2019 | 2018;
   /** Use natural image dimensions instead of the default 16/7 crop */
   natural?: boolean;
   width?: number;
@@ -30,13 +30,14 @@ const MEDIA: MediaItem[] = [
   { type: "video", src: "/projects/surfing/mvi-0038-compressed.mp4",                            label: "La Jolla · Scripps",        year: 2020 },
   { type: "video", src: "/projects/surfing/mvi-0032-compressed.mp4",                            label: "La Jolla · Scripps",        year: 2020 },
   { type: "image", src: "/projects/surfing/delmar-15th.png", alt: "Surfing Del Mar 15th Street", label: "Del Mar · 15th Street",     year: 2019, natural: true, width: 1439, height: 810 },
+  { type: "image", src: "/projects/surfing/45890266_992600090926215_2195589467853553664_o.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018 },
   { type: "video", src: "/projects/surfing/revo-trimmed-slo-compressed.mp4",                    label: "Pacific Beach · PB Drive",  year: 2019 },
   { type: "video", src: "/projects/surfing/will-snap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-almost-combo-compressed.mp4",                   label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-wrap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
 ];
 
-const YEARS = [2026, 2023, 2020, 2019] as const;
+const YEARS = [2026, 2023, 2020, 2019, 2018] as const;
 
 function AutoplayVideo({ src }: { src: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -93,7 +94,7 @@ function MediaBlock({ item }: { item: MediaItem }) {
 }
 
 export default function Surfing() {
-  const [year, setYear] = useState<2026 | 2023 | 2020 | 2019 | null>(null);
+  const [year, setYear] = useState<2026 | 2023 | 2020 | 2019 | 2018 | null>(null);
 
   const filtered = year ? MEDIA.filter((m) => m.year === year) : MEDIA;
 
