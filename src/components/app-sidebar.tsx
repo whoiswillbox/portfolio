@@ -168,7 +168,7 @@ export function AppSidebar({
                           <Icon />
                           <span>{group.title}</span>
                           {"comingSoon" in group && group.comingSoon && (
-                            <Badge variant="warning" className="ml-1 font-mono tracking-wide">PACKAGING</Badge>
+                            <Badge variant="warning" className="ml-1">PACKAGING</Badge>
                           )}
                         </Link>
                       </SidebarMenuButton>
@@ -189,7 +189,7 @@ export function AppSidebar({
                         <GroupIcon />
                         <span>{group.title}</span>
                         {"comingSoon" in group && group.comingSoon && (
-                          <Badge variant="warning" className="ml-1 font-mono tracking-wide">PACKAGING</Badge>
+                          <Badge variant="warning" className="ml-1">PACKAGING</Badge>
                         )}
                         <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
