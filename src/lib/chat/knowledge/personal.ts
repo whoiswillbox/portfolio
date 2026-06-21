@@ -20,6 +20,17 @@ export const personalEntries: QAEntry[] = [
     ],
   },
   {
+    id: "surfing-background",
+    question: "How long have you been surfing?",
+    keywords: [
+      "how long surfing", "when start surfing", "when did you start surfing",
+      "surfing background", "surf history", "been surfing", "surf since",
+      "learn to surf", "learned to surf",
+    ],
+    answer:
+      "I learned to surf when I was 12 but didn't really start surfing regularly until I was 15–16. I competed on the UCSD Surf Team in 2018–2019 — I surf for the love of it though, not competition. That chapter was just a fun bonus.",
+  },
+  {
     id: "goat",
     question: "Is he the best?",
     keywords: [
