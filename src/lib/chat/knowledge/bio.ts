@@ -38,7 +38,7 @@ export const bioEntries: QAEntry[] = [
       "before", "prior", "what have you done", "what has he done",
     ],
     answer:
-      "Besides my current role at BARBRI, I spent two years at Technergetics — ending as Lead UX Designer, the sole designer on the mobile logistics team, shipping web, mobile, and PWA platforms used by 250,000+ airmen and partnering with ML engineers on LLM-powered recommendation features. Before that I was a UX/UI design intern at Lightcert. All of it remote. (And way back, a stunt double — ask me. 🎬)",
+      "Besides my current role at BARBRI, I spent two years at Technergetics — starting as UX Designer and getting promoted to Lead UX Designer after a year, driven by my hunger to shape processes. I was the sole designer on the mobile logistics team, shipping web, mobile, and PWA platforms used by 250,000+ airmen, partnering with engineers and SMEs from research all the way to shipped product. Before that I was a UX/UI design intern at Lightcert. All of it remote. (And way back, a stunt double — ask me. 🎬)",
   },
   {
     id: "location",
