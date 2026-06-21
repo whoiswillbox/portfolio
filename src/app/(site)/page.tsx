@@ -91,7 +91,6 @@ function FallingBox({ box }: { box: Box }) {
 export default function LandingPage() {
   const router = useRouter();
   const { setOpen } = useSidebar();
-  const [exiting, setExiting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
 
@@ -102,7 +101,7 @@ export default function LandingPage() {
 
   const enter = (path: string) => {
     setLoading(true);
-    setTimeout(() => { setExiting(true); setOpen(true); router.push(path); }, 2000);
+    setTimeout(() => { sessionStorage.setItem("entered", "1"); setOpen(true); router.push(path); }, 2000);
   };
 
   return (
@@ -122,8 +121,7 @@ export default function LandingPage() {
       <ContentCard
         className={cn(
           "relative h-full overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
-          "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-          exiting && "animate-out fade-out duration-300 fill-mode-forwards"
+          "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
         )}
       >
         {/* Landing content — fades out when loading */}

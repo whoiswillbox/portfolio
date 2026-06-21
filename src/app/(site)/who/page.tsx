@@ -1,9 +1,21 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { BoxAI } from "@/components/box-ai";
+import { cn } from "@/lib/utils";
 
 export default function Who() {
-  // BoxAI renders its own content card(s) and fills the content area.
+  const [entered, setEntered] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("entered") === "1") {
+      setEntered(true);
+      sessionStorage.removeItem("entered");
+    }
+  }, []);
+
   return (
-    <div className="h-full">
+    <div className={cn("h-full", entered && "animate-in fade-in duration-500")}>
       <BoxAI />
     </div>
   );
