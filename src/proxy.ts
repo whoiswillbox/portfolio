@@ -64,6 +64,6 @@ export const config = {
   // source asset with an internal (cookie-less) request, so gating those paths
   // would block optimization ("isn't a valid image / received null").
   matcher: [
-    "/((?!unlock|api/unlock|admin/login|api/admin-login|_next/static|_next/image|favicon.ico|.*\\.(?:jpg|jpeg|png|webp|avif|gif|svg|ico)$).*)",
+    "/((?!unlock|api/unlock|admin/login|api/admin-login|_next/static|_next/image|favicon.ico|animations/|.*\\.(?:jpg|jpeg|png|webp|avif|gif|svg|ico|json)$).*)",
   ],
 };
