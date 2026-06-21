@@ -336,23 +336,13 @@ export function AppSidebar({
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}
-          {showLock && (
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={lock} className="text-muted-foreground">
-                <LockClosedIcon className="size-4" />
-                <span>Lock site (dev)</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
-          {showLock && (
-            <SidebarMenuItem>
+          <SidebarMenuItem>
               <SidebarMenuButton asChild className="text-muted-foreground">
                 <Link href="/">
                   <span>Landing page (dev)</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          )}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

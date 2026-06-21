@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+
+const Lottie = lazy(() => import("lottie-react"));
 
 interface Box {
   id: number;
@@ -90,13 +92,17 @@ export default function LandingPage() {
   const router = useRouter();
   const { setOpen } = useSidebar();
   const [exiting, setExiting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [animData, setAnimData] = useState<object | null>(null);
 
   useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetch("/animations/box.json").then(r => r.json()).then(setAnimData).catch(() => null);
+  }, []);
 
   const enter = (path: string) => {
-    setExiting(true);
-    setOpen(true);
-    router.push(path);
+    setLoading(true);
+    setTimeout(() => { setExiting(true); setOpen(true); router.push(path); }, 2000);
   };
 
   return (
@@ -120,21 +126,29 @@ export default function LandingPage() {
           exiting && "animate-out fade-out duration-300 fill-mode-forwards"
         )}
       >
-        <FallingBoxes />
-
-        <div className="relative z-10 flex w-full max-w-4xl flex-col gap-8">
-          <h1 className="text-[clamp(3rem,7vw,7rem)] font-medium leading-[1.05] tracking-tighter" >
-            <span className="text-muted-foreground">William Box is a </span><span className="font-mono" style={{ fontFamily: "inherit" }}>product designer</span><span className="text-muted-foreground"> that pulls, branches, and merges.</span>
-          </h1>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button size="lg" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
-              I&apos;m a recruiter / hiring manager
-            </Button>
-            <Button size="lg" variant="outline" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
-              I&apos;m a friend
-            </Button>
+        {/* Landing content — fades out when loading */}
+        <div className={cn("absolute inset-0 flex flex-col items-center justify-center gap-8 px-12 transition-opacity duration-500", loading ? "opacity-0 pointer-events-none" : "opacity-100")}>
+          <FallingBoxes />
+          <div className="relative z-10 flex w-full max-w-4xl flex-col gap-8">
+            <h1 className="text-[clamp(3rem,7vw,7rem)] font-medium leading-[1.05] tracking-tighter">
+              <span className="text-muted-foreground">William Box is a </span><span className="font-mono" style={{ fontFamily: "inherit" }}>product designer</span><span className="text-muted-foreground"> that pulls, branches, and merges.</span>
+            </h1>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button size="lg" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
+                I&apos;m a recruiter / hiring manager
+              </Button>
+              <Button size="lg" variant="outline" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
+                I&apos;m a friend
+              </Button>
+            </div>
           </div>
+        </div>
+
+        {/* Lottie loading state — fades in when loading */}
+        <div className={cn("absolute inset-0 flex items-center justify-center transition-opacity duration-500", loading ? "opacity-100" : "opacity-0 pointer-events-none")}>
+          <Suspense fallback={null}>
+            {animData && <Lottie animationData={animData} loop style={{ width: 120, height: 120, filter: "grayscale(1) opacity(0.5)" }} />}
+          </Suspense>
         </div>
       </ContentCard>
     </>
