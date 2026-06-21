@@ -94,7 +94,7 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
 
-  useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetch("/animations/box.json").then(r => r.json()).then(setAnimData).catch(() => null);
   }, []);
