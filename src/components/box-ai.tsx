@@ -265,6 +265,7 @@ export function BoxAI({
   const [visibleSteps, setVisibleSteps] = React.useState<ReasoningStep[]>([]);
   const [streamingText, setStreamingText] = React.useState("");
   const [reasoningOpen, setReasoningOpen] = React.useState(false);
+  const [suggestions, setSuggestions] = React.useState<string[]>([]);
 
   const [usage, setUsage] = React.useState<{ date: string; count: number }>({
     date: today(),
@@ -448,7 +449,7 @@ export function BoxAI({
     conversationId: string,
     onToken: (token: string) => void,
     signal: AbortSignal,
-  ): Promise<{ text: string; entryId: string | null; fromApi: boolean }> => {
+  ): Promise<{ text: string; entryId: string | null; fromApi: boolean; suggestions?: string[] }> => {
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -474,11 +475,22 @@ export function BoxAI({
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
         fullText += chunk;
-        onToken(chunk);
+        // Stream visible text only — strip sentinel suffix as it arrives
+        const sentinelIdx = fullText.indexOf("\n\n__SUGGESTIONS__");
+        onToken(sentinelIdx === -1 ? chunk : fullText.slice(0, sentinelIdx).slice(fullText.length - chunk.length));
       }
 
-      if (!fullText.trim()) throw new Error("empty");
-      return { text: fullText, entryId: null, fromApi: true };
+      // Split out suggestions sentinel
+      const sentinelIdx = fullText.indexOf("\n\n__SUGGESTIONS__");
+      let suggestions: string[] | undefined;
+      let text = fullText;
+      if (sentinelIdx !== -1) {
+        text = fullText.slice(0, sentinelIdx);
+        try { suggestions = JSON.parse(fullText.slice(sentinelIdx + "\n\n__SUGGESTIONS__".length)); } catch { /* ignore */ }
+      }
+
+      if (!text.trim()) throw new Error("empty");
+      return { text, entryId: null, fromApi: true, suggestions };
     } catch {
       // Local fallback: simulate streaming by dripping the response word by word.
       const fallback = respondTo(trimmed, shown);
@@ -518,6 +530,7 @@ export function BoxAI({
     setStreamingText("");
     setVisibleSteps([]);
     setReasoningOpen(false);
+    setSuggestions([]);
     const steps = getReasoningSteps(trimmed);
     setReasoningSteps(steps);
     setSending(true);
@@ -566,6 +579,7 @@ export function BoxAI({
       await new Promise((r) => setTimeout(r, MIN_THINK_MS - elapsed));
     }
 
+    if (reply.suggestions?.length) setSuggestions(reply.suggestions);
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
 
     // If the reply references a case study, open it in the side content card.
@@ -843,25 +857,21 @@ export function BoxAI({
               </div>
             )}
 
-            {/* Case-study follow-up prompts — shown when a case study is open
-                or the conversation is framed about a project, and it's the
-                visitor's turn. */}
-            {(openCaseStudy ?? contextStudy) &&
-              !sending &&
-              messages[messages.length - 1]?.role === "bot" && (
-                <div className="flex flex-wrap gap-2">
-                  {(openCaseStudy ?? contextStudy)!.prompts.map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => send(p)}
-                      disabled={atLimit}
-                      className="rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground transition-colors hover:bg-muted disabled:opacity-50"
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              )}
+            {/* Follow-up prompt chips — dynamic suggestions from API, or static case-study prompts */}
+            {!sending && messages[messages.length - 1]?.role === "bot" && (
+              <div className="flex flex-wrap gap-2">
+                {(suggestions.length > 0 ? suggestions : (openCaseStudy ?? contextStudy)?.prompts ?? []).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => send(p)}
+                    disabled={atLimit}
+                    className="rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -104,6 +104,27 @@ export async function POST(request: Request) {
           output_tokens: finalMessage.usage.output_tokens,
         });
 
+        // Generate follow-up suggestions based on the conversation
+        try {
+          const suggestionMsg = await client.messages.create({
+            model: MODEL,
+            max_tokens: 80,
+            system: "You generate short follow-up question suggestions. Reply with ONLY a JSON array of 2-3 short questions (under 8 words each) the user might want to ask next, based on the conversation. No explanation, just the JSON array.",
+            messages: [
+              ...messages,
+              { role: "assistant", content: fullText },
+              { role: "user", content: "Give me 2-3 short follow-up questions I might ask." },
+            ],
+          });
+          const raw = suggestionMsg.content[0].type === "text" ? suggestionMsg.content[0].text.trim() : "[]";
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            controller.enqueue(encoder.encode(`\n\n__SUGGESTIONS__${JSON.stringify(parsed)}`));
+          }
+        } catch {
+          // suggestions are best-effort
+        }
+
         await logChat({
           t: new Date().toISOString(),
           q: question,
