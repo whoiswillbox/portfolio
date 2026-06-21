@@ -58,6 +58,16 @@ export const bioEntries: QAEntry[] = [
       "I studied Psychology with a Cognitive Science (Design + Interaction) minor at UC San Diego (2018–2022), after an AA in Communication at Santa Barbara City College. My UCSD coursework covered interaction design, prototyping, usability, and programming in Python and Java. I'm also certified in AI Product Design through ELVTR (Intro to AI Product Design with Robert Redmond, 2024).",
   },
   {
+    id: "resume",
+    question: "What's on your resume?",
+    keywords: [
+      "resume", "cv", "curriculum vitae", "work history", "full experience",
+      "all roles", "every job", "timeline", "career timeline",
+    ],
+    answer:
+      "Here's the full picture:\n\nEXPERIENCE:\n• BARBRI — Product Designer (current, remote LA). Leading design for Bar Prep and SQE across two teams, partnering with UK teams on SQE.\n• Technergetics — Lead UX Designer (Aug 2023–Aug 2024, remote). Sole designer on the mobile logistics team; led end-to-end design for web, mobile, and PWA platforms used by 250,000+ airmen. Partnered with ML engineers on recommendation systems. Responsible for Rawhide, Merlin, Upgrade, Manifast, JetDash, Hyperkit, JIJOE, DPC, and LogTrax.\n• Technergetics — UX Designer (Aug 2022–Aug 2023, remote). Automated and optimized military processes; won 3+ SBIR Phase II contracts through early-stage design feasibility work. Promoted to Lead after one year.\n• Lightcert — UX/UI Design Intern (Jan–Jun 2022, LA). Revamped the mobile design system; designed save/share feature for MVP v.2 that reached 40k+ fandoms.\n\nEDUCATION:\n• UC San Diego — Psychology B.A., Cognitive Science (Design + Interaction) Minor (2018–2022)\n• Santa Barbara City College — Communication A.A. (2017–2018)\n\nCERTIFICATIONS:\n• ELVTR — Intro to AI Product Design with Robert Redmond (2023–2024)\n\nSKILLS: Persona mapping, IA, interaction design, wireframing, prototyping, design systems, design ops, Figma, Figjam, Webflow, Framer, Storybook, agile methodologies.",
+  },
+  {
     id: "overview",
     question: "Overview",
     keywords: [
