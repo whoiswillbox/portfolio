@@ -22,10 +22,9 @@ export default async function SiteLayout({
   const adminCookie = cookieStore.get(ADMIN_COOKIE)?.value;
   const isAdmin = Boolean(adminKey) && adminCookie === (await adminToken(adminKey!));
 
-  // Respect the persisted sidebar state; default closed so the landing page
-  // starts without the sidebar, and opens once the user enters the app.
-  const sidebarCookie = cookieStore.get("sidebar_state")?.value;
-  const sidebarDefaultOpen = sidebarCookie === undefined ? false : sidebarCookie === "true";
+  // Always start closed — content-workspace opens it once the user enters the app.
+  // This ensures the landing page never shows the sidebar even if the cookie is set.
+  const sidebarDefaultOpen = false;
 
   return (
     <TooltipProvider>

@@ -10,7 +10,6 @@ export default function Who() {
   useEffect(() => {
     if (sessionStorage.getItem("entered") === "1") {
       setEntered(true);
-      sessionStorage.removeItem("entered");
     }
   }, []);
 
