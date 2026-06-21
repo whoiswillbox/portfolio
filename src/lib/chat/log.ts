@@ -59,6 +59,7 @@ export type FeedbackEntry = {
   q?: string; // the question that prompted the rated answer
   a: string; // the rated answer
   rating: "up" | "down";
+  feedback?: string; // optional text from the feedback modal
   country?: string;
   city?: string;
   ip?: string; // short hash, not the raw IP

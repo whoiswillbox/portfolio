@@ -6,12 +6,22 @@ import {
   ArrowLeftIcon,
   XMarkIcon,
   CubeIcon,
+  ChevronDownIcon,
   HandThumbUpIcon,
   HandThumbDownIcon,
+  FolderIcon,
+  BuildingOffice2Icon,
+  DocumentTextIcon,
+  LifebuoyIcon,
+  MusicalNoteIcon,
+  BoltIcon,
+  PuzzlePieceIcon,
+  AcademicCapIcon,
 } from "@heroicons/react/24/outline";
-import { InformationCircleIcon } from "@heroicons/react/24/solid";
+import { InformationCircleIcon, HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from "@heroicons/react/24/solid";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertAction } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ChatInput } from "@/components/chat-input";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { ContactCard } from "@/components/contact-card";
@@ -107,6 +117,117 @@ const SURF_PHRASES = [
 
 const randomSurf = () => SURF_PHRASES[Math.floor(Math.random() * SURF_PHRASES.length)];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Lottie = React.lazy(() => import("lottie-react"));
+
+let _animDataCache: object | null = null;
+let _animDataPromise: Promise<void | null> | null = null;
+function preloadBoxAnim() {
+  if (_animDataCache || _animDataPromise) return;
+  _animDataPromise = fetch("/animations/box.json").then(r => r.json()).then(d => { _animDataCache = d; }).catch(() => { /* ignore */ });
+}
+
+function AnimatedBoxIcon({ className }: { className?: string }) {
+  const [animData, setAnimData] = React.useState<object | null>(_animDataCache);
+  React.useEffect(() => {
+    if (_animDataCache) { setAnimData(_animDataCache); return; }
+    fetch("/animations/box.json").then(r => r.json()).then(d => { _animDataCache = d; setAnimData(d); }).catch(() => null);
+  }, []);
+
+  if (animData) {
+    return (
+      <React.Suspense fallback={null}>
+        <div className={className} style={{ display: "flex", alignItems: "center", justifyContent: "center", filter: "grayscale(1) opacity(0.5)", overflow: "hidden" }}>
+          <Lottie animationData={animData} loop style={{ width: "100%", height: "100%", flexShrink: 0 }} />
+        </div>
+      </React.Suspense>
+    );
+  }
+
+  // Render nothing until JSON is loaded to avoid SVG→Lottie flash
+  return (
+    <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn(className, "opacity-0")} aria-hidden="true">
+      <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FadeOnScroll({ children }: { children: React.ReactNode }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = React.useState(true);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={cn("transition-opacity duration-500", visible ? "opacity-100" : "opacity-0")}>
+      {children}
+    </div>
+  );
+}
+
+/* Reasoning trace — keyword → steps shown while waiting for first token. */
+type ReasoningStep = { label: string; Icon: React.ElementType };
+const REASONING_STEPS: { keywords: string[]; steps: ReasoningStep[] }[] = [
+  {
+    keywords: ["project", "built", "shipped", "work", "portfolio", "design", "barbri", "technergetics", "lightcert", "swiperight", "jetdash"],
+    steps: [
+      { label: "Checking your projects…", Icon: FolderIcon },
+      { label: "Pulling case study details…", Icon: BoltIcon },
+    ],
+  },
+  {
+    keywords: ["music", "playlist", "song", "listen", "artist", "spotify", "track"],
+    steps: [
+      { label: "Reading your music knowledge…", Icon: MusicalNoteIcon },
+      { label: "Checking Spotify data…", Icon: MusicalNoteIcon },
+    ],
+  },
+  {
+    keywords: ["surf", "surfing", "wave", "board", "ocean", "skate"],
+    steps: [
+      { label: "Checking your surfing background…", Icon: LifebuoyIcon },
+    ],
+  },
+  {
+    keywords: ["experience", "job", "role", "career", "resume", "hire", "recruiter", "work at"],
+    steps: [
+      { label: "Reviewing your experience…", Icon: BuildingOffice2Icon },
+      { label: "Checking your resume…", Icon: DocumentTextIcon },
+    ],
+  },
+  {
+    keywords: ["design", "skill", "process", "figma", "ux", "ui", "research"],
+    steps: [
+      { label: "Looking at your design background…", Icon: FolderIcon },
+    ],
+  },
+  {
+    keywords: ["fun", "hobby", "outside", "personal", "life", "game", "gaming"],
+    steps: [
+      { label: "Checking your personal interests…", Icon: PuzzlePieceIcon },
+    ],
+  },
+  {
+    keywords: ["school", "swiperight", "student", "class"],
+    steps: [
+      { label: "Checking your school projects…", Icon: AcademicCapIcon },
+    ],
+  },
+];
+
+function getReasoningSteps(query: string): ReasoningStep[] {
+  const lower = query.toLowerCase();
+  const matched = REASONING_STEPS.find((r) => r.keywords.some((k) => lower.includes(k)));
+  return matched?.steps ?? [{ label: "Thinking…", Icon: CubeIcon }];
+}
+
 function uid(): string {
   return typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
@@ -133,9 +254,18 @@ export function BoxAI({
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [input, setInput] = React.useState("");
   const [loaded, setLoaded] = React.useState(false);
+  React.useEffect(() => { preloadBoxAnim(); }, []);
   const [heading, setHeading] = React.useState(HEADINGS[0]);
   const [sending, setSending] = React.useState(false);
   const [thinking, setThinking] = React.useState(SURF_PHRASES[0]);
+  const [thinkSecs, setThinkSecs] = React.useState(0);
+  const thinkTimerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const abortRef = React.useRef<AbortController | null>(null);
+  const [reasoningSteps, setReasoningSteps] = React.useState<ReasoningStep[]>([]);
+  const [visibleSteps, setVisibleSteps] = React.useState<ReasoningStep[]>([]);
+  const [streamingText, setStreamingText] = React.useState("");
+  const [reasoningOpen, setReasoningOpen] = React.useState(false);
+
   const [usage, setUsage] = React.useState<{ date: string; count: number }>({
     date: today(),
     count: 0,
@@ -160,6 +290,7 @@ export function BoxAI({
     return () => mq.removeEventListener("change", update);
   }, []);
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [isScrolled, setIsScrolled] = React.useState(false);
 
 
   // Show the privacy notice unless the visitor has dismissed it before. In local
@@ -291,6 +422,14 @@ export function BoxAI({
   const active = conversations.find((c) => c.id === activeId) ?? null;
   const messages = active?.messages ?? [];
 
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => setIsScrolled(el.scrollTop > 40);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [active]);
+
   // This view owns its top bar (SiteTopbar is hidden on /who), so it exposes
   // the sidebar trigger when the sidebar is collapsed / on mobile.
   const { state: sidebarState, isMobile } = useSidebar();
@@ -298,7 +437,7 @@ export function BoxAI({
 
   React.useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages.length]);
+  }, [messages.length, sending, streamingText]);
 
   // Ask the grounded LLM via /api/chat; fall back to local matching if the API
   // isn't configured, is rate-limited, or errors.
@@ -306,11 +445,14 @@ export function BoxAI({
     trimmed: string,
     history: Message[],
     shown: string[],
-    conversationId: string
+    conversationId: string,
+    onToken: (token: string) => void,
+    signal: AbortSignal,
   ): Promise<{ text: string; entryId: string | null; fromApi: boolean }> => {
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
+        signal,
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           conversationId,
@@ -321,11 +463,32 @@ export function BoxAI({
         }),
       });
       if (!res.ok) throw new Error("api");
-      const data = await res.json();
-      if (typeof data.reply !== "string" || !data.reply.trim()) throw new Error("empty");
-      return { text: data.reply, entryId: null, fromApi: true };
+      if (!res.body) throw new Error("no body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        fullText += chunk;
+        onToken(chunk);
+      }
+
+      if (!fullText.trim()) throw new Error("empty");
+      return { text: fullText, entryId: null, fromApi: true };
     } catch {
-      return { ...respondTo(trimmed, shown), fromApi: false }; // local fallback (free)
+      // Local fallback: simulate streaming by dripping the response word by word.
+      const fallback = respondTo(trimmed, shown);
+      // Wait so the thinking accordion is visible before streaming starts.
+      await new Promise((r) => setTimeout(r, 9000));
+      for (const char of fallback.text) {
+        await new Promise((r) => setTimeout(r, 12));
+        onToken(char);
+      }
+      return { ...fallback, fromApi: false };
     }
   };
 
@@ -349,9 +512,26 @@ export function BoxAI({
     const priorMessages = active?.messages ?? [];
     const userMsg: Message = { id: uid(), role: "user", text: trimmed };
     setInput("");
+    abortRef.current = new AbortController();
     setThinking(randomSurf());
+    setThinkSecs(0);
+    setStreamingText("");
+    setVisibleSteps([]);
+    setReasoningOpen(false);
+    const steps = getReasoningSteps(trimmed);
+    setReasoningSteps(steps);
     setSending(true);
     const startedAt = Date.now();
+    thinkTimerRef.current = setInterval(() => {
+      setThinkSecs(Math.floor((Date.now() - startedAt) / 1000));
+    }, 1000);
+
+    // Reveal reasoning steps one by one, 500ms apart, starting after 400ms.
+    steps.forEach((_, i) => {
+      setTimeout(() => {
+        setVisibleSteps((prev) => [...prev, steps[i]]);
+      }, 400 + i * 500);
+    });
 
     // Add the user message immediately (create the conversation if needed).
     let convoId = activeId;
@@ -368,7 +548,15 @@ export function BoxAI({
       ]);
     }
 
-    const reply = await fetchReply(trimmed, [...priorMessages, userMsg], shown, convoId!);
+    let firstToken = true;
+    const reply = await fetchReply(trimmed, [...priorMessages, userMsg], shown, convoId!, (chunk) => {
+      if (firstToken) {
+        firstToken = false;
+        if (thinkTimerRef.current) { clearInterval(thinkTimerRef.current); thinkTimerRef.current = null; }
+        setReasoningOpen(false);
+      }
+      setStreamingText((prev) => prev + chunk);
+    }, abortRef.current!.signal);
 
     // Keep the "thinking" indicator up for a beat so it's visible even when the
     // free local fallback answers instantly (no API call on localhost).
@@ -412,6 +600,9 @@ export function BoxAI({
           : c
       )
     );
+    if (thinkTimerRef.current) { clearInterval(thinkTimerRef.current); thinkTimerRef.current = null; }
+    setStreamingText("");
+    setVisibleSteps([]);
     setSending(false);
   };
 
@@ -481,6 +672,7 @@ export function BoxAI({
       value={input}
       onValueChange={setInput}
       onSend={() => send(input)}
+      onStop={() => { abortRef.current?.abort(); }}
       placeholder={atLimit ? "Daily limit reached" : "Ask Box…"}
       ariaLabel="Ask Box a question about Will"
       disabled={atLimit}
@@ -553,6 +745,7 @@ export function BoxAI({
         className={cn(
           "flex-1 min-h-0 overflow-y-auto",
           !active && "flex flex-col justify-center",
+          active && isScrolled && "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_100%)]",
           // Reserve a top strip so the floating sidebar trigger / close button
           // don't overlay the conversation when embedded in the launcher.
           embedded && active && "pt-12"
@@ -560,8 +753,12 @@ export function BoxAI({
       >
         {!active ? (
           <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">
-            <CubeIcon className="mb-4 size-12 self-center text-foreground" strokeWidth={1} />
-            <h1 className="text-h1 font-bold uppercase tracking-tight">{heading}</h1>
+            <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-4 size-12 self-center text-foreground" aria-hidden="true">
+              <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+              <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+              <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+            </svg>
+            <h1 className="text-h1 font-semibold">{heading}</h1>
             <div className="mt-3">{searchForm}</div>
             {disclaimer}
             <div className="flex flex-wrap justify-center gap-2">
@@ -579,13 +776,14 @@ export function BoxAI({
 
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-xl flex-col gap-3 p-6">
+          <div className="mx-auto flex w-full max-w-xl flex-col gap-8 px-6 pb-6 pt-28">
             {messages.map((m, idx) =>
               m.role === "bot" ? (
                 <BotBubble
                   key={m.id}
                   text={m.text}
                   conversationId={active?.id}
+                  isLast={idx === messages.length - 1 && !sending}
                   question={
                     messages
                       .slice(0, idx)
@@ -596,20 +794,52 @@ export function BoxAI({
               ) : (
                 <div
                   key={m.id}
-                  className="ml-auto max-w-[85%] rounded-lg rounded-br-sm bg-primary px-3 py-2 text-body-sm text-primary-foreground"
+                  className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-body-sm text-primary-foreground"
                 >
                   {m.text}
                 </div>
               )
             )}
             {sending && (
-              <div className="flex items-center gap-2 px-1 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground">
-                <span className="animate-pulse">{thinking} 🏄‍♂️</span>
-                <span className="inline-flex gap-1">
-                  <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
-                  <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
-                  <span className="size-1.5 animate-bounce rounded-full bg-current" />
-                </span>
+              <div className="flex w-full flex-col gap-1">
+                {!streamingText && (
+                  <div className="w-full rounded-lg bg-muted px-3 py-2 flex flex-col font-mono text-body-xs uppercase tracking-wide text-muted-foreground mb-2">
+                    <button
+                      type="button"
+                      onClick={() => setReasoningOpen((o) => !o)}
+                      className="flex items-center gap-2 text-left hover:text-foreground transition-colors"
+                    >
+                      <span className="animate-pulse">{thinking} 🏄‍♂️</span>
+                      {thinkSecs > 0 && <span>{thinkSecs}s</span>}
+                      <ChevronDownIcon className={cn("ml-auto size-3 transition-transform duration-300", reasoningOpen ? "rotate-0" : "-rotate-90")} />
+                    </button>
+                    <div className={cn("grid transition-[grid-template-rows] duration-300 ease-out", reasoningOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
+                      <div className="overflow-hidden">
+                        <div className="flex flex-col pt-2">
+                          {visibleSteps.map((step, i) => (
+                            <div key={i} className="flex gap-2 animate-in fade-in slide-in-from-bottom-1 duration-300">
+                              <div className="flex flex-col items-center">
+                                <step.Icon className="size-3 opacity-60 shrink-0 mt-0.5" />
+                                {i < visibleSteps.length - 1 && (
+                                  <span className="w-px flex-1 bg-current opacity-20 my-0.5" />
+                                )}
+                              </div>
+                              <span className="pb-2">{step.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {streamingText && (
+                  <p className="font-sans text-body-sm text-foreground">
+                    {streamingText.split(" ").map((word, i) => (
+                      <span key={i} className="animate-in fade-in duration-300">{i > 0 ? " " : ""}{word}</span>
+                    ))}
+                  </p>
+                )}
+                <AnimatedBoxIcon className="size-20 text-muted-foreground -ml-6" />
               </div>
             )}
 
@@ -689,60 +919,93 @@ function BotBubble({
   text,
   question,
   conversationId,
+  isLast,
 }: {
   text: string;
   question?: string;
   conversationId?: string;
+  isLast?: boolean;
 }) {
   const [rating, setRating] = React.useState<"up" | "down" | null>(null);
-  const rate = (value: "up" | "down") =>
-    setRating((prev) => {
-      const next = prev === value ? null : value;
-      // Record the rating (fire-and-forget). Skip when clearing a rating.
-      if (next) {
-        fetch("/api/feedback", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ conversationId, question, answer: text, rating: next }),
-        }).catch(() => {
-          /* never let feedback break the UI */
-        });
-      }
-      return next;
-    });
+  const [pendingRating, setPendingRating] = React.useState<"up" | "down" | null>(null);
+  const [feedbackText, setFeedbackText] = React.useState("");
+
+  const openModal = (value: "up" | "down") => {
+    if (rating === value) { setRating(null); return; }
+    setPendingRating(value);
+    setFeedbackText("");
+  };
+
+  const submitFeedback = () => {
+    if (!pendingRating) return;
+    setRating(pendingRating);
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ conversationId, question, answer: text, rating: pendingRating, feedback: feedbackText }),
+    }).catch(() => { /* never let feedback break the UI */ });
+    setPendingRating(null);
+  };
 
   return (
-    <div className="group flex max-w-[85%] flex-col gap-1">
-      <div className="rounded-lg rounded-bl-sm bg-muted px-3 py-2 font-heading text-body-sm text-foreground">
-        {stripCaseStudyMarker(stripContactMarker(text))}
+    <>
+      <Dialog open={!!pendingRating} onOpenChange={(open) => { if (!open) setPendingRating(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{pendingRating === "up" ? "Give positive feedback" : "Give negative feedback"}</DialogTitle>
+          </DialogHeader>
+          <textarea
+            value={feedbackText}
+            onChange={(e) => setFeedbackText(e.target.value)}
+            placeholder={pendingRating === "up" ? "What was satisfying about this response?" : "What was wrong with this response?"}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring min-h-[100px] resize-none"
+          />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPendingRating(null)}>Cancel</Button>
+            <Button onClick={submitFeedback}>Submit</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="group flex w-full flex-col gap-1">
+        <p className="font-sans text-body-sm text-foreground">
+          {stripCaseStudyMarker(stripContactMarker(text))}
+        </p>
+        {showContactCard(text) && <ContactCard />}
+        <div className="flex items-center gap-0.5 pl-1">
+          <button
+            type="button"
+            onClick={() => openModal("up")}
+            aria-pressed={rating === "up"}
+            aria-label="Good response"
+            className={cn(
+              "rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95",
+              rating === "up" && "text-foreground hover:text-foreground"
+            )}
+          >
+            {rating === "up" ? <HandThumbUpSolid className="size-3.5" /> : <HandThumbUpIcon className="size-3.5" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => openModal("down")}
+            aria-pressed={rating === "down"}
+            aria-label="Bad response"
+            className={cn(
+              "rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95",
+              rating === "down" && "text-foreground hover:text-foreground"
+            )}
+          >
+            {rating === "down" ? <HandThumbDownSolid className="size-3.5" /> : <HandThumbDownIcon className="size-3.5" />}
+          </button>
+        </div>
+        {isLast && (
+          <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-8 text-muted-foreground mt-1 animate-in fade-in duration-500" aria-hidden="true">
+            <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+            <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+            <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+          </svg>
+        )}
       </div>
-      {showContactCard(text) && <ContactCard />}
-      <div className="flex items-center gap-0.5 pl-1">
-        <button
-          type="button"
-          onClick={() => rate("up")}
-          aria-pressed={rating === "up"}
-          aria-label="Good response"
-          className={cn(
-            "rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95",
-            rating === "up" && "bg-surface-success text-success hover:bg-surface-success hover:text-success"
-          )}
-        >
-          <HandThumbUpIcon className={cn("size-3.5", rating === "up" && "fill-current")} />
-        </button>
-        <button
-          type="button"
-          onClick={() => rate("down")}
-          aria-pressed={rating === "down"}
-          aria-label="Bad response"
-          className={cn(
-            "rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95",
-            rating === "down" && "bg-surface-critical text-critical hover:bg-surface-critical hover:text-critical"
-          )}
-        >
-          <HandThumbDownIcon className={cn("size-3.5", rating === "down" && "fill-current")} />
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

@@ -11,6 +11,7 @@ export async function POST(request: Request) {
     question?: string;
     answer?: string;
     rating?: string;
+    feedback?: string;
   };
   try {
     body = await request.json();
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
     q: typeof body.question === "string" ? body.question.slice(0, 300) : undefined,
     a: typeof body.answer === "string" ? body.answer.slice(0, 300) : "",
     rating,
+    feedback: typeof body.feedback === "string" ? body.feedback.slice(0, 500) : undefined,
     country: request.headers.get("x-vercel-ip-country") ?? undefined,
     city: city ? decodeURIComponent(city) : undefined,
     ip: ipRaw ? await hashIp(ipRaw) : undefined,

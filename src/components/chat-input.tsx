@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { PaperAirplaneIcon, StopIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -14,6 +14,7 @@ export function ChatInput({
   value,
   onValueChange,
   onSend,
+  onStop,
   placeholder = "Ask a question…",
   ariaLabel = "Ask a question",
   disabled = false,
@@ -24,6 +25,7 @@ export function ChatInput({
   value: string;
   onValueChange: (value: string) => void;
   onSend: () => void;
+  onStop?: () => void;
   placeholder?: string;
   ariaLabel?: string;
   disabled?: boolean;
@@ -78,15 +80,27 @@ export function ChatInput({
       />
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 pl-1">{footerLeft}</div>
-        <Button
-          type="submit"
-          size="icon"
-          className="size-8 rounded-full"
-          disabled={!value.trim() || sending || disabled}
-          aria-label="Send"
-        >
-          <PaperAirplaneIcon className="size-4" />
-        </Button>
+        {sending && onStop ? (
+          <Button
+            type="button"
+            size="icon"
+            className="size-8 rounded-full"
+            onClick={onStop}
+            aria-label="Stop"
+          >
+            <StopIcon className="size-4" />
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            size="icon"
+            className="size-8 rounded-full"
+            disabled={!value.trim() || sending || disabled}
+            aria-label="Send"
+          >
+            <PaperAirplaneIcon className="size-4" />
+          </Button>
+        )}
       </div>
     </div>
   );

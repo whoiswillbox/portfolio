@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Geist_Mono, EB_Garamond } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono, EB_Garamond } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const instrumentSans = Instrument_Sans({
+const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
@@ -33,7 +33,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${instrumentSans.variable} ${geistMono.variable} ${ebGaramond.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${geistMono.variable} ${ebGaramond.variable} h-full antialiased`}
     >
       <body className="h-dvh overflow-hidden flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>

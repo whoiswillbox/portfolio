@@ -34,21 +34,21 @@
   --text-h4--font-weight: var(--font-weight-semibold);
   --text-h3: var(--font-size-h3);
   --text-h3--line-height: 1.25;
-  --text-h3--letter-spacing: -0.01em;
+  --text-h3--letter-spacing: 0.01em;
   --text-h3--font-weight: var(--font-weight-semibold);
   --text-h2: var(--font-size-h2);
   --text-h2--line-height: 1.2;
-  --text-h2--letter-spacing: -0.015em;
+  --text-h2--letter-spacing: 0.01em;
   --text-h2--font-weight: var(--font-weight-semibold);
   --text-h1: var(--font-size-h1);
   --text-h1--line-height: 1.15;
-  --text-h1--letter-spacing: -0.02em;
+  --text-h1--letter-spacing: 0.01em;
   --text-h1--font-weight: var(--font-weight-bold);
 
   /* --- Display -> text-display-sm / text-display / text-display-lg ---- */
   --text-display-sm: var(--font-size-display-sm);
   --text-display-sm--line-height: 1.1;
-  --text-display-sm--letter-spacing: -0.02em;
+  --text-display-sm--letter-spacing: -0.01em;
   --text-display-sm--font-weight: var(--font-weight-semibold);
   --text-display: var(--font-size-display);
   --text-display--line-height: 1.05;

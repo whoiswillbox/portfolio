@@ -67,42 +67,64 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Ground music answers in real, live Spotify data when it's configured.
     const musicSummary = await getMusicSummary().catch(() => null);
     const system = buildSystemPrompt(musicSummary);
-
     const client = new Anthropic();
-    const response = await client.messages.create({
+
+    const stream = await client.messages.stream({
       model: MODEL,
       max_tokens: 400,
       system,
       messages,
     });
-    const reply = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("")
-      .trim();
-    // Track token usage server-side (not shown to visitors).
-    console.log("chat usage:", {
-      input_tokens: response.usage.input_tokens,
-      output_tokens: response.usage.output_tokens,
-    });
 
-    // Log the exchange (question, reply, rough location, hashed IP).
     const ipRaw = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
     const city = request.headers.get("x-vercel-ip-city");
-    await logChat({
-      t: new Date().toISOString(),
-      q: messages[messages.length - 1].content.slice(0, 300),
-      a: reply.slice(0, 300),
-      country: request.headers.get("x-vercel-ip-country") ?? undefined,
-      city: city ? decodeURIComponent(city) : undefined,
-      ip: ipRaw ? await hashIp(ipRaw) : undefined,
-      c: conversationId,
+    const question = messages[messages.length - 1].content.slice(0, 300);
+
+    const readable = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        let fullText = "";
+
+        for await (const event of stream) {
+          if (
+            event.type === "content_block_delta" &&
+            event.delta.type === "text_delta"
+          ) {
+            const chunk = event.delta.text;
+            fullText += chunk;
+            controller.enqueue(encoder.encode(chunk));
+          }
+        }
+
+        const finalMessage = await stream.finalMessage();
+        console.log("chat usage:", {
+          input_tokens: finalMessage.usage.input_tokens,
+          output_tokens: finalMessage.usage.output_tokens,
+        });
+
+        await logChat({
+          t: new Date().toISOString(),
+          q: question,
+          a: fullText.slice(0, 300),
+          country: request.headers.get("x-vercel-ip-country") ?? undefined,
+          city: city ? decodeURIComponent(city) : undefined,
+          ip: ipRaw ? await hashIp(ipRaw) : undefined,
+          c: conversationId,
+        });
+
+        controller.close();
+      },
     });
 
-    return Response.json({ reply, usage: response.usage });
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "X-Content-Type-Options": "nosniff",
+        "Transfer-Encoding": "chunked",
+      },
+    });
   } catch (err) {
     console.error("chat api error:", err);
     return Response.json({ error: "upstream" }, { status: 502 });

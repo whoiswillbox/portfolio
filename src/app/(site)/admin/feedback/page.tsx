@@ -12,6 +12,7 @@ type Entry = {
   q?: string;
   a: string;
   rating: "up" | "down";
+  feedback?: string;
   country?: string;
   city?: string;
   ip?: string;
@@ -102,6 +103,9 @@ export default function FeedbackPage() {
               <div className="flex flex-col gap-1 p-3">
                 {e.q && <p className="text-body-sm font-medium">{e.q}</p>}
                 <p className="text-body-sm text-muted-foreground">{e.a}</p>
+                {e.feedback && (
+                  <p className="mt-1 text-body-sm italic text-muted-foreground border-l-2 border-border pl-2">"{e.feedback}"</p>
+                )}
               </div>
             </div>
           ))}

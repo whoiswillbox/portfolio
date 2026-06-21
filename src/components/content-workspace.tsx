@@ -16,7 +16,9 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const [rendered, setRendered] = React.useState(false);
   const [exiting, setExiting] = React.useState(false);
   const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/";
-  const boxParam = useSearchParams().get("box");
+  const searchParams = useSearchParams();
+  const boxParam = searchParams.get("box");
+  const enteredParam = searchParams.get("entered");
   const inProgressPaths = [
     "/projects/next-gen-bar",
     "/projects/sqe2",
@@ -42,6 +44,14 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   }, []);
 
   React.useEffect(() => { setOpen(false); setExiting(false); setRendered(false); setSplitPct(30); }, [pathname]);
+
+  const { setOpen: setSidebarOpen } = useSidebar();
+  React.useEffect(() => {
+    if (enteredParam) {
+      setSidebarOpen(true);
+      router.replace(pathname);
+    }
+  }, [enteredParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const boxAI = React.useMemo(
     () => <BoxAI key={boxParam ?? "default"} embedded seed={contextSeed} />,
