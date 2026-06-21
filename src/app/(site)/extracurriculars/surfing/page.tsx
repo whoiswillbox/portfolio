@@ -32,6 +32,7 @@ const MEDIA: MediaItem[] = [
   { type: "image", src: "/projects/surfing/delmar-15th.png", alt: "Surfing Del Mar 15th Street", label: "Del Mar · 15th Street",     year: 2019, natural: true, width: 1439, height: 810 },
   { type: "image", src: "/projects/surfing/45890266_992600090926215_2195589467853553664_o.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018 },
   { type: "image", src: "/projects/surfing/DSCF3790.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018 },
+  { type: "image", src: "/projects/surfing/DSCF3770.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018 },
   { type: "video", src: "/projects/surfing/revo-trimmed-slo-compressed.mp4",                    label: "Pacific Beach · PB Drive",  year: 2019 },
   { type: "video", src: "/projects/surfing/will-snap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-almost-combo-compressed.mp4",                   label: "Leucadia · Grandview",      year: 2019 },
