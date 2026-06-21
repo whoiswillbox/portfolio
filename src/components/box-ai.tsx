@@ -511,7 +511,7 @@ export function BoxAI({
         await new Promise((r) => setTimeout(r, 12));
         onToken(char);
       }
-      return { ...fallback, fromApi: false };
+      return { ...fallback, fromApi: false, suggestions: undefined };
     }
   };
 
@@ -590,7 +590,17 @@ export function BoxAI({
       await new Promise((r) => setTimeout(r, MIN_THINK_MS - elapsed));
     }
 
-    if (reply.suggestions?.length) setSuggestions(reply.suggestions);
+    // Use API suggestions if available, else generate fallbacks from seed/context
+    if (reply.suggestions?.length) {
+      setSuggestions(reply.suggestions);
+    } else {
+      const fallbackSuggestions = seed?.prompts?.slice(0, 3) ?? [
+        "Tell me more about your experience",
+        "What's your favorite project?",
+        "How can I reach you?",
+      ];
+      setSuggestions(fallbackSuggestions);
+    }
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
 
     // If the reply references a case study, open it in the side content card.

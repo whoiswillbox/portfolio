@@ -109,16 +109,18 @@ export async function POST(request: Request) {
         try {
           const suggestionMsg = await client.messages.create({
             model: MODEL,
-            max_tokens: 80,
-            system: "You generate short follow-up question suggestions. Reply with ONLY a JSON array of 2-3 short questions (under 8 words each) the user might want to ask next, based on the conversation. No explanation, just the JSON array.",
+            max_tokens: 100,
+            system: "Reply with ONLY a JSON array of 2-3 short follow-up questions (under 8 words each) the visitor might ask next. Output only the raw JSON array, nothing else.",
             messages: [
               ...messages,
               { role: "assistant", content: fullText },
-              { role: "user", content: "Give me 2-3 short follow-up questions I might ask." },
+              { role: "user", content: "JSON array of 2-3 follow-up questions:" },
             ],
           });
           const raw = suggestionMsg.content[0].type === "text" ? suggestionMsg.content[0].text.trim() : "[]";
-          const parsed = JSON.parse(raw);
+          // Strip markdown code fences if model wraps it
+          const cleaned = raw.replace(/^```json?\n?/, "").replace(/\n?```$/, "").trim();
+          const parsed = JSON.parse(cleaned);
           if (Array.isArray(parsed)) {
             controller.enqueue(encoder.encode(`\n\n__SUGGESTIONS__${JSON.stringify(parsed)}`));
           }
