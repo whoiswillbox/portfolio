@@ -59,13 +59,8 @@ const groups = [
     comingSoon: true,
     icon: FolderIcon,
     iconActive: FolderSolid,
-    items: [
-      { title: "Next Gen", href: "/projects/next-gen-bar" },
-      { title: "SQE2", href: "/projects/sqe2" },
-      { title: "AI Tutor", href: "/projects/powerscore-ai-tutor" },
-      { title: "OneUX", href: "/projects/onebarbri" },
-      { title: "Debora", href: "/projects/deborah" },
-    ],
+    href: "/projects/next-gen-bar",
+    items: [],
   },
   {
     title: "Technergetics",
@@ -161,6 +156,26 @@ export function AppSidebar({
                   (i) => pathname === i.href || pathname.startsWith(`${i.href}/`)
                 )
                 const GroupIcon = sectionActive ? group.iconActive : group.icon
+
+                // No sub-items: render as a plain nav link
+                if (group.items.length === 0 && "href" in group && group.href) {
+                  const active = pathname === group.href || pathname.startsWith(`${group.href}/`);
+                  const Icon = active ? group.iconActive : group.icon;
+                  return (
+                    <SidebarMenuItem key={group.title}>
+                      <SidebarMenuButton asChild isActive={active}>
+                        <Link href={group.href}>
+                          <Icon />
+                          <span>{group.title}</span>
+                          {"comingSoon" in group && group.comingSoon && (
+                            <Badge variant="warning" className="ml-1 font-mono tracking-wide">PACKAGING</Badge>
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
                 return (
                 <Collapsible
                   key={group.title}
