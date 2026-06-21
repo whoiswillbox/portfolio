@@ -37,7 +37,12 @@ const MEDIA: MediaItem[] = [
 
   { type: "image", src: "/projects/surfing/DSCF3790.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
   { type: "image", src: "/projects/surfing/DSCF3770.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
-  { type: "video", src: "/projects/surfing/blacks-beach-2018-compressed.mp4", label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018, aspect: "aspect-[4/3]" },
+  { type: "video", src: "/projects/surfing/blacks-beach-2018-compressed.mp4",       label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018, aspect: "aspect-[4/3]" },
+  { type: "video", src: "/projects/surfing/DSC_7987-1920-compressed.mp4",           label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
+  { type: "video", src: "/projects/surfing/DSC_7989-1920-compressed.mp4",           label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
+  { type: "video", src: "/projects/surfing/DSC_9378-1920-compressed.mp4",           label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
+  { type: "video", src: "/projects/surfing/DSC_9379-1920-compressed.mp4",           label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
+  { type: "video", src: "/projects/surfing/air revo almost-compressed.mp4",         label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
   { type: "video", src: "/projects/surfing/revo-trimmed-slo-compressed.mp4",                    label: "Pacific Beach · PB Drive",  year: 2019 },
   { type: "video", src: "/projects/surfing/will-snap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-almost-combo-compressed.mp4",                   label: "Leucadia · Grandview",      year: 2019 },
