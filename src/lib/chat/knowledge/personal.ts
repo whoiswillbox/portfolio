@@ -38,7 +38,7 @@ export const personalEntries: QAEntry[] = [
       "surf where", "breaks", "local spot", "home break",
     ],
     answer:
-      "I grew up surfing all over North County San Diego, got to surf the points in Santa Barbara during community college, then really learned the breaks of South County San Diego during my undergrad at UCSD. These days I'm based in LA, hunting for waves in North and South LA — far and few between, but worth it 😄 My favorite beach break is Oceanside — either the harbor or the pier. Favorite reef break is Suckouts, a Cardiff gem that only breaks on low tide.",
+      "I grew up surfing all over North County San Diego, got to surf the points in Santa Barbara during community college, then really learned the breaks of South County San Diego during my undergrad at UCSD. These days I'm based in LA, hunting for waves in North and South LA — far and few between, but worth it 😄 My favorite beach break is Oceanside — either the harbor or the pier. Favorite reef break is Suckouts, a Cardiff gem that only breaks on low tide. But the spot that really shaped how I surf is Terramar — the reef break I learned and grew up on.",
   },
   {
     id: "goat",
