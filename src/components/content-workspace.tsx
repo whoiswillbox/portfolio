@@ -50,7 +50,10 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     setExiting(false);
     setRendered(false);
     setSplitPct(30);
-    if (entering) setSidebarOpen(true);
+    if (entering) {
+      // Defer so sidebar open fires after any layout resets settle
+      requestAnimationFrame(() => setSidebarOpen(true));
+    }
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const boxAI = React.useMemo(
