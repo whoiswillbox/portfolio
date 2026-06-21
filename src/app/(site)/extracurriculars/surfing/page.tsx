@@ -17,6 +17,7 @@ type MediaItem = {
   natural?: boolean;
   width?: number;
   height?: number;
+  fullWidth?: boolean;
 };
 
 const MEDIA: MediaItem[] = [
@@ -35,7 +36,7 @@ const MEDIA: MediaItem[] = [
 
   { type: "image", src: "/projects/surfing/DSCF3790.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
   { type: "image", src: "/projects/surfing/DSCF3770.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
-  { type: "sequence", src: "/projects/surfing/DSC_3850.jpg", srcs: ["/projects/surfing/DSC_3851.jpg", "/projects/surfing/DSC_3852.jpg"], alt: "Blacks Beach Surf Team Practice", label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018, width: 2400, height: 1600 },
+  { type: "gif", src: "/projects/surfing/blacks-beach-2018.gif", alt: "Blacks Beach Surf Team Practice", label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018, fullWidth: true },
   { type: "video", src: "/projects/surfing/revo-trimmed-slo-compressed.mp4",                    label: "Pacific Beach · PB Drive",  year: 2019 },
   { type: "video", src: "/projects/surfing/will-snap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-almost-combo-compressed.mp4",                   label: "Leucadia · Grandview",      year: 2019 },
@@ -88,7 +89,7 @@ function MediaBlock({ item }: { item: MediaItem }) {
         )
       )}
       {item.type === "gif" && (
-        <div className="overflow-hidden rounded-xl" style={{ maxWidth: "320px" }}>
+        <div className="overflow-hidden rounded-xl" style={item.fullWidth ? undefined : { maxWidth: "320px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={item.src} alt={item.alt!} className="h-auto w-full object-cover object-top" />
         </div>
