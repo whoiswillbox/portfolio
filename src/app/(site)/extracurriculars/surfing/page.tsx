@@ -6,8 +6,10 @@ import { ContentCard } from "@/components/content-card";
 import { cn } from "@/lib/utils";
 
 type MediaItem = {
-  type: "image" | "gif" | "video";
+  type: "image" | "gif" | "video" | "sequence";
   src: string;
+  /** For sequence: additional srcs after the first */
+  srcs?: string[];
   alt?: string;
   label: string;
   year: 2026 | 2023 | 2020 | 2019 | 2018;
@@ -33,6 +35,7 @@ const MEDIA: MediaItem[] = [
 
   { type: "image", src: "/projects/surfing/DSCF3790.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
   { type: "image", src: "/projects/surfing/DSCF3770.jpg", alt: "Cardiff Seaside Contest, UCSD Surf Team", label: "Cardiff · Seaside Contest · UCSD Surf Team", year: 2018, natural: true, width: 2400, height: 1600 },
+  { type: "sequence", src: "/projects/surfing/DSC_3850.jpg", srcs: ["/projects/surfing/DSC_3851.jpg", "/projects/surfing/DSC_3852.jpg"], alt: "Blacks Beach Surf Team Practice", label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018, width: 2400, height: 1600 },
   { type: "video", src: "/projects/surfing/revo-trimmed-slo-compressed.mp4",                    label: "Pacific Beach · PB Drive",  year: 2019 },
   { type: "video", src: "/projects/surfing/will-snap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-almost-combo-compressed.mp4",                   label: "Leucadia · Grandview",      year: 2019 },
@@ -91,6 +94,13 @@ function MediaBlock({ item }: { item: MediaItem }) {
         </div>
       )}
       {item.type === "video" && <AutoplayVideo src={item.src} />}
+      {item.type === "sequence" && (
+        <div className="flex flex-col gap-4">
+          {[item.src, ...(item.srcs ?? [])].map((s, i) => (
+            <Image key={i} src={s} alt={item.alt ?? ""} width={item.width ?? 2400} height={item.height ?? 1600} sizes="(min-width: 1024px) 56rem, 100vw" className="w-full rounded-xl" />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
