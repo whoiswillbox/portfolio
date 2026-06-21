@@ -31,6 +31,16 @@ export const personalEntries: QAEntry[] = [
       "I learned to surf when I was 12 but didn't really start surfing regularly until I was 15–16. I competed on the UCSD Surf Team in 2018–2019 — I surf for the love of it though, not competition. That chapter was just a fun bonus.",
   },
   {
+    id: "where-surf",
+    question: "Where do you surf?",
+    keywords: [
+      "where surf", "where do you surf", "surf spots", "favorite spot", "favorite surf spot",
+      "surf where", "breaks", "local spot", "home break",
+    ],
+    answer:
+      "I grew up surfing all over North County San Diego, got to surf the points in Santa Barbara during community college, then really learned the breaks of South County San Diego during my undergrad at UCSD.",
+  },
+  {
     id: "goat",
     question: "Is he the best?",
     keywords: [
