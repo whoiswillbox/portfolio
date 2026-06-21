@@ -39,6 +39,7 @@ import { respondTo } from "@/lib/chat/match";
 import {
   loadConversations,
   saveConversations,
+  subscribeConversations,
   type Message,
   type Conversation,
 } from "@/lib/chat/store";
@@ -419,6 +420,17 @@ export function BoxAI({
     if (!loaded) return;
     saveConversations(conversations);
   }, [conversations, loaded]);
+
+  // Sync deletions made from the sidebar back into this component's state.
+  // Without this, box-ai holds a stale copy and "restores" deleted conversations
+  // when the user clicks a chip that matches a deleted conversation's first message.
+  React.useEffect(() => {
+    if (!loaded) return;
+    return subscribeConversations(() => {
+      const fresh = loadConversations();
+      setConversations(fresh);
+    });
+  }, [loaded]);
 
   const active = conversations.find((c) => c.id === activeId) ?? null;
   const messages = active?.messages ?? [];
