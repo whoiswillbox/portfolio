@@ -14,8 +14,7 @@ export default async function SiteLayout({
 }>) {
   // Show the lock button only in local dev (never on the deployed site), and
   // only when the gate is actually active.
-  const showLock =
-    process.env.NODE_ENV === "development" && Boolean(process.env.SITE_PASSWORD);
+  const showLock = process.env.NODE_ENV === "development";
 
   // Only the owner (valid admin cookie) sees the Admin nav item.
   const adminKey = process.env.ADMIN_KEY;

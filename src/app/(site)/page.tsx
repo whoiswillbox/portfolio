@@ -93,10 +93,9 @@ export default function LandingPage() {
 
   useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const enter = async (path: string) => {
+  const enter = (path: string) => {
     setExiting(true);
     setOpen(true);
-    await fetch("/api/enter", { method: "POST" });
     router.push(path);
   };
 

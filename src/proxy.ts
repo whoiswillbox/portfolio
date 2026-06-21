@@ -31,23 +31,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Landing-page gate: skip for /, /unlock, /api/*, /admin/*.
-  if (
-    path !== "/" &&
-    !path.startsWith("/unlock") &&
-    !path.startsWith("/api/") &&
-    !path.startsWith("/admin")
-  ) {
-    const enteredCookie = request.cookies.get(ENTERED_COOKIE)?.value;
-    const enteredAt = enteredCookie ? parseInt(enteredCookie, 10) : NaN;
-    if (isNaN(enteredAt) || Date.now() - enteredAt >= ENTERED_TTL_MS) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      url.search = "";
-      return NextResponse.redirect(url);
-    }
-  }
-
   return NextResponse.next();
 }
 
