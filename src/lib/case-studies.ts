@@ -47,26 +47,9 @@ export const caseStudies: Record<string, CaseStudy> = {
     title: "Next Gen Bar Prep",
     meta: "Lead Product Designer · BARBRI · 2024–2025",
     summary:
-      "A ground-up reimagining of how law graduates prepare for the bar exam — replacing a rigid, one-size-fits-all course with an adaptive study experience that meets each student where they are.",
-    metrics: [
-      { value: "+28%", label: "Study-plan completion" },
-      { value: "4.6/5", label: "Avg. student satisfaction" },
-      { value: "10k+", label: "Students onboarded" },
-    ],
-    sections: [
-      {
-        heading: "The problem",
-        body: "Students faced a fixed, linear schedule that ignored their strengths and gaps. Falling behind early meant low confidence and high drop-off heading into the most important exam of their careers.",
-      },
-      {
-        heading: "What I did",
-        body: "Led design end-to-end across two squads — from research and IA through prototyping and shipped front-end. Designed an adaptive study planner that re-sequences daily tasks based on diagnostic performance, and built the shared component system that keeps the experience consistent across web and mobile.",
-      },
-      {
-        heading: "The outcome",
-        body: "The adaptive planner lifted plan completion and student-reported confidence, and became the template for BARBRI's broader product modernization.",
-      },
-    ],
+      "A bar exam product I led at BARBRI. Case study coming soon.",
+    metrics: [],
+    sections: [],
     prompts: [
       "When's this going live?",
       "What's the hold up?",

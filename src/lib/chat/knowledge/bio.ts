@@ -15,7 +15,7 @@ export const bioEntries: QAEntry[] = [
     question: "What do you do?",
     keywords: ["what do you do", "job", "role", "work", "profession", "title", "occupation"],
     answer:
-      "I'm a product designer at BARBRI, working remotely from LA, where I lead design for the Bar Prep and SQE products across two teams. I partner closely with stakeholders, product owners, and engineering to take experiences from research to polished UI — and I ship the front-end code too. I'm also building BARBRI's unified design system and a new AI tutor for the PowerScore platform.",
+      "I'm a product designer at BARBRI, working remotely from LA. I lead design across two teams — Bar Prep and SQE (partnering with UK teams on SQE). I work closely with stakeholders, product owners, and engineering to take experiences from research to polished UI — and I ship the front-end code too.",
   },
   {
     id: "skills",

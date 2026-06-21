@@ -53,7 +53,7 @@ export const projectEntries: QAEntry[] = [
     question: "What have you built?",
     keywords: ["projects", "built", "portfolio", "work samples", "made", "shipped", "apps", "working on"],
     answer:
-      "A few things I'm driving right now: BARBRI's unified design system that ties all their products together, a new AI tutor for the PowerScore platform, and the Bar Prep & SQE product experiences. Oh — and this site you're on. Ask me how it was made!",
+      "A few things I'm working on: Bar Prep and SQE product experiences at BARBRI (including work with UK partners on SQE). Oh — and this site you're on. Ask me how it was made!",
   },
   {
     id: "this-site",
