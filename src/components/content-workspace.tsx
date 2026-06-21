@@ -43,15 +43,15 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  React.useEffect(() => { setOpen(false); setExiting(false); setRendered(false); setSplitPct(30); }, [pathname]);
-
   const { setOpen: setSidebarOpen } = useSidebar();
   React.useEffect(() => {
-    if (enteredParam) {
-      setSidebarOpen(true);
-      router.replace(pathname);
-    }
-  }, [enteredParam]); // eslint-disable-line react-hooks/exhaustive-deps
+    const entering = sessionStorage.getItem("entered") === "1";
+    setOpen(false);
+    setExiting(false);
+    setRendered(false);
+    setSplitPct(30);
+    if (entering) setSidebarOpen(true);
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const boxAI = React.useMemo(
     () => <BoxAI key={boxParam ?? "default"} embedded seed={contextSeed} />,
