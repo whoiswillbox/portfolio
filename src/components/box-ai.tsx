@@ -451,12 +451,23 @@ export function BoxAI({
     signal: AbortSignal,
   ): Promise<{ text: string; entryId: string | null; fromApi: boolean; suggestions?: string[] }> => {
     try {
+      // Build page context from the current seed so the model knows what the visitor is viewing
+      const pageContext = seed
+        ? [
+            `Page: ${seed.title}`,
+            seed.meta && `Meta: ${seed.meta}`,
+            seed.summary && `Summary: ${seed.summary}`,
+            ...(seed.sections ?? []).map((s) => `${s.heading}: ${s.body}`),
+          ].filter(Boolean).join("\n")
+        : undefined;
+
       const res = await fetch("/api/chat", {
         method: "POST",
         signal,
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           conversationId,
+          pageContext,
           messages: history.map((m) => ({
             role: m.role === "bot" ? "assistant" : "user",
             content: m.text,

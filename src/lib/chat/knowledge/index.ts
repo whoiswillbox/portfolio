@@ -47,7 +47,7 @@ const KNOWLEDGE_BASE = qaEntries
 
 /** Assemble the full Claude system prompt. Pass the live Spotify summary (from
     getMusicSummary) to ground music answers in real-time data. */
-export function buildSystemPrompt(musicSummary?: string | null): string {
+export function buildSystemPrompt(musicSummary?: string | null, pageContext?: string | null): string {
   const base = `${PERSONA}
 
 MUSIC NOTES:
@@ -58,7 +58,7 @@ ${PROJECT_NOTES}
 
 KNOWLEDGE BASE:
 ${KNOWLEDGE_BASE}`;
-  return musicSummary
-    ? `${base}\n\nMY MUSIC (live from my Spotify):\n${musicSummary}`
-    : base;
+  let prompt = musicSummary ? `${base}\n\nMY MUSIC (live from my Spotify):\n${musicSummary}` : base;
+  if (pageContext) prompt += `\n\nCURRENT PAGE CONTEXT (the visitor is viewing this content right now — use it to answer questions about it):\n${pageContext}`;
+  return prompt;
 }

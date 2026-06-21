@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
   }
 
-  let body: { messages?: ClientMessage[]; conversationId?: string };
+  let body: { messages?: ClientMessage[]; conversationId?: string; pageContext?: string };
   try {
     body = await request.json();
   } catch {
@@ -68,7 +68,8 @@ export async function POST(request: Request) {
 
   try {
     const musicSummary = await getMusicSummary().catch(() => null);
-    const system = buildSystemPrompt(musicSummary);
+    const pageContext = typeof body.pageContext === "string" ? body.pageContext.slice(0, 3000) : undefined;
+    const system = buildSystemPrompt(musicSummary, pageContext);
     const client = new Anthropic();
 
     const stream = await client.messages.stream({
