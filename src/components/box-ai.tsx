@@ -951,7 +951,7 @@ export function BoxAI({
               </div>
             )}
             {searchForm}
-            <div className="sm:block hidden">{!active && disclaimer}</div>
+            {!active && disclaimer}
           </div>
         </div>
       )}
