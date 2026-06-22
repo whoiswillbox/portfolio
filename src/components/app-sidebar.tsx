@@ -114,7 +114,7 @@ export function AppSidebar({
       variant="floating"
       className="[&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
     >
-      <SidebarHeader>
+      <SidebarHeader className="max-sm:pt-14">
         <div className="flex items-center justify-end">
           <SidebarTrigger />
         </div>
