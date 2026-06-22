@@ -221,7 +221,7 @@ export function MobileNav() {
               key={item.id}
               onClick={item.onPress}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors",
+                "flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors bg-transparent outline-none",
                 item.active || isOpen ? "text-foreground" : "text-muted-foreground"
               )}
             >
