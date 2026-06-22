@@ -80,35 +80,40 @@ export function MobileNav() {
     {
       id: "box" as const,
       label: "Box",
-      icon: boxActive ? CubeSolid : CubeIcon,
+      iconOutline: CubeIcon,
+      iconSolid: CubeSolid,
       active: boxActive,
       onPress: () => { closeTray(); router.push("/who") },
     },
     {
       id: "experience" as const,
       label: "Experience",
-      icon: experienceActive ? FolderSolid : FolderIcon,
+      iconOutline: FolderIcon,
+      iconSolid: FolderSolid,
       active: experienceActive,
       onPress: () => toggleTray("experience"),
     },
     {
       id: "school" as const,
       label: "School",
-      icon: schoolActive ? AcademicCapSolid : AcademicCapIcon,
+      iconOutline: AcademicCapIcon,
+      iconSolid: AcademicCapSolid,
       active: schoolActive,
       onPress: () => toggleTray("school"),
     },
     {
       id: "extras" as const,
       label: "Extras",
-      icon: extrasActive ? LifebuoySolid : LifebuoyIcon,
+      iconOutline: LifebuoyIcon,
+      iconSolid: LifebuoySolid,
       active: extrasActive,
       onPress: () => toggleTray("extras"),
     },
     {
       id: "conversations" as const,
       label: "Convos",
-      icon: convsActive ? CubeSolid : CubeIcon,
+      iconOutline: CubeIcon,
+      iconSolid: CubeSolid,
       active: convsActive,
       onPress: () => toggleTray("conversations"),
     },
@@ -214,15 +219,16 @@ export function MobileNav() {
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-end justify-center p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <div className="flex h-16 w-full items-center rounded-xl bg-background ring-1 ring-border shadow-lg">
         {navItems.map((item) => {
-          const Icon = item.icon
           const isOpen = openTray === item.id
+          const highlighted = item.active || isOpen
+          const Icon = highlighted ? item.iconSolid : item.iconOutline
           return (
             <button
               key={item.id}
               onClick={item.onPress}
               className={cn(
                 "flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors bg-transparent outline-none",
-                item.active || isOpen ? "text-foreground" : "text-muted-foreground"
+                highlighted ? "text-foreground" : "text-muted-foreground"
               )}
             >
               <Icon className="size-5" />
