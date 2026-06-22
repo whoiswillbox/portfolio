@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ContentWorkspace } from "@/components/content-workspace";
+import { MobileNav } from "@/components/mobile-nav";
 import { BoxSeedProvider } from "@/components/box-seed";
 import { ADMIN_COOKIE, adminToken } from "@/lib/auth";
 
@@ -30,7 +31,7 @@ export default async function SiteLayout({
     <TooltipProvider>
       <SidebarProvider defaultOpen={sidebarDefaultOpen} className="h-full min-h-0 bg-background max-sm:bg-sidebar">
         <AppSidebar showLock={showLock} isAdmin={isAdmin} />
-        <SidebarInset className="min-h-0 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar">
+        <SidebarInset className="min-h-0 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar max-sm:pb-16">
           {/* No overflow-hidden here: it would clip the content cards' drop
               shadows and rounded corners. The cards manage their own scroll.
               ContentWorkspace surfaces the sidebar trigger + Box AI launcher
@@ -44,6 +45,11 @@ export default async function SiteLayout({
           </main>
         </SidebarInset>
       </SidebarProvider>
+      <div className="sm:hidden">
+        <Suspense fallback={null}>
+          <MobileNav />
+        </Suspense>
+      </div>
     </TooltipProvider>
   );
 }
