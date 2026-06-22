@@ -782,7 +782,7 @@ export function BoxAI({
     <ContentCard className="flex h-full w-full min-w-0 flex-col">
       {!embedded && (showTrigger || openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
-          {showTrigger && <SidebarTrigger />}
+          {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
           {activeId && !openCaseStudy && (
             <button
               type="button"

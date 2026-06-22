@@ -116,7 +116,7 @@ export function AppSidebar({
     >
       <SidebarHeader>
         <div className="flex items-center justify-end">
-          <SidebarTrigger />
+          <SidebarTrigger className="max-sm:hidden" />
         </div>
       </SidebarHeader>
       <SidebarContent>

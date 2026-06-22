@@ -83,7 +83,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   const controls = enabled && (
     <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
-      {!open && showTrigger && <SidebarTrigger />}
+      {!open && showTrigger && <SidebarTrigger className="max-sm:hidden" />}
       {!open && launcherEnabled && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -161,7 +161,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             style={{ overflow: "visible" }}
           >
             <div className="absolute left-2 top-2 z-10 flex items-center gap-1 max-sm:top-[calc(0.5rem+env(safe-area-inset-top))]">
-              {showTrigger && <SidebarTrigger />}
+              {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
             </div>
             <button
               type="button"
