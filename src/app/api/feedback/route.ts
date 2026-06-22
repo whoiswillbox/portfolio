@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     t: new Date().toISOString(),
     c: typeof body.conversationId === "string" ? body.conversationId.slice(0, 64) : undefined,
     q: typeof body.question === "string" ? body.question.slice(0, 300) : undefined,
-    a: typeof body.answer === "string" ? body.answer.slice(0, 300) : "",
+    a: typeof body.answer === "string" ? body.answer.slice(0, 300) : undefined,
     rating,
     feedback: typeof body.feedback === "string" ? body.feedback.slice(0, 500) : undefined,
     country: request.headers.get("x-vercel-ip-country") ?? undefined,

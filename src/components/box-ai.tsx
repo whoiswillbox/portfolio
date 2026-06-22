@@ -118,7 +118,6 @@ const SURF_PHRASES = [
 
 const randomSurf = () => SURF_PHRASES[Math.floor(Math.random() * SURF_PHRASES.length)];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Lottie = React.lazy(() => import("lottie-react"));
 
 let _animDataCache: object | null = null;
@@ -251,6 +250,8 @@ export function BoxAI({
    *  follow-up prompts). May be a static case study or a dynamic seed. */
   seed?: CaseStudy | null;
 } = {}) {
+  const seedRef = React.useRef(seed);
+  React.useEffect(() => { seedRef.current = seed; }, [seed]);
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [input, setInput] = React.useState("");
@@ -467,13 +468,15 @@ export function BoxAI({
     signal: AbortSignal,
   ): Promise<{ text: string; entryId: string | null; fromApi: boolean; suggestions?: string[] }> => {
     try {
-      // Build page context from the current seed so the model knows what the visitor is viewing
-      const pageContext = seed
+      // Build page context from the current seed so the model knows what the visitor is viewing.
+      // Use seedRef.current to avoid stale closure if seed prop changed between renders.
+      const currentSeed = seedRef.current;
+      const pageContext = currentSeed
         ? [
-            `Page: ${seed.title}`,
-            seed.meta && `Meta: ${seed.meta}`,
-            seed.summary && `Summary: ${seed.summary}`,
-            ...(seed.sections ?? []).map((s) => `${s.heading}: ${s.body}`),
+            `Page: ${currentSeed.title}`,
+            currentSeed.meta && `Meta: ${currentSeed.meta}`,
+            currentSeed.summary && `Summary: ${currentSeed.summary}`,
+            ...(currentSeed.sections ?? []).map((s) => `${s.heading}: ${s.body}`),
           ].filter(Boolean).join("\n")
         : undefined;
 
@@ -626,7 +629,7 @@ export function BoxAI({
     if (reply.suggestions?.length) {
       setSuggestions(reply.suggestions);
     } else {
-      const fallbackSuggestions = seed?.prompts?.slice(0, 3) ?? [
+      const fallbackSuggestions = seedRef.current?.prompts?.slice(0, 3) ?? [
         "Tell me more about your experience",
         "What's your favorite project?",
         "How can I reach you?",

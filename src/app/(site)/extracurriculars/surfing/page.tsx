@@ -25,7 +25,7 @@ const MEDIA: MediaItem[] = [
   { type: "video", src: "/projects/surfing/el-salvador-compressed.mp4",                         label: "El Salvador · El Palmarcito", year: 2026 },
   { type: "video", src: "/projects/surfing/nicaragua-santana-compressed.mp4",                   label: "Nicaragua · Playa Santana",  year: 2023 },
   { type: "image", src: "/projects/surfing/0F5A4554.jpeg", alt: "Surfing a wave in Nicaragua", label: "Nicaragua · Playa Colorado", year: 2023 },
-  { type: "gif",   src: "/projects/surfing/nica.gif",      alt: "Surfing Nicaragua",           label: "Nicaragua · Manzanillo",   year: 2023 },
+  { type: "gif",   src: "/projects/surfing/nica.gif",      alt: "Surfing Nicaragua",           label: "Nicaragua · Manzanillo",   year: 2023, width: 887, height: 1858 },
   { type: "video", src: "/projects/surfing/C0126-compressed.mp4",                               label: "Carlsbad · Tamarack Jetty", year: 2023 },
   { type: "video", src: "/projects/surfing/trimmed-downcarve-compressed.mp4",                   label: "Carlsbad · Tamarack Jetty", year: 2023 },
   { type: "video", src: "/projects/surfing/will-water-compressed.mp4",                          label: "La Jolla · Scripps",        year: 2020 },
@@ -97,7 +97,13 @@ function MediaBlock({ item }: { item: MediaItem }) {
       {item.type === "gif" && (
         <div className="overflow-hidden rounded-xl" style={item.fullWidth ? undefined : { maxWidth: "320px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={item.src} alt={item.alt!} className="h-auto w-full object-cover object-top" />
+          <img
+            src={item.src}
+            alt={item.alt!}
+            width={item.width}
+            height={item.height}
+            className="h-auto w-full object-cover object-top"
+          />
         </div>
       )}
       {item.type === "video" && <AutoplayVideo src={item.src} aspect={item.aspect} />}
