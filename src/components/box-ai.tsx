@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  ArrowLeftIcon,
+  PencilSquareIcon,
   XMarkIcon,
   CubeIcon,
   ChevronDownIcon,
@@ -787,11 +787,11 @@ export function BoxAI({
             <button
               type="button"
               onClick={goHome}
-              aria-label="Back"
+              aria-label="New chat"
               className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              <ArrowLeftIcon className="size-4" />
-              Back
+              <PencilSquareIcon className="size-4" />
+              New chat
             </button>
           )}
           {openCaseStudy && (
