@@ -82,7 +82,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
 
   const controls = enabled && (
-    <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
+    <div className="absolute left-3 top-3 z-30 flex items-center gap-1 max-sm:top-[calc(0.75rem+env(safe-area-inset-top))]">
       {!open && showTrigger && <SidebarTrigger />}
       {!open && launcherEnabled && (
         <Tooltip>
@@ -160,7 +160,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             )}
             style={{ overflow: "visible" }}
           >
-            <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1 max-sm:top-[calc(0.5rem+env(safe-area-inset-top))]">
               {showTrigger && <SidebarTrigger />}
             </div>
             <button
