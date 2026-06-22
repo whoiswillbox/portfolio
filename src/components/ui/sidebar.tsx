@@ -201,7 +201,7 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col p-2" style={{ paddingTop: "max(0.5rem, env(safe-area-inset-top))" }}>
+          <div className="flex h-full w-full flex-col p-2 max-sm:pt-8">
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto rounded-xl bg-background ring-1 ring-border shadow-lg">
               {children}
             </div>
