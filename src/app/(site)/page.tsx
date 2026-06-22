@@ -101,7 +101,7 @@ export default function LandingPage() {
 
   const enter = (path: string) => {
     setLoading(true);
-    setTimeout(() => { sessionStorage.setItem("entered", "1"); router.push(path); }, 2000);
+    setTimeout(() => { sessionStorage.setItem("entered", "1"); router.push(path); }, 800);
   };
 
   return (
@@ -120,7 +120,7 @@ export default function LandingPage() {
       `}</style>
       <ContentCard
         className={cn(
-          "relative h-full overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
+          "relative h-full max-sm:min-h-dvh overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
           "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
         )}
       >

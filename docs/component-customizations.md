@@ -128,3 +128,10 @@ grid `<table>` element). Same styling, just the correct key name.
 **Date:** 2026-06-18
 **Why:** `pr-18` (72px) left too much space between alert text and the dismiss button.
 **What:** Changed `has-data-[slot=alert-action]:pr-18` to `has-data-[slot=alert-action]:pr-10`.
+
+---
+
+### `sheet.tsx` — left/right side sheets float as cards
+**Date:** 2026-06-22
+**Why:** Mobile sidebar slides in as a floating card (mirroring the desktop content card aesthetic). The default sheet was edge-to-edge with no padding or rounding.
+**What:** Changed `data-[side=left]` and `data-[side=right]` from `inset-y-0`/`h-full` to `inset-y-2`/`h-[calc(100%-1rem)]` and added `rounded-xl`. Removed the `border-r`/`border-l` since the card style replaces the border.

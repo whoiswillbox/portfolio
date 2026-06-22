@@ -336,7 +336,14 @@ export function AppSidebar({
               <Switch
                 id="theme-switch"
                 checked={isDark}
-                onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                onCheckedChange={(checked) => {
+                  setTheme(checked ? "dark" : "light");
+                  // Update theme-color immediately so Safari status bar responds
+                  // before the sheet closes (MutationObserver fires too late).
+                  const color = checked ? "oklch(0.205 0.011 55)" : "oklch(0.985 0.003 75)";
+                  const tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+                  if (tag) tag.content = color;
+                }}
                 aria-label="Toggle dark mode"
               />
             </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Geist_Mono, EB_Garamond } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeColorMeta } from "@/components/theme-color-meta";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -24,6 +25,13 @@ export const metadata: Metadata = {
   description: "Personal portfolio",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "oklch(0.985 0.003 75)",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,7 +44,8 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${geistMono.variable} ${ebGaramond.variable} h-full antialiased`}
     >
       <body className="h-dvh overflow-hidden flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme disableTransitionOnChange>
+          <ThemeColorMeta />
           {children}
         </ThemeProvider>
         <Analytics />

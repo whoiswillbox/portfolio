@@ -28,9 +28,9 @@ export default async function SiteLayout({
 
   return (
     <TooltipProvider>
-      <SidebarProvider defaultOpen={sidebarDefaultOpen} className="h-full min-h-0 bg-background">
+      <SidebarProvider defaultOpen={sidebarDefaultOpen} className="h-full min-h-0 bg-background max-sm:bg-sidebar">
         <AppSidebar showLock={showLock} isAdmin={isAdmin} />
-        <SidebarInset className="min-h-0 m-2 bg-transparent">
+        <SidebarInset className="min-h-0 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar">
           {/* No overflow-hidden here: it would clip the content cards' drop
               shadows and rounded corners. The cards manage their own scroll.
               ContentWorkspace surfaces the sidebar trigger + Box AI launcher

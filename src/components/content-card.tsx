@@ -13,7 +13,7 @@ export function ContentCard({
   return (
     <div
       className={cn(
-        "min-h-0 overflow-hidden rounded-xl bg-sidebar shadow-lg ring-1 ring-sidebar-border",
+        "min-h-0 sm:overflow-hidden sm:bg-sidebar sm:rounded-xl sm:shadow-lg sm:ring-1 sm:ring-sidebar-border",
         className
       )}
       {...props}
