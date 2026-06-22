@@ -74,7 +74,7 @@ export function MobileNav() {
   const schoolActive = pathname.startsWith("/school")
   const extrasActive = pathname.startsWith("/extracurriculars")
   const convsActive = pathname === "/conversations" || pathname === "/who"
-  const boxActive = pathname === "/who" && convoParam === null
+  const boxActive = pathname === "/who" && convoParam === null && openTray === null
 
   const navItems = [
     {
