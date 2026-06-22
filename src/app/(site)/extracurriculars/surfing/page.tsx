@@ -12,7 +12,7 @@ type MediaItem = {
   srcs?: string[];
   alt?: string;
   label: string;
-  year: 2026 | 2023 | 2020 | 2019 | 2018;
+  year: 2026 | 2023 | 2020 | 2019 | 2018 | 2017;
   /** Use natural image dimensions instead of the default 16/7 crop */
   natural?: boolean;
   width?: number;
@@ -44,13 +44,15 @@ const MEDIA: MediaItem[] = [
   { type: "video", src: "/projects/surfing/DSC_9379-1920-compressed.mp4",           label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
   { type: "video", src: "/projects/surfing/air revo almost-compressed.mp4",         label: "Blacks Beach · Surf Team Practice · UCSD Surf Team", year: 2018 },
   { type: "video", src: "/projects/surfing/A01A4857-compressed.mp4",               label: "La Jolla · Scripps",        year: 2018 },
+  { type: "video", src: "/projects/surfing/DJI_0006-compressed.mp4",               label: "Santa Barbara · Sands",     year: 2017 },
+  { type: "video", src: "/projects/surfing/sands-drone-compressed.mp4",            label: "Santa Barbara · Sands",     year: 2017 },
   { type: "video", src: "/projects/surfing/revo-trimmed-slo-compressed.mp4",                    label: "Pacific Beach · PB Drive",  year: 2019 },
   { type: "video", src: "/projects/surfing/will-snap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-almost-combo-compressed.mp4",                   label: "Leucadia · Grandview",      year: 2019 },
   { type: "video", src: "/projects/surfing/will-wrap-compressed.mp4",                           label: "Leucadia · Grandview",      year: 2019 },
 ];
 
-const YEARS = [2026, 2023, 2020, 2019, 2018] as const;
+const YEARS = [2026, 2023, 2020, 2019, 2018, 2017] as const;
 
 function AutoplayVideo({ src, aspect }: { src: string; aspect?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -120,7 +122,7 @@ function MediaBlock({ item }: { item: MediaItem }) {
 }
 
 export default function Surfing() {
-  const [year, setYear] = useState<2026 | 2023 | 2020 | 2019 | 2018 | null>(null);
+  const [year, setYear] = useState<2026 | 2023 | 2020 | 2019 | 2018 | 2017 | null>(null);
 
   const filtered = (year ? MEDIA.filter((m) => m.year === year) : [...MEDIA].sort((a, b) => b.year - a.year));
 
