@@ -829,9 +829,10 @@ export function BoxAI({
               <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
             </svg>
             <h1 className="text-h1 font-semibold">{heading}</h1>
-            <div className="mt-3">{searchForm}</div>
-            {disclaimer}
-            <div className="flex flex-wrap justify-center gap-2">
+            {/* On desktop: input + chips inline. On mobile: hidden here, shown pinned below */}
+            <div className="mt-3 sm:block hidden">{searchForm}</div>
+            <div className="sm:block hidden">{disclaimer}</div>
+            <div className="sm:flex hidden flex-wrap justify-center gap-2">
               {CHIPS.map((chip) => (
                 <button
                   key={chip.prompt}
@@ -843,7 +844,6 @@ export function BoxAI({
                 </button>
               ))}
             </div>
-
           </div>
         ) : (
           <div className="mx-auto flex w-full max-w-xl flex-col gap-8 px-6 pb-6 pt-28">
@@ -932,10 +932,24 @@ export function BoxAI({
         )}
       </div>
 
-      {/* Active-conversation input pinned to the bottom */}
-      {active && (
-        <div className="p-3">
+      {/* Pinned bottom: active input always, inactive input+chips on mobile only */}
+      {(active || true) && (
+        <div className={cn("p-3", !active && "sm:hidden")}>
           <div className="mx-auto flex w-full max-w-xl flex-col gap-1">
+            {!active && (
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                {CHIPS.map((chip) => (
+                  <button
+                    key={chip.prompt}
+                    onClick={() => send(chip.prompt)}
+                    disabled={atLimit}
+                    className="shrink-0 rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            )}
             {searchForm}
             {disclaimer}
           </div>
