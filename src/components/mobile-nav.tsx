@@ -41,7 +41,11 @@ export function MobileNav() {
   const convoParam = searchParams.get("c")
   const boxParam = searchParams.get("box")
   const [openTray, setOpenTray] = React.useState<Tray>(null)
+  const [activeNav, setActiveNav] = React.useState<string | null>(null)
   const [conversations, setConversations] = React.useState<Conversation[]>([])
+
+  // Reset optimistic active state when pathname settles
+  React.useEffect(() => { setActiveNav(null) }, [pathname])
   React.useEffect(() => {
     const sync = () => setConversations(loadConversations())
     sync()
@@ -72,8 +76,9 @@ export function MobileNav() {
 
   const closeTray = () => setOpenTray(null)
 
-  const navigate = (href: string) => {
+  const navigate = (href: string, navId?: string) => {
     closeTray()
+    if (navId) setActiveNav(navId)
     router.push(href)
   }
 
@@ -85,12 +90,11 @@ export function MobileNav() {
 
   if (pathname === "/") return null
 
-  const experienceActive =
-    pathname.startsWith("/technergetics") || pathname === "/projects/next-gen-bar" || pathname === "/resume"
-  const schoolActive = pathname.startsWith("/school")
-  const extrasActive = pathname.startsWith("/extracurriculars")
-  const convsActive = pathname === "/conversations" || pathname === "/who"
-  const boxActive = pathname === "/who" && convoParam === null && openTray === null
+  const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname.startsWith("/technergetics") || pathname === "/projects/next-gen-bar" || pathname === "/resume"))
+  const schoolActive = activeNav === "school" || (!activeNav && openTray === null && pathname.startsWith("/school"))
+  const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && pathname.startsWith("/extracurriculars"))
+  const boxActive = activeNav === "box" || (!activeNav && pathname === "/who" && convoParam === null && openTray === null)
+  const convsActive = activeNav === "conversations" || (!activeNav && pathname === "/conversations" && openTray === null)
 
   const navItems = [
     {
@@ -99,7 +103,7 @@ export function MobileNav() {
       iconOutline: CubeIcon,
       iconSolid: CubeSolid,
       active: boxActive,
-      onPress: () => { closeTray(); router.push("/who") },
+      onPress: () => { closeTray(); setActiveNav("box"); router.push("/who") },
     },
     {
       id: "experience" as const,
@@ -130,8 +134,8 @@ export function MobileNav() {
       label: "Convos",
       iconOutline: ChatBubbleLeftRightIcon,
       iconSolid: ChatBubbleLeftRightSolid,
-      active: pathname === "/conversations",
-      onPress: () => { closeTray(); router.push("/conversations") },
+      active: convsActive,
+      onPress: () => { closeTray(); setActiveNav("conversations"); router.push("/conversations") },
     },
   ]
 
