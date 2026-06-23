@@ -38,7 +38,6 @@ export function MobileNav() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  if (pathname === "/") return null
   const convoParam = searchParams.get("c")
   const boxParam = searchParams.get("box")
   const [openTray, setOpenTray] = React.useState<Tray>(null)
@@ -83,6 +82,8 @@ export function MobileNav() {
     saveConversations(next)
     setConversations(next)
   }
+
+  if (pathname === "/") return null
 
   const experienceActive =
     pathname.startsWith("/technergetics") || pathname === "/projects/next-gen-bar" || pathname === "/resume"
