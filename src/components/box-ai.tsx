@@ -1041,15 +1041,37 @@ export function BoxAI({
       </ContentCard>
   );
 
+  // On mobile: chat full screen + case study in bottom sheet
+  if (!isDesktop && openCaseStudy) {
+    return (
+      <div className="h-full w-full">
+        {chatCard}
+        <Sheet open={!!openCaseStudy} onOpenChange={(o) => { if (!o) setOpenCaseStudy(null); }}>
+          <SheetContent
+            side="bottom"
+            showCloseButton={false}
+            className="sm:hidden h-[85dvh] rounded-t-2xl px-0 pb-0 overflow-hidden"
+            style={{ backgroundColor: "var(--color-background)" }}
+          >
+            <div className="mx-auto mb-3 mt-2 h-1 w-10 rounded-full bg-border" />
+            <div className="h-full overflow-y-auto">
+              <CaseStudyPanel study={openCaseStudy} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    );
+  }
+
   // Single column when no case study is open.
   if (!openCaseStudy) {
     return <div className="h-full w-full">{chatCard}</div>;
   }
 
-  // Side-by-side, resizable. Defaults to chat 30 / case study 70.
+  // Desktop: side-by-side resizable. Defaults to chat 30 / case study 70.
   return (
     <ResizablePanelGroup
-      orientation={isDesktop ? "horizontal" : "vertical"}
+      orientation="horizontal"
       className="gap-2"
       style={{ overflow: "visible" }}
     >
