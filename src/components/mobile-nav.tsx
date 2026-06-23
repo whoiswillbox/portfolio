@@ -150,7 +150,7 @@ export function MobileNav() {
 
       {/* Tray */}
       {openTray && (
-        <div className="fixed bottom-[4.5rem] left-6 right-6 z-50 pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
+        <div className="fixed bottom-[4.5rem] left-6 right-6 z-40 pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
           <div className="rounded-xl bg-background ring-1 ring-border shadow-lg overflow-hidden">
             {openTray === "experience" && (
               <TraySection>
@@ -235,7 +235,7 @@ export function MobileNav() {
       )}
 
       {/* Bottom bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <div className="flex h-16 w-full items-center rounded-xl bg-background/80 supports-backdrop-filter:backdrop-blur-md shadow-lg overflow-hidden">
         {navItems.map((item) => {
           const isOpen = openTray === item.id

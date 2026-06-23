@@ -37,10 +37,10 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-[199] bg-black/20 data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
+        "fixed inset-0 bg-black/20 data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
         className
       )}
-      style={{ transition: "opacity 500ms cubic-bezier(0.16,1,0.3,1)" }}
+      style={{ transition: "opacity 500ms cubic-bezier(0.16,1,0.3,1)", zIndex: 299 }}
       {...props}
     />
   )
