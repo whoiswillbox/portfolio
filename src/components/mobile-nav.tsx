@@ -8,6 +8,7 @@ import {
   CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon,
   AcademicCapIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon,
   BoltIcon, MoonIcon, SunIcon, XMarkIcon, ChevronRightIcon,
+  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
@@ -19,6 +20,7 @@ import {
   PuzzlePieceIcon as PuzzlePieceSolid,
   MusicalNoteIcon as MusicalNoteSolid,
   BoltIcon as BoltSolid,
+  ChatBubbleLeftRightIcon as ChatBubbleLeftRightSolid,
 } from "@heroicons/react/24/solid"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
@@ -131,9 +133,9 @@ export function MobileNav() {
     {
       id: "conversations" as const,
       label: "Convos",
-      iconOutline: CubeIcon,
-      iconSolid: CubeSolid,
-      active: convsActive,
+      iconOutline: ChatBubbleLeftRightIcon,
+      iconSolid: ChatBubbleLeftRightSolid,
+      active: false,
       onPress: () => toggleTray("conversations"),
     },
   ]
