@@ -101,7 +101,7 @@ export function CaseStudyLayout({
           )}
         </DialogContent>
       </Dialog>
-    <article className="@container mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 pb-40 pt-16">
+    <article className="@container mx-auto flex w-full max-w-4xl flex-col gap-14 px-6 pb-40 pt-16 max-sm:pt-24">
       {/* Hero */}
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-3">
