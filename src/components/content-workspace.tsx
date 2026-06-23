@@ -212,7 +212,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {/* Content column */}
       <div
         className={cn(
-          "relative min-h-0 min-w-0",
+          "relative min-h-0 min-w-0 h-full",
           !isDesktop && open && "sm:transition-[padding] sm:duration-300 sm:ease-[cubic-bezier(0.32,0.72,0,1)] sm:pl-[min(440px,90vw)]",
         )}
         style={{ overflow: "visible" }}
