@@ -265,15 +265,17 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
-  // Track visual viewport offset so the pinned input follows the keyboard on iOS
-  const [vvOffset, setVvOffset] = React.useState(0);
+  // Track visual viewport so the pinned input sits just above the keyboard on iOS
+  const [vvBottom, setVvBottom] = React.useState<number | null>(null);
   React.useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
     const update = () => {
-      const offset = window.innerHeight - vv.height - vv.offsetTop;
-      setVvOffset(Math.max(0, offset));
+      // Distance from top of layout viewport to bottom of visual viewport
+      const bottom = window.innerHeight - (vv.offsetTop + vv.height);
+      setVvBottom(Math.max(0, bottom));
     };
+    update();
     vv.addEventListener("resize", update);
     vv.addEventListener("scroll", update);
     return () => { vv.removeEventListener("resize", update); vv.removeEventListener("scroll", update); };
@@ -986,7 +988,7 @@ export function BoxAI({
       {(active || true) && (
         <div
           className={cn("max-sm:px-6 p-3 max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:z-30", !active && "sm:hidden")}
-          style={vvOffset > 0 ? { bottom: vvOffset } : { bottom: "5rem" }}
+          style={{ bottom: vvBottom !== null && vvBottom > 80 ? vvBottom : "5rem" }}
         >
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
