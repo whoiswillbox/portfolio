@@ -37,6 +37,8 @@ export function MobileNav() {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  if (pathname === "/") return null
   const convoParam = searchParams.get("c")
   const boxParam = searchParams.get("box")
   const [openTray, setOpenTray] = React.useState<Tray>(null)
