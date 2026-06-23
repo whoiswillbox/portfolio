@@ -51,6 +51,25 @@ export function MobileNav() {
     return subscribeConversations(sync)
   }, [])
 
+  // Prefetch all nav destinations on mount so taps feel instant
+  React.useEffect(() => {
+    const hrefs = [
+      "/who",
+      "/projects/next-gen-bar",
+      "/technergetics/jetdash",
+      "/technergetics/upgrade",
+      "/technergetics/reusable-table",
+      "/technergetics/design-standards",
+      "/technergetics/lightcert",
+      "/resume",
+      "/school/swiperight-ai",
+      "/extracurriculars/surfing",
+      "/extracurriculars/gaming",
+      "/extracurriculars/music",
+    ]
+    hrefs.forEach((href) => router.prefetch(href))
+  }, [router])
+
   const isDark = mounted && resolvedTheme === "dark"
 
   const toggleTray = (tray: Tray) =>
