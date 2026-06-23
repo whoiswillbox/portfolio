@@ -51,6 +51,7 @@ function SheetContent({
   children,
   side = "right",
   showCloseButton = true,
+  style,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: "top" | "right" | "bottom" | "left"
@@ -63,7 +64,7 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-transparent text-sm",
+          "fixed flex flex-col gap-4 bg-transparent text-sm",
           "data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto",
           "data-[side=left]:inset-0 data-[side=right]:inset-0",
           "data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto",
@@ -74,7 +75,11 @@ function SheetContent({
           "data-[state=open]:translate-x-0 data-[state=open]:translate-y-0",
           className
         )}
-        style={{ transition: "transform 500ms cubic-bezier(0.16,1,0.3,1), opacity 500ms cubic-bezier(0.16,1,0.3,1)" }}
+        style={{
+          zIndex: 300,
+          transition: "transform 500ms cubic-bezier(0.16,1,0.3,1), opacity 500ms cubic-bezier(0.16,1,0.3,1)",
+          ...style,
+        }}
         {...props}
       >
         {children}

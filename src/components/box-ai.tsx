@@ -991,7 +991,7 @@ export function BoxAI({
         <SheetContent
           side="bottom"
           showCloseButton={false}
-          className="sm:hidden rounded-t-2xl px-0 pb-10 !z-[200]"
+          className="sm:hidden rounded-t-2xl px-0 pb-10"
           style={{ backgroundColor: "var(--color-background)" }}
         >
           {/* Drag handle */}
