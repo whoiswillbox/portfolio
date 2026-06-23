@@ -43,3 +43,7 @@
     background-color: var(--neutral-50) !important;
   }
 }
+
+body.sheet-open .mobile-nav {
+  display: none;
+}

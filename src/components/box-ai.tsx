@@ -260,6 +260,10 @@ export function BoxAI({
   const seedRef = React.useRef(seed);
   React.useEffect(() => { seedRef.current = seed; }, [seed]);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+  React.useEffect(() => {
+    document.body.classList.toggle("sheet-open", settingsOpen);
+    return () => document.body.classList.remove("sheet-open");
+  }, [settingsOpen]);
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
   React.useEffect(() => setThemeMounted(true), []);
