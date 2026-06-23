@@ -303,7 +303,7 @@ export function BoxAI({
   // Side-by-side split resizes horizontally on desktop, vertically on mobile.
   const [isDesktop, setIsDesktop] = React.useState(false);
   React.useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
+    const mq = window.matchMedia("(min-width: 640px)");
     const update = () => setIsDesktop(mq.matches);
     update();
     mq.addEventListener("change", update);
