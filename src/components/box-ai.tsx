@@ -303,11 +303,10 @@ export function BoxAI({
   // Side-by-side split resizes horizontally on desktop, vertically on mobile.
   const [isDesktop, setIsDesktop] = React.useState(false);
   React.useEffect(() => {
-    const mq = window.matchMedia("(min-width: 640px)");
-    const update = () => setIsDesktop(mq.matches);
+    const update = () => setIsDesktop(window.innerWidth >= 640);
     update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -655,7 +654,7 @@ export function BoxAI({
     }
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
 
-    // If the reply references a case study, open it in the side content card.
+    // If the reply references a case study, open it in the side panel (desktop) or bottom sheet (mobile).
     const cs = findCaseStudy(reply.text);
     if (cs) setOpenCaseStudy(cs);
 
