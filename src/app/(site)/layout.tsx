@@ -24,7 +24,7 @@ export default async function SiteLayout({
       <SidebarProvider defaultOpen={false} className="h-full min-h-0 bg-background max-sm:bg-sidebar">
         <AppSidebar showLock={showLock} isAdmin={isAdmin} />
         <SidebarInset className="min-h-0 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar max-sm:pb-28">
-          <main className="flex flex-1 flex-col min-w-0 min-h-0">
+          <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
             <BoxSeedProvider>
               <Suspense fallback={null}>
                 <ContentWorkspace>{children}</ContentWorkspace>
