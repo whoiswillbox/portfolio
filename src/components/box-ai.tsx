@@ -809,7 +809,7 @@ export function BoxAI({
   );
 
   const chatCard = (
-    <ContentCard className="flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-24">
+    <ContentCard className="flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-48">
       {!embedded && (showTrigger || openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
           {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
@@ -985,8 +985,8 @@ export function BoxAI({
       {/* Pinned bottom: active input always, inactive input+chips on mobile only */}
       {(active || true) && (
         <div
-          className={cn("max-sm:px-6 p-3", !active && "sm:hidden")}
-          style={vvOffset > 0 ? { marginBottom: vvOffset } : undefined}
+          className={cn("max-sm:px-6 p-3 max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:z-30", !active && "sm:hidden")}
+          style={vvOffset > 0 ? { bottom: vvOffset } : { bottom: "5rem" }}
         >
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
