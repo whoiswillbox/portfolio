@@ -253,7 +253,7 @@ export function MobileNav() {
               )}
             >
               <div className={cn(
-                "flex w-full flex-col items-center gap-1 rounded-lg py-1 transition-colors",
+                "flex w-full flex-col items-center gap-1 rounded-lg py-2 transition-colors",
                 highlighted ? "bg-muted shadow-sm" : "bg-transparent"
               )}>
                 <Icon className="size-5" />
