@@ -90,8 +90,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
 
   const controls = enabled && (
-    <>
-      {/* Desktop: left-aligned controls */}
+    <div className="contents">
+      {/* Desktop: cube icon top-left */}
       <div className="absolute left-3 top-3 z-30 flex items-center gap-1 max-sm:hidden">
         {!open && showTrigger && <SidebarTrigger />}
         {!open && launcherEnabled && (
@@ -110,9 +110,9 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           </Tooltip>
         )}
       </div>
-      {/* Mobile: back button left, cube right */}
-      <div className="sm:hidden absolute left-6 top-4 z-30">
-        {backTo && (
+      {/* Mobile: back button left */}
+      {backTo && (
+        <div className="sm:hidden absolute left-6 top-4 z-30">
           <button
             type="button"
             onClick={() => router.push(backTo.href)}
@@ -120,10 +120,11 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           >
             <ArrowLeftIcon className="size-5" />
           </button>
-        )}
-      </div>
-      <div className="sm:hidden absolute right-6 top-4 z-30">
-        {!open && launcherEnabled && (
+        </div>
+      )}
+      {/* Mobile: cube icon right */}
+      {!open && launcherEnabled && (
+        <div className="sm:hidden absolute right-6 top-4 z-30">
           <button
             type="button"
             onClick={() => { setRendered(true); setOpen(true); }}
@@ -132,9 +133,9 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           >
             <CubeIcon className="size-5" />
           </button>
-        )}
-      </div>
-    </>
+        </div>
+      )}
+    </div>
   );
 
   const desktopOpen = isDesktop && (open || exiting);
@@ -212,7 +213,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {/* Content column */}
       <div
         className={cn(
-          "relative min-h-0 min-w-0 h-full",
+          "relative min-h-0 min-w-0",
           !isDesktop && open && "sm:transition-[padding] sm:duration-300 sm:ease-[cubic-bezier(0.32,0.72,0,1)] sm:pl-[min(440px,90vw)]",
         )}
         style={{ overflow: "visible" }}
