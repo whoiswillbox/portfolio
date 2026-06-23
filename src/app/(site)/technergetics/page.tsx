@@ -36,7 +36,7 @@ export default function Experience() {
           {/* BARBRI */}
           <Link
             href="/projects/next-gen-bar"
-            className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted -mx-2 px-2 rounded-lg"
+            className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
           >
             <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
               <FolderIcon className="size-5 text-foreground" />
@@ -56,7 +56,7 @@ export default function Experience() {
             <button
               type="button"
               onClick={() => setTechOpen((o) => !o)}
-              className="flex w-full items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted -mx-2 px-2 rounded-lg"
+              className="flex w-full items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
             >
               <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                 <BuildingOffice2Icon className="size-5 text-foreground" />
@@ -73,7 +73,7 @@ export default function Experience() {
                   <Link
                     key={href}
                     href={href}
-                    className="flex items-center gap-3 py-3 pr-2 transition-colors hover:bg-muted active:bg-muted -mx-2 px-2 rounded-lg"
+                    className="flex items-center gap-3 py-3 pr-2 transition-colors hover:bg-muted active:bg-muted rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium">{label}</div>
@@ -89,7 +89,7 @@ export default function Experience() {
           {/* Resume */}
           <Link
             href="/resume"
-            className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted -mx-2 px-2 rounded-lg"
+            className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
           >
             <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
               <DocumentTextIcon className="size-5 text-foreground" />
