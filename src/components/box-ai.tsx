@@ -849,7 +849,7 @@ export function BoxAI({
         </div>
       )}
       {!embedded && !showTrigger && !openCaseStudy && !activeId && (
-        <div className="flex items-center justify-end p-2 sm:hidden">
+        <div className="flex items-center justify-end pt-6 px-2 pb-2 sm:hidden">
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
