@@ -265,22 +265,6 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
-  // Track visual viewport so the pinned input sits just above the keyboard on iOS
-  const [vvBottom, setVvBottom] = React.useState<number | null>(null);
-  React.useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => {
-      // On iOS Safari, when the keyboard opens vv.height shrinks.
-      // The keyboard height = layout viewport height - visual viewport height.
-      const bottom = window.innerHeight - vv.height;
-      setVvBottom(Math.max(0, bottom));
-    };
-    update();
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    return () => { vv.removeEventListener("resize", update); vv.removeEventListener("scroll", update); };
-  }, []);
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
   React.useEffect(() => setThemeMounted(true), []);
@@ -988,8 +972,7 @@ export function BoxAI({
       {/* Pinned bottom: active input always, inactive input+chips on mobile only */}
       {(active || true) && (
         <div
-          className={cn("max-sm:px-6 p-3 max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:z-30", !active && "sm:hidden")}
-          style={{ bottom: vvBottom !== null && vvBottom > 0 ? vvBottom : "5rem" }}
+          className={cn("max-sm:px-6 p-3 max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:z-30 max-sm:bottom-0", !active && "sm:hidden")}
         >
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
