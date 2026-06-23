@@ -109,16 +109,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             <TooltipContent side="bottom">Ask Box</TooltipContent>
           </Tooltip>
         )}
-        {backTo && (
-          <button
-            type="button"
-            onClick={() => router.push(backTo.href)}
-            className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <ArrowLeftIcon className="size-4" />
-            {backTo.label}
-          </button>
-        )}
       </div>
       {/* Mobile: back button left, cube right */}
       <div className="sm:hidden absolute left-6 top-4 z-30">
