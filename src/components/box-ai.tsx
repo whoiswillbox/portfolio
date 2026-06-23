@@ -934,7 +934,7 @@ export function BoxAI({
 
       {/* Pinned bottom: active input always, inactive input+chips on mobile only */}
       {(active || true) && (
-        <div className={cn("p-3", !active && "sm:hidden")}>
+        <div className={cn("max-sm:px-6 p-3", !active && "sm:hidden")}>
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
