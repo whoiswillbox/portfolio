@@ -56,6 +56,8 @@ export function MobileNav() {
   React.useEffect(() => {
     const hrefs = [
       "/who",
+      "/technergetics",
+      "/school",
       "/projects/next-gen-bar",
       "/technergetics/jetdash",
       "/technergetics/upgrade",
@@ -93,8 +95,8 @@ export function MobileNav() {
 
   if (pathname === "/") return null
 
-  const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname.startsWith("/technergetics") || pathname === "/projects/next-gen-bar" || pathname === "/resume"))
-  const schoolActive = activeNav === "school" || (!activeNav && openTray === null && pathname.startsWith("/school"))
+  const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname === "/technergetics" || pathname.startsWith("/technergetics/") || pathname === "/projects/next-gen-bar" || pathname === "/resume"))
+  const schoolActive = activeNav === "school" || (!activeNav && openTray === null && (pathname === "/school" || pathname.startsWith("/school/")))
   const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && (pathname === "/extracurriculars" || pathname.startsWith("/extracurriculars/")))
   const boxActive = activeNav === "box" || (!activeNav && pathname === "/who" && convoParam === null && openTray === null)
   const convsActive = activeNav === "conversations" || (!activeNav && pathname === "/conversations" && openTray === null)
@@ -114,7 +116,7 @@ export function MobileNav() {
       iconOutline: FolderIcon,
       iconSolid: FolderSolid,
       active: experienceActive,
-      onPress: () => toggleTray("experience"),
+      onPress: () => { closeTray(); setActiveNav("experience"); router.push("/technergetics") },
     },
     {
       id: "school" as const,
@@ -122,7 +124,7 @@ export function MobileNav() {
       iconOutline: AcademicCapIcon,
       iconSolid: AcademicCapSolid,
       active: schoolActive,
-      onPress: () => toggleTray("school"),
+      onPress: () => { closeTray(); setActiveNav("school"); router.push("/school") },
     },
     {
       id: "extras" as const,

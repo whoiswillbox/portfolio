@@ -15,7 +15,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
   const [exiting, setExiting] = React.useState(false);
-  const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/" && pathname !== "/extracurriculars";
+  const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/" && pathname !== "/extracurriculars" && pathname !== "/technergetics" && pathname !== "/school";
   const searchParams = useSearchParams();
   const boxParam = searchParams.get("box");
   const enteredParam = searchParams.get("entered");
