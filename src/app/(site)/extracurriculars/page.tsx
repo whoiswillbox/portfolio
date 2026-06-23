@@ -13,8 +13,8 @@ export default function Extracurriculars() {
   return (
     <MobileOnly fallback="/extracurriculars/surfing">
     <ContentCard className="h-full overflow-auto">
-      <div className="mx-auto w-full max-w-4xl px-6 pt-16 pb-10">
-        <div className="flex flex-col gap-3 mb-8">
+      <div className="mx-auto w-full max-w-4xl px-6 pt-24 pb-10">
+        <div className="flex flex-col gap-3 mb-10">
           <h1 className="text-h1 font-semibold">Extracurriculars</h1>
           <p className="text-body-lg text-muted-foreground">Outside of work.</p>
         </div>
