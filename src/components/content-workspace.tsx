@@ -240,7 +240,9 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           </div>
         )}
         {controls}
-        {children}
+        <div className="h-full min-h-0">
+          {children}
+        </div>
       </div>
     </div>
   );
