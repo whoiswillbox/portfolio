@@ -264,6 +264,20 @@ export function BoxAI({
     document.body.classList.toggle("sheet-open", settingsOpen);
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
+
+  // Track visual viewport offset so the pinned input follows the keyboard on iOS
+  const [vvOffset, setVvOffset] = React.useState(0);
+  React.useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const offset = window.innerHeight - vv.height - vv.offsetTop;
+      setVvOffset(Math.max(0, offset));
+    };
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => { vv.removeEventListener("resize", update); vv.removeEventListener("scroll", update); };
+  }, []);
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
   React.useEffect(() => setThemeMounted(true), []);
@@ -970,7 +984,10 @@ export function BoxAI({
 
       {/* Pinned bottom: active input always, inactive input+chips on mobile only */}
       {(active || true) && (
-        <div className={cn("max-sm:px-6 p-3", !active && "sm:hidden")}>
+        <div
+          className={cn("max-sm:px-6 p-3", !active && "sm:hidden")}
+          style={vvOffset > 0 ? { marginBottom: vvOffset } : undefined}
+        >
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
