@@ -111,7 +111,7 @@ export default function ConversationsPage() {
     <ContentCard className="flex h-full flex-col">
       {/* Top bar — sidebar trigger (when collapsed) + Back, top-left like the
           chat and case-study pages. */}
-      <div className="flex items-center gap-1 p-2">
+      <div className="flex items-center gap-1 p-2 max-sm:hidden">
         {showTrigger && <SidebarTrigger />}
         <Button
           variant="ghost"
