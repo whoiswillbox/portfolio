@@ -37,7 +37,7 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-[199] bg-black/20 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 z-[199] bg-black/20 transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
         className
       )}
       {...props}
@@ -62,7 +62,16 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-transparent text-sm transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=left]:inset-0 data-[side=right]:inset-0 data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-open:animate-in data-open:fade-in-0 data-[side=bottom]:data-open:slide-in-from-bottom-4 data-[side=left]:data-open:slide-in-from-left-4 data-[side=right]:data-open:slide-in-from-right-4 data-[side=top]:data-open:slide-in-from-top-4 data-closed:animate-out data-closed:fade-out-0 data-[side=bottom]:data-closed:slide-out-to-bottom-4 data-[side=left]:data-closed:slide-out-to-left-4 data-[side=right]:data-closed:slide-out-to-right-4 data-[side=top]:data-closed:slide-out-to-top-4",
+          "fixed z-50 flex flex-col gap-4 bg-transparent text-sm",
+          "transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          "data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto",
+          "data-[side=left]:inset-0 data-[side=right]:inset-0",
+          "data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto",
+          "data-[state=closed]:data-[side=bottom]:translate-y-full",
+          "data-[state=closed]:data-[side=top]:-translate-y-full",
+          "data-[state=closed]:data-[side=left]:-translate-x-full",
+          "data-[state=closed]:data-[side=right]:translate-x-full",
+          "data-[state=open]:translate-x-0 data-[state=open]:translate-y-0",
           className
         )}
         {...props}
