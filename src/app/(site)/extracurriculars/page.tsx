@@ -11,7 +11,7 @@ const items = [
 export default function Extracurriculars() {
   return (
     <ContentCard className="h-full overflow-auto">
-      <div className="mx-auto w-full max-w-2xl px-6 pt-16 pb-10">
+      <div className="mx-auto w-full max-w-4xl px-6 pt-16 pb-10">
         <h1 className="text-h1 font-semibold mb-2">Extracurriculars</h1>
         <p className="text-muted-foreground text-body-sm mb-8">Outside of work.</p>
         <div className="flex flex-col divide-y divide-border border-y border-border">
