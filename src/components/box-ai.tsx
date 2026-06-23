@@ -265,18 +265,6 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
-  // Track visual viewport so input lifts above keyboard on iOS (and desktop dev tools)
-  const [vvBottom, setVvBottom] = React.useState(0);
-  React.useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => setVvBottom(Math.max(0, window.innerHeight - vv.height));
-    update();
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    return () => { vv.removeEventListener("resize", update); vv.removeEventListener("scroll", update); };
-  }, []);
-
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
   React.useEffect(() => setThemeMounted(true), []);
@@ -808,7 +796,7 @@ export function BoxAI({
   );
 
   const chatCard = (
-    <ContentCard className="flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-48">
+    <ContentCard className="flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-24">
       {!embedded && (showTrigger || openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
           {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
@@ -984,8 +972,7 @@ export function BoxAI({
       {/* Pinned bottom: active input always, inactive input+chips on mobile only */}
       {(active || true) && (
         <div
-          className={cn("max-sm:px-6 p-3", vvBottom > 50 && "max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:z-30", !active && "sm:hidden")}
-          style={vvBottom > 50 ? { bottom: vvBottom } : undefined}
+          className={cn("max-sm:px-6 p-3", !active && "sm:hidden")}
         >
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
