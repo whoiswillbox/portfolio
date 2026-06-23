@@ -828,9 +828,11 @@ export function BoxAI({
             type="button"
             onClick={() => setSettingsOpen(true)}
             aria-label="Settings"
-            className="sm:hidden ml-auto rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            className="sm:hidden ml-auto transition-colors active:scale-95"
           >
-            <Cog6ToothIcon className="size-5" />
+            <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground">
+              <Cog6ToothIcon className="size-5" />
+            </span>
           </button>
         </div>
       )}

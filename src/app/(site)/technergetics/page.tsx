@@ -38,7 +38,7 @@ export default function Experience() {
             href="/projects/next-gen-bar"
             className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
           >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border">
               <FolderIcon className="size-5 text-foreground" />
             </div>
             <div className="flex-1 min-w-0">
@@ -58,7 +58,7 @@ export default function Experience() {
               onClick={() => setTechOpen((o) => !o)}
               className="flex w-full items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
             >
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border">
                 <BuildingOffice2Icon className="size-5 text-foreground" />
               </div>
               <div className="flex-1 min-w-0 text-left">
@@ -91,7 +91,7 @@ export default function Experience() {
             href="/resume"
             className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
           >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border">
               <DocumentTextIcon className="size-5 text-foreground" />
             </div>
             <div className="flex-1 min-w-0">

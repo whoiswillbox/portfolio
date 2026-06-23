@@ -23,7 +23,7 @@ export default function Extracurriculars() {
               href={href}
               className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted -mx-2 px-2 rounded-lg"
             >
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border">
                 <Icon className="size-5 text-foreground" />
               </div>
               <div className="flex-1 min-w-0">
