@@ -248,12 +248,17 @@ export function MobileNav() {
               key={item.id}
               onClick={item.onPress}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors bg-transparent outline-none",
+                "flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors outline-none",
                 highlighted ? "text-foreground" : "text-muted-foreground"
               )}
             >
-              <Icon className="size-5" />
-              <span className="font-mono text-[10px] uppercase tracking-wide">{item.label}</span>
+              <div className={cn(
+                "flex flex-col items-center gap-1 rounded-lg px-3 py-1 transition-colors",
+                highlighted ? "bg-muted shadow-sm" : "bg-transparent"
+              )}>
+                <Icon className="size-5" />
+                <span className="font-mono text-[10px] uppercase tracking-wide">{item.label}</span>
+              </div>
             </button>
           )
         })}
