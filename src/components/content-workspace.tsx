@@ -82,7 +82,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
 
   const controls = enabled && (
-    <div className="absolute left-3 top-3 z-30 flex items-center gap-1">
+    <div className="absolute left-3 top-3 z-30 flex items-center gap-1 max-sm:left-6 max-sm:top-4">
       {!open && showTrigger && <SidebarTrigger className="max-sm:hidden" />}
       {!open && launcherEnabled && (
         <Tooltip>
@@ -91,7 +91,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
               type="button"
               onClick={() => { setRendered(true); setOpen(true); }}
               aria-label="Ask Box"
-              className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
+              className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95 max-sm:size-10 max-sm:rounded-lg max-sm:bg-muted max-sm:ring-1 max-sm:ring-border"
             >
               <CubeIcon className="size-5" />
             </button>
