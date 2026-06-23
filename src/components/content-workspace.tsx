@@ -216,7 +216,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           "relative min-h-0 min-w-0",
           !isDesktop && open && "sm:transition-[padding] sm:duration-300 sm:ease-[cubic-bezier(0.32,0.72,0,1)] sm:pl-[min(440px,90vw)]",
         )}
-        style={{ overflow: "visible" }}
+        style={{ overflow: "visible", height: "100%" }}
       >
         {!isDesktop && enabled && rendered && (
           <div
