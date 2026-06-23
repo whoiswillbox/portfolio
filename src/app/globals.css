@@ -45,5 +45,6 @@
 }
 
 body.sheet-open .mobile-nav {
-  display: none;
+  visibility: hidden;
+  pointer-events: none;
 }

@@ -77,6 +77,7 @@ function SheetContent({
         )}
         style={{
           zIndex: 300,
+          isolation: "isolate",
           transition: "transform 500ms cubic-bezier(0.16,1,0.3,1), opacity 500ms cubic-bezier(0.16,1,0.3,1)",
           ...style,
         }}
