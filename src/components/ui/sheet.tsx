@@ -37,9 +37,10 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-[199] bg-black/20 transition-opacity duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
+        "fixed inset-0 z-[199] bg-black/20 data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
         className
       )}
+      style={{ transition: "opacity 500ms cubic-bezier(0.16,1,0.3,1)" }}
       {...props}
     />
   )
@@ -63,7 +64,6 @@ function SheetContent({
         data-side={side}
         className={cn(
           "fixed z-50 flex flex-col gap-4 bg-transparent text-sm",
-          "transition-[transform,opacity] duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]",
           "data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto",
           "data-[side=left]:inset-0 data-[side=right]:inset-0",
           "data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto",
@@ -74,6 +74,7 @@ function SheetContent({
           "data-[state=open]:translate-x-0 data-[state=open]:translate-y-0",
           className
         )}
+        style={{ transition: "transform 500ms cubic-bezier(0.16,1,0.3,1), opacity 500ms cubic-bezier(0.16,1,0.3,1)" }}
         {...props}
       >
         {children}
