@@ -301,7 +301,7 @@ export function BoxAI({
   // when the launcher is opened — without docking the side case-study panel.
   const [contextStudy, setContextStudy] = React.useState<CaseStudy | null>(null);
   // Side-by-side split resizes horizontally on desktop, vertically on mobile.
-  const [isDesktop, setIsDesktop] = React.useState(true);
+  const [isDesktop, setIsDesktop] = React.useState(false);
   React.useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
     const update = () => setIsDesktop(mq.matches);
