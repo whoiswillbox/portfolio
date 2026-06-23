@@ -12,7 +12,7 @@ export default function Extracurriculars() {
   return (
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-2xl px-6 pt-10 pb-10">
-        <h1 className="font-heading text-h1 font-semibold mb-2">Extracurriculars</h1>
+        <h1 className="text-h1 font-semibold mb-2">Extracurriculars</h1>
         <p className="text-muted-foreground text-body-sm mb-8">Outside of work.</p>
         <div className="flex flex-col divide-y divide-border border-y border-border">
           {items.map(({ label, href, icon: Icon, description }) => (

@@ -128,7 +128,7 @@ export default function ConversationsPage() {
         <div className="mx-auto w-full max-w-3xl px-6 pb-10 pt-10">
           <header className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-3">
-            <h1 className="text-h1 font-bold tracking-tight">Conversations</h1>
+            <h1 className="text-h1 font-semibold">Conversations</h1>
             <p className="text-body-md text-muted-foreground">
               Everything you&apos;ve asked Box, in one place.
             </p>
