@@ -999,8 +999,8 @@ export function BoxAI({
           <SheetHeader className="px-6 pb-4">
             <SheetTitle className="text-center text-base font-semibold">Settings</SheetTitle>
           </SheetHeader>
-          <div className="flex flex-col divide-y divide-border mx-4 rounded-xl overflow-hidden ring-1 ring-border">
-            <div className="flex items-center gap-3 px-4 py-3.5 bg-background">
+          <div className="flex flex-col divide-y divide-border border-y border-border">
+            <div className="flex items-center gap-3 px-6 py-4">
               {isDark ? <MoonIcon className="size-5 text-muted-foreground" /> : <SunIcon className="size-5 text-muted-foreground" />}
               <span className="flex-1 text-sm">Dark mode</span>
               <Switch
@@ -1015,14 +1015,14 @@ export function BoxAI({
             </div>
             <button
               onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
-              className="flex items-center gap-3 px-4 py-3.5 text-sm text-left bg-background transition-colors active:bg-muted"
+              className="flex items-center gap-3 px-6 py-4 text-sm text-left transition-colors active:bg-muted w-full"
             >
               <ShieldCheckIcon className="size-5 text-muted-foreground" />
               Admin
             </button>
             <button
               onClick={() => { setSettingsOpen(false); router.push("/"); }}
-              className="flex items-center gap-3 px-4 py-3.5 text-sm text-left text-muted-foreground bg-background transition-colors active:bg-muted"
+              className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted w-full"
             >
               <CubeIcon className="size-5 text-muted-foreground" />
               Landing page (dev)
