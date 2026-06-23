@@ -127,8 +127,8 @@ export function MobileNav() {
       label: "Convos",
       iconOutline: ChatBubbleLeftRightIcon,
       iconSolid: ChatBubbleLeftRightSolid,
-      active: false,
-      onPress: () => toggleTray("conversations"),
+      active: pathname === "/conversations",
+      onPress: () => { closeTray(); router.push("/conversations") },
     },
   ]
 
