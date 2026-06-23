@@ -33,6 +33,14 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const contextSeed = dynamicSeed ?? findCaseStudyByPath(pathname);
   const backTo = pathname.startsWith("/extracurriculars/music/")
     ? { href: "/extracurriculars/music", label: "Back" }
+    : pathname.startsWith("/extracurriculars/")
+    ? { href: "/extracurriculars", label: "Back" }
+    : pathname.startsWith("/technergetics/") || pathname.startsWith("/projects/")
+    ? { href: "/technergetics", label: "Back" }
+    : pathname.startsWith("/school/")
+    ? { href: "/school", label: "Back" }
+    : pathname === "/resume"
+    ? { href: "/technergetics", label: "Back" }
     : null;
   const [isDesktop, setIsDesktop] = React.useState(true);
   React.useEffect(() => {
@@ -82,34 +90,61 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
 
   const controls = enabled && (
-    <div className="absolute left-3 top-3 z-30 flex items-center gap-1 max-sm:left-6 max-sm:top-4">
-      {!open && showTrigger && <SidebarTrigger className="max-sm:hidden" />}
-      {!open && launcherEnabled && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={() => { setRendered(true); setOpen(true); }}
-              aria-label="Ask Box"
-              className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95 max-sm:size-10 max-sm:rounded-lg max-sm:bg-muted max-sm:ring-1 max-sm:ring-border"
-            >
-              <CubeIcon className="size-5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Ask Box</TooltipContent>
-        </Tooltip>
-      )}
-      {backTo && (
-        <button
-          type="button"
-          onClick={() => router.push(backTo.href)}
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <ArrowLeftIcon className="size-4" />
-          {backTo.label}
-        </button>
-      )}
-    </div>
+    <>
+      {/* Desktop: left-aligned controls */}
+      <div className="absolute left-3 top-3 z-30 flex items-center gap-1 max-sm:hidden">
+        {!open && showTrigger && <SidebarTrigger />}
+        {!open && launcherEnabled && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => { setRendered(true); setOpen(true); }}
+                aria-label="Ask Box"
+                className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
+              >
+                <CubeIcon className="size-5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Ask Box</TooltipContent>
+          </Tooltip>
+        )}
+        {backTo && (
+          <button
+            type="button"
+            onClick={() => router.push(backTo.href)}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            {backTo.label}
+          </button>
+        )}
+      </div>
+      {/* Mobile: back button left, cube right */}
+      <div className="sm:hidden absolute left-6 top-4 z-30">
+        {backTo && (
+          <button
+            type="button"
+            onClick={() => router.push(backTo.href)}
+            className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground transition-colors active:scale-95"
+          >
+            <ArrowLeftIcon className="size-5" />
+          </button>
+        )}
+      </div>
+      <div className="sm:hidden absolute right-6 top-4 z-30">
+        {!open && launcherEnabled && (
+          <button
+            type="button"
+            onClick={() => { setRendered(true); setOpen(true); }}
+            aria-label="Ask Box"
+            className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground transition-colors active:scale-95"
+          >
+            <CubeIcon className="size-5" />
+          </button>
+        )}
+      </div>
+    </>
   );
 
   const desktopOpen = isDesktop && (open || exiting);
