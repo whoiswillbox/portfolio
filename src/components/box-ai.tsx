@@ -988,7 +988,7 @@ export function BoxAI({
         </div>
       )}
       <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <SheetContent side="bottom" showCloseButton={false} className="sm:hidden rounded-t-xl px-0 pb-8">
+        <SheetContent side="bottom" showCloseButton={false} className="sm:hidden rounded-t-xl px-0 pb-8 !bg-background"style={{ backgroundColor: "var(--color-background)" }}>
           <SheetHeader className="px-6 pb-2">
             <SheetTitle className="text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">Settings</SheetTitle>
           </SheetHeader>
