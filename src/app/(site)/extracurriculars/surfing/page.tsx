@@ -132,7 +132,7 @@ export default function Surfing() {
 
   return (
     <ContentCard className="h-full overflow-auto">
-      <article className="mx-auto w-full max-w-4xl px-6 pb-32 pt-28">
+      <article className="mx-auto w-full max-w-4xl px-6 pb-32 pt-16">
         <header className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex flex-col gap-3">
             <h1 className="text-h1 font-bold tracking-tight">Surfing</h1>
