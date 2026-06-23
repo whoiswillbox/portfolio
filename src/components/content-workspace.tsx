@@ -188,14 +188,14 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "relative min-h-0 min-w-0",
-          !isDesktop && open && "transition-[padding] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] pl-[min(440px,90vw)]",
+          !isDesktop && open && "sm:transition-[padding] sm:duration-300 sm:ease-[cubic-bezier(0.32,0.72,0,1)] sm:pl-[min(440px,90vw)]",
         )}
         style={{ overflow: "visible" }}
       >
         {!isDesktop && enabled && rendered && (
           <div
             className={cn(
-              "absolute bottom-0 left-0 top-0 z-20 w-[min(440px,90vw)]",
+              "absolute bottom-0 left-0 top-0 z-20 max-sm:right-0 sm:w-[min(440px,90vw)]",
               open
                 ? "animate-in slide-in-from-left duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
                 : "pointer-events-none animate-out slide-out-to-left duration-300 ease-in fill-mode-forwards",
