@@ -271,8 +271,9 @@ export function BoxAI({
     const vv = window.visualViewport;
     if (!vv) return;
     const update = () => {
-      // Distance from top of layout viewport to bottom of visual viewport
-      const bottom = window.innerHeight - (vv.offsetTop + vv.height);
+      // On iOS Safari, when the keyboard opens vv.height shrinks.
+      // The keyboard height = layout viewport height - visual viewport height.
+      const bottom = window.innerHeight - vv.height;
       setVvBottom(Math.max(0, bottom));
     };
     update();
@@ -988,7 +989,7 @@ export function BoxAI({
       {(active || true) && (
         <div
           className={cn("max-sm:px-6 p-3 max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:z-30", !active && "sm:hidden")}
-          style={{ bottom: vvBottom !== null && vvBottom > 80 ? vvBottom : "5rem" }}
+          style={{ bottom: vvBottom !== null && vvBottom > 0 ? vvBottom : "5rem" }}
         >
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
