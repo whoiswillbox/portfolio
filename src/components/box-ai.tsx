@@ -1021,20 +1021,6 @@ export function BoxAI({
             <SheetTitle className="text-center text-base font-semibold">Settings</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col">
-            <div className="flex items-center gap-3 px-6 py-4">
-              {isDark ? <MoonIcon className="size-5 text-muted-foreground" /> : <SunIcon className="size-5 text-muted-foreground" />}
-              <span className="flex-1 text-sm">Dark mode</span>
-              <Switch
-                checked={isDark}
-                onCheckedChange={(checked) => {
-                  setTheme(checked ? "dark" : "light");
-                  const color = checked ? "#1c1917" : "#fafaf9";
-                  const tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-                  if (tag) tag.content = color;
-                }}
-              />
-            </div>
-            <div className="ml-6 h-px bg-border" />
             <button
               onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
               className="flex items-center gap-3 px-6 py-4 text-sm text-left transition-colors active:bg-muted w-full"

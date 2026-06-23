@@ -3,11 +3,10 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useTheme } from "next-themes"
 import {
   CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon,
   AcademicCapIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon,
-  BoltIcon, MoonIcon, SunIcon, XMarkIcon, ChevronRightIcon,
+  BoltIcon, XMarkIcon, ChevronRightIcon,
   ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline"
 import {
@@ -22,7 +21,6 @@ import {
   BoltIcon as BoltSolid,
   ChatBubbleLeftRightIcon as ChatBubbleLeftRightSolid,
 } from "@heroicons/react/24/solid"
-import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import {
@@ -41,12 +39,8 @@ export function MobileNav() {
   const searchParams = useSearchParams()
   const convoParam = searchParams.get("c")
   const boxParam = searchParams.get("box")
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
   const [openTray, setOpenTray] = React.useState<Tray>(null)
   const [conversations, setConversations] = React.useState<Conversation[]>([])
-
-  React.useEffect(() => setMounted(true), [])
   React.useEffect(() => {
     const sync = () => setConversations(loadConversations())
     sync()
@@ -71,8 +65,6 @@ export function MobileNav() {
     ]
     hrefs.forEach((href) => router.prefetch(href))
   }, [router])
-
-  const isDark = mounted && resolvedTheme === "dark"
 
   const toggleTray = (tray: Tray) =>
     setOpenTray((prev) => (prev === tray ? null : tray))
@@ -218,18 +210,6 @@ export function MobileNav() {
                     )
                   })
                 )}
-                <div className="border-t border-border px-4 py-2 flex items-center justify-between">
-                  <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">Dark mode</span>
-                  <Switch
-                    checked={isDark}
-                    onCheckedChange={(checked) => {
-                      setTheme(checked ? "dark" : "light")
-                      const color = checked ? "#1c1917" : "#fafaf9"
-                      const tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-                      if (tag) tag.content = color
-                    }}
-                  />
-                </div>
               </TraySection>
             )}
           </div>
