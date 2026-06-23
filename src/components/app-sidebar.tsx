@@ -340,7 +340,7 @@ export function AppSidebar({
                   setTheme(checked ? "dark" : "light");
                   // Update theme-color immediately so Safari status bar responds
                   // before the sheet closes (MutationObserver fires too late).
-                  const color = checked ? "oklch(0.205 0.011 55)" : "oklch(0.985 0.003 75)";
+                  const color = checked ? "#1c1917" : "#fafaf9";
                   const tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
                   if (tag) tag.content = color;
                 }}

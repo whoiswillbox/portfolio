@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 function updateThemeColor() {
   const isDark = document.documentElement.classList.contains("dark");
-  const color = isDark ? "oklch(0.205 0.011 55)" : "oklch(0.985 0.003 75)";
+  const color = isDark ? "#1c1917" : "#fafaf9";
   let tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (!tag) {
     tag = document.createElement("meta");

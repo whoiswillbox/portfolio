@@ -224,7 +224,7 @@ export function MobileNav() {
                     checked={isDark}
                     onCheckedChange={(checked) => {
                       setTheme(checked ? "dark" : "light")
-                      const color = checked ? "oklch(0.205 0.011 55)" : "oklch(0.985 0.003 75)"
+                      const color = checked ? "#1c1917" : "#fafaf9"
                       const tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
                       if (tag) tag.content = color
                     }}
