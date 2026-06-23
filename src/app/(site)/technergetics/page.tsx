@@ -18,7 +18,6 @@ const technergeticsItems = [
   { label: "Upgrade", href: "/technergetics/upgrade", description: "Self-service plan upgrade flow." },
   { label: "Reusable Table", href: "/technergetics/reusable-table", description: "Design system data table component." },
   { label: "Design Standards", href: "/technergetics/design-standards", description: "Company-wide design language." },
-  { label: "Lightcert", href: "/technergetics/lightcert", description: "Certification management platform." },
 ];
 
 export default function Experience() {
@@ -85,6 +84,21 @@ export default function Experience() {
               </div>
             )}
           </div>
+
+          {/* Lightcert */}
+          <Link
+            href="/technergetics/lightcert"
+            className="flex items-center gap-4 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
+          >
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border">
+              <BoltIcon className="size-5 text-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium">Lightcert</div>
+              <div className="text-xs text-muted-foreground">Certification management platform.</div>
+            </div>
+            <ChevronRightIcon className="size-4 text-muted-foreground shrink-0" />
+          </Link>
 
           {/* Resume */}
           <Link
