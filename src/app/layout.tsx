@@ -29,7 +29,6 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#fafaf9",
 };
 
 export default function RootLayout({
@@ -43,6 +42,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${plusJakartaSans.variable} ${geistMono.variable} ${ebGaramond.variable} h-full antialiased`}
     >
+      <head>
+        <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1c1917" media="(prefers-color-scheme: dark)" />
+      </head>
       <body className="h-dvh overflow-hidden flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme disableTransitionOnChange>
           <ThemeColorMeta />
