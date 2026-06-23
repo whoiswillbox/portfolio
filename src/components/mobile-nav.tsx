@@ -71,8 +71,10 @@ export function MobileNav() {
     hrefs.forEach((href) => router.prefetch(href))
   }, [router])
 
-  const toggleTray = (tray: Tray) =>
+  const toggleTray = (tray: Tray) => {
+    setActiveNav(null)
     setOpenTray((prev) => (prev === tray ? null : tray))
+  }
 
   const closeTray = () => setOpenTray(null)
 
