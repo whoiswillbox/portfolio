@@ -64,6 +64,7 @@ export function MobileNav() {
       "/technergetics/lightcert",
       "/resume",
       "/school/swiperight-ai",
+      "/extracurriculars",
       "/extracurriculars/surfing",
       "/extracurriculars/gaming",
       "/extracurriculars/music",
@@ -94,7 +95,7 @@ export function MobileNav() {
 
   const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname.startsWith("/technergetics") || pathname === "/projects/next-gen-bar" || pathname === "/resume"))
   const schoolActive = activeNav === "school" || (!activeNav && openTray === null && pathname.startsWith("/school"))
-  const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && pathname.startsWith("/extracurriculars"))
+  const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && (pathname === "/extracurriculars" || pathname.startsWith("/extracurriculars/")))
   const boxActive = activeNav === "box" || (!activeNav && pathname === "/who" && convoParam === null && openTray === null)
   const convsActive = activeNav === "conversations" || (!activeNav && pathname === "/conversations" && openTray === null)
 
@@ -129,7 +130,7 @@ export function MobileNav() {
       iconOutline: LifebuoyIcon,
       iconSolid: LifebuoySolid,
       active: extrasActive,
-      onPress: () => toggleTray("extras"),
+      onPress: () => { closeTray(); setActiveNav("extras"); router.push("/extracurriculars") },
     },
     {
       id: "conversations" as const,
