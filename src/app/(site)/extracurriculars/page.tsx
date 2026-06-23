@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ContentCard } from "@/components/content-card";
+import { MobileOnly } from "@/components/mobile-only";
 import { LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const items = [
@@ -10,6 +11,7 @@ const items = [
 
 export default function Extracurriculars() {
   return (
+    <MobileOnly fallback="/extracurriculars/surfing">
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 pb-10">
         <div className="flex flex-col gap-3 mb-8">
@@ -36,5 +38,6 @@ export default function Extracurriculars() {
         </div>
       </div>
     </ContentCard>
+    </MobileOnly>
   );
 }

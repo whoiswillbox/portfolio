@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { ContentCard } from "@/components/content-card";
+import { MobileOnly } from "@/components/mobile-only";
 import {
   FolderIcon,
   BuildingOffice2Icon,
@@ -24,6 +25,7 @@ export default function Experience() {
   const [techOpen, setTechOpen] = React.useState(false);
 
   return (
+    <MobileOnly fallback="/projects/next-gen-bar">
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 pb-10">
         <div className="flex flex-col gap-3 mb-8">
@@ -118,5 +120,6 @@ export default function Experience() {
         </div>
       </div>
     </ContentCard>
+    </MobileOnly>
   );
 }

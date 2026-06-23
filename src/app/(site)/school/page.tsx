@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ContentCard } from "@/components/content-card";
+import { MobileOnly } from "@/components/mobile-only";
 import { AcademicCapIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const items = [
@@ -8,6 +9,7 @@ const items = [
 
 export default function School() {
   return (
+    <MobileOnly fallback="/school/swiperight-ai">
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 pb-10">
         <div className="flex flex-col gap-3 mb-8">
@@ -34,5 +36,6 @@ export default function School() {
         </div>
       </div>
     </ContentCard>
+    </MobileOnly>
   );
 }
