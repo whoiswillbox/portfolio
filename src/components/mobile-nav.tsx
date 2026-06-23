@@ -248,13 +248,13 @@ export function MobileNav() {
               key={item.id}
               onClick={item.onPress}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 py-2 px-2 transition-colors outline-none",
+                "flex flex-1 flex-col items-center justify-center gap-1 py-2 px-2 outline-none transition-colors duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]",
                 highlighted ? "text-foreground" : "text-muted-foreground"
               )}
             >
               <div className={cn(
-                "flex w-full flex-col items-center gap-1 rounded-lg py-2 transition-colors",
-                highlighted ? "bg-muted shadow-sm" : "bg-transparent"
+                "relative flex w-full flex-col items-center gap-1 rounded-lg py-2 transition-[background-color,box-shadow] duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]",
+                highlighted ? "bg-muted shadow-sm" : "bg-transparent shadow-none"
               )}>
                 <Icon className="size-5" />
                 <span className="font-mono text-[10px] uppercase tracking-wide">{item.label}</span>
