@@ -17,8 +17,15 @@ import {
   BoltIcon,
   PuzzlePieceIcon,
   AcademicCapIcon,
+  Cog6ToothIcon,
+  MoonIcon,
+  SunIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import { InformationCircleIcon, HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from "@heroicons/react/24/solid";
+import { useTheme } from "next-themes";
+import { Switch } from "@/components/ui/switch";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertAction } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -252,6 +259,11 @@ export function BoxAI({
 } = {}) {
   const seedRef = React.useRef(seed);
   React.useEffect(() => { seedRef.current = seed; }, [seed]);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [themeMounted, setThemeMounted] = React.useState(false);
+  React.useEffect(() => setThemeMounted(true), []);
+  const isDark = themeMounted && resolvedTheme === "dark";
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [input, setInput] = React.useState("");
@@ -808,6 +820,26 @@ export function BoxAI({
               <XMarkIcon className="size-4" />
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            aria-label="Settings"
+            className="sm:hidden ml-auto rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+          >
+            <Cog6ToothIcon className="size-5" />
+          </button>
+        </div>
+      )}
+      {!embedded && !showTrigger && !openCaseStudy && !activeId && (
+        <div className="flex items-center justify-end p-2 sm:hidden">
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            aria-label="Settings"
+            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+          >
+            <Cog6ToothIcon className="size-5" />
+          </button>
         </div>
       )}
       <div
@@ -955,6 +987,41 @@ export function BoxAI({
           </div>
         </div>
       )}
+      <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <SheetContent side="bottom" showCloseButton={false} className="sm:hidden rounded-t-xl px-0 pb-8">
+          <SheetHeader className="px-6 pb-2">
+            <SheetTitle className="text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">Settings</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col divide-y divide-border">
+            <div className="flex items-center gap-3 px-6 py-3">
+              {isDark ? <MoonIcon className="size-5 text-muted-foreground" /> : <SunIcon className="size-5 text-muted-foreground" />}
+              <span className="flex-1 text-sm">Dark mode</span>
+              <Switch
+                checked={isDark}
+                onCheckedChange={(checked) => {
+                  setTheme(checked ? "dark" : "light");
+                  const color = checked ? "oklch(0.205 0.011 55)" : "oklch(0.985 0.003 75)";
+                  const tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+                  if (tag) tag.content = color;
+                }}
+              />
+            </div>
+            <button
+              onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
+              className="flex items-center gap-3 px-6 py-3 text-sm text-left transition-colors hover:bg-muted"
+            >
+              <ShieldCheckIcon className="size-5 text-muted-foreground" />
+              Admin
+            </button>
+            <button
+              onClick={() => { setSettingsOpen(false); router.push("/"); }}
+              className="flex items-center gap-3 px-6 py-3 text-sm text-left text-muted-foreground transition-colors hover:bg-muted"
+            >
+              Landing page (dev)
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
       </ContentCard>
   );
 
