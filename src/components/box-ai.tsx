@@ -999,7 +999,7 @@ export function BoxAI({
           <SheetHeader className="px-6 pb-4">
             <SheetTitle className="text-center text-base font-semibold">Settings</SheetTitle>
           </SheetHeader>
-          <div className="flex flex-col divide-y divide-border border-y border-border">
+          <div className="flex flex-col">
             <div className="flex items-center gap-3 px-6 py-4">
               {isDark ? <MoonIcon className="size-5 text-muted-foreground" /> : <SunIcon className="size-5 text-muted-foreground" />}
               <span className="flex-1 text-sm">Dark mode</span>
@@ -1013,6 +1013,7 @@ export function BoxAI({
                 }}
               />
             </div>
+            <div className="ml-6 h-px bg-border" />
             <button
               onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
               className="flex items-center gap-3 px-6 py-4 text-sm text-left transition-colors active:bg-muted w-full"
@@ -1020,6 +1021,7 @@ export function BoxAI({
               <ShieldCheckIcon className="size-5 text-muted-foreground" />
               Admin
             </button>
+            <div className="ml-6 h-px bg-border" />
             <button
               onClick={() => { setSettingsOpen(false); router.push("/"); }}
               className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted w-full"
