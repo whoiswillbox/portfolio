@@ -988,12 +988,19 @@ export function BoxAI({
         </div>
       )}
       <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <SheetContent side="bottom" showCloseButton={false} className="sm:hidden rounded-t-xl px-0 pb-8 !bg-background"style={{ backgroundColor: "var(--color-background)" }}>
-          <SheetHeader className="px-6 pb-2">
-            <SheetTitle className="text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">Settings</SheetTitle>
+        <SheetContent
+          side="bottom"
+          showCloseButton={false}
+          className="sm:hidden rounded-t-2xl px-0 pb-10"
+          style={{ backgroundColor: "var(--color-background)" }}
+        >
+          {/* Drag handle */}
+          <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-border" />
+          <SheetHeader className="px-6 pb-4">
+            <SheetTitle className="text-center text-base font-semibold">Settings</SheetTitle>
           </SheetHeader>
-          <div className="flex flex-col divide-y divide-border">
-            <div className="flex items-center gap-3 px-6 py-3">
+          <div className="flex flex-col divide-y divide-border mx-4 rounded-xl overflow-hidden ring-1 ring-border">
+            <div className="flex items-center gap-3 px-4 py-3.5 bg-background">
               {isDark ? <MoonIcon className="size-5 text-muted-foreground" /> : <SunIcon className="size-5 text-muted-foreground" />}
               <span className="flex-1 text-sm">Dark mode</span>
               <Switch
@@ -1008,15 +1015,16 @@ export function BoxAI({
             </div>
             <button
               onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
-              className="flex items-center gap-3 px-6 py-3 text-sm text-left transition-colors hover:bg-muted"
+              className="flex items-center gap-3 px-4 py-3.5 text-sm text-left bg-background transition-colors active:bg-muted"
             >
               <ShieldCheckIcon className="size-5 text-muted-foreground" />
               Admin
             </button>
             <button
               onClick={() => { setSettingsOpen(false); router.push("/"); }}
-              className="flex items-center gap-3 px-6 py-3 text-sm text-left text-muted-foreground transition-colors hover:bg-muted"
+              className="flex items-center gap-3 px-4 py-3.5 text-sm text-left text-muted-foreground bg-background transition-colors active:bg-muted"
             >
+              <CubeIcon className="size-5 text-muted-foreground" />
               Landing page (dev)
             </button>
           </div>
