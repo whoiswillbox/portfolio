@@ -143,17 +143,17 @@ export function MobileNav() {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — stops above the nav bar so nav buttons remain tappable */}
       {openTray && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 bottom-[4.5rem] z-[39]"
           onClick={closeTray}
         />
       )}
 
       {/* Tray */}
       {openTray && (
-        <div className="fixed bottom-[4.5rem] left-6 right-6 z-40 pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
+        <div className="fixed bottom-[4.5rem] left-6 right-6 z-[41] pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
           <div className="rounded-xl bg-background ring-1 ring-border shadow-lg overflow-hidden">
             {openTray === "experience" && (
               <TraySection>
@@ -226,7 +226,7 @@ export function MobileNav() {
       )}
 
       {/* Bottom bar */}
-      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-40 flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <div className="flex w-full items-center rounded-xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border shadow-lg overflow-hidden">
         {navItems.map((item) => {
           const isOpen = openTray === item.id
