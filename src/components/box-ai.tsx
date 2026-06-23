@@ -265,6 +265,18 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
+  // Track visual viewport so input lifts above keyboard on iOS (and desktop dev tools)
+  const [vvBottom, setVvBottom] = React.useState(0);
+  React.useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setVvBottom(Math.max(0, window.innerHeight - vv.height));
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => { vv.removeEventListener("resize", update); vv.removeEventListener("scroll", update); };
+  }, []);
+
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
   React.useEffect(() => setThemeMounted(true), []);
@@ -973,6 +985,7 @@ export function BoxAI({
       {(active || true) && (
         <div
           className={cn("max-sm:px-6 p-3 max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:z-30 max-sm:bottom-20", !active && "sm:hidden")}
+          style={vvBottom > 50 ? { bottom: vvBottom } : undefined}
         >
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {!active && (
