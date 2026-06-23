@@ -828,7 +828,7 @@ export function BoxAI({
             type="button"
             onClick={() => setSettingsOpen(true)}
             aria-label="Settings"
-            className="sm:hidden ml-auto transition-colors active:scale-95"
+            className="sm:hidden ml-auto mr-4 transition-colors active:scale-95"
           >
             <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground">
               <Cog6ToothIcon className="size-5" />
@@ -837,14 +837,16 @@ export function BoxAI({
         </div>
       )}
       {!embedded && !showTrigger && !openCaseStudy && !activeId && (
-        <div className="flex items-center justify-end p-2 sm:hidden">
+        <div className="flex items-center justify-end px-6 pt-4 sm:hidden">
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
             aria-label="Settings"
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+            className="transition-colors active:scale-95"
           >
-            <Cog6ToothIcon className="size-5" />
+            <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground">
+              <Cog6ToothIcon className="size-5" />
+            </span>
           </button>
         </div>
       )}
