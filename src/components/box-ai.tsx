@@ -895,12 +895,11 @@ export function BoxAI({
           // Reserve a top strip so the floating sidebar trigger / close button
           // don't overlay the conversation when embedded in the launcher.
           embedded && active && "pt-12",
-          // Standalone PWA (/who empty state only) has no mobile-Safari chrome, so
-          // the canvas is taller and the centered cube/heading drift low. Reserve
-          // the phantom Safari bottom-bar height here so the centered content
-          // compresses upward to match the browser — without moving the pinned
+          // Standalone PWA (/who empty state only): nudge the centered cube/heading
+          // down with top padding so it sits visually centered in the taller PWA
+          // canvas. Only affects the centered content — not the pinned
           // input/disclaimer or the box height. Not embedded = box page only.
-          !embedded && !active && "max-sm:[@media(display-mode:standalone)]:pb-4",
+          !embedded && !active && "max-sm:[@media(display-mode:standalone)]:pt-16",
         )}
       >
         {!active ? (
