@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
 
-  if (body.key !== adminKey) {
+  if (body.key?.trim() !== adminKey.trim()) {
     return NextResponse.json({ error: "wrong_key" }, { status: 401 });
   }
 

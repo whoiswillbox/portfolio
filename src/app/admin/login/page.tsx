@@ -30,7 +30,7 @@ function AdminLoginForm() {
       const res = await fetch("/api/admin-login", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ key }),
+        body: JSON.stringify({ key: key.trim() }),
       });
       if (!res.ok) {
         setError(true);
@@ -68,6 +68,12 @@ function AdminLoginForm() {
           placeholder="Admin key"
           aria-label="Admin key"
           autoFocus
+          // Prevent mobile Safari from mangling the key (capitalizing the first
+          // letter, autocorrecting, or inserting smart punctuation/spaces).
+          autoCapitalize="none"
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck={false}
           className="text-body-sm"
         />
         {error && <p className="text-body-xs text-critical">Incorrect key. Try again.</p>}
