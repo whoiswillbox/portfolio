@@ -74,7 +74,6 @@ function AdminLoginForm() {
           autoCorrect="off"
           autoComplete="off"
           spellCheck={false}
-          className="text-body-sm"
         />
         {error && <p className="text-body-xs text-critical">Incorrect key. Try again.</p>}
         <Button type="submit" disabled={!key.trim() || submitting} className="w-full">
