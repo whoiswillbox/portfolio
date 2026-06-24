@@ -14,15 +14,15 @@ export default function Who() {
   // Cap height to stop at the mobile nav's top edge so box-ai's pinned
   // input/disclaimer sit just above the nav, never under it.
   //
-  // Installed PWA only: the nav drops lower (pb-0, no safe-area reserve), so
-  // bring the box content down with it by reclaiming that clearance (drop the
-  // safe-bottom term + a touch more). The card top is fixed, so the settings
-  // toolbar (absolute) stays put — only the content below shifts down.
+  // Installed PWA only: the nav sits lower (pb-3, no full safe-area reserve), so
+  // the box clearance matches the nav's actual height (~4.75rem) instead of the
+  // browser's 5rem + safe-bottom — keeping the disclaimer just above the nav.
+  // The card top is fixed, so the settings toolbar (absolute) stays put.
   return (
     <div
       className={cn(
         "h-full max-sm:h-[calc(100svh-5rem-env(safe-area-inset-bottom))]",
-        "max-sm:[@media(display-mode:standalone)]:h-[calc(100svh-4.5rem-env(safe-area-inset-bottom))]",
+        "max-sm:[@media(display-mode:standalone)]:h-[calc(100svh-4.75rem)]",
         entered.current && "animate-in fade-in duration-500",
       )}
     >
