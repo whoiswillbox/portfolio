@@ -829,7 +829,7 @@ export function BoxAI({
   );
 
   const chatCard = (
-    <ContentCard className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0">
+    <ContentCard className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0 max-sm:[@media(display-mode:standalone)]:pb-0">
       {!embedded && (showTrigger || openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
           {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
