@@ -3,8 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { useTheme } from "next-themes"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, MoonIcon, SunIcon, ChevronRightIcon, LockClosedIcon, ShieldCheckIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, ChevronRightIcon, LockClosedIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
+import { Cog6ToothIcon as Cog6ToothSolid } from "@heroicons/react/24/solid"
 import {
   CubeIcon as CubeSolid,
   FolderIcon as FolderSolid,
@@ -17,7 +17,6 @@ import {
   AcademicCapIcon as AcademicCapSolid,
 } from "@heroicons/react/24/solid"
 import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
 import {
   Collapsible,
   CollapsibleContent,
@@ -38,6 +37,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import {
@@ -77,19 +77,13 @@ const groups = [
 
 export function AppSidebar({
   showLock = false,
-  isAdmin = false,
 }: {
   showLock?: boolean
-  isAdmin?: boolean
 }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const convoParam = searchParams.get("c")
   const boxParam = searchParams.get("box")
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => setMounted(true), [])
-  const isDark = mounted && resolvedTheme === "dark"
 
   // Box AI conversations, kept in sync with the chat (same localStorage store).
   const [conversations, setConversations] = React.useState<Conversation[]>([])
@@ -328,43 +322,16 @@ export function AppSidebar({
         )}
       </SidebarContent>
       <SidebarFooter>
+        <SidebarSeparator className="mx-0 mb-2 bg-border/50" />
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center gap-2 px-2 py-1.5 text-sm">
-              {isDark ? <MoonIcon className="size-4" /> : <SunIcon className="size-4" />}
-              <span className="flex-1 font-mono uppercase tracking-wide">Dark mode</span>
-              <Switch
-                id="theme-switch"
-                checked={isDark}
-                onCheckedChange={(checked) => {
-                  setTheme(checked ? "dark" : "light");
-                  // Update theme-color immediately so Safari status bar responds
-                  // before the sheet closes (MutationObserver fires too late).
-                  const color = checked ? "#1c1917" : "#fafaf9";
-                  const tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-                  if (tag) tag.content = color;
-                }}
-                aria-label="Toggle dark mode"
-              />
-            </div>
+            <SidebarMenuButton asChild isActive={pathname === "/settings"}>
+              <Link href="/settings">
+                {pathname === "/settings" ? <Cog6ToothSolid /> : <Cog6ToothIcon />}
+                <span>Settings</span>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
-          {isAdmin && (
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/admin/chat">
-                  <ShieldCheckIcon className="size-4" />
-                  <span>Admin</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
-          <SidebarMenuItem>
-              <SidebarMenuButton asChild className="text-muted-foreground">
-                <Link href="/">
-                  <span>Landing page (dev)</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

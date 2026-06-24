@@ -21,6 +21,8 @@ import {
   MoonIcon,
   SunIcon,
   ShieldCheckIcon,
+  ArrowDownTrayIcon,
+  WindowIcon,
 } from "@heroicons/react/24/outline";
 import { InformationCircleIcon, HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from "@heroicons/react/24/solid";
 import { useTheme } from "next-themes";
@@ -42,6 +44,7 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
+import { usePwaInstall } from "@/lib/use-pwa-install";
 import { respondTo } from "@/lib/chat/match";
 import {
   loadConversations,
@@ -264,6 +267,12 @@ export function BoxAI({
     document.body.classList.toggle("sheet-open", settingsOpen);
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
+  const {
+    canShow: showInstall,
+    showHint: showInstallHint,
+    hint: installHint,
+    install: handleInstall,
+  } = usePwaInstall();
 
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
@@ -1036,7 +1045,29 @@ export function BoxAI({
                     onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
                   />
                 </div>
-                <div className="ml-6 h-px bg-border" />
+                <div className="mx-6 h-px bg-border/50" />
+              </>
+            )}
+            {showInstall && (
+              <>
+                <button
+                  onClick={handleInstall}
+                  className="flex items-start gap-3 px-6 py-4 text-left transition-colors active:bg-muted w-full"
+                >
+                  <ArrowDownTrayIcon className="size-5 shrink-0 text-muted-foreground mt-0.5" />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm">Download app</span>
+                    <span className="text-xs text-muted-foreground">
+                      Adds this site to your phone or computer like a regular app.
+                      You get a tidy icon to tap, a clean full-screen view, quicker
+                      opening, and it still works without internet.
+                    </span>
+                  </div>
+                </button>
+                {showInstallHint && (
+                  <p className="px-6 pb-3 -mt-1 text-xs text-muted-foreground">{installHint}</p>
+                )}
+                <div className="mx-6 h-px bg-border/50" />
               </>
             )}
             <button
@@ -1046,12 +1077,12 @@ export function BoxAI({
               <ShieldCheckIcon className="size-5 text-muted-foreground" />
               Admin
             </button>
-            <div className="ml-6 h-px bg-border" />
+            <div className="mx-6 h-px bg-border/50" />
             <button
               onClick={() => { setSettingsOpen(false); router.push("/"); }}
               className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted w-full"
             >
-              <CubeIcon className="size-5 text-muted-foreground" />
+              <WindowIcon className="size-5 text-muted-foreground" />
               Landing page (dev)
             </button>
           </div>
