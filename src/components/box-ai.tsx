@@ -260,6 +260,7 @@ export function BoxAI({
    *  follow-up prompts). May be a static case study or a dynamic seed. */
   seed?: CaseStudy | null;
 } = {}) {
+  const router = useRouter();
   const seedRef = React.useRef(seed);
   React.useEffect(() => { seedRef.current = seed; }, [seed]);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
@@ -282,6 +283,22 @@ export function BoxAI({
       .then((d) => setIsAdmin(Boolean(d.isAdmin)))
       .catch(() => { /* ignore */ });
   }, []);
+
+  // Hidden admin entry: 5 quick taps on the empty-state cube logo opens the
+  // admin login. Needed because the installed PWA has no address bar to type
+  // /admin/login. Taps must come within 600ms of each other to count.
+  const logoTapsRef = React.useRef(0);
+  const logoTapTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleLogoTap = () => {
+    logoTapsRef.current += 1;
+    if (logoTapTimerRef.current) clearTimeout(logoTapTimerRef.current);
+    if (logoTapsRef.current >= 5) {
+      logoTapsRef.current = 0;
+      router.push("/admin/login");
+      return;
+    }
+    logoTapTimerRef.current = setTimeout(() => { logoTapsRef.current = 0; }, 600);
+  };
 
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
@@ -710,7 +727,6 @@ export function BoxAI({
     setSending(false);
   };
 
-  const router = useRouter();
   const goHome = () => {
     setActiveId(null);
     setInput("");
@@ -883,11 +899,21 @@ export function BoxAI({
       >
         {!active ? (
           <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">
-            <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-4 size-12 self-center text-foreground" aria-hidden="true">
-              <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-              <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-              <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-            </svg>
+            {/* Hidden admin entry: 5 quick taps opens /admin/login (the PWA has
+                no address bar). Plain decorative cube otherwise. */}
+            <button
+              type="button"
+              onClick={handleLogoTap}
+              aria-hidden="true"
+              tabIndex={-1}
+              className="mb-4 self-center cursor-default"
+            >
+              <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-12 text-foreground">
+                <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+                <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+                <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+              </svg>
+            </button>
             <h1 className="text-h1 font-semibold">{heading}</h1>
             {/* On desktop: input + chips inline. On mobile: hidden here, shown pinned below */}
             <div className="mt-3 sm:block hidden">{searchForm}</div>
