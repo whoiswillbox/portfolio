@@ -173,7 +173,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       {/* Box AI column — explicit pixel height so BoxAI's h-full resolves correctly */}
       <div
         className="relative min-w-0 flex flex-col"
-        style={{ overflow: "visible", height: "calc(100vh - 1rem)", maxHeight: "calc(100vh - 1rem)" }}
+        style={{ overflow: "visible", height: "calc(100dvh - 1rem)", maxHeight: "calc(100dvh - 1rem)" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}
