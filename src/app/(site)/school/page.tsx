@@ -11,7 +11,7 @@ export default function School() {
   return (
     <MobileOnly fallback="/school/swiperight-ai">
     <ContentCard className="h-full overflow-auto">
-      <div className="mx-auto w-full max-w-4xl px-6 pt-16 pb-10">
+      <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:[@media(display-mode:standalone)]:pt-24 pb-10">
         <div className="flex flex-col gap-3 mb-10">
           <h1 className="text-h1 font-semibold">School</h1>
           <p className="text-body-lg text-muted-foreground">Projects from university.</p>

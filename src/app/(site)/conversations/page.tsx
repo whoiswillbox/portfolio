@@ -125,7 +125,7 @@ export default function ConversationsPage() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
-        <div className="mx-auto w-full max-w-4xl px-6 pb-10 pt-16">
+        <div className="mx-auto w-full max-w-4xl px-6 pb-10 pt-16 max-sm:[@media(display-mode:standalone)]:pt-24">
           <header className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-3">
             <h1 className="text-h1 font-semibold">Conversations</h1>

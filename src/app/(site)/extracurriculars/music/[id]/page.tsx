@@ -64,7 +64,7 @@ export default async function PlaylistPage({
   if (!data) {
     return (
       <ContentCard className="h-full overflow-auto">
-        <div className="mx-auto w-full max-w-3xl px-6 pb-10 pt-16 max-sm:pt-32">
+        <div className="mx-auto w-full max-w-3xl px-6 pb-10 pt-16 max-sm:pt-32 max-sm:[@media(display-mode:standalone)]:pt-40">
           <p className="text-body-sm text-muted-foreground">Spotify isn’t connected.</p>
         </div>
       </ContentCard>
@@ -76,7 +76,7 @@ export default async function PlaylistPage({
     <ContentCard className="h-full overflow-auto">
       {/* Seed Box AI to talk about this specific playlist when opened here. */}
       <RegisterBoxSeed seed={playlistSeed(meta?.name ?? "this playlist", id)} />
-      <article className="mx-auto w-full max-w-3xl px-6 pb-10 pt-16 max-sm:pt-32">
+      <article className="mx-auto w-full max-w-3xl px-6 pb-10 pt-16 max-sm:pt-32 max-sm:[@media(display-mode:standalone)]:pt-40">
         {/* Header */}
         <header className="flex items-end gap-5">
           {meta?.images?.[0]?.url ? (
