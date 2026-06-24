@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { ADMIN_COOKIE, adminToken } from "@/lib/auth";
 
+// Always evaluate per-request (reads the admin cookie); never cache the result.
+export const dynamic = "force-dynamic";
+
 /** Returns whether the current request carries a valid admin cookie, so client
  *  components can gate admin-only UI (the cookie itself is HTTP-only). */
 export async function GET() {

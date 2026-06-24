@@ -277,7 +277,7 @@ export function BoxAI({
   // admin cookie is HTTP-only, so check status via the API.
   const [isAdmin, setIsAdmin] = React.useState(false);
   React.useEffect(() => {
-    fetch("/api/admin-status")
+    fetch("/api/admin-status", { credentials: "same-origin", cache: "no-store" })
       .then((r) => r.json())
       .then((d) => setIsAdmin(Boolean(d.isAdmin)))
       .catch(() => { /* ignore */ });
