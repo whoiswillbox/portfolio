@@ -900,7 +900,7 @@ export function BoxAI({
           // the phantom Safari bottom-bar height here so the centered content
           // compresses upward to match the browser — without moving the pinned
           // input/disclaimer or the box height. Not embedded = box page only.
-          !embedded && !active && "max-sm:[@media(display-mode:standalone)]:pb-12",
+          !embedded && !active && "max-sm:[@media(display-mode:standalone)]:pb-4",
         )}
       >
         {!active ? (
