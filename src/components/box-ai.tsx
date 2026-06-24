@@ -829,7 +829,7 @@ export function BoxAI({
   );
 
   const chatCard = (
-    <ContentCard className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0 max-sm:[@media(display-mode:standalone)]:pb-0">
+    <ContentCard className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0">
       {!embedded && (showTrigger || openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
           {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
@@ -862,7 +862,7 @@ export function BoxAI({
             type="button"
             onClick={() => setSettingsOpen(true)}
             aria-label="Settings"
-            className="sm:hidden absolute right-6 top-12 max-sm:[@media(display-mode:standalone)]:top-24 z-30 transition-colors active:scale-95"
+            className="sm:hidden absolute right-6 top-12 z-30 transition-colors active:scale-95"
           >
             <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground">
               <Cog6ToothIcon className="size-5" />
@@ -873,7 +873,7 @@ export function BoxAI({
       {/* Same absolute positioning as content-workspace back/cube so all
           mobile toolbar buttons line up and the gear can't drift in flow. */}
       {!embedded && !showTrigger && !openCaseStudy && !activeId && (
-        <div className="sm:hidden absolute right-6 top-12 max-sm:[@media(display-mode:standalone)]:top-24 z-30">
+        <div className="sm:hidden absolute right-6 top-12 z-30">
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
@@ -895,11 +895,6 @@ export function BoxAI({
           // Reserve a top strip so the floating sidebar trigger / close button
           // don't overlay the conversation when embedded in the launcher.
           embedded && active && "pt-12",
-          // Standalone PWA (/who empty state only): nudge the centered cube/heading
-          // down with top padding so it sits visually centered in the taller PWA
-          // canvas. Only affects the centered content — not the pinned
-          // input/disclaimer or the box height. Not embedded = box page only.
-          !embedded && !active && "max-sm:[@media(display-mode:standalone)]:pt-16",
         )}
       >
         {!active ? (
