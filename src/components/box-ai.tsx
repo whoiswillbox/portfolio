@@ -273,6 +273,15 @@ export function BoxAI({
     hint: installHint,
     install: handleInstall,
   } = usePwaInstall();
+  // Admin-only items in the mobile settings sheet (Admin, Landing page) — the
+  // admin cookie is HTTP-only, so check status via the API.
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  React.useEffect(() => {
+    fetch("/api/admin-status")
+      .then((r) => r.json())
+      .then((d) => setIsAdmin(Boolean(d.isAdmin)))
+      .catch(() => { /* ignore */ });
+  }, []);
 
   const { resolvedTheme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = React.useState(false);
@@ -1067,24 +1076,28 @@ export function BoxAI({
                 {showInstallHint && (
                   <p className="px-6 pb-3 -mt-1 text-xs text-muted-foreground">{installHint}</p>
                 )}
-                <div className="mx-6 h-px bg-border/50" />
               </>
             )}
-            <button
-              onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
-              className="flex items-center gap-3 px-6 py-4 text-sm text-left transition-colors active:bg-muted w-full"
-            >
-              <ShieldCheckIcon className="size-5 text-muted-foreground" />
-              Admin
-            </button>
-            <div className="mx-6 h-px bg-border/50" />
-            <button
-              onClick={() => { setSettingsOpen(false); router.push("/"); }}
-              className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted w-full"
-            >
-              <WindowIcon className="size-5 text-muted-foreground" />
-              Landing page (dev)
-            </button>
+            {isAdmin && (
+              <>
+                <div className="mx-6 h-px bg-border/50" />
+                <button
+                  onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
+                  className="flex items-center gap-3 px-6 py-4 text-sm text-left transition-colors active:bg-muted w-full"
+                >
+                  <ShieldCheckIcon className="size-5 text-muted-foreground" />
+                  Admin
+                </button>
+                <div className="mx-6 h-px bg-border/50" />
+                <button
+                  onClick={() => { setSettingsOpen(false); router.push("/"); }}
+                  className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted w-full"
+                >
+                  <WindowIcon className="size-5 text-muted-foreground" />
+                  Landing page
+                </button>
+              </>
+            )}
           </div>
         </SheetContent>
       </Sheet>

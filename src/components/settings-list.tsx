@@ -32,8 +32,6 @@ export function SettingsList({ isAdmin = false }: { isAdmin?: boolean }) {
   React.useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
 
-  const isDev = process.env.NODE_ENV !== "production";
-
   const {
     canShow: showInstall,
     installed,
@@ -175,8 +173,9 @@ export function SettingsList({ isAdmin = false }: { isAdmin?: boolean }) {
               </Link>
             )}
 
-            {/* Landing page (dev) */}
-            {isDev && (
+            {/* Landing page — admin-only (visible to the authenticated owner in
+                production and dev; hidden from everyone else). */}
+            {isAdmin && (
               <Link
                 href="/"
                 className="flex items-center gap-4 px-3 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
@@ -187,7 +186,7 @@ export function SettingsList({ isAdmin = false }: { isAdmin?: boolean }) {
                 <div className="flex flex-1 min-w-0 flex-col gap-1">
                   <div className="text-sm font-medium">Landing page</div>
                   <div className="text-xs text-muted-foreground">
-                    View the marketing landing page (dev).
+                    View the marketing landing page.
                   </div>
                 </div>
                 <ChevronRightIcon className="size-4 text-muted-foreground shrink-0" />
