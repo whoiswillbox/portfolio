@@ -229,7 +229,7 @@ export function MobileNav() {
       )}
 
       {/* Bottom bar */}
-      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] [@media(display-mode:standalone)]:pb-2">
         <div className="flex w-full items-center rounded-xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border shadow-lg overflow-hidden">
         {navItems.map((item) => {
           const isOpen = openTray === item.id
