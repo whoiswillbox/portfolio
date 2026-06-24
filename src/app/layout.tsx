@@ -23,6 +23,18 @@ const ebGaramond = EB_Garamond({
 export const metadata: Metadata = {
   title: "Will Box - Product Designer",
   description: "Personal portfolio",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Will Box",
+    // Transparent status bar so the app draws fullscreen under it (pairs with
+    // viewportFit: "cover" and our safe-area handling).
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
 };
 
 export const viewport = {
@@ -46,6 +58,8 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#1c1917" media="(prefers-color-scheme: dark)" />
+        {/* Older iOS Safari still keys fullscreen off the apple-prefixed tag. */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="h-dvh overflow-hidden flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme disableTransitionOnChange>
