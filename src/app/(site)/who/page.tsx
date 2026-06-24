@@ -26,10 +26,11 @@ export default function Who() {
     <div
       className={cn(
         "h-full max-sm:h-[calc(100svh-5rem-env(safe-area-inset-bottom))]",
-        // Installed PWA only: no Safari bottom bar, so the default clearance left
-        // a gap between the input/disclaimer and the nav. Make the box taller
-        // (subtract less) so the pinned bottom sits closer to the nav.
-        "max-sm:[@media(display-mode:standalone)]:h-[calc(100svh-4.5rem)]",
+        // Installed PWA only: no Safari bottom bar means more height, leaving a
+        // gap below the input/disclaimer. Subtract slightly less clearance (4rem
+        // vs 5rem) so the pinned bottom drops a little closer to the nav —
+        // keeping safe-bottom so the disclaimer stays visible above it.
+        "max-sm:[@media(display-mode:standalone)]:h-[calc(100svh-4rem-env(safe-area-inset-bottom))]",
         entered.current && "animate-in fade-in duration-500",
       )}
     >
