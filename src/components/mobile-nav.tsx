@@ -44,6 +44,23 @@ export function MobileNav() {
   const [activeNav, setActiveNav] = React.useState<string | null>(null)
   const [conversations, setConversations] = React.useState<Conversation[]>([])
 
+  // Publish the nav's real rendered height (varies by device via the bottom
+  // safe-area inset) as --mobile-nav-height so content can clear it exactly on
+  // every device, instead of approximating with a fixed padding value.
+  const navRef = React.useRef<HTMLElement>(null)
+  React.useEffect(() => {
+    const el = navRef.current
+    if (!el) return
+    const setVar = () => {
+      document.documentElement.style.setProperty("--mobile-nav-height", `${el.offsetHeight}px`)
+    }
+    setVar()
+    const ro = new ResizeObserver(setVar)
+    ro.observe(el)
+    window.addEventListener("resize", setVar)
+    return () => { ro.disconnect(); window.removeEventListener("resize", setVar) }
+  }, [])
+
   // Reset optimistic active state when pathname settles
   React.useEffect(() => { setActiveNav(null) }, [pathname])
   React.useEffect(() => {
@@ -229,7 +246,7 @@ export function MobileNav() {
       )}
 
       {/* Bottom bar */}
-      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <nav ref={navRef} className="mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <div className="flex w-full items-center rounded-xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border shadow-lg overflow-hidden">
         {navItems.map((item) => {
           const isOpen = openTray === item.id

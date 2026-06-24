@@ -93,7 +93,7 @@ const SKILLS = [
 export default function Resume() {
   return (
     <ContentCard className="h-full overflow-auto">
-      <div className="mx-auto w-full max-w-4xl px-6 pb-10 pt-16 max-sm:pt-24">
+      <div className="mx-auto w-full max-w-4xl px-6 pb-10 pt-16 max-sm:pt-32">
         {/* Header */}
         <div className="mb-10 grid items-center gap-4 md:grid-cols-[1fr_200px]">
           <div>

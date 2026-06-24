@@ -7,7 +7,7 @@ export default function Music() {
     <ContentCard className="relative h-full overflow-hidden">
       {/* Scrollable content */}
       <div className="h-full overflow-auto">
-        <article className="mx-auto w-full max-w-4xl px-6 pb-32 pt-16 max-sm:pt-24">
+        <article className="mx-auto w-full max-w-4xl px-6 pb-32 pt-16 max-sm:pt-32">
           <header className="flex flex-col gap-3">
             <h1 className="text-h1 font-bold tracking-tight">Music</h1>
             <p className="max-w-xl text-body-lg text-muted-foreground">
