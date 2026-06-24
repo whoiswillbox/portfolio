@@ -18,7 +18,7 @@ export default function Who() {
   // any measured --mobile-nav-height, hasn't mounted yet).
   return (
     <div
-      className={cn("h-full max-sm:h-[calc(100svh-5rem-env(safe-area-inset-bottom)-var(--pwa-top-inset))]", entered.current && "animate-in fade-in duration-500")}
+      className={cn("h-full max-sm:h-[calc(100svh-5rem-env(safe-area-inset-bottom))]", entered.current && "animate-in fade-in duration-500")}
     >
       <BoxAI />
     </div>
