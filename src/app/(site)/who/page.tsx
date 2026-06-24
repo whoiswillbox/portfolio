@@ -22,7 +22,7 @@ export default function Who() {
     <div
       className={cn(
         "h-full max-sm:h-[calc(100svh-5rem-env(safe-area-inset-bottom))]",
-        "max-sm:[@media(display-mode:standalone)]:h-[calc(100svh-3.5rem)]",
+        "max-sm:[@media(display-mode:standalone)]:h-[calc(100svh-4.5rem-env(safe-area-inset-bottom))]",
         entered.current && "animate-in fade-in duration-500",
       )}
     >
