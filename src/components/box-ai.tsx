@@ -1023,9 +1023,12 @@ export function BoxAI({
         <div
           className={cn("max-sm:px-6 p-3", !active && "sm:hidden")}
         >
-          <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
-            {!active && (
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+          {/* Chips scroll full-bleed: negative margin cancels the container's
+              px-6 so they reach the screen edges, with matching inner padding so
+              the first chip still aligns and the last can scroll past the edge. */}
+          {!active && (
+            <div className="mx-auto w-full max-w-xl">
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-6 px-6">
                 {CHIPS.map((chip) => (
                   <button
                     key={chip.prompt}
@@ -1037,7 +1040,9 @@ export function BoxAI({
                   </button>
                 ))}
               </div>
-            )}
+            </div>
+          )}
+          <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {searchForm}
             {!active && disclaimer}
           </div>

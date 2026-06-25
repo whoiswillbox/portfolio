@@ -44,6 +44,30 @@ export function MobileNav() {
   const [activeNav, setActiveNav] = React.useState<string | null>(null)
   const [conversations, setConversations] = React.useState<Conversation[]>([])
 
+  // Hide on scroll down, show on scroll up (and always show near the top). The
+  // page scrolls inside the ContentCard's [data-scroll-container], not window.
+  const [hidden, setHidden] = React.useState(false)
+  React.useEffect(() => {
+    setHidden(false) // reveal on every route change
+    const el = document.querySelector<HTMLElement>("[data-scroll-container]")
+    if (!el) return
+    let lastY = el.scrollTop
+    const onScroll = () => {
+      const y = el.scrollTop
+      const delta = y - lastY
+      if (y < 64) {
+        setHidden(false) // always visible near the top
+      } else if (delta > 6) {
+        setHidden(true) // scrolling down
+      } else if (delta < -6) {
+        setHidden(false) // scrolling up
+      }
+      lastY = y
+    }
+    el.addEventListener("scroll", onScroll, { passive: true })
+    return () => el.removeEventListener("scroll", onScroll)
+  }, [pathname])
+
   // Reset optimistic active state when pathname settles
   React.useEffect(() => { setActiveNav(null) }, [pathname])
   React.useEffect(() => {
@@ -157,7 +181,7 @@ export function MobileNav() {
       {/* Tray */}
       {openTray && (
         <div className="fixed bottom-[4.5rem] left-6 right-6 z-[41] pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
-          <div className="rounded-xl bg-background ring-1 ring-border shadow-lg overflow-hidden">
+          <div className="rounded-xl bg-background ring-1 ring-border/50 shadow-lg overflow-hidden">
             {openTray === "experience" && (
               <TraySection>
                 <TrayItem
@@ -228,9 +252,12 @@ export function MobileNav() {
         </div>
       )}
 
-      {/* Bottom bar */}
-      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-        <div className="flex w-full items-center rounded-xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border shadow-lg overflow-hidden">
+      {/* Bottom bar — hides on scroll down, shows on scroll up */}
+      <nav className={cn(
+        "mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+        hidden && "translate-y-[calc(100%+1rem)]",
+      )}>
+        <div className="flex w-full items-center rounded-xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-lg overflow-hidden">
         {navItems.map((item) => {
           const isOpen = openTray === item.id
           const highlighted = item.active || isOpen
@@ -246,7 +273,9 @@ export function MobileNav() {
             >
               <div className={cn(
                 "relative flex w-full flex-col items-center gap-1 rounded-lg py-2 transition-[background-color,box-shadow] duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]",
-                highlighted ? "bg-muted shadow-sm" : "bg-transparent shadow-none"
+                highlighted
+                  ? "bg-muted/40 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-sm"
+                  : "bg-transparent shadow-none"
               )}>
                 <Icon className="size-5" />
                 <span className="font-mono text-[10px] uppercase tracking-wide">{item.label}</span>
