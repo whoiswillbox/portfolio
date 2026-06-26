@@ -70,11 +70,13 @@ body.input-focused .mobile-nav {
      keep the cube visible. Nudge the cube down so it stays visually centered in
      the reduced space above the keyboard. */
   .box-heading,
-  .box-chips {
+  .box-chips,
+  .box-settings {
     transition: opacity 250ms ease;
   }
   body.input-focused .box-heading,
-  body.input-focused .box-chips {
+  body.input-focused .box-chips,
+  body.input-focused .box-settings {
     opacity: 0;
     pointer-events: none;
   }
