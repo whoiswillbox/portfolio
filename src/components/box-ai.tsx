@@ -1092,7 +1092,7 @@ export function BoxAI({
               <>
                 <button
                   onClick={handleInstall}
-                  className="flex items-start gap-3 px-6 py-4 text-left transition-colors active:bg-muted w-full"
+                  className="flex items-start gap-3 px-6 py-4 text-left transition-colors active:bg-muted outline-none w-full"
                 >
                   <ArrowDownTrayIcon className="size-5 shrink-0 text-muted-foreground mt-0.5" />
                   <div className="flex flex-col gap-1">
@@ -1114,7 +1114,7 @@ export function BoxAI({
                 <div className="mx-6 h-px bg-border/50" />
                 <button
                   onClick={() => { setSettingsOpen(false); router.push("/admin/chat"); }}
-                  className="flex items-center gap-3 px-6 py-4 text-sm text-left transition-colors active:bg-muted w-full"
+                  className="flex items-center gap-3 px-6 py-4 text-sm text-left transition-colors active:bg-muted outline-none w-full"
                 >
                   <ShieldCheckIcon className="size-5 text-muted-foreground" />
                   Admin
@@ -1122,7 +1122,7 @@ export function BoxAI({
                 <div className="mx-6 h-px bg-border/50" />
                 <button
                   onClick={() => { setSettingsOpen(false); router.push("/"); }}
-                  className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted w-full"
+                  className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted outline-none w-full"
                 >
                   <WindowIcon className="size-5 text-muted-foreground" />
                   Landing page
