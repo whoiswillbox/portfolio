@@ -1125,12 +1125,14 @@ export function BoxAI({
           className="sm:hidden max-h-[85dvh] rounded-t-2xl px-0 pb-10 overflow-hidden"
           style={{ backgroundColor: "var(--color-background)" }}
         >
-          {/* Drag handle — drag up to expand (to 75%), down to dismiss */}
+          {/* Drag handle — drag up to expand (to 85%), down to dismiss. The
+              wrapper is a generous (invisible) touch target; the visible pill is
+              unchanged, just centered within the larger hit area. */}
           <div
             onPointerDown={onHandlePointerDown}
             onPointerMove={onHandlePointerMove}
             onPointerUp={onHandlePointerUp}
-            className="mx-auto -mt-1 mb-3 flex w-full cursor-grab touch-none justify-center px-6 pt-3 pb-2 active:cursor-grabbing"
+            className="mx-auto -mt-2 flex w-full cursor-grab touch-none items-center justify-center px-6 pt-5 pb-5 active:cursor-grabbing"
           >
             <div className="h-1 w-10 rounded-full bg-border" />
           </div>
