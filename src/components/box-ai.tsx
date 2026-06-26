@@ -289,6 +289,7 @@ export function BoxAI({
   }, []);
 
 
+
   // On focus, scroll the window back to the top a few times during the keyboard
   // open animation so the position:fixed close button lands in the visible
   // top-right — but DON'T keep a persistent scroll listener forcing it. Holding
@@ -332,13 +333,14 @@ export function BoxAI({
       return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); };
     }
 
-    // On blur: hold the pinned height through the keyboard-close animation, then
-    // clear it so the page returns to its normal CSS height after things settle
-    // (avoids an instant height snap while the keyboard is still closing).
-    // NOTE: Safari's address-bar re-expand animation on keyboard dismiss is
-    // native browser chrome we can't suppress (it does NOT occur in the PWA).
-    const t = setTimeout(() => { shell.style.height = ""; }, 350);
-    return () => clearTimeout(t);
+    // On blur: clear the pinned height IMMEDIATELY (no delay) so the content
+    // reflows to full-page right away — while the hero is still at opacity 0 and
+    // only just starting to fade back in. The reflow happens behind the still-
+    // invisible hero, so there's no visible "jump down on a lag". By the time the
+    // hero is visible, the layout has already settled.
+    // NOTE: Safari's address-bar re-expand on keyboard dismiss is native browser
+    // chrome we can't suppress (it does NOT occur in the PWA).
+    shell.style.height = "";
   }, [inputFocused]);
 
 
