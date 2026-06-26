@@ -917,7 +917,7 @@ export function BoxAI({
             type="button"
             onClick={() => setSettingsOpen(true)}
             aria-label="Settings"
-            className="sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30 transition-colors active:scale-95"
+            className="box-settings sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30 transition-colors active:scale-95"
           >
             <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
               <Cog6ToothIcon className="size-5" />
@@ -928,7 +928,7 @@ export function BoxAI({
       {/* Same absolute positioning as content-workspace back/cube so all
           mobile toolbar buttons line up and the gear can't drift in flow. */}
       {!embedded && !showTrigger && !openCaseStudy && !activeId && (
-        <div className="sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
+        <div className="box-settings sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
@@ -940,6 +940,25 @@ export function BoxAI({
             </span>
           </button>
         </div>
+      )}
+      {/* Typing-mode close (top-left): dismisses the keyboard. Hidden by default,
+          revealed via body.input-focused. Mirrors the settings gear's position. */}
+      {!embedded && !active && (
+        <button
+          type="button"
+          aria-label="Done"
+          // Pointer-down (not click) so it fires before the input's blur steals
+          // focus; blur the active field to dismiss the keyboard.
+          onPointerDown={(e) => {
+            e.preventDefault();
+            (document.activeElement as HTMLElement | null)?.blur();
+          }}
+          className="box-close hidden sm:hidden absolute left-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30 transition-colors active:scale-95"
+        >
+          <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
+            <XMarkIcon className="size-5" />
+          </span>
+        </button>
       )}
       <div
         ref={scrollRef}
