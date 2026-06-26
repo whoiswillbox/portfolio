@@ -324,10 +324,7 @@ export function BoxAI({
     if (!shell) return;
 
     if (inputFocused && window.innerWidth < 640) {
-      // While focused: keep the shell sized to the visible area above the
-      // keyboard. No height transition here — it must track the keyboard 1:1 as
-      // it opens (a transition would lag behind it).
-      shell.style.transition = "none";
+      // While focused: keep the shell sized to the visible area above the keyboard.
       const apply = () => { shell.style.height = `${vv.height}px`; };
       vv.addEventListener("resize", apply);
       vv.addEventListener("scroll", apply);
@@ -335,20 +332,13 @@ export function BoxAI({
       return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); };
     }
 
-    if (window.innerWidth < 640 && shell.style.height) {
-      // On blur: animate the shell height back to the full viewport over the
-      // keyboard-close duration so the content glides up to fill, instead of
-      // snapping — making exit as smooth as entry. Clear the inline height after
-      // so it returns to the normal CSS height.
-      shell.style.transition = "height 300ms cubic-bezier(0.33,1,0.68,1)";
-      // next frame so the transition picks up the change from the pinned height
-      requestAnimationFrame(() => { shell.style.height = `${window.innerHeight}px`; });
-      const t = setTimeout(() => {
-        shell.style.transition = "none";
-        shell.style.height = "";
-      }, 320);
-      return () => clearTimeout(t);
-    }
+    // On blur: hold the pinned height through the keyboard-close animation, then
+    // clear it so the page returns to its normal CSS height after things settle
+    // (avoids an instant height snap while the keyboard is still closing).
+    // NOTE: Safari's address-bar re-expand animation on keyboard dismiss is
+    // native browser chrome we can't suppress (it does NOT occur in the PWA).
+    const t = setTimeout(() => { shell.style.height = ""; }, 350);
+    return () => clearTimeout(t);
   }, [inputFocused]);
 
 
