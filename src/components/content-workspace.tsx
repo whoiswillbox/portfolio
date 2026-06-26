@@ -116,7 +116,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => router.push(backTo.href)}
-            className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground transition-colors active:scale-95"
+            className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground transition-colors active:scale-95"
           >
             <ArrowLeftIcon className="size-5" />
           </button>
@@ -129,7 +129,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => { setRendered(true); setOpen(true); }}
             aria-label="Ask Box"
-            className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground transition-colors active:scale-95"
+            className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground transition-colors active:scale-95"
           >
             <CubeIcon className="size-5" />
           </button>

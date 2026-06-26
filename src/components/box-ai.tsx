@@ -919,7 +919,7 @@ export function BoxAI({
             aria-label="Settings"
             className="sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30 transition-colors active:scale-95"
           >
-            <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground">
+            <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
               <Cog6ToothIcon className="size-5" />
             </span>
           </button>
@@ -935,7 +935,7 @@ export function BoxAI({
             aria-label="Settings"
             className="transition-colors active:scale-95"
           >
-            <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground">
+            <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
               <Cog6ToothIcon className="size-5" />
             </span>
           </button>
