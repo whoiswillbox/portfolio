@@ -999,26 +999,32 @@ export function BoxAI({
           <body> so no transformed ancestor breaks its fixed position. Rendered
           only while a text input is focused; visibility via inline styles (no
           CSS-class matching to guess at). */}
-      {!embedded && !active && mounted && inputFocused && createPortal(
+      {!embedded && !active && mounted && createPortal(
         <button
           type="button"
           aria-label="Done"
+          tabIndex={inputFocused ? 0 : -1}
           // Pointer-down (not click) so it fires before the input's blur steals
           // focus; blur the active field to dismiss the keyboard.
           onPointerDown={(e) => {
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          // Top-right, taking the settings gear's exact spot (the gear hides in
-          // typing mode) so the toolbar reads as "gear → close" in one corner.
+          // Top-right, taking the settings gear's exact spot. Kept mounted and
+          // opacity-toggled so it fades BOTH on enter and exit. (Shell height is
+          // intentionally left untouched on exit — manipulating it fought the
+          // native keyboard-close and made exit janky.)
           style={{
             position: "fixed",
             top: "calc(1.5rem + env(safe-area-inset-top))",
             right: "1.5rem",
             zIndex: 50,
             display: "flex",
+            opacity: inputFocused ? 1 : 0,
+            pointerEvents: inputFocused ? "auto" : "none",
+            transition: "opacity 320ms cubic-bezier(0.33,1,0.68,1)",
           }}
-          className="sm:hidden active:scale-95 animate-in fade-in duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
+          className="sm:hidden active:scale-95"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
