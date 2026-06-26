@@ -59,41 +59,21 @@ body.input-focused .mobile-nav {
   pointer-events: none;
 }
 
-/* The box shell's typing-mode height is set in JS (who/page.tsx) to the exact
-   VisualViewport height — NOT here — so it equals the visible area above the
-   keyboard (no overflow, no scroll). A CSS height !important here would override
-   that JS inline style, so it's intentionally omitted. */
+/* While typing, the nav is hidden so drop its reserved clearance and let the box
+   shell fill the dynamic viewport (100dvh contracts when the keyboard opens on
+   iOS), so the chat input sits right above the keyboard instead of floating. */
 @media (max-width: 639px) {
-  /* While typing, fade the heading, chips, and settings gear out so the cube +
-     Ask Box input are the focus. The cube stays visible; its centering in the
-     space above the keyboard is handled by VisualViewport padding on the scroll
-     area (see box-ai.tsx). Heading collapses to 0 height so it doesn't push the
-     cube off-center. */
-  .box-chips,
-  .box-settings,
-  .box-heading {
+  body.input-focused .who-shell {
+    height: 100dvh !important;
+  }
+  /* Fade the cube/heading and chips out while typing so the input is the focus. */
+  .box-empty-hero,
+  .box-chips {
     transition: opacity 250ms ease;
   }
-  body.input-focused .box-chips,
-  body.input-focused .box-settings {
+  body.input-focused .box-empty-hero,
+  body.input-focused .box-chips {
     opacity: 0;
     pointer-events: none;
-  }
-  body.input-focused .box-heading {
-    opacity: 0;
-    height: 0;
-    margin: 0;
-    overflow: hidden;
-  }
-  body.input-focused .box-cube {
-    margin-bottom: 0;
-  }
-  /* Lock all scroll containers on the box page while typing so the page can't
-     scroll, and the lone cube just centers (justify-center) in the space above
-     the keyboard. who-shell is 100dvh (contracts above the keyboard), input is
-     pinned at its bottom, so the flex-1 area = the visible space above the input. */
-  body.input-focused .box-scroll,
-  body.input-focused .who-shell [data-scroll-container] {
-    overflow: hidden !important;
   }
 }

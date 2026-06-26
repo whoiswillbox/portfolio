@@ -269,7 +269,6 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
-
   // Draggable settings sheet (height-based). The sheet rests at its natural
   // content height; dragging the handle UP grows its height toward a 75dvh cap,
   // DOWN shrinks it and (past a threshold) dismisses. Release snaps to the
@@ -918,7 +917,7 @@ export function BoxAI({
             type="button"
             onClick={() => setSettingsOpen(true)}
             aria-label="Settings"
-            className="box-settings sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30 transition-colors active:scale-95"
+            className="sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30 transition-colors active:scale-95"
           >
             <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
               <Cog6ToothIcon className="size-5" />
@@ -929,7 +928,7 @@ export function BoxAI({
       {/* Same absolute positioning as content-workspace back/cube so all
           mobile toolbar buttons line up and the gear can't drift in flow. */}
       {!embedded && !showTrigger && !openCaseStudy && !activeId && (
-        <div className="box-settings sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
+        <div className="sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
@@ -946,7 +945,7 @@ export function BoxAI({
         ref={scrollRef}
         className={cn(
           "flex-1 min-h-0 overflow-y-auto",
-          !active && "box-scroll flex flex-col justify-center",
+          !active && "flex flex-col justify-center",
           active && isScrolled && "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_100%)]",
           // Reserve a top strip so the floating sidebar trigger / close button
           // don't overlay the conversation when embedded in the launcher.
@@ -962,7 +961,7 @@ export function BoxAI({
               onClick={handleLogoTap}
               aria-hidden="true"
               tabIndex={-1}
-              className="box-cube mb-4 self-center cursor-default"
+              className="mb-4 self-center cursor-default"
             >
               <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-12 text-foreground">
                 <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
@@ -970,7 +969,7 @@ export function BoxAI({
                 <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
               </svg>
             </button>
-            <h1 className="box-heading text-h1 font-semibold">{heading}</h1>
+            <h1 className="text-h1 font-semibold">{heading}</h1>
             {/* On desktop: input + chips inline. On mobile: hidden here, shown pinned below */}
             <div className="mt-3 sm:block hidden">{searchForm}</div>
             <div className="sm:block hidden">{disclaimer}</div>
