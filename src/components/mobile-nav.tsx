@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import {
   CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon,
-  AcademicCapIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon,
+  LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon,
   BoltIcon, XMarkIcon, ChevronRightIcon,
   ChatBubbleLeftRightIcon, Squares2X2Icon,
 } from "@heroicons/react/24/outline"
@@ -14,7 +14,6 @@ import {
   FolderIcon as FolderSolid,
   BuildingOffice2Icon as BuildingOffice2Solid,
   DocumentTextIcon as DocumentTextSolid,
-  AcademicCapIcon as AcademicCapSolid,
   LifebuoyIcon as LifebuoySolid,
   PuzzlePieceIcon as PuzzlePieceSolid,
   MusicalNoteIcon as MusicalNoteSolid,
@@ -32,7 +31,7 @@ import {
 } from "@/lib/chat/store"
 import { caseStudyForConversation } from "@/lib/case-studies"
 
-type Tray = "experience" | "school" | "extras" | "conversations" | null
+type Tray = "experience" | "extras" | "conversations" | null
 
 export function MobileNav() {
   const pathname = usePathname()
@@ -120,8 +119,7 @@ export function MobileNav() {
 
   if (pathname === "/") return null
 
-  const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname === "/technergetics" || pathname.startsWith("/technergetics/") || pathname === "/projects/next-gen-bar" || pathname === "/resume"))
-  const schoolActive = activeNav === "school" || (!activeNav && openTray === null && (pathname === "/school" || pathname.startsWith("/school/")))
+  const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname === "/technergetics" || pathname.startsWith("/technergetics/") || pathname === "/projects/next-gen-bar" || pathname === "/resume" || pathname === "/school" || pathname.startsWith("/school/")))
   const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && (pathname === "/extracurriculars" || pathname.startsWith("/extracurriculars/")))
   const boxActive = activeNav === "box" || (!activeNav && pathname === "/who" && convoParam === null && openTray === null)
   const convsActive = activeNav === "conversations" || (!activeNav && pathname === "/conversations" && openTray === null)
@@ -142,14 +140,6 @@ export function MobileNav() {
       iconSolid: FolderSolid,
       active: experienceActive,
       onPress: () => { closeTray(); setActiveNav("experience"); router.push("/technergetics") },
-    },
-    {
-      id: "school" as const,
-      label: "School",
-      iconOutline: AcademicCapIcon,
-      iconSolid: AcademicCapSolid,
-      active: schoolActive,
-      onPress: () => { closeTray(); setActiveNav("school"); router.push("/school") },
     },
     {
       id: "extras" as const,
@@ -199,11 +189,6 @@ export function MobileNav() {
                 <TrayItem label="Design Standards" href="/technergetics/design-standards" active={pathname === "/technergetics/design-standards"} onPress={() => navigate("/technergetics/design-standards")} icon={pathname === "/technergetics/design-standards" ? BuildingOffice2Solid : BuildingOffice2Icon} />
                 <TrayItem label="Lightcert" href="/technergetics/lightcert" active={pathname === "/technergetics/lightcert"} onPress={() => navigate("/technergetics/lightcert")} icon={pathname === "/technergetics/lightcert" ? BoltSolid : BoltIcon} />
                 <TrayItem label="Resume" href="/resume" active={pathname === "/resume"} onPress={() => navigate("/resume")} icon={pathname === "/resume" ? DocumentTextSolid : DocumentTextIcon} />
-              </TraySection>
-            )}
-            {openTray === "school" && (
-              <TraySection>
-                <TrayItem label="SwipeRight.ai" href="/school/swiperight-ai" active={pathname === "/school/swiperight-ai"} onPress={() => navigate("/school/swiperight-ai")} icon={pathname === "/school/swiperight-ai" ? AcademicCapSolid : AcademicCapIcon} />
               </TraySection>
             )}
             {openTray === "extras" && (
