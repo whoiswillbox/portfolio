@@ -1190,7 +1190,7 @@ export function BoxAI({
           )}
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {searchForm}
-            {!active && disclaimer}
+            {!active && <div className="box-disclaimer">{disclaimer}</div>}
           </div>
         </div>
       )}

@@ -86,6 +86,17 @@ body.input-focused .mobile-nav {
     opacity: 0;
     pointer-events: none;
   }
+  /* Collapse the disclaimer below the input while typing so it doesn't sit
+     behind the keyboard / add height. */
+  .box-disclaimer {
+    overflow: hidden;
+    transition: opacity 200ms ease;
+  }
+  body.input-focused .box-disclaimer {
+    opacity: 0;
+    height: 0;
+    pointer-events: none;
+  }
   /* ...and reveal a small cube right above the input instead, so the cube still
      reads "above the keyboard" without any height/scroll manipulation. */
   .box-typing-cube {
