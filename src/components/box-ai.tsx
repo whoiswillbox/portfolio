@@ -269,6 +269,26 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
+  // Keyboard height via VisualViewport (px). When the on-screen keyboard opens,
+  // the visual viewport shrinks; this is the difference from the layout viewport.
+  // Used to reserve space below the empty-state content so the cube centers in
+  // the area actually visible above the keyboard (reliable across devices).
+  const [keyboardInset, setKeyboardInset] = React.useState(0);
+  const [typing, setTyping] = React.useState(false);
+  React.useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!vv) return;
+    const onResize = () => {
+      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setKeyboardInset(inset);
+      setTyping(inset > 80); // keyboard considered open past a small threshold
+    };
+    vv.addEventListener("resize", onResize);
+    vv.addEventListener("scroll", onResize);
+    onResize();
+    return () => { vv.removeEventListener("resize", onResize); vv.removeEventListener("scroll", onResize); };
+  }, []);
+
   // Draggable settings sheet (height-based). The sheet rests at its natural
   // content height; dragging the handle UP grows its height toward a 75dvh cap,
   // DOWN shrinks it and (past a threshold) dismisses. Release snaps to the
@@ -951,6 +971,10 @@ export function BoxAI({
           // don't overlay the conversation when embedded in the launcher.
           embedded && active && "pt-12",
         )}
+        // While typing on the empty state, reserve the keyboard height below the
+        // centered content (cube) so it centers in the visible area above the
+        // keyboard. Measured via VisualViewport — accurate on any device.
+        style={!active && typing ? { paddingBottom: keyboardInset } : undefined}
       >
         {!active ? (
           <div className="box-empty-hero mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">

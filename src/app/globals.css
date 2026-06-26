@@ -66,10 +66,14 @@ body.input-focused .mobile-nav {
   body.input-focused .who-shell {
     height: 100dvh !important;
   }
-  /* While typing, fade the settings gear + chips out (they keep their box so the
-     layout below is stable). */
+  /* While typing, fade the heading, chips, and settings gear out so the cube +
+     Ask Box input are the focus. The cube stays visible; its centering in the
+     space above the keyboard is handled by VisualViewport padding on the scroll
+     area (see box-ai.tsx). Heading collapses to 0 height so it doesn't push the
+     cube off-center. */
   .box-chips,
-  .box-settings {
+  .box-settings,
+  .box-heading {
     transition: opacity 250ms ease;
   }
   body.input-focused .box-chips,
@@ -77,17 +81,12 @@ body.input-focused .mobile-nav {
     opacity: 0;
     pointer-events: none;
   }
-  /* Heading collapses to nothing (not just fades) so the cube becomes the only
-     content in the justify-center scroll area and ends up centered in the space
-     above the keyboard — on any device, no fixed offset needed. */
-  .box-heading {
-    transition: opacity 200ms ease;
-  }
   body.input-focused .box-heading {
-    display: none;
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
   }
-  /* Cube's bottom margin (gap to the heading) isn't needed once the heading is
-     gone — drop it so the cube sits truly centered. */
   body.input-focused .box-cube {
     margin-bottom: 0;
   }
