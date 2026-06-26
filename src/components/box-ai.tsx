@@ -961,7 +961,7 @@ export function BoxAI({
               onClick={handleLogoTap}
               aria-hidden="true"
               tabIndex={-1}
-              className="mb-4 self-center cursor-default"
+              className="box-cube mb-4 self-center cursor-default"
             >
               <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-12 text-foreground">
                 <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
@@ -969,7 +969,7 @@ export function BoxAI({
                 <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
               </svg>
             </button>
-            <h1 className="text-h1 font-semibold">{heading}</h1>
+            <h1 className="box-heading text-h1 font-semibold">{heading}</h1>
             {/* On desktop: input + chips inline. On mobile: hidden here, shown pinned below */}
             <div className="mt-3 sm:block hidden">{searchForm}</div>
             <div className="sm:block hidden">{disclaimer}</div>

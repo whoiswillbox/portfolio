@@ -66,14 +66,22 @@ body.input-focused .mobile-nav {
   body.input-focused .who-shell {
     height: 100dvh !important;
   }
-  /* Fade the cube/heading and chips out while typing so the input is the focus. */
-  .box-empty-hero,
+  /* While typing, fade out the heading + chips so the input is the focus, but
+     keep the cube visible. Nudge the cube down so it stays visually centered in
+     the reduced space above the keyboard. */
+  .box-heading,
   .box-chips {
     transition: opacity 250ms ease;
   }
-  body.input-focused .box-empty-hero,
+  body.input-focused .box-heading,
   body.input-focused .box-chips {
     opacity: 0;
     pointer-events: none;
+  }
+  .box-cube {
+    transition: transform 250ms ease;
+  }
+  body.input-focused .box-cube {
+    transform: translateY(2.5rem);
   }
 }
