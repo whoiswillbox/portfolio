@@ -332,11 +332,11 @@ export function BoxAI({
       return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); };
     }
 
-    // On blur: DON'T release the height immediately (that makes the content jump
-    // while the keyboard is still closing, which reads as the Safari bar floating
-    // over shifting content). Hold the pinned height through the close animation,
-    // then clear it so the page returns to its normal CSS height after the bar
-    // has settled.
+    // On blur: hold the pinned height through the keyboard-close animation, then
+    // clear it so the page returns to its normal CSS height after things settle
+    // (avoids an instant height snap while the keyboard is still closing).
+    // NOTE: Safari's address-bar re-expand animation on keyboard dismiss is
+    // native browser chrome we can't suppress (it does NOT occur in the PWA).
     const t = setTimeout(() => { shell.style.height = ""; }, 350);
     return () => clearTimeout(t);
   }, [inputFocused]);
