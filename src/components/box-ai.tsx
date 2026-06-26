@@ -289,33 +289,15 @@ export function BoxAI({
   }, []);
 
 
-  // While focused, hard-lock the document scroll position by fixing <html> in
-  // place (position:fixed) rather than JS-forcing scrollTo(0,0) on every scroll
-  // event. The scrollTo approach kept Safari's address bar pinned compact, so it
-  // sprang/floated back on exit. A genuine scroll-lock keeps the close button in
-  // view AND lets Safari's bar just slide naturally when the keyboard dismisses.
+  // Keep the window pinned to the top while typing so the position:fixed close
+  // button stays in the visible top-right (iOS auto-scrolls the window on focus
+  // otherwise).
   React.useEffect(() => {
-    const html = document.documentElement;
-    if (inputFocused && window.innerWidth < 640) {
-      html.style.position = "fixed";
-      html.style.top = "0";
-      html.style.left = "0";
-      html.style.right = "0";
-      html.style.width = "100%";
-    } else {
-      html.style.position = "";
-      html.style.top = "";
-      html.style.left = "";
-      html.style.right = "";
-      html.style.width = "";
-    }
-    return () => {
-      html.style.position = "";
-      html.style.top = "";
-      html.style.left = "";
-      html.style.right = "";
-      html.style.width = "";
-    };
+    if (!inputFocused) return;
+    const pin = () => { if (window.scrollY !== 0) window.scrollTo(0, 0); };
+    pin();
+    window.addEventListener("scroll", pin, { passive: true });
+    return () => window.removeEventListener("scroll", pin);
   }, [inputFocused]);
 
   // Pin the box shell to the exact VisualViewport height while typing, so the
