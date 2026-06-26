@@ -135,3 +135,12 @@ grid `<table>` element). Same styling, just the correct key name.
 **Date:** 2026-06-22
 **Why:** Mobile sidebar slides in as a floating card (mirroring the desktop content card aesthetic). The default sheet was edge-to-edge with no padding or rounding.
 **What:** Changed `data-[side=left]` and `data-[side=right]` from `inset-y-0`/`h-full` to `inset-y-2`/`h-[calc(100%-1rem)]` and added `rounded-xl`. Removed the `border-r`/`border-l` since the card style replaces the border.
+
+### `sheet.tsx` — real slide animation + `draggable` opt-out
+**Date:** 2026-06-25
+**Why:** The CSS `transition` on translate didn't actually slide (Radix mounts content already in the `open` state, so only opacity animated → it "appeared"). Also needed an escape hatch for a drag-controlled sheet.
+**What:**
+- Overlay: `opacity 420ms cubic-bezier(0.33,1,0.68,1)`.
+- Content: replaced the inline `transition` + `data-[state]` translate classes with `tw-animate-css` enter/exit animations keyed on Radix state (`data-[state=open]:animate-in`/`closed:animate-out` + per-side `slide-in-from-*`/`slide-out-to-*`), `duration-[420ms]` easeOutCubic. Added `transform-gpu will-change-transform`; dropped the opacity/fade on content (transform-only = smoother on mobile).
+- Added a `draggable?: boolean` prop: when true, the built-in slide classes are skipped so a consumer can drive the transform/height itself. (Currently unused — the settings sheet drag is height-based and keeps the slide — but kept as an escape hatch.)
+Applies to all sheets (settings + case-study bottom sheet).

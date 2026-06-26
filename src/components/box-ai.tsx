@@ -268,6 +268,61 @@ export function BoxAI({
     document.body.classList.toggle("sheet-open", settingsOpen);
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
+
+  // Draggable settings sheet (height-based). The sheet rests at its natural
+  // content height; dragging the handle UP grows its height toward a 75dvh cap,
+  // DOWN shrinks it and (past a threshold) dismisses. Release snaps to the
+  // nearest of: expanded (75dvh) / content height / closed.
+  const settingsContentRef = React.useRef<HTMLDivElement>(null);
+  const settingsInnerRef = React.useRef<HTMLDivElement>(null);
+  const drag = React.useRef<{ startY: number; startH: number; contentH: number; maxH: number; lastY: number; lastT: number; dragging: boolean }>({
+    startY: 0, startH: 0, contentH: 0, maxH: 0, lastY: 0, lastT: 0, dragging: false,
+  });
+
+  const onHandlePointerDown = (e: React.PointerEvent) => {
+    const el = settingsContentRef.current;
+    const inner = settingsInnerRef.current;
+    if (!el || !inner) return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const startH = el.offsetHeight;
+    const maxH = Math.round(window.innerHeight * 0.85);
+    // Natural content height = handle strip (~40px) + inner content, capped at maxH.
+    const contentH = Math.min(maxH, inner.scrollHeight + 40);
+    drag.current = { startY: e.clientY, startH, contentH, maxH, lastY: e.clientY, lastT: e.timeStamp, dragging: true };
+    el.style.transition = "none";
+    el.style.height = `${startH}px`; // pin to px so we can drag it
+  };
+  const onHandlePointerMove = (e: React.PointerEvent) => {
+    const el = settingsContentRef.current;
+    const s = drag.current;
+    if (!el || !s.dragging) return;
+    // Drag up (dy negative) grows height; down shrinks it. Allow shrinking below
+    // content height (for dismiss feel), cap growth at maxH.
+    const dy = e.clientY - s.startY;
+    const h = Math.min(s.maxH, Math.max(80, s.startH - dy));
+    el.style.height = `${h}px`;
+    s.lastY = e.clientY;
+    s.lastT = e.timeStamp;
+  };
+  const onHandlePointerUp = (e: React.PointerEvent) => {
+    const el = settingsContentRef.current;
+    const s = drag.current;
+    if (!el || !s.dragging) return;
+    s.dragging = false;
+    const h = el.offsetHeight;
+    const velocity = (e.clientY - s.lastY) / Math.max(1, e.timeStamp - s.lastT); // +down
+    el.style.transition = "height 320ms cubic-bezier(0.33,1,0.68,1), transform 320ms cubic-bezier(0.33,1,0.68,1)";
+
+    // Dismiss: shrunk well below content height, or a strong downward flick.
+    if (h < s.contentH - 80 || velocity > 0.6) {
+      setSettingsOpen(false);
+      return;
+    }
+    // Snap to expanded (maxH) vs content height by midpoint / upward flick.
+    const midpoint = (s.contentH + s.maxH) / 2;
+    el.style.height = h > midpoint || velocity < -0.4 ? `${s.maxH}px` : `${s.contentH}px`;
+  };
   const {
     canShow: showInstall,
     showHint: showInstallHint,
@@ -1064,13 +1119,23 @@ export function BoxAI({
       </Sheet>
       <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
         <SheetContent
+          ref={settingsContentRef}
           side="bottom"
           showCloseButton={false}
-          className="sm:hidden rounded-t-2xl px-0 pb-10"
+          className="sm:hidden max-h-[85dvh] rounded-t-2xl px-0 pb-10 overflow-hidden"
           style={{ backgroundColor: "var(--color-background)" }}
         >
-          {/* Drag handle */}
-          <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-border" />
+          {/* Drag handle — drag up to expand (to 75%), down to dismiss */}
+          <div
+            onPointerDown={onHandlePointerDown}
+            onPointerMove={onHandlePointerMove}
+            onPointerUp={onHandlePointerUp}
+            className="mx-auto -mt-1 mb-3 flex w-full cursor-grab touch-none justify-center px-6 pt-3 pb-2 active:cursor-grabbing"
+          >
+            <div className="h-1 w-10 rounded-full bg-border" />
+          </div>
+          {/* Inner content — fills the (drag-controlled) sheet height and scrolls. */}
+          <div ref={settingsInnerRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <SheetHeader className="px-6 pb-4">
             <SheetTitle className="text-center text-base font-semibold">Settings</SheetTitle>
           </SheetHeader>
@@ -1129,6 +1194,7 @@ export function BoxAI({
                 </button>
               </>
             )}
+          </div>
           </div>
         </SheetContent>
       </Sheet>

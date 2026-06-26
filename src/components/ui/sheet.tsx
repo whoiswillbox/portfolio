@@ -40,7 +40,7 @@ function SheetOverlay({
         "fixed inset-0 bg-black/20 data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
         className
       )}
-      style={{ transition: "opacity 500ms cubic-bezier(0.16,1,0.3,1)", zIndex: 299 }}
+      style={{ transition: "opacity 420ms cubic-bezier(0.33,1,0.68,1)", zIndex: 299 }}
       {...props}
     />
   )
@@ -51,11 +51,15 @@ function SheetContent({
   children,
   side = "right",
   showCloseButton = true,
+  draggable = false,
   style,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: "top" | "right" | "bottom" | "left"
   showCloseButton?: boolean
+  /** Disable the built-in slide animation so the consumer can drive the
+   *  transform itself (e.g. drag-to-expand/dismiss). */
+  draggable?: boolean
 }) {
   return (
     <SheetPortal>
@@ -68,17 +72,22 @@ function SheetContent({
           "data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto",
           "data-[side=left]:inset-0 data-[side=right]:inset-0",
           "data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto",
-          "data-[state=closed]:data-[side=bottom]:translate-y-full",
-          "data-[state=closed]:data-[side=top]:-translate-y-full",
-          "data-[state=closed]:data-[side=left]:-translate-x-full",
-          "data-[state=closed]:data-[side=right]:translate-x-full",
-          "data-[state=open]:translate-x-0 data-[state=open]:translate-y-0",
+          "transform-gpu will-change-transform",
+          // Enter/exit slide keyed on Radix's open/closed state via tw-animate.
+          // Skipped when draggable (consumer drives the transform).
+          !draggable && [
+            "duration-[420ms] ease-[cubic-bezier(0.33,1,0.68,1)]",
+            "data-[state=open]:animate-in data-[state=closed]:animate-out",
+            "data-[side=bottom]:data-[state=open]:slide-in-from-bottom data-[side=bottom]:data-[state=closed]:slide-out-to-bottom",
+            "data-[side=top]:data-[state=open]:slide-in-from-top data-[side=top]:data-[state=closed]:slide-out-to-top",
+            "data-[side=left]:data-[state=open]:slide-in-from-left data-[side=left]:data-[state=closed]:slide-out-to-left",
+            "data-[side=right]:data-[state=open]:slide-in-from-right data-[side=right]:data-[state=closed]:slide-out-to-right",
+          ],
           className
         )}
         style={{
           zIndex: 300,
           isolation: "isolate",
-          transition: "transform 500ms cubic-bezier(0.16,1,0.3,1), opacity 500ms cubic-bezier(0.16,1,0.3,1)",
           ...style,
         }}
         {...props}

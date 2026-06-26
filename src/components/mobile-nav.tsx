@@ -275,7 +275,7 @@ export function MobileNav() {
               <div className={cn(
                 "relative flex w-full flex-col items-center gap-1 rounded-lg py-1.5 transition-[background-color,box-shadow] duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]",
                 highlighted
-                  ? "bg-muted/40 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-sm"
+                  ? "bg-muted/40 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/20 shadow-sm"
                   : "bg-transparent shadow-none"
               )}>
                 <Icon className="size-5" />
