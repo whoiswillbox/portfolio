@@ -66,7 +66,8 @@ body.input-focused .mobile-nav {
   body.input-focused .who-shell {
     height: 100dvh !important;
   }
-  /* Fade the cube/heading and chips out while typing so the input is the focus. */
+  /* Fade the hero (cube/heading) and chips out while typing so the input is the
+     focus. */
   .box-empty-hero,
   .box-chips {
     transition: opacity 250ms ease;
@@ -75,5 +76,15 @@ body.input-focused .mobile-nav {
   body.input-focused .box-chips {
     opacity: 0;
     pointer-events: none;
+  }
+  /* ...and reveal a small cube right above the input instead, so the cube still
+     reads "above the keyboard" without any height/scroll manipulation. */
+  .box-typing-cube {
+    opacity: 0;
+    transition: opacity 250ms ease;
+  }
+  body.input-focused .box-typing-cube {
+    display: flex;
+    opacity: 1;
   }
 }

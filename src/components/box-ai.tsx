@@ -1078,6 +1078,19 @@ export function BoxAI({
         <div
           className={cn("max-sm:px-6 p-3", !active && "sm:hidden")}
         >
+          {/* Typing-mode cube: shown only while a text input is focused (the
+              main hero cube/heading fade out then). Sits just above the input so
+              it reads as "above the keyboard" without any height/scroll hacks.
+              hidden by default, revealed via body.input-focused in globals. */}
+          {!active && (
+            <div className="box-typing-cube hidden justify-center pb-3" aria-hidden="true">
+              <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-10 text-foreground">
+                <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+                <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+                <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+              </svg>
+            </div>
+          )}
           {/* Chips scroll full-bleed: negative margin cancels the container's
               px-6 so they reach the screen edges, with matching inner padding so
               the first chip still aligns and the last can scroll past the edge. */}
