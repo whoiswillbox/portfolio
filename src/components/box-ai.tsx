@@ -269,6 +269,25 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
+  // The typing-mode close button is position:fixed, but on iOS `fixed` is
+  // relative to the layout viewport (full page), so with the keyboard open it
+  // sits above the visible area. Track the VisualViewport's top offset and push
+  // the button down by that amount so it stays at the visible top-left. This is
+  // positioning ONLY (a CSS var) — no height/scroll/layout changes.
+  const closeBtnRef = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const apply = () => {
+      const el = closeBtnRef.current;
+      if (el) el.style.setProperty("--vv-top", `${vv.offsetTop}px`);
+    };
+    vv.addEventListener("resize", apply);
+    vv.addEventListener("scroll", apply);
+    apply();
+    return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); };
+  }, []);
+
   // Draggable settings sheet (height-based). The sheet rests at its natural
   // content height; dragging the handle UP grows its height toward a 75dvh cap,
   // DOWN shrinks it and (past a threshold) dismisses. Release snaps to the
@@ -945,6 +964,7 @@ export function BoxAI({
           revealed via body.input-focused. Mirrors the settings gear's position. */}
       {!embedded && !active && (
         <button
+          ref={closeBtnRef}
           type="button"
           aria-label="Done"
           // Pointer-down (not click) so it fires before the input's blur steals
@@ -953,7 +973,9 @@ export function BoxAI({
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          className="box-close hidden sm:hidden fixed left-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-50 transition-colors active:scale-95"
+          // top = base inset + the VisualViewport top offset (--vv-top, set in
+          // JS) so the fixed button tracks the visible area's top edge on iOS.
+          className="box-close hidden sm:hidden fixed left-6 top-[calc(1.5rem+var(--vv-top,0px))] max-sm:[@media(display-mode:standalone)]:top-[calc(4.5rem+var(--vv-top,0px))] z-50 transition-colors active:scale-95"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
