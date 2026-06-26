@@ -58,3 +58,12 @@ body.input-focused .mobile-nav {
   transform: translateY(calc(100% + 1rem)) !important;
   pointer-events: none;
 }
+
+/* While typing, the nav is hidden so drop its reserved clearance and let the box
+   shell fill the dynamic viewport (100dvh contracts when the keyboard opens on
+   iOS), so the chat input sits right above the keyboard instead of floating. */
+@media (max-width: 639px) {
+  body.input-focused .who-shell {
+    height: 100dvh !important;
+  }
+}

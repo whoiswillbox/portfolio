@@ -22,7 +22,7 @@ export default function Who() {
   // input/disclaimer sit just above the nav, never under it.
   return (
     <div
-      className={cn("h-full max-sm:h-[calc(100svh-5rem-env(safe-area-inset-bottom))]", entered && "animate-in fade-in duration-500")}
+      className={cn("who-shell h-full max-sm:h-[calc(100svh-5rem-env(safe-area-inset-bottom))]", entered && "animate-in fade-in duration-500")}
     >
       <BoxAI />
     </div>
