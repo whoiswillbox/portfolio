@@ -289,25 +289,18 @@ export function BoxAI({
   }, []);
 
 
-  // Track the visual viewport's top offset + scroll so the fixed close button
-  // can compensate and stay in the visible top-right, WITHOUT pinning the window
-  // scroll (window.scrollTo fought Safari's address-bar animation on exit). The
-  // button reads `--vv-top` (set here) and adds it to its `top`.
-  const [vvTop, setVvTop] = React.useState(0);
+  // Keep the window pinned to the top WHILE FOCUSED so the position:fixed close
+  // button stays in the visible top-right (iOS auto-scrolls the window on focus
+  // otherwise). The pin is removed the moment focus is lost, so Safari can
+  // animate its address bar back freely on exit (pinning through the close
+  // caused a floating bar transition).
   React.useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const apply = () => setVvTop(vv.offsetTop + window.scrollY);
-    vv.addEventListener("resize", apply);
-    vv.addEventListener("scroll", apply);
-    window.addEventListener("scroll", apply, { passive: true });
-    apply();
-    return () => {
-      vv.removeEventListener("resize", apply);
-      vv.removeEventListener("scroll", apply);
-      window.removeEventListener("scroll", apply);
-    };
-  }, []);
+    if (!inputFocused) return;
+    const pin = () => { if (window.scrollY !== 0) window.scrollTo(0, 0); };
+    pin();
+    window.addEventListener("scroll", pin, { passive: true });
+    return () => window.removeEventListener("scroll", pin);
+  }, [inputFocused]);
 
   // Pin the box shell to the exact VisualViewport height while typing, so the
   // page equals the visible area above the keyboard: the input lands just above
@@ -1027,7 +1020,7 @@ export function BoxAI({
           // native keyboard-close and made exit janky.)
           style={{
             position: "fixed",
-            top: `calc(1.5rem + env(safe-area-inset-top) + ${vvTop}px)`,
+            top: "calc(1.5rem + env(safe-area-inset-top))",
             right: "1.5rem",
             zIndex: 50,
             display: "flex",
