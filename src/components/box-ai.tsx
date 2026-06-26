@@ -302,6 +302,7 @@ export function BoxAI({
   // page equals the visible area above the keyboard: the input lands just above
   // the keyboard (not behind it) and nothing needs to scroll. Pairs with the
   // window pin above (which keeps the fixed close button in view).
+  const [dbg, setDbg] = React.useState("");
   React.useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
@@ -310,10 +311,12 @@ export function BoxAI({
     const apply = () => {
       const kbOpen = window.innerHeight - vv.height - vv.offsetTop > 80;
       shell.style.height = kbOpen && window.innerWidth < 640 ? `${vv.height}px` : "";
+      setDbg(`innerH:${window.innerHeight} vvH:${Math.round(vv.height)} offY:${Math.round(vv.offsetTop)} kb:${kbOpen} shellH:${Math.round(shell.getBoundingClientRect().height)} scrollH:${shell.scrollHeight}`);
     };
     vv.addEventListener("resize", apply);
+    vv.addEventListener("scroll", apply);
     apply();
-    return () => { vv.removeEventListener("resize", apply); shell.style.height = ""; };
+    return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); shell.style.height = ""; };
   }, []);
 
 
@@ -989,6 +992,13 @@ export function BoxAI({
             </span>
           </button>
         </div>
+      )}
+      {/* TEMP DEBUG readout */}
+      {mounted && inputFocused && createPortal(
+        <div style={{ position: "fixed", top: "calc(0.5rem + env(safe-area-inset-top))", left: "50%", transform: "translateX(-50%)", zIndex: 60, background: "rgba(0,0,0,0.85)", color: "#0f0", font: "10px monospace", padding: "4px 8px", borderRadius: 6, whiteSpace: "nowrap", pointerEvents: "none" }}>
+          {dbg}
+        </div>,
+        document.body
       )}
       {/* Typing-mode close (top-left): dismisses the keyboard. Portaled to
           <body> so no transformed ancestor breaks its fixed position. Rendered
