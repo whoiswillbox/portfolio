@@ -298,29 +298,28 @@ export function BoxAI({
     return () => window.removeEventListener("scroll", pin);
   }, [inputFocused]);
 
-  // Pin the box shell to the exact VisualViewport height while the keyboard is
-  // open so the page equals the visible area above it (input snug, no overflow).
-  // Track vv.height live — including while the keyboard ANIMATES OPEN AND CLOSED
-  // — and only clear the inline height once the viewport is back near full, so
-  // the shell glides back on exit instead of snapping. (Can't use innerH/vvH to
-  // detect the keyboard on iOS — innerH already equals the shrunk height — so we
-  // compare against the largest height seen.)
+  // Pin the box shell to the exact VisualViewport height while typing, so the
+  // page equals the visible area above the keyboard: the input lands just above
+  // the keyboard (not behind it) and nothing needs to scroll. Pairs with the
+  // window pin above (which keeps the fixed close button in view).
+  // While a text input is focused, pin the box shell to the exact VisualViewport
+  // height so the page equals the visible area above the keyboard (input snug
+  // above the keyboard, no overflow). Key off `inputFocused` — NOT an innerH/vvH
+  // comparison, because on iOS window.innerHeight already equals the shrunk
+  // height, so there's no delta to detect the keyboard from.
   React.useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
     const shell = document.querySelector<HTMLElement>(".who-shell");
     if (!shell) return;
-    let maxH = vv.height;
     const apply = () => {
-      maxH = Math.max(maxH, vv.height);
-      const kbOpen = maxH - vv.height > 80; // viewport meaningfully shrunk
-      shell.style.height = kbOpen && window.innerWidth < 640 ? `${vv.height}px` : "";
+      shell.style.height = inputFocused && window.innerWidth < 640 ? `${vv.height}px` : "";
     };
     vv.addEventListener("resize", apply);
     vv.addEventListener("scroll", apply);
     apply();
     return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); shell.style.height = ""; };
-  }, []);
+  }, [inputFocused]);
 
 
 
@@ -996,34 +995,30 @@ export function BoxAI({
           </button>
         </div>
       )}
-      {/* Typing-mode close (top-right): dismisses the keyboard, taking the
-          settings gear's spot. Portaled to <body> so no transformed ancestor
-          breaks its fixed position. Kept mounted while on the empty state and
-          faded via opacity so it transitions BOTH on enter and exit. */}
-      {!embedded && !active && mounted && createPortal(
+      {/* Typing-mode close (top-left): dismisses the keyboard. Portaled to
+          <body> so no transformed ancestor breaks its fixed position. Rendered
+          only while a text input is focused; visibility via inline styles (no
+          CSS-class matching to guess at). */}
+      {!embedded && !active && mounted && inputFocused && createPortal(
         <button
           type="button"
           aria-label="Done"
-          tabIndex={inputFocused ? 0 : -1}
           // Pointer-down (not click) so it fires before the input's blur steals
           // focus; blur the active field to dismiss the keyboard.
           onPointerDown={(e) => {
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          // Top-right (settings gear's spot). Opacity-toggled so it fades in AND
-          // out in sync with the rest of the typing-mode cross-fade.
+          // Top-right, taking the settings gear's exact spot (the gear hides in
+          // typing mode) so the toolbar reads as "gear → close" in one corner.
           style={{
             position: "fixed",
             top: "calc(1.5rem + env(safe-area-inset-top))",
             right: "1.5rem",
             zIndex: 50,
             display: "flex",
-            opacity: inputFocused ? 1 : 0,
-            pointerEvents: inputFocused ? "auto" : "none",
-            transition: "opacity 320ms cubic-bezier(0.33,1,0.68,1)",
           }}
-          className="sm:hidden active:scale-95"
+          className="sm:hidden active:scale-95 animate-in fade-in duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
