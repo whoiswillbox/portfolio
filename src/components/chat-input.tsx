@@ -71,6 +71,10 @@ export function ChatInput({
             onSend();
           }
         }}
+        // Hide the mobile bottom nav while typing (the keyboard covers that
+        // area anyway) via a body class consumed in globals.css.
+        onFocus={() => document.body.classList.add("input-focused")}
+        onBlur={() => document.body.classList.remove("input-focused")}
         rows={1}
         placeholder={placeholder}
         aria-label={ariaLabel}
