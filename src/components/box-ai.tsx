@@ -70,7 +70,10 @@ const FORCE_USAGE_UI = process.env.NEXT_PUBLIC_FORCE_USAGE_UI === "1";
 const today = () => new Date().toISOString().slice(0, 10);
 
 /* Preset prompt chips for the empty state — conversational openers that map to
-   topics in the repository so the local matcher (and the LLM) answer well. */
+   topics in the repository so the local matcher (and the LLM) answer well. A
+   random subset (CHIP_COUNT) is shown each refresh, so both which chips appear
+   and their order vary. */
+const CHIP_COUNT = 6;
 const CHIPS = [
   { label: "⭐ What's your favorite project?", prompt: "What's your favorite project?" },
   { label: "🧭 Tell me about your experience", prompt: "Tell me about your experience" },
@@ -79,6 +82,17 @@ const CHIPS = [
   { label: "🚀 How'd you get into product design?", prompt: "How'd you get into product design?" },
   { label: "🏄 What do you do for fun?", prompt: "What do you do for fun?" },
   { label: "📬 How can I reach you?", prompt: "How can I reach you?" },
+  { label: "🛠️ Walk me through your process", prompt: "Walk me through your design process" },
+  { label: "📐 Tell me about Design Standards", prompt: "Tell me about the Design Standards project" },
+  { label: "🤖 What did you build with AI?", prompt: "What have you built with AI?" },
+  { label: "🎓 What's your background?", prompt: "What's your education and background?" },
+  { label: "🏢 Where have you worked?", prompt: "Where have you worked?" },
+  { label: "🌊 Do you surf?", prompt: "Do you surf?" },
+  { label: "🎸 What music are you into?", prompt: "What music are you into?" },
+  { label: "🎮 Do you play games?", prompt: "What games do you play?" },
+  { label: "💡 What are you proudest of?", prompt: "What work are you proudest of?" },
+  { label: "🧠 How do you think about design?", prompt: "How do you think about design?" },
+  { label: "🔭 What are you building lately?", prompt: "What are you building lately?" },
 ];
 
 /* Fisher–Yates shuffle (returns a new array, leaves the input untouched). */
@@ -451,9 +465,10 @@ export function BoxAI({
   const [loaded, setLoaded] = React.useState(false);
   React.useEffect(() => { preloadBoxAnim(); }, []);
   const [heading, setHeading] = React.useState(HEADINGS[0]);
-  // Chips render in their static order on the server, then shuffle after mount
-  // so they're randomized on each refresh without a hydration mismatch.
-  const [chips, setChips] = React.useState<typeof CHIPS>(CHIPS);
+  // Chips render a fixed slice on the server, then a random subset of CHIP_COUNT
+  // after mount — so both which chips appear and their order vary per refresh,
+  // without a hydration mismatch.
+  const [chips, setChips] = React.useState<typeof CHIPS>(() => CHIPS.slice(0, CHIP_COUNT));
   const [sending, setSending] = React.useState(false);
   const [thinking, setThinking] = React.useState(SURF_PHRASES[0]);
   const [thinkSecs, setThinkSecs] = React.useState(0);
@@ -546,7 +561,7 @@ export function BoxAI({
   // Randomize the heading + chip order after mount (avoids SSR hydration mismatch).
   React.useEffect(() => {
     setHeading(randomHeading());
-    setChips(shuffle(CHIPS));
+    setChips(shuffle(CHIPS).slice(0, CHIP_COUNT));
   }, []);
 
   // Load persisted conversations on mount, and (launcher use) seed a fresh
