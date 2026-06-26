@@ -73,18 +73,37 @@ body.input-focused .mobile-nav {
     overscroll-behavior: none !important;
     touch-action: none !important;
   }
-  /* Fade the hero (cube/heading), chips, and settings gear out while typing so
-     the input is the focus. */
-  .box-empty-hero,
+  /* While typing, fade out the chips + settings gear (the input is the focus).
+     The hero CONTAINER stays visible so its cube shows; only the heading fades. */
   .box-chips,
-  .box-settings {
+  .box-settings,
+  .box-heading {
     transition: opacity 250ms ease;
   }
-  body.input-focused .box-empty-hero,
   body.input-focused .box-chips,
   body.input-focused .box-settings {
     opacity: 0;
     pointer-events: none;
+  }
+  /* Heading collapses (0 height) so the hero shrinks to just the cube, which the
+     scroll area's justify-center then centers in the visible space above the
+     input — on any device, since the shell is pinned to the VisualViewport. */
+  .box-heading {
+    overflow: hidden;
+  }
+  body.input-focused .box-heading {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+  /* Drop the cube's bottom margin (the gap to the heading) when typing so it's
+     truly centered. */
+  .box-cube {
+    transition: margin 250ms ease;
+  }
+  body.input-focused .box-cube {
+    margin-bottom: 0;
   }
   /* Collapse the disclaimer below the input while typing so it doesn't sit
      behind the keyboard / add height. */
@@ -96,15 +115,5 @@ body.input-focused .mobile-nav {
     opacity: 0;
     height: 0;
     pointer-events: none;
-  }
-  /* ...and reveal a small cube right above the input instead, so the cube still
-     reads "above the keyboard" without any height/scroll manipulation. */
-  .box-typing-cube {
-    opacity: 0;
-    transition: opacity 250ms ease;
-  }
-  body.input-focused .box-typing-cube {
-    display: flex;
-    opacity: 1;
   }
 }
