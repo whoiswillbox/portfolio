@@ -289,6 +289,16 @@ export function BoxAI({
   }, []);
 
 
+  // Keep the window pinned to the top while typing so the position:fixed close
+  // button can't be carried off-screen by iOS's focus auto-scroll.
+  React.useEffect(() => {
+    if (!inputFocused) return;
+    const pin = () => { if (window.scrollY !== 0) window.scrollTo(0, 0); };
+    pin();
+    window.addEventListener("scroll", pin, { passive: true });
+    return () => window.removeEventListener("scroll", pin);
+  }, [inputFocused]);
+
   // Pin the box shell to the exact VisualViewport height while typing, so the
   // page equals the visible area above the keyboard: the input lands just above
   // the keyboard (not behind it) and nothing needs to scroll. Pairs with the
