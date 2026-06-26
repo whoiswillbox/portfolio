@@ -7,7 +7,7 @@ import {
   CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon,
   AcademicCapIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon,
   BoltIcon, XMarkIcon, ChevronRightIcon,
-  ChatBubbleLeftRightIcon,
+  ChatBubbleLeftRightIcon, Squares2X2Icon,
 } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
@@ -20,6 +20,7 @@ import {
   MusicalNoteIcon as MusicalNoteSolid,
   BoltIcon as BoltSolid,
   ChatBubbleLeftRightIcon as ChatBubbleLeftRightSolid,
+  Squares2X2Icon as Squares2X2Solid,
 } from "@heroicons/react/24/solid"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -153,8 +154,8 @@ export function MobileNav() {
     {
       id: "extras" as const,
       label: "Extras",
-      iconOutline: LifebuoyIcon,
-      iconSolid: LifebuoySolid,
+      iconOutline: Squares2X2Icon,
+      iconSolid: Squares2X2Solid,
       active: extrasActive,
       onPress: () => { closeTray(); setActiveNav("extras"); router.push("/extracurriculars") },
     },
@@ -181,7 +182,7 @@ export function MobileNav() {
       {/* Tray */}
       {openTray && (
         <div className="fixed bottom-[4.5rem] left-6 right-6 z-[41] pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
-          <div className="rounded-xl bg-background ring-1 ring-border/50 shadow-lg overflow-hidden">
+          <div className="rounded-2xl bg-background ring-1 ring-border/50 shadow-lg overflow-hidden">
             {openTray === "experience" && (
               <TraySection>
                 <TrayItem
@@ -257,7 +258,7 @@ export function MobileNav() {
         "mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
         hidden && "translate-y-[calc(100%+1rem)]",
       )}>
-        <div className="flex w-full items-center rounded-xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-lg overflow-hidden">
+        <div className="flex w-full items-center rounded-2xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-lg overflow-hidden">
         {navItems.map((item) => {
           const isOpen = openTray === item.id
           const highlighted = item.active || isOpen

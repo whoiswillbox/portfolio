@@ -15,7 +15,10 @@ export default async function SiteLayout({
 
   return (
     <TooltipProvider>
-      <SidebarProvider defaultOpen={false} className="h-full min-h-0 bg-background max-sm:bg-sidebar">
+      {/* defaultOpen=true matches the client (ContentWorkspace auto-opens the
+          sidebar on every non-landing page), avoiding a hydration mismatch on
+          the sidebar's data-state. */}
+      <SidebarProvider defaultOpen className="h-full min-h-0 bg-background max-sm:bg-sidebar">
         <Suspense fallback={null}>
           <AppSidebar showLock={showLock} />
         </Suspense>
