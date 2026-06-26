@@ -269,22 +269,6 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
-  // Detect the on-screen keyboard via VisualViewport: when it opens, the visual
-  // viewport shrinks below the layout viewport. `typing` gates the empty-state
-  // "focus mode" (no scroll, cube centered above the keyboard).
-  const [typing, setTyping] = React.useState(false);
-  React.useEffect(() => {
-    const vv = typeof window !== "undefined" ? window.visualViewport : null;
-    if (!vv) return;
-    const onResize = () => {
-      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setTyping(inset > 80); // keyboard considered open past a small threshold
-    };
-    vv.addEventListener("resize", onResize);
-    vv.addEventListener("scroll", onResize);
-    onResize();
-    return () => { vv.removeEventListener("resize", onResize); vv.removeEventListener("scroll", onResize); };
-  }, []);
 
   // Draggable settings sheet (height-based). The sheet rests at its natural
   // content height; dragging the handle UP grows its height toward a 75dvh cap,
@@ -962,15 +946,11 @@ export function BoxAI({
         ref={scrollRef}
         className={cn(
           "flex-1 min-h-0 overflow-y-auto",
-          !active && "flex flex-col justify-center",
+          !active && "box-scroll flex flex-col justify-center",
           active && isScrolled && "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_100%)]",
           // Reserve a top strip so the floating sidebar trigger / close button
           // don't overlay the conversation when embedded in the launcher.
           embedded && active && "pt-12",
-          // No scrolling while typing on the empty state — the cube just centers
-          // (the who-shell is already 100dvh, contracted above the keyboard, so
-          // justify-center centers the cube in the visible area above the input).
-          !active && typing && "overflow-hidden",
         )}
       >
         {!active ? (

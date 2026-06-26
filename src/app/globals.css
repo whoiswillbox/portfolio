@@ -90,4 +90,11 @@ body.input-focused .mobile-nav {
   body.input-focused .box-cube {
     margin-bottom: 0;
   }
+  /* Lock the empty-state scroll area while typing so the page can't scroll, and
+     the lone cube just centers (justify-center) in the space above the keyboard.
+     who-shell is 100dvh (contracts above the keyboard), input is pinned at its
+     bottom, so this flex-1 area = the visible space above the input. */
+  body.input-focused .box-scroll {
+    overflow: hidden !important;
+  }
 }
