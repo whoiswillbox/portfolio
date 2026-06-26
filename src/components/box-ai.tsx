@@ -289,15 +289,23 @@ export function BoxAI({
   }, []);
 
 
-  // Keep the window pinned to the top while typing so the position:fixed close
-  // button stays in the visible top-right (iOS auto-scrolls the window on focus
-  // otherwise).
+  // On focus, scroll the window back to the top a few times during the keyboard
+  // open animation so the position:fixed close button lands in the visible
+  // top-right — but DON'T keep a persistent scroll listener forcing it. Holding
+  // scrollY=0 continuously kept Safari's address bar compact, so it floated back
+  // on exit; a brief burst lets the bar settle naturally when the keyboard
+  // dismisses. Content scroll is separately CSS-locked.
   React.useEffect(() => {
     if (!inputFocused) return;
-    const pin = () => { if (window.scrollY !== 0) window.scrollTo(0, 0); };
-    pin();
-    window.addEventListener("scroll", pin, { passive: true });
-    return () => window.removeEventListener("scroll", pin);
+    let raf = 0;
+    const start = performance.now();
+    const tick = () => {
+      if (window.scrollY !== 0) window.scrollTo(0, 0);
+      // Nudge for ~400ms (covers the keyboard-open animation), then stop.
+      if (performance.now() - start < 400) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [inputFocused]);
 
   // Pin the box shell to the exact VisualViewport height while typing, so the
