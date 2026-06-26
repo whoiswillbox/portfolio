@@ -955,7 +955,10 @@ export function BoxAI({
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          className="box-close sm:hidden fixed left-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-50 transition-colors active:scale-95"
+          // top includes the safe-area inset so it clears the status bar / notch
+          // (without it, fixed top-6 can sit behind the Dynamic Island).
+          style={{ top: "calc(1.5rem + env(safe-area-inset-top))" }}
+          className="box-close sm:hidden fixed left-6 z-50 transition-colors active:scale-95"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
