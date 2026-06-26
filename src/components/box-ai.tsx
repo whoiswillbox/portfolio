@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   PencilSquareIcon,
@@ -268,6 +269,12 @@ export function BoxAI({
     document.body.classList.toggle("sheet-open", settingsOpen);
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
+
+  // Portal target for the typing-mode close button — rendered into <body> so no
+  // transformed ancestor (animations/GPU hints in the box chain) breaks its
+  // position:fixed. mounted gates SSR.
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
 
 
@@ -943,9 +950,10 @@ export function BoxAI({
           </button>
         </div>
       )}
-      {/* Typing-mode close (top-left): dismisses the keyboard. Hidden by default,
-          revealed via body.input-focused. Mirrors the settings gear's position. */}
-      {!embedded && !active && (
+      {/* Typing-mode close (top-left): dismisses the keyboard. Portaled to
+          <body> so no transformed ancestor breaks its fixed position. Hidden by
+          default, revealed via body.input-focused. */}
+      {!embedded && !active && mounted && createPortal(
         <button
           type="button"
           aria-label="Done"
@@ -955,15 +963,15 @@ export function BoxAI({
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          // top includes the safe-area inset so it clears the status bar / notch
-          // (without it, fixed top-6 can sit behind the Dynamic Island).
+          // top includes the safe-area inset so it clears the status bar / notch.
           style={{ top: "calc(1.5rem + env(safe-area-inset-top))" }}
           className="box-close sm:hidden fixed left-6 z-50 transition-colors active:scale-95"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
           </span>
-        </button>
+        </button>,
+        document.body
       )}
       <div
         ref={scrollRef}
