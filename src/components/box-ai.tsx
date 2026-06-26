@@ -1009,10 +1009,12 @@ export function BoxAI({
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
+          // Top-right, taking the settings gear's exact spot (the gear hides in
+          // typing mode) so the toolbar reads as "gear → close" in one corner.
           style={{
             position: "fixed",
             top: "calc(1.5rem + env(safe-area-inset-top))",
-            left: "1.5rem",
+            right: "1.5rem",
             zIndex: 50,
             display: "flex",
           }}
