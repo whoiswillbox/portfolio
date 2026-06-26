@@ -862,7 +862,7 @@ export function BoxAI({
             type="button"
             onClick={() => setSettingsOpen(true)}
             aria-label="Settings"
-            className="sm:hidden absolute right-6 top-12 max-sm:[@media(display-mode:standalone)]:top-24 z-30 transition-colors active:scale-95"
+            className="sm:hidden absolute right-6 top-8 max-sm:[@media(display-mode:standalone)]:top-20 z-30 transition-colors active:scale-95"
           >
             <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border text-foreground">
               <Cog6ToothIcon className="size-5" />
@@ -873,7 +873,7 @@ export function BoxAI({
       {/* Same absolute positioning as content-workspace back/cube so all
           mobile toolbar buttons line up and the gear can't drift in flow. */}
       {!embedded && !showTrigger && !openCaseStudy && !activeId && (
-        <div className="sm:hidden absolute right-6 top-12 max-sm:[@media(display-mode:standalone)]:top-24 z-30">
+        <div className="sm:hidden absolute right-6 top-8 max-sm:[@media(display-mode:standalone)]:top-20 z-30">
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
