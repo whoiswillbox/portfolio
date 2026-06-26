@@ -269,18 +269,15 @@ export function BoxAI({
     return () => document.body.classList.remove("sheet-open");
   }, [settingsOpen]);
 
-  // Keyboard height via VisualViewport (px). When the on-screen keyboard opens,
-  // the visual viewport shrinks; this is the difference from the layout viewport.
-  // Used to reserve space below the empty-state content so the cube centers in
-  // the area actually visible above the keyboard (reliable across devices).
-  const [keyboardInset, setKeyboardInset] = React.useState(0);
+  // Detect the on-screen keyboard via VisualViewport: when it opens, the visual
+  // viewport shrinks below the layout viewport. `typing` gates the empty-state
+  // "focus mode" (no scroll, cube centered above the keyboard).
   const [typing, setTyping] = React.useState(false);
   React.useEffect(() => {
     const vv = typeof window !== "undefined" ? window.visualViewport : null;
     if (!vv) return;
     const onResize = () => {
       const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setKeyboardInset(inset);
       setTyping(inset > 80); // keyboard considered open past a small threshold
     };
     vv.addEventListener("resize", onResize);
@@ -970,11 +967,11 @@ export function BoxAI({
           // Reserve a top strip so the floating sidebar trigger / close button
           // don't overlay the conversation when embedded in the launcher.
           embedded && active && "pt-12",
+          // No scrolling while typing on the empty state — the cube just centers
+          // (the who-shell is already 100dvh, contracted above the keyboard, so
+          // justify-center centers the cube in the visible area above the input).
+          !active && typing && "overflow-hidden",
         )}
-        // While typing on the empty state, reserve the keyboard height below the
-        // centered content (cube) so it centers in the visible area above the
-        // keyboard. Measured via VisualViewport — accurate on any device.
-        style={!active && typing ? { paddingBottom: keyboardInset } : undefined}
       >
         {!active ? (
           <div className="box-empty-hero mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">
