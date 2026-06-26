@@ -289,15 +289,25 @@ export function BoxAI({
   }, []);
 
 
-  // Keep the window pinned to the top while typing so the position:fixed close
-  // button can't be carried off-screen by iOS's focus auto-scroll.
+  // Track the visual viewport's top offset + scroll so the fixed close button
+  // can compensate and stay in the visible top-right, WITHOUT pinning the window
+  // scroll (window.scrollTo fought Safari's address-bar animation on exit). The
+  // button reads `--vv-top` (set here) and adds it to its `top`.
+  const [vvTop, setVvTop] = React.useState(0);
   React.useEffect(() => {
-    if (!inputFocused) return;
-    const pin = () => { if (window.scrollY !== 0) window.scrollTo(0, 0); };
-    pin();
-    window.addEventListener("scroll", pin, { passive: true });
-    return () => window.removeEventListener("scroll", pin);
-  }, [inputFocused]);
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const apply = () => setVvTop(vv.offsetTop + window.scrollY);
+    vv.addEventListener("resize", apply);
+    vv.addEventListener("scroll", apply);
+    window.addEventListener("scroll", apply, { passive: true });
+    apply();
+    return () => {
+      vv.removeEventListener("resize", apply);
+      vv.removeEventListener("scroll", apply);
+      window.removeEventListener("scroll", apply);
+    };
+  }, []);
 
   // Pin the box shell to the exact VisualViewport height while typing, so the
   // page equals the visible area above the keyboard: the input lands just above
@@ -1017,7 +1027,7 @@ export function BoxAI({
           // native keyboard-close and made exit janky.)
           style={{
             position: "fixed",
-            top: "calc(1.5rem + env(safe-area-inset-top))",
+            top: `calc(1.5rem + env(safe-area-inset-top) + ${vvTop}px)`,
             right: "1.5rem",
             zIndex: 50,
             display: "flex",
