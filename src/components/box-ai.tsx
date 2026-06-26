@@ -322,13 +322,23 @@ export function BoxAI({
     if (!vv) return;
     const shell = document.querySelector<HTMLElement>(".who-shell");
     if (!shell) return;
-    const apply = () => {
-      shell.style.height = inputFocused && window.innerWidth < 640 ? `${vv.height}px` : "";
-    };
-    vv.addEventListener("resize", apply);
-    vv.addEventListener("scroll", apply);
-    apply();
-    return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); shell.style.height = ""; };
+
+    if (inputFocused && window.innerWidth < 640) {
+      // While focused: keep the shell sized to the visible area above the keyboard.
+      const apply = () => { shell.style.height = `${vv.height}px`; };
+      vv.addEventListener("resize", apply);
+      vv.addEventListener("scroll", apply);
+      apply();
+      return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); };
+    }
+
+    // On blur: DON'T release the height immediately (that makes the content jump
+    // while the keyboard is still closing, which reads as the Safari bar floating
+    // over shifting content). Hold the pinned height through the close animation,
+    // then clear it so the page returns to its normal CSS height after the bar
+    // has settled.
+    const t = setTimeout(() => { shell.style.height = ""; }, 350);
+    return () => clearTimeout(t);
   }, [inputFocused]);
 
 
