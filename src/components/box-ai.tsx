@@ -81,6 +81,16 @@ const CHIPS = [
   { label: "📬 How can I reach you?", prompt: "How can I reach you?" },
 ];
 
+/* Fisher–Yates shuffle (returns a new array, leaves the input untouched). */
+const shuffle = <T,>(arr: readonly T[]): T[] => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
 /* Fun, first-person headings for the empty state — picked at random. */
 const HEADINGS = [
   "Get to know the designer behind the work",
@@ -441,6 +451,9 @@ export function BoxAI({
   const [loaded, setLoaded] = React.useState(false);
   React.useEffect(() => { preloadBoxAnim(); }, []);
   const [heading, setHeading] = React.useState(HEADINGS[0]);
+  // Chips render in their static order on the server, then shuffle after mount
+  // so they're randomized on each refresh without a hydration mismatch.
+  const [chips, setChips] = React.useState<typeof CHIPS>(CHIPS);
   const [sending, setSending] = React.useState(false);
   const [thinking, setThinking] = React.useState(SURF_PHRASES[0]);
   const [thinkSecs, setThinkSecs] = React.useState(0);
@@ -530,8 +543,11 @@ export function BoxAI({
   const atLimit = showUsage && remaining <= 0;
   const resetUsage = () => setUsage({ date: today(), count: 0 });
 
-  // Randomize the heading after mount (avoids SSR hydration mismatch).
-  React.useEffect(() => setHeading(randomHeading()), []);
+  // Randomize the heading + chip order after mount (avoids SSR hydration mismatch).
+  React.useEffect(() => {
+    setHeading(randomHeading());
+    setChips(shuffle(CHIPS));
+  }, []);
 
   // Load persisted conversations on mount, and (launcher use) seed a fresh
   // project-framed conversation: a bot opener + that project's follow-up chips.
@@ -1087,7 +1103,7 @@ export function BoxAI({
             <div className="mt-3 sm:block hidden">{searchForm}</div>
             <div className="sm:block hidden">{disclaimer}</div>
             <div className="sm:flex hidden flex-wrap justify-center gap-2">
-              {CHIPS.map((chip) => (
+              {chips.map((chip) => (
                 <button
                   key={chip.prompt}
                   onClick={() => send(chip.prompt)}
@@ -1197,7 +1213,7 @@ export function BoxAI({
           {!active && (
             <div className="box-chips mx-auto w-full max-w-xl">
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-6 px-6">
-                {CHIPS.map((chip) => (
+                {chips.map((chip) => (
                   <button
                     key={chip.prompt}
                     onClick={() => send(chip.prompt)}
