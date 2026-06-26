@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ContentCard } from "@/components/content-card";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 
 type MediaItem = {
@@ -140,10 +141,27 @@ export default function Surfing() {
               Repository of sessions over the years.
             </p>
           </div>
+          {/* Mobile: native dropdown (the inline pills overflow on narrow
+              screens). Desktop: pill tablist. */}
+          <div className="relative shrink-0 sm:hidden">
+            <select
+              aria-label="Filter by year"
+              value={year ?? "all"}
+              onChange={(e) => setYear(e.target.value === "all" ? null : (Number(e.target.value) as typeof year))}
+              className="appearance-none rounded-lg border bg-background py-1.5 pl-3 pr-9 font-mono text-body-xs uppercase tracking-wide text-foreground shadow-sm outline-none"
+            >
+              <option value="all">All</option>
+              {YEARS.map((y) => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+            <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          </div>
+
           <div
             role="tablist"
             aria-label="Year"
-            className="shrink-0"
+            className="hidden shrink-0 sm:block"
           >
           <div className="inline-flex w-fit flex-wrap items-center gap-0.5 rounded-lg border bg-background p-1">
             <button
