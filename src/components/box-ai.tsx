@@ -976,7 +976,7 @@ export function BoxAI({
           }}
           // top = base inset + the VisualViewport top offset (--vv-top, set in
           // JS) so the fixed button tracks the visible area's top edge on iOS.
-          className="box-close hidden sm:hidden fixed left-6 top-[calc(1.5rem+var(--vv-top,0px))] max-sm:[@media(display-mode:standalone)]:top-[calc(4.5rem+var(--vv-top,0px))] z-50 transition-colors active:scale-95"
+          className="box-close sm:hidden fixed left-6 top-[calc(1.5rem+var(--vv-top,0px))] max-sm:[@media(display-mode:standalone)]:top-[calc(4.5rem+var(--vv-top,0px))] z-50 transition-colors active:scale-95"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
