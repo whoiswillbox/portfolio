@@ -258,7 +258,7 @@ export function MobileNav() {
         "mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
         hidden && "translate-y-[calc(100%+1rem)]",
       )}>
-        <div className="flex w-full items-center rounded-2xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-lg overflow-hidden">
+        <div className="flex w-full items-center gap-1 rounded-2xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-lg p-1.5">
         {navItems.map((item) => {
           const isOpen = openTray === item.id
           const highlighted = item.active || isOpen
@@ -268,7 +268,7 @@ export function MobileNav() {
               key={item.id}
               onClick={item.onPress}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 py-1.5 px-1 outline-none transition-colors duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]",
+                "flex flex-1 flex-col items-center justify-center gap-1 outline-none transition-colors duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]",
                 highlighted ? "text-foreground" : "text-muted-foreground"
               )}
             >
