@@ -59,13 +59,11 @@ body.input-focused .mobile-nav {
   pointer-events: none;
 }
 
-/* While typing, the nav is hidden so drop its reserved clearance and let the box
-   shell fill the dynamic viewport (100dvh contracts when the keyboard opens on
-   iOS), so the chat input sits right above the keyboard instead of floating. */
+/* The box shell's typing-mode height is set in JS (who/page.tsx) to the exact
+   VisualViewport height — NOT here — so it equals the visible area above the
+   keyboard (no overflow, no scroll). A CSS height !important here would override
+   that JS inline style, so it's intentionally omitted. */
 @media (max-width: 639px) {
-  body.input-focused .who-shell {
-    height: 100dvh !important;
-  }
   /* While typing, fade the heading, chips, and settings gear out so the cube +
      Ask Box input are the focus. The cube stays visible; its centering in the
      space above the keyboard is handled by VisualViewport padding on the scroll
