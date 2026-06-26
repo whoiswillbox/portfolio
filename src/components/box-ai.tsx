@@ -288,36 +288,6 @@ export function BoxAI({
     return () => obs.disconnect();
   }, []);
 
-  // `typingSettled` flips true only once the keyboard has finished animating in
-  // and the shell height has settled — so the cube + close button fade in at
-  // their FINAL position instead of fading while the shell is still shrinking
-  // (which reads as a slide-up). Toggles off immediately on blur.
-  const [typingSettled, setTypingSettled] = React.useState(false);
-  React.useEffect(() => {
-    if (!inputFocused) { setTypingSettled(false); return; }
-    const vv = window.visualViewport;
-    if (!vv) { setTypingSettled(true); return; }
-    let last = vv.height;
-    let settleTimer: ReturnType<typeof setTimeout>;
-    const check = () => {
-      clearTimeout(settleTimer);
-      // When vv.height hasn't changed for 120ms, the keyboard animation is done.
-      settleTimer = setTimeout(() => setTypingSettled(true), 120);
-      last = vv.height;
-    };
-    vv.addEventListener("resize", check);
-    check();
-    return () => { clearTimeout(settleTimer); vv.removeEventListener("resize", check); void last; };
-  }, [inputFocused]);
-
-  // Mirror typingSettled onto the body so CSS can hold the cube/heading layout
-  // until the keyboard has settled (avoids the cube sliding while the shell is
-  // still shrinking).
-  React.useEffect(() => {
-    document.body.classList.toggle("typing-settled", typingSettled);
-    return () => document.body.classList.remove("typing-settled");
-  }, [typingSettled]);
-
   // Keep the window pinned to the top while typing so the position:fixed close
   // button can't be carried off-screen by iOS's focus auto-scroll.
   React.useEffect(() => {
@@ -1029,7 +999,7 @@ export function BoxAI({
           <body> so no transformed ancestor breaks its fixed position. Rendered
           only while a text input is focused; visibility via inline styles (no
           CSS-class matching to guess at). */}
-      {!embedded && !active && mounted && typingSettled && createPortal(
+      {!embedded && !active && mounted && inputFocused && createPortal(
         <button
           type="button"
           aria-label="Done"

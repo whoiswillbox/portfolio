@@ -96,10 +96,7 @@ body.input-focused .mobile-nav {
       max-height 320ms cubic-bezier(0.33, 1, 0.68, 1),
       margin 320ms cubic-bezier(0.33, 1, 0.68, 1);
   }
-  /* Gate the heading collapse + cube centering on typing-SETTLED (keyboard done
-     animating) so the cube settles into its centered position cleanly, rather
-     than sliding while the shell is still shrinking. */
-  body.typing-settled .box-heading {
+  body.input-focused .box-heading {
     opacity: 0;
     max-height: 0;
     margin: 0;
@@ -110,7 +107,7 @@ body.input-focused .mobile-nav {
   .box-cube {
     transition: margin 320ms cubic-bezier(0.33, 1, 0.68, 1);
   }
-  body.typing-settled .box-cube {
+  body.input-focused .box-cube {
     margin-bottom: 0;
   }
   /* Collapse the disclaimer below the input while typing, smoothly. */
