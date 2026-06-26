@@ -52,8 +52,9 @@ body.sheet-open .mobile-nav {
 
 /* Hide the bottom nav while a text input is focused (the on-screen keyboard
    covers that area, and the nav floating above it looks cramped). Slides down
-   so it animates out rather than blinking. */
+   so it animates out. Uses !important to win over Tailwind's transform utility
+   on the nav (transition-transform / translate-y-*). */
 body.input-focused .mobile-nav {
-  transform: translateY(calc(100% + 1rem));
+  transform: translateY(calc(100% + 1rem)) !important;
   pointer-events: none;
 }
