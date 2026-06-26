@@ -953,7 +953,7 @@ export function BoxAI({
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          className="box-close hidden sm:hidden absolute left-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30 transition-colors active:scale-95"
+          className="box-close hidden sm:hidden fixed left-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-50 transition-colors active:scale-95"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
