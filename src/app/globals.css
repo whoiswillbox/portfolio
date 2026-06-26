@@ -98,18 +98,4 @@ body.input-focused .mobile-nav {
     display: flex;
     opacity: 1;
   }
-  /* Reveal the typing-mode close button (top-left) only while typing. Always
-     display:flex (so it can transition immediately — display:none can't animate
-     and lagged); toggle opacity/pointer-events. Snappy fade so it appears with
-     the keyboard, not after. */
-  .box-close {
-    display: flex;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 150ms ease;
-  }
-  body.input-focused .box-close {
-    opacity: 1;
-    pointer-events: auto;
-  }
 }

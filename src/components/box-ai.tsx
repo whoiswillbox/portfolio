@@ -276,6 +276,18 @@ export function BoxAI({
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
+  // Track whether a text input is focused (keyboard open) by observing the
+  // body.input-focused class that ChatInput toggles. Drives the close button's
+  // visibility via React/inline styles instead of relying on CSS class matching.
+  const [inputFocused, setInputFocused] = React.useState(false);
+  React.useEffect(() => {
+    const update = () => setInputFocused(document.body.classList.contains("input-focused"));
+    const obs = new MutationObserver(update);
+    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    update();
+    return () => obs.disconnect();
+  }, []);
+
 
 
   // Draggable settings sheet (height-based). The sheet rests at its natural
@@ -951,9 +963,10 @@ export function BoxAI({
         </div>
       )}
       {/* Typing-mode close (top-left): dismisses the keyboard. Portaled to
-          <body> so no transformed ancestor breaks its fixed position. Hidden by
-          default, revealed via body.input-focused. */}
-      {!embedded && !active && mounted && createPortal(
+          <body> so no transformed ancestor breaks its fixed position. Rendered
+          only while a text input is focused; visibility via inline styles (no
+          CSS-class matching to guess at). */}
+      {!embedded && !active && mounted && inputFocused && createPortal(
         <button
           type="button"
           aria-label="Done"
@@ -963,9 +976,14 @@ export function BoxAI({
             e.preventDefault();
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          // top includes the safe-area inset so it clears the status bar / notch.
-          style={{ top: "calc(1.5rem + env(safe-area-inset-top))" }}
-          className="box-close sm:hidden fixed left-6 z-50 transition-colors active:scale-95"
+          style={{
+            position: "fixed",
+            top: "calc(1.5rem + env(safe-area-inset-top))",
+            left: "1.5rem",
+            zIndex: 50,
+            display: "flex",
+          }}
+          className="sm:hidden active:scale-95"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
