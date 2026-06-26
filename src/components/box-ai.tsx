@@ -288,6 +288,17 @@ export function BoxAI({
     return () => obs.disconnect();
   }, []);
 
+  // iOS scrolls the whole page/window up on input focus to reveal the field —
+  // which carries our position:fixed close button up off-screen. While typing,
+  // keep the window pinned to the top so the fixed button stays in view.
+  React.useEffect(() => {
+    if (!inputFocused) return;
+    const pin = () => { if (window.scrollY !== 0) window.scrollTo(0, 0); };
+    pin();
+    window.addEventListener("scroll", pin, { passive: true });
+    return () => window.removeEventListener("scroll", pin);
+  }, [inputFocused]);
+
 
 
   // Draggable settings sheet (height-based). The sheet rests at its natural
