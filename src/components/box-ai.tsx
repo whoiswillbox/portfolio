@@ -953,7 +953,7 @@ export function BoxAI({
         )}
       >
         {!active ? (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">
+          <div className="box-empty-hero mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">
             {/* Hidden admin entry: 5 quick taps opens /admin/login (the PWA has
                 no address bar). Plain decorative cube otherwise. */}
             <button
@@ -1082,7 +1082,7 @@ export function BoxAI({
               px-6 so they reach the screen edges, with matching inner padding so
               the first chip still aligns and the last can scroll past the edge. */}
           {!active && (
-            <div className="mx-auto w-full max-w-xl">
+            <div className="box-chips mx-auto w-full max-w-xl">
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-6 px-6">
                 {CHIPS.map((chip) => (
                   <button
