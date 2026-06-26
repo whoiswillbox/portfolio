@@ -1018,7 +1018,7 @@ export function BoxAI({
             zIndex: 50,
             display: "flex",
           }}
-          className="sm:hidden active:scale-95 animate-in fade-in zoom-in-95 duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
+          className="sm:hidden active:scale-95 animate-in fade-in duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
         >
           <span className="flex size-10 items-center justify-center rounded-lg bg-muted ring-1 ring-border shadow-sm text-foreground">
             <XMarkIcon className="size-5" />
