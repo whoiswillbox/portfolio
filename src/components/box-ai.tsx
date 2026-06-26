@@ -288,9 +288,8 @@ export function BoxAI({
     return () => obs.disconnect();
   }, []);
 
-  // iOS scrolls the whole page/window up on input focus to reveal the field —
-  // which carries our position:fixed close button up off-screen. While typing,
-  // keep the window pinned to the top so the fixed button stays in view.
+  // Keep the window pinned to the top while typing so the position:fixed close
+  // button can't be carried off-screen by iOS's focus auto-scroll.
   React.useEffect(() => {
     if (!inputFocused) return;
     const pin = () => { if (window.scrollY !== 0) window.scrollTo(0, 0); };
@@ -298,6 +297,24 @@ export function BoxAI({
     window.addEventListener("scroll", pin, { passive: true });
     return () => window.removeEventListener("scroll", pin);
   }, [inputFocused]);
+
+  // Pin the box shell to the exact VisualViewport height while typing, so the
+  // page equals the visible area above the keyboard: the input lands just above
+  // the keyboard (not behind it) and nothing needs to scroll. Pairs with the
+  // window pin above (which keeps the fixed close button in view).
+  React.useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const shell = document.querySelector<HTMLElement>(".who-shell");
+    if (!shell) return;
+    const apply = () => {
+      const kbOpen = window.innerHeight - vv.height - vv.offsetTop > 80;
+      shell.style.height = kbOpen && window.innerWidth < 640 ? `${vv.height}px` : "";
+    };
+    vv.addEventListener("resize", apply);
+    apply();
+    return () => { vv.removeEventListener("resize", apply); shell.style.height = ""; };
+  }, []);
 
 
 

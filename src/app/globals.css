@@ -59,13 +59,11 @@ body.input-focused .mobile-nav {
   pointer-events: none;
 }
 
-/* While typing, the nav is hidden so drop its reserved clearance and let the box
-   shell fill the dynamic viewport (100dvh contracts when the keyboard opens on
-   iOS), so the chat input sits right above the keyboard instead of floating. */
+/* The box shell's typing-mode height is pinned in JS (box-ai.tsx) to the exact
+   VisualViewport height — so the page equals the visible area above the keyboard
+   (input above the keyboard, nothing behind it). No CSS height here: a height
+   !important would override the JS inline style. */
 @media (max-width: 639px) {
-  body.input-focused .who-shell {
-    height: 100dvh !important;
-  }
   /* Lock every scroll container in the box page chain while typing so the
      keyboard-shrunk box can't scroll/rubber-band (overscroll-behavior:none kills
      iOS momentum). Scoped to the box page via .who-shell. */
