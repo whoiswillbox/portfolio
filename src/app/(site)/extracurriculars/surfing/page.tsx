@@ -4,6 +4,13 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ContentCard } from "@/components/content-card";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 type MediaItem = {
@@ -141,21 +148,28 @@ export default function Surfing() {
               Repository of sessions over the years.
             </p>
           </div>
-          {/* Mobile: native dropdown (the inline pills overflow on narrow
-              screens). Desktop: pill tablist. */}
-          <div className="relative shrink-0 sm:hidden">
-            <select
-              aria-label="Filter by year"
-              value={year ?? "all"}
-              onChange={(e) => setYear(e.target.value === "all" ? null : (Number(e.target.value) as typeof year))}
-              className="appearance-none rounded-lg border bg-background py-1.5 pl-3 pr-9 font-mono text-body-xs uppercase tracking-wide text-foreground shadow-sm outline-none"
-            >
-              <option value="all">All</option>
-              {YEARS.map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          {/* Mobile: custom dropdown (the inline pills overflow on narrow
+              screens). Full-width, matched to the toggle height. Desktop:
+              pill tablist. */}
+          <div className="w-full sm:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex h-10 w-full items-center justify-between rounded-lg border bg-background px-3 font-mono text-body-xs uppercase tracking-wide text-foreground shadow-sm outline-none">
+                {year ?? "All"}
+                <ChevronDownIcon className="size-4 text-muted-foreground" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="flex w-[var(--radix-dropdown-menu-trigger-width)] min-w-[var(--radix-dropdown-menu-trigger-width)] flex-col gap-1 font-mono text-body-xs uppercase tracking-wide">
+                <DropdownMenuRadioGroup
+                  value={year === null ? "all" : String(year)}
+                  onValueChange={(v) => setYear(v === "all" ? null : (Number(v) as typeof year))}
+                  className="flex flex-col gap-1"
+                >
+                  <DropdownMenuRadioItem value="all" className="py-2">All</DropdownMenuRadioItem>
+                  {YEARS.map((y) => (
+                    <DropdownMenuRadioItem key={y} value={String(y)} className="py-2">{y}</DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div
