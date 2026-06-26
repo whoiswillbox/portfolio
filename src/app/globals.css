@@ -87,19 +87,4 @@ body.input-focused .mobile-nav {
     opacity: 0;
     pointer-events: none;
   }
-  /* Collapse the disclaimer below the input while typing. The HEIGHT change is
-     instant (no transition) so it never animates layout — only opacity fades.
-     This avoids the input being pushed up/down as the disclaimer expands on exit
-     (which read as a content stutter). On exit it snaps to full height behind
-     the opacity fade-in, so you only perceive the fade. */
-  .box-disclaimer {
-    overflow: hidden;
-    max-height: 4rem;
-    transition: opacity 320ms cubic-bezier(0.33, 1, 0.68, 1);
-  }
-  body.input-focused .box-disclaimer {
-    opacity: 0;
-    max-height: 0;
-    pointer-events: none;
-  }
 }

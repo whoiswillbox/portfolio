@@ -984,12 +984,6 @@ export function BoxAI({
     />
   );
 
-  const disclaimer = (
-    <p className="mt-2 px-1 text-center text-body-xs text-muted-foreground">
-      Box never makes mistakes, no need to cross-check.
-    </p>
-  );
-
   const chatCard = (
     <ContentCard className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0 max-sm:[@media(display-mode:standalone)]:pb-0">
       {!embedded && (showTrigger || openCaseStudy || activeId) && (
@@ -1116,7 +1110,6 @@ export function BoxAI({
             <h1 className="box-heading text-h1 font-semibold">{heading}</h1>
             {/* On desktop: input + chips inline. On mobile: hidden here, shown pinned below */}
             <div className="mt-3 sm:block hidden">{searchForm}</div>
-            <div className="sm:block hidden">{disclaimer}</div>
             <div className="sm:flex hidden flex-wrap justify-center gap-2">
               {chips.map((chip) => (
                 <button
@@ -1243,7 +1236,6 @@ export function BoxAI({
           )}
           <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
             {searchForm}
-            {!active && <div className="box-disclaimer">{disclaimer}</div>}
           </div>
         </div>
       )}
