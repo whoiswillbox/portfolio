@@ -66,6 +66,15 @@ body.input-focused .mobile-nav {
   body.input-focused .who-shell {
     height: 100dvh !important;
   }
+  /* Lock every scroll container in the box page chain while typing so the
+     keyboard-shrunk box can't scroll/rubber-band (overscroll-behavior:none kills
+     iOS momentum). Scoped to the box page via .who-shell. */
+  body.input-focused .who-shell .box-scroll,
+  body.input-focused .who-shell [data-scroll-container] {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
+  }
   /* Fade the hero (cube/heading), chips, and settings gear out while typing so
      the input is the focus. */
   .box-empty-hero,

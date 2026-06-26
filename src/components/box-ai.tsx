@@ -288,22 +288,6 @@ export function BoxAI({
     return () => { vv.removeEventListener("resize", apply); vv.removeEventListener("scroll", apply); };
   }, []);
 
-  // Prevent the page from scrolling while typing (the box content is taller than
-  // the keyboard-shrunk viewport, so it would otherwise scroll/rubber-band).
-  // Block touchmove at the document level only while body.input-focused — this
-  // touches no layout (no jank), and still allows scrolling inside the textarea
-  // and the chips row.
-  React.useEffect(() => {
-    const onTouchMove = (e: TouchEvent) => {
-      if (!document.body.classList.contains("input-focused")) return;
-      const t = e.target as HTMLElement | null;
-      // Allow native scroll within the input or the horizontal chips row.
-      if (t?.closest("textarea, input, .scrollbar-none")) return;
-      e.preventDefault();
-    };
-    document.addEventListener("touchmove", onTouchMove, { passive: false });
-    return () => document.removeEventListener("touchmove", onTouchMove);
-  }, []);
 
   // Draggable settings sheet (height-based). The sheet rests at its natural
   // content height; dragging the handle UP grows its height toward a 75dvh cap,
@@ -1002,7 +986,7 @@ export function BoxAI({
       <div
         ref={scrollRef}
         className={cn(
-          "flex-1 min-h-0 overflow-y-auto",
+          "box-scroll flex-1 min-h-0 overflow-y-auto",
           !active && "flex flex-col justify-center",
           active && isScrolled && "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_100%)]",
           // Reserve a top strip so the floating sidebar trigger / close button
