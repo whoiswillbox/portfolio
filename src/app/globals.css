@@ -73,42 +73,19 @@ body.input-focused .mobile-nav {
     overscroll-behavior: none !important;
     touch-action: none !important;
   }
-  /* Unified typing-mode transition: one duration + easing across every element
-     so entering/exiting feels cohesive (easeOutCubic, 320ms). */
+  /* Typing mode: fade the entire hero (cube + heading), chips, and settings gear
+     out so the focus is the input. Nothing collapses/re-centers, so nothing
+     slides — it's a clean cross-fade. Unified 320ms easeOutCubic. */
+  .box-empty-hero,
   .box-chips,
   .box-settings {
     transition: opacity 320ms cubic-bezier(0.33, 1, 0.68, 1);
   }
+  body.input-focused .box-empty-hero,
   body.input-focused .box-chips,
   body.input-focused .box-settings {
     opacity: 0;
     pointer-events: none;
-  }
-  /* Heading collapses so the hero shrinks to just the cube, which the scroll
-     area's justify-center then centers in the visible space above the input.
-     Transition max-height/margin/opacity together so the cube GLIDES to center
-     instead of snapping. */
-  .box-heading {
-    overflow: hidden;
-    max-height: 6rem;
-    transition:
-      opacity 320ms cubic-bezier(0.33, 1, 0.68, 1),
-      max-height 320ms cubic-bezier(0.33, 1, 0.68, 1),
-      margin 320ms cubic-bezier(0.33, 1, 0.68, 1);
-  }
-  body.input-focused .box-heading {
-    opacity: 0;
-    max-height: 0;
-    margin: 0;
-    pointer-events: none;
-  }
-  /* Drop the cube's bottom margin (the gap to the heading) when typing so it's
-     truly centered — same timing so it moves with the heading collapse. */
-  .box-cube {
-    transition: margin 320ms cubic-bezier(0.33, 1, 0.68, 1);
-  }
-  body.input-focused .box-cube {
-    margin-bottom: 0;
   }
   /* Collapse the disclaimer below the input while typing, smoothly. */
   .box-disclaimer {
