@@ -40,7 +40,16 @@ function SheetOverlay({
         "fixed inset-0 bg-black/20 data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
         className
       )}
-      style={{ transition: "opacity 420ms cubic-bezier(0.33,1,0.68,1)", zIndex: 299 }}
+      style={{
+        // Promote the scrim to its own GPU layer so the opacity fade composites
+        // instead of repainting a full-screen translucent surface each frame
+        // (the dismiss fade was janky). Exit is snappier than enter.
+        transition: "opacity 280ms cubic-bezier(0.33,1,0.68,1)",
+        willChange: "opacity",
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
+        zIndex: 299,
+      }}
       {...props}
     />
   )

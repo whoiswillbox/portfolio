@@ -140,7 +140,7 @@ grid `<table>` element). Same styling, just the correct key name.
 **Date:** 2026-06-25
 **Why:** The CSS `transition` on translate didn't actually slide (Radix mounts content already in the `open` state, so only opacity animated → it "appeared"). Also needed an escape hatch for a drag-controlled sheet.
 **What:**
-- Overlay: `opacity 420ms cubic-bezier(0.33,1,0.68,1)`.
+- Overlay (scrim): `opacity 280ms cubic-bezier(0.33,1,0.68,1)`, GPU-promoted with `will-change:opacity` + `transform:translateZ(0)` + `backface-visibility:hidden` so the fade composites instead of repainting a full-screen translucent layer each frame (the dismiss fade was janky). Shortened from 420ms so the dismiss feels snappier.
 - Content: replaced the inline `transition` + `data-[state]` translate classes with `tw-animate-css` enter/exit animations keyed on Radix state (`data-[state=open]:animate-in`/`closed:animate-out` + per-side `slide-in-from-*`/`slide-out-to-*`), `duration-[420ms]` easeOutCubic. Added `transform-gpu will-change-transform`; dropped the opacity/fade on content (transform-only = smoother on mobile).
 - Added a `draggable?: boolean` prop: when true, the built-in slide classes are skipped so a consumer can drive the transform/height itself. (Currently unused — the settings sheet drag is height-based and keeps the slide — but kept as an escape hatch.)
 Applies to all sheets (settings + case-study bottom sheet).
