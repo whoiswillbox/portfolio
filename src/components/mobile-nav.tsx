@@ -171,7 +171,7 @@ export function MobileNav() {
 
       {/* Tray */}
       {openTray && (
-        <div className="fixed bottom-[4.5rem] left-6 right-6 z-[41] pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
+        <div className="fixed bottom-[4.5rem] left-4 right-4 z-[41] pb-1 animate-in slide-in-from-bottom-2 fade-in duration-150">
           <div className="rounded-2xl bg-background ring-1 ring-border/50 shadow-lg overflow-hidden">
             {openTray === "experience" && (
               <TraySection>
@@ -240,7 +240,7 @@ export function MobileNav() {
 
       {/* Bottom bar — hides on scroll down, shows on scroll up */}
       <nav className={cn(
-        "mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-6 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+        "mobile-nav fixed bottom-0 left-0 right-0 z-[42] flex items-end justify-center px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
         hidden && "translate-y-[calc(100%+1rem)]",
       )}>
         <div className="flex w-full items-center gap-1 rounded-2xl bg-background/80 supports-backdrop-filter:backdrop-blur-md ring-1 ring-border/50 shadow-lg p-1.5">

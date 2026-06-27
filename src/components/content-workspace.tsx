@@ -112,7 +112,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       </div>
       {/* Mobile: back button left */}
       {backTo && (
-        <div className="sm:hidden absolute left-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
+        <div className="sm:hidden absolute left-4 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
           <button
             type="button"
             onClick={() => router.push(backTo.href)}
@@ -124,7 +124,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       )}
       {/* Mobile: cube icon right */}
       {!open && launcherEnabled && (
-        <div className="sm:hidden absolute right-6 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
+        <div className="sm:hidden absolute right-4 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
           <button
             type="button"
             onClick={() => { setRendered(true); setOpen(true); }}
