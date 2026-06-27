@@ -37,21 +37,17 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 bg-black/20",
-        // Use tw-animate enter/exit (keyed on Radix state) so Radix's Presence
-        // waits for the fade to finish before unmounting — a plain CSS transition
-        // can get cut off as the node is removed, which read as "blocky". Pair
-        // with GPU promotion so the fade composites smoothly.
-        "data-[state=open]:animate-in data-[state=open]:fade-in",
-        "data-[state=closed]:animate-out data-[state=closed]:fade-out",
-        "duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]",
+        // Fully OPAQUE black fill; the dim level comes from the element's own
+        // opacity (0.2 → 0). Safari bands the alpha of a *translucent* fill near
+        // the status bar / chrome; animating opacity of an opaque layer
+        // interpolates smoothly there. A plain CSS transition gets state-driven.
+        "fixed inset-0 bg-black",
+        "data-[state=open]:opacity-20 data-[state=closed]:opacity-0",
         className
       )}
       style={{
-        // Safari (in-browser) banded/"blocky" the opacity fade of this large
-        // translucent fill. translate3d + isolation forces a real, isolated
-        // compositor layer (more reliable than translateZ(0) in Safari) so the
-        // alpha interpolates smoothly. Clean in the PWA either way.
+        // GPU-promote to a real isolated Safari compositor layer for a clean fade.
+        transition: "opacity 300ms cubic-bezier(0.33,1,0.68,1)",
         willChange: "opacity",
         transform: "translate3d(0,0,0)",
         backfaceVisibility: "hidden",
