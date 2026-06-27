@@ -37,16 +37,16 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        // Fully OPAQUE black fill; the dim level comes from the element's own
-        // opacity (0.2 → 0). Safari bands the alpha of a *translucent* fill near
-        // the status bar / chrome; animating opacity of an opaque layer
-        // interpolates smoothly there. A plain CSS transition gets state-driven.
-        "fixed inset-0 bg-black",
-        "data-[state=open]:opacity-20 data-[state=closed]:opacity-0",
+        // Translucent fill (an OPAQUE black layer turned the iOS status-bar safe
+        // area solid black). Fade element opacity 1 → 0 via a state-driven CSS
+        // transition.
+        "fixed inset-0 bg-black/20",
+        "data-[state=open]:opacity-100 data-[state=closed]:opacity-0",
         className
       )}
       style={{
-        // GPU-promote to a real isolated Safari compositor layer for a clean fade.
+        // GPU-promote to a real isolated Safari compositor layer so the fade
+        // composites smoothly (it banded/"blocky" otherwise, esp. in Safari).
         transition: "opacity 300ms cubic-bezier(0.33,1,0.68,1)",
         willChange: "opacity",
         transform: "translate3d(0,0,0)",
