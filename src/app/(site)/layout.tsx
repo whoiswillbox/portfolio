@@ -15,10 +15,12 @@ export default async function SiteLayout({
 
   return (
     <TooltipProvider>
-      {/* defaultOpen=true matches the client (ContentWorkspace auto-opens the
-          sidebar on every non-landing page), avoiding a hydration mismatch on
-          the sidebar's data-state. */}
-      <SidebarProvider defaultOpen className="h-full min-h-0 bg-background max-sm:bg-sidebar">
+      {/* defaultOpen=false so SSR always renders the sidebar collapsed — matching
+          the landing page (which stays collapsed on the client). ContentWorkspace
+          opens it on the client for every non-landing page (rAF after mount), so
+          those still show it. This avoids a data-state hydration mismatch that
+          `defaultOpen` (SSR expanded) caused on a full load of the landing page. */}
+      <SidebarProvider defaultOpen={false} className="h-full min-h-0 bg-background max-sm:bg-sidebar">
         <Suspense fallback={null}>
           <AppSidebar showLock={showLock} />
         </Suspense>

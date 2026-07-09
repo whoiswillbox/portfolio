@@ -58,15 +58,11 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     setExiting(false);
     setRendered(false);
     setSplitPct(30);
-    // Open sidebar on any non-landing page (handles hard refresh + entering
-    // flow); on the landing page close it in the next frame so it never lingers
-    // (e.g. arriving from the /unlock gate, where the provider is still open).
-    // Deferring to rAF (not calling during this effect) avoids fighting the
-    // server-rendered expanded state → no hydration mismatch.
+    // Sidebar is collapsed by SSR default (see layout). Open it on the client
+    // for any non-landing page (hard refresh + entering flow); the landing keeps
+    // the collapsed default, so no toggle needed there.
     if (pathname !== "/") {
       requestAnimationFrame(() => setSidebarOpen(true));
-    } else {
-      requestAnimationFrame(() => setSidebarOpen(false));
     }
     if (entering) sessionStorage.removeItem("entered");
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
