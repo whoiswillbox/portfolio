@@ -12,16 +12,15 @@ import { cn } from "@/lib/utils";
 
 // Component-specific role tokens (shadcn vocabulary) that aren't covered by the
 // foundational Background/Text/Borders families — button colors, focus ring, and
-// the sidebar theming. Rendered via their CSS var so they are theme-aware; `fg`
-// is the paired foreground for legible text.
-const COMPONENTS: { name: string; varName: string; fg?: string }[] = [
-  { name: "primary", varName: "--primary", fg: "--primary-foreground" },
-  { name: "primary-foreground", varName: "--primary-foreground", fg: "--primary" },
-  { name: "destructive", varName: "--destructive", fg: "--background" },
-  { name: "ring", varName: "--ring", fg: "--background" },
-  { name: "sidebar", varName: "--sidebar", fg: "--sidebar-foreground" },
-  { name: "sidebar-accent", varName: "--sidebar-accent", fg: "--sidebar-accent-foreground" },
-  { name: "sidebar-border", varName: "--sidebar-border", fg: "--sidebar-foreground" },
+// the sidebar theming. Rendered as solid swatches like the other sections.
+const COMPONENTS: { token: string; v: string; description: string }[] = [
+  { token: "bg-primary", v: "--primary", description: "Primary action color (e.g. filled buttons)." },
+  { token: "text-primary-foreground", v: "--primary-foreground", description: "Text/icon on top of a primary fill." },
+  { token: "bg-destructive", v: "--destructive", description: "Destructive action color." },
+  { token: "ring-ring", v: "--ring", description: "Focus ring color." },
+  { token: "bg-sidebar", v: "--sidebar", description: "Sidebar background." },
+  { token: "bg-sidebar-accent", v: "--sidebar-accent", description: "Sidebar hovered / active item background." },
+  { token: "border-sidebar-border", v: "--sidebar-border", description: "Sidebar borders and dividers." },
 ];
 
 // Neutral surfaces — PatternFly prominence system. `bg-surface` is the highest
@@ -144,38 +143,20 @@ const RAMPS: { name: string; prefix: string; steps: readonly string[] }[] = [
   { name: "Red — critical", prefix: "--red", steps: STEPS },
 ];
 
-function SemanticSwatch({ name, varName, fg }: { name: string; varName: string; fg?: string }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div
-        className="flex h-20 items-end rounded-xl border border-border p-2"
-        style={{ background: `var(${varName})`, color: fg ? `var(${fg})` : undefined }}
-      >
-        <span className="font-mono text-body-xs">{name}</span>
-      </div>
-      <div>
-        <CopyToken value={name} className="-ml-1.5" />
-        <div className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">var({varName})</div>
-      </div>
-    </div>
-  );
-}
-
 function RampRow({ name, prefix, steps }: { name: string; prefix: string; steps: readonly string[] }) {
   return (
     <div className="flex flex-col gap-2">
       <h3 className="font-mono text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
         {name}
       </h3>
-      <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-10">
+      <div className="flex flex-col divide-y divide-border">
         {steps.map((step) => (
-          <div key={step} className="flex flex-col gap-1">
-            <div
-              className="h-12 rounded-lg border border-border"
-              style={{ background: `var(${prefix}-${step})` }}
-            />
-            <span className="text-center font-mono text-[0.6rem] text-muted-foreground">{step}</span>
-          </div>
+          <SurfaceRow
+            key={step}
+            token={`${prefix.replace(/^--/, "")}-${step}`}
+            v={`${prefix}-${step}`}
+            description=""
+          />
         ))}
       </div>
     </div>
@@ -299,7 +280,7 @@ export default function Colors() {
         </>
         ) : view === "components" ? (
         /* Component-specific roles */
-        <section className="mb-14 flex flex-col gap-5">
+        <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Component roles</h2>
             <p className="text-body-sm text-muted-foreground">
@@ -307,9 +288,9 @@ export default function Colors() {
               the sidebar theming.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {COMPONENTS.map((t) => (
-              <SemanticSwatch key={t.name} {...t} />
+          <div className="flex flex-col divide-y divide-border">
+            {COMPONENTS.map((c) => (
+              <SurfaceRow key={c.token} {...c} />
             ))}
           </div>
         </section>
