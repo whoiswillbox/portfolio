@@ -10,20 +10,14 @@ import { cn } from "@/lib/utils";
 /* Living reference — swatches render the ACTUAL CSS variables the app uses, so
    this page always reflects the real tokens (and updates with the theme). */
 
-// Semantic role tokens (shadcn vocabulary). Rendered via their CSS var so they
-// are theme-aware. `fg` is the paired foreground for showing legible text.
-const SEMANTIC: { name: string; varName: string; fg?: string }[] = [
-  { name: "background", varName: "--background", fg: "--foreground" },
-  { name: "foreground", varName: "--foreground", fg: "--background" },
-  { name: "card", varName: "--card", fg: "--card-foreground" },
-  { name: "popover", varName: "--popover", fg: "--popover-foreground" },
+// Component-specific role tokens (shadcn vocabulary) that aren't covered by the
+// foundational Background/Text/Borders families — button colors, focus ring, and
+// the sidebar theming. Rendered via their CSS var so they are theme-aware; `fg`
+// is the paired foreground for legible text.
+const COMPONENTS: { name: string; varName: string; fg?: string }[] = [
   { name: "primary", varName: "--primary", fg: "--primary-foreground" },
-  { name: "secondary", varName: "--secondary", fg: "--secondary-foreground" },
-  { name: "muted", varName: "--muted", fg: "--muted-foreground" },
-  { name: "accent", varName: "--accent", fg: "--accent-foreground" },
+  { name: "primary-foreground", varName: "--primary-foreground", fg: "--primary" },
   { name: "destructive", varName: "--destructive", fg: "--background" },
-  { name: "border", varName: "--border", fg: "--foreground" },
-  { name: "input", varName: "--input", fg: "--foreground" },
   { name: "ring", varName: "--ring", fg: "--background" },
   { name: "sidebar", varName: "--sidebar", fg: "--sidebar-foreground" },
   { name: "sidebar-accent", varName: "--sidebar-accent", fg: "--sidebar-accent-foreground" },
@@ -188,7 +182,7 @@ function RampRow({ name, prefix, steps }: { name: string; prefix: string; steps:
   );
 }
 
-type View = "semantics" | "primitives";
+type View = "semantics" | "components" | "primitives";
 
 export default function Colors() {
   const [view, setView] = React.useState<View>("semantics");
@@ -214,7 +208,7 @@ export default function Colors() {
           </div>
           {/* Semantics / Primitives toggle */}
           <div className="inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
-            {(["semantics", "primitives"] as const).map((v) => (
+            {(["semantics", "components", "primitives"] as const).map((v) => (
               <button
                 key={v}
                 type="button"
@@ -234,22 +228,6 @@ export default function Colors() {
 
         {view === "semantics" ? (
         <>
-        {/* Semantic tokens */}
-        <section className="mb-14 flex flex-col gap-5">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Semantic roles</h2>
-            <p className="text-body-sm text-muted-foreground">
-              Theme-aware role tokens consumed by components. Always use these in
-              the UI — never a raw ramp value.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {SEMANTIC.map((t) => (
-              <SemanticSwatch key={t.name} {...t} />
-            ))}
-          </div>
-        </section>
-
         {/* Neutral surfaces (PatternFly prominence system) */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -319,6 +297,22 @@ export default function Colors() {
         </section>
 
         </>
+        ) : view === "components" ? (
+        /* Component-specific roles */
+        <section className="mb-14 flex flex-col gap-5">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h3 font-semibold">Component roles</h2>
+            <p className="text-body-sm text-muted-foreground">
+              Tokens tied to specific components — button color, focus ring, and
+              the sidebar theming.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {COMPONENTS.map((t) => (
+              <SemanticSwatch key={t.name} {...t} />
+            ))}
+          </div>
+        </section>
         ) : (
         /* Primitive ramps */
         <section className="flex flex-col gap-8">
