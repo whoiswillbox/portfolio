@@ -25,6 +25,30 @@ const SEMANTIC: { name: string; varName: string; fg?: string }[] = [
   { name: "sidebar-border", varName: "--sidebar-border", fg: "--sidebar-foreground" },
 ];
 
+// Neutral surfaces — PatternFly prominence system. `bg-surface` is the highest
+// prominence (a card); each has interaction states. token = the Tailwind utility;
+// v = the live CSS var the swatch renders (theme-aware).
+const SURFACES: { token: string; v: string; description: string }[] = [
+  { token: "bg-p-bg-surface", v: "--p-bg-surface", description: "Highest prominence surface, like a card." },
+  { token: "bg-p-bg-surface-hover", v: "--p-bg-surface-hover", description: "Hover state for the highest-prominence surface." },
+  { token: "bg-p-bg-surface-active", v: "--p-bg-surface-active", description: "Active (on-press) state for the highest-prominence surface." },
+  { token: "bg-p-bg-surface-selected", v: "--p-bg-surface-selected", description: "Selected state for the highest-prominence surface." },
+  { token: "bg-p-bg-surface-disabled", v: "--p-bg-surface-disabled", description: "Disabled state for elements." },
+];
+
+function SurfaceRow({ token, v, description }: { token: string; v: string; description: string }) {
+  return (
+    <div className="flex items-center gap-4 py-3">
+      <div className="size-12 shrink-0 rounded-lg border border-border" style={{ background: `var(${v})` }} />
+      <div className="w-52 shrink-0">
+        <div className="font-mono text-body-xs text-foreground break-all">{token}</div>
+        <div className="font-mono text-[0.65rem] text-muted-foreground">var({v})</div>
+      </div>
+      <div className="text-body-sm text-muted-foreground">{description}</div>
+    </div>
+  );
+}
+
 // Intent tokens (PatternFly-style `p-` scheme). Each intent has a pale surface
 // (+hover/active), a saturated accent (text/border), and a solid fill. Swatches
 // render the live internal vars these map to, so they stay in sync + theme-aware.
@@ -141,6 +165,22 @@ export default function Colors() {
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {SEMANTIC.map((t) => (
               <SemanticSwatch key={t.name} {...t} />
+            ))}
+          </div>
+        </section>
+
+        {/* Neutral surfaces (PatternFly prominence system) */}
+        <section className="mb-14 flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h3 font-semibold">Surfaces</h2>
+            <p className="text-body-sm text-muted-foreground">
+              Neutral backgrounds by prominence, with interaction states —{" "}
+              <span className="font-mono text-body-xs">bg-p-bg-surface</span> and friends.
+            </p>
+          </div>
+          <div className="flex flex-col divide-y divide-border">
+            {SURFACES.map((s) => (
+              <SurfaceRow key={s.token} {...s} />
             ))}
           </div>
         </section>
