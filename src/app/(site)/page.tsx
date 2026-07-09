@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef, Suspense, lazy } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -93,17 +93,21 @@ export default function LandingPage() {
   const { setOpen } = useSidebar();
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
-  // When arriving from the /unlock gate, fade in WITHOUT the slide (a plain
-  // crossfade). Detect it via document.referrer read synchronously in the state
-  // initializer — this avoids useSearchParams (which shifted the hydration
-  // boundary and surfaced a sidebar data-state mismatch). This screen is reached
-  // by client nav from /unlock, so there's no SSR frame to mismatch.
-  const [fromUnlock] = useState(() => {
-    if (typeof window === "undefined") return false;
-    const flag = sessionStorage.getItem("from-unlock") === "1";
-    if (flag) sessionStorage.removeItem("from-unlock");
-    return flag;
-  });
+  // When arriving from the /unlock gate, fade in WITHOUT the slide. The slide
+  // class is rendered identically on server + client (so no hydration mismatch);
+  // if we arrived from unlock, strip it in a layout effect BEFORE paint so the
+  // slide never plays — a plain crossfade instead.
+  const cardRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("from-unlock") === "1") {
+      sessionStorage.removeItem("from-unlock");
+      // The slide class lives on the inner [data-scroll-container] div.
+      cardRef.current
+        ?.querySelector("[data-scroll-container]")
+        ?.classList.remove("slide-in-from-bottom-4");
+    }
+  }, []);
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -130,11 +134,12 @@ export default function LandingPage() {
         }
       `}</style>
       <ContentCard
+        ref={cardRef}
         className={cn(
           "relative h-full max-sm:min-h-dvh overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
-          "animate-in fade-in duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-          // Slide up on a normal load, but fade-only when arriving from /unlock.
-          !fromUnlock && "slide-in-from-bottom-4"
+          // Rendered the same on server + client (hydration-safe). The slide is
+          // stripped before paint via the layout effect when arriving from /unlock.
+          "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
         )}
       >
         {/* Landing content — fades out when loading */}

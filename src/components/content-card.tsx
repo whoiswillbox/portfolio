@@ -3,10 +3,12 @@ import { cn } from "@/lib/utils";
 export function ContentCard({
   className,
   children,
+  ref,
   ...props
 }: React.ComponentProps<"div">) {
   return (
     <div
+      ref={ref}
       className="min-h-0 h-full overflow-hidden sm:bg-sidebar sm:rounded-xl sm:shadow-lg sm:ring-1 sm:ring-sidebar-border"
       {...props}
     >
