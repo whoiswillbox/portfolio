@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
@@ -89,21 +89,22 @@ function FallingBox({ box }: { box: Box }) {
 }
 
 export default function LandingPage() {
+  return (
+    <Suspense fallback={null}>
+      <LandingContent />
+    </Suspense>
+  );
+}
+
+function LandingContent() {
   const router = useRouter();
   const { setOpen } = useSidebar();
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
-  // When arriving from the /unlock gate, fade in WITHOUT the slide (a plain
-  // crossfade). Read the flag synchronously in the state initializer so the
-  // FIRST render already omits the slide (an effect would fire after the
-  // animation has started). This is reached via client navigation from /unlock,
-  // so there's no SSR frame to mismatch.
-  const [fromUnlock] = useState(() => {
-    if (typeof window === "undefined") return false;
-    const flag = sessionStorage.getItem("from-unlock") === "1";
-    if (flag) sessionStorage.removeItem("from-unlock");
-    return flag;
-  });
+  // When arriving from the /unlock gate (?from=unlock), fade in WITHOUT the
+  // slide (a plain crossfade). Read from the URL so it's available synchronously
+  // on the first render (before the entrance animation paints).
+  const fromUnlock = useSearchParams().get("from") === "unlock";
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
