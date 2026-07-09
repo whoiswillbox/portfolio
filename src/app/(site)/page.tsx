@@ -93,6 +93,17 @@ export default function LandingPage() {
   const { setOpen } = useSidebar();
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
+  // When arriving from the /unlock gate, fade in WITHOUT the slide (a plain
+  // crossfade). Read the flag synchronously in the state initializer so the
+  // FIRST render already omits the slide (an effect would fire after the
+  // animation has started). This is reached via client navigation from /unlock,
+  // so there's no SSR frame to mismatch.
+  const [fromUnlock] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const flag = sessionStorage.getItem("from-unlock") === "1";
+    if (flag) sessionStorage.removeItem("from-unlock");
+    return flag;
+  });
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -121,7 +132,9 @@ export default function LandingPage() {
       <ContentCard
         className={cn(
           "relative h-full max-sm:min-h-dvh overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
-          "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+          "animate-in fade-in duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          // Slide up on a normal load, but fade-only when arriving from /unlock.
+          !fromUnlock && "slide-in-from-bottom-4"
         )}
       >
         {/* Landing content — fades out when loading */}

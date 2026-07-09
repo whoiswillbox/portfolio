@@ -143,7 +143,9 @@ function UnlockForm() {
       // Always land on the landing page (/) after unlocking — the site's front
       // door — regardless of where the visitor was gated from. Keep the box
       // loading animation up briefly (submitting stays true) so the transition
-      // matches the landing page's own "enter" feel.
+      // matches the landing page's own "enter" feel. Flag the arrival so the
+      // landing page fades in WITHOUT the slide (a plain crossfade from here).
+      sessionStorage.setItem("from-unlock", "1");
       setTimeout(() => {
         router.replace("/");
         router.refresh();
