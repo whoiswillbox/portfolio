@@ -2,13 +2,23 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, LightBulbIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
 import { cn } from "@/lib/utils";
 
 /* Living reference — swatches render the ACTUAL CSS variables the app uses, so
    this page always reflects the real tokens (and updates with the theme). */
+
+// Small guidance line shown under a section's description — how/when to use.
+function UsageHint({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-body-sm text-muted-foreground">
+      <LightBulbIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+      <p>{children}</p>
+    </div>
+  );
+}
 
 // Component-specific role tokens (shadcn vocabulary) that aren't covered by the
 // foundational Background/Text/Borders families — button colors, focus ring, and
@@ -218,6 +228,14 @@ export default function Colors() {
               <span className="font-mono text-body-xs">bg-surface-info</span>,{" "}
               <span className="font-mono text-body-xs">bg-fill-info</span>.
             </p>
+            <UsageHint>
+              Use <span className="font-mono text-body-xs">bg-surface</span> for cards
+              and raised elements, <span className="font-mono text-body-xs">bg-surface-secondary</span>{" "}
+              for insets and nested panels, and the intent surfaces (
+              <span className="font-mono text-body-xs">bg-surface-info</span>…) for
+              status banners. Solid <span className="font-mono text-body-xs">bg-fill-*</span>{" "}
+              is for filled buttons and badges.
+            </UsageHint>
           </div>
           <div className="flex flex-col divide-y divide-border">
             {SURFACES.map((s) => (
@@ -234,6 +252,14 @@ export default function Colors() {
               Foreground text by prominence —{" "}
               <span className="font-mono text-body-xs">text-fg</span> and friends.
             </p>
+            <UsageHint>
+              <span className="font-mono text-body-xs">text-fg</span> for body copy,{" "}
+              <span className="font-mono text-body-xs">text-fg-subtle</span> for
+              captions and secondary labels, <span className="font-mono text-body-xs">text-fg-link</span>{" "}
+              for links, and the intent variants (
+              <span className="font-mono text-body-xs">text-critical</span>…) for
+              inline status messages.
+            </UsageHint>
           </div>
           <div className="flex flex-col divide-y divide-border">
             {TEXTS.map((t) => (
@@ -250,6 +276,12 @@ export default function Colors() {
               Dividers and outlines by prominence —{" "}
               <span className="font-mono text-body-xs">border-line</span> and friends.
             </p>
+            <UsageHint>
+              <span className="font-mono text-body-xs">border-line</span> is the
+              default; <span className="font-mono text-body-xs">border-line-secondary</span>{" "}
+              for quieter dividers, <span className="font-mono text-body-xs">border-line-focus</span>{" "}
+              for focus rings, and the intent variants to outline status elements.
+            </UsageHint>
           </div>
           <div className="flex flex-col divide-y divide-border">
             {BORDERS.map((b) => (
@@ -267,6 +299,12 @@ export default function Colors() {
               <span className="font-mono text-body-xs">text-icon</span>,{" "}
               <span className="font-mono text-body-xs">text-icon-info</span>, and friends.
             </p>
+            <UsageHint>
+              Match icon color to its context —{" "}
+              <span className="font-mono text-body-xs">text-icon</span> alongside body
+              text, <span className="font-mono text-body-xs">text-icon-subtle</span> for
+              decorative glyphs, and the intent variants when an icon reinforces a status.
+            </UsageHint>
           </div>
           <div className="flex flex-col divide-y divide-border">
             {ICONS.map((i) => (
