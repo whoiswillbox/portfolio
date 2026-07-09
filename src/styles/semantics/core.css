@@ -72,6 +72,16 @@
   --color-fg-link-hover: var(--p-text-link-hover);
   --color-fg-link-active: var(--p-text-link-active);
 
+  /* Icon colors — utility form: text-icon, text-icon-info, … */
+  --color-icon: var(--p-text);
+  --color-icon-secondary: var(--p-text-secondary);
+  --color-icon-subtle: var(--p-text-subtle);
+  --color-icon-brand: var(--accent-brand);
+  --color-icon-info: var(--accent-info);
+  --color-icon-success: var(--accent-success);
+  --color-icon-caution: var(--accent-caution);
+  --color-icon-critical: var(--accent-critical);
+
   /* Neutral borders — by prominence + state. Utility form: border-line,
      border-line-secondary, border-line-hover, … (distinct neutral shades). */
   --color-line: var(--p-border);

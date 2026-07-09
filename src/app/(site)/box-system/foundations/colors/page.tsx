@@ -64,6 +64,17 @@ const SURFACES: { token: string; v: string; description: string }[] = [
   { token: "bg-surface-critical", v: "--surface-critical", description: "Pale surface communicating a critical / error state." },
   { token: "bg-surface-critical-hover", v: "--surface-critical-hover", description: "Hover state for the critical surface." },
   { token: "bg-surface-critical-active", v: "--surface-critical-active", description: "Active state for the critical surface." },
+  // Fills (solid intent backgrounds) — bg-fill-info / bg-fill-success / …
+  { token: "bg-fill-brand", v: "--fill-brand", description: "Solid brand background." },
+  { token: "bg-fill-brand-hover", v: "--fill-brand-hover", description: "Hover state for the brand fill." },
+  { token: "bg-fill-info", v: "--fill-info", description: "Solid background communicating information." },
+  { token: "bg-fill-info-hover", v: "--fill-info-hover", description: "Hover state for the info fill." },
+  { token: "bg-fill-success", v: "--fill-success", description: "Solid background communicating success." },
+  { token: "bg-fill-success-hover", v: "--fill-success-hover", description: "Hover state for the success fill." },
+  { token: "bg-fill-caution", v: "--fill-caution", description: "Solid background communicating caution." },
+  { token: "bg-fill-caution-hover", v: "--fill-caution-hover", description: "Hover state for the caution fill." },
+  { token: "bg-fill-critical", v: "--fill-critical", description: "Solid background communicating a critical / error state." },
+  { token: "bg-fill-critical-hover", v: "--fill-critical-hover", description: "Hover state for the critical fill." },
 ];
 
 // Text tokens — the swatch shows the color as a filled chip (text colors are
@@ -115,34 +126,18 @@ function SurfaceRow({ token, v, description, swatch }: { token: string; v: strin
   );
 }
 
-// Intent tokens. Each intent has a pale surface (+hover/active), a saturated
-// accent (text/border), and a solid fill. Swatches render the live internal vars
-// these map to, so they stay in sync + theme-aware.
-const INTENTS = ["brand", "info", "success", "caution", "critical"] as const;
-function IntentRow({ intent }: { intent: (typeof INTENTS)[number] }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <h3 className="font-mono text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {intent}
-      </h3>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Swatch token={`text-${intent}`} v={`--accent-${intent}`} />
-        <Swatch token={`border-${intent}`} v={`--accent-${intent}`} />
-        <Swatch token={`bg-fill-${intent}`} v={`--fill-${intent}`} />
-        <Swatch token={`bg-fill-${intent}-hover`} v={`--fill-${intent}-hover`} />
-      </div>
-    </div>
-  );
-}
-
-function Swatch({ token, v }: { token: string; v: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="h-12 rounded-lg border border-border" style={{ background: `var(${v})` }} />
-      <CopyToken value={token} className="text-[0.6rem] leading-tight" />
-    </div>
-  );
-}
+// Icon tokens — saturated colors for icon glyphs, mostly mirroring the intent
+// accents. Rendered as solid swatches.
+const ICONS: { token: string; v: string; description: string }[] = [
+  { token: "text-icon", v: "--p-text", description: "Default icon color." },
+  { token: "text-icon-secondary", v: "--p-text-secondary", description: "Secondary, lower-prominence icons." },
+  { token: "text-icon-subtle", v: "--p-text-subtle", description: "Subtle / muted icons." },
+  { token: "text-icon-brand", v: "--accent-brand", description: "Icons that need to pull attention." },
+  { token: "text-icon-info", v: "--accent-info", description: "Icons communicating information." },
+  { token: "text-icon-success", v: "--accent-success", description: "Icons communicating success." },
+  { token: "text-icon-caution", v: "--accent-caution", description: "Icons communicating caution." },
+  { token: "text-icon-critical", v: "--accent-critical", description: "Icons communicating a critical / error state." },
+];
 
 // Primitive ramps — raw palette values (context-free). Var names match colors.css.
 const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
@@ -258,11 +253,13 @@ export default function Colors() {
         {/* Neutral surfaces (PatternFly prominence system) */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Surfaces</h2>
+            <h2 className="text-h3 font-semibold">Background</h2>
             <p className="text-body-sm text-muted-foreground">
-              Backgrounds — neutral by prominence, plus pale intent surfaces —{" "}
+              All background tokens — neutral surfaces by prominence, pale intent
+              surfaces, and solid fills —{" "}
               <span className="font-mono text-body-xs">bg-surface</span>,{" "}
-              <span className="font-mono text-body-xs">bg-surface-info</span>, and friends.
+              <span className="font-mono text-body-xs">bg-surface-info</span>,{" "}
+              <span className="font-mono text-body-xs">bg-fill-info</span>.
             </p>
           </div>
           <div className="flex flex-col divide-y divide-border">
@@ -304,21 +301,23 @@ export default function Colors() {
           </div>
         </section>
 
-        {/* Intent tokens */}
-        <section className="mb-14 flex flex-col gap-6">
+        {/* Icon tokens */}
+        <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Intents</h2>
+            <h2 className="text-h3 font-semibold">Icons</h2>
             <p className="text-body-sm text-muted-foreground">
-              Status accents — <span className="font-mono text-body-xs">text-*</span> /{" "}
-              <span className="font-mono text-body-xs">border-*</span> (saturated) and{" "}
-              <span className="font-mono text-body-xs">fill-*</span> (solid). Pale intent
-              surfaces live in Surfaces above.
+              Colors for icon glyphs, by prominence and intent —{" "}
+              <span className="font-mono text-body-xs">text-icon</span>,{" "}
+              <span className="font-mono text-body-xs">text-icon-info</span>, and friends.
             </p>
           </div>
-          {INTENTS.map((intent) => (
-            <IntentRow key={intent} intent={intent} />
-          ))}
+          <div className="flex flex-col divide-y divide-border">
+            {ICONS.map((i) => (
+              <SurfaceRow key={i.token} {...i} />
+            ))}
+          </div>
         </section>
+
         </>
         ) : (
         /* Primitive ramps */
