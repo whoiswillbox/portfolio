@@ -176,7 +176,14 @@ function UnlockForm() {
       >
         <FallingBoxes />
 
-        <div className="relative z-10 flex w-full max-w-4xl flex-col gap-8">
+        {/* Content crossfades out as the box loading state fades in — mirrors the
+            landing page's "enter" transition exactly. */}
+        <div
+          className={cn(
+            "relative z-10 flex w-full max-w-4xl flex-col gap-8 transition-opacity duration-500",
+            submitting ? "opacity-0 pointer-events-none" : "opacity-100"
+          )}
+        >
           <h1 className="text-[clamp(2.25rem,6vw,5.5rem)] font-medium leading-[1.05] tracking-tighter">
             <span className="text-muted-foreground">I&apos;m currently working on this — </span>
             <span className="font-mono" style={{ fontFamily: "inherit" }}>check back later</span>
