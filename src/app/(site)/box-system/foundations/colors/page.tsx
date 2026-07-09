@@ -1,7 +1,11 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
+import { cn } from "@/lib/utils";
 
 /* Living reference — swatches render the ACTUAL CSS variables the app uses, so
    this page always reflects the real tokens (and updates with the theme). */
@@ -44,6 +48,22 @@ const SURFACES: { token: string; v: string; description: string }[] = [
   { token: "bg-surface-tertiary", v: "--p-bg-surface-tertiary", description: "Third level of prominence." },
   { token: "bg-surface-tertiary-hover", v: "--p-bg-surface-tertiary-hover", description: "Hover state for the third level of prominence." },
   { token: "bg-surface-tertiary-active", v: "--p-bg-surface-tertiary-active", description: "Active (on-press) state for the third level of prominence." },
+  // Intent surfaces (pale tinted backgrounds) — bg-surface-info / bg-surface-success / …
+  { token: "bg-surface-brand", v: "--surface-brand", description: "Pale surface communicating brand." },
+  { token: "bg-surface-brand-hover", v: "--surface-brand-hover", description: "Hover state for the brand surface." },
+  { token: "bg-surface-brand-active", v: "--surface-brand-active", description: "Active state for the brand surface." },
+  { token: "bg-surface-info", v: "--surface-info", description: "Pale surface communicating information." },
+  { token: "bg-surface-info-hover", v: "--surface-info-hover", description: "Hover state for the info surface." },
+  { token: "bg-surface-info-active", v: "--surface-info-active", description: "Active state for the info surface." },
+  { token: "bg-surface-success", v: "--surface-success", description: "Pale surface communicating success." },
+  { token: "bg-surface-success-hover", v: "--surface-success-hover", description: "Hover state for the success surface." },
+  { token: "bg-surface-success-active", v: "--surface-success-active", description: "Active state for the success surface." },
+  { token: "bg-surface-caution", v: "--surface-caution", description: "Pale surface communicating caution." },
+  { token: "bg-surface-caution-hover", v: "--surface-caution-hover", description: "Hover state for the caution surface." },
+  { token: "bg-surface-caution-active", v: "--surface-caution-active", description: "Active state for the caution surface." },
+  { token: "bg-surface-critical", v: "--surface-critical", description: "Pale surface communicating a critical / error state." },
+  { token: "bg-surface-critical-hover", v: "--surface-critical-hover", description: "Hover state for the critical surface." },
+  { token: "bg-surface-critical-active", v: "--surface-critical-active", description: "Active state for the critical surface." },
 ];
 
 // Text tokens — the swatch shows the color as a filled chip (text colors are
@@ -59,6 +79,11 @@ const TEXTS: { token: string; v: string; description: string }[] = [
   { token: "text-fg-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
   { token: "text-fg-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
   { token: "text-fg-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
+  // Intent text (saturated accents) — text-info / text-success / …
+  { token: "text-info", v: "--accent-info", description: "Text communicating information." },
+  { token: "text-success", v: "--accent-success", description: "Text communicating success." },
+  { token: "text-caution", v: "--accent-caution", description: "Text communicating caution." },
+  { token: "text-critical", v: "--accent-critical", description: "Text communicating a critical / error state." },
 ];
 
 const BORDERS: { token: string; v: string; description: string }[] = [
@@ -68,6 +93,11 @@ const BORDERS: { token: string; v: string; description: string }[] = [
   { token: "border-line-secondary", v: "--p-border-secondary", description: "Subtle, low-contrast divider." },
   { token: "border-line-tertiary", v: "--p-border-tertiary", description: "Stronger, higher-contrast border." },
   { token: "border-line-focus", v: "--p-border-focus", description: "Focus ring / active outline." },
+  // Intent borders (saturated accents) — border-info / border-success / …
+  { token: "border-info", v: "--accent-info", description: "Border communicating information." },
+  { token: "border-success", v: "--accent-success", description: "Border communicating success." },
+  { token: "border-caution", v: "--accent-caution", description: "Border communicating caution." },
+  { token: "border-critical", v: "--accent-critical", description: "Border communicating a critical / error state." },
 ];
 
 function SurfaceRow({ token, v, description, swatch }: { token: string; v: string; description: string; swatch?: React.ReactNode }) {
@@ -90,22 +120,16 @@ function SurfaceRow({ token, v, description, swatch }: { token: string; v: strin
 // these map to, so they stay in sync + theme-aware.
 const INTENTS = ["brand", "info", "success", "caution", "critical"] as const;
 function IntentRow({ intent }: { intent: (typeof INTENTS)[number] }) {
-  const surfaces = [
-    { token: `bg-surface-${intent}`, v: `--surface-${intent}` },
-    { token: `bg-surface-${intent}-hover`, v: `--surface-${intent}-hover` },
-    { token: `bg-surface-${intent}-active`, v: `--surface-${intent}-active` },
-  ];
   return (
     <div className="flex flex-col gap-2">
       <h3 className="font-mono text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
         {intent}
       </h3>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-        {surfaces.map((s) => (
-          <Swatch key={s.token} token={s.token} v={s.v} />
-        ))}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Swatch token={`text-${intent}`} v={`--accent-${intent}`} />
+        <Swatch token={`border-${intent}`} v={`--accent-${intent}`} />
         <Swatch token={`bg-fill-${intent}`} v={`--fill-${intent}`} />
+        <Swatch token={`bg-fill-${intent}-hover`} v={`--fill-${intent}-hover`} />
       </div>
     </div>
   );
@@ -169,7 +193,11 @@ function RampRow({ name, prefix, steps }: { name: string; prefix: string; steps:
   );
 }
 
+type View = "semantics" | "primitives";
+
 export default function Colors() {
+  const [view, setView] = React.useState<View>("semantics");
+
   return (
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
@@ -181,14 +209,36 @@ export default function Colors() {
           Foundations
         </Link>
 
-        <div className="flex flex-col gap-3 mb-12">
-          <h1 className="text-h1 font-semibold">Colors</h1>
-          <p className="text-body-lg text-muted-foreground">
-            The live color tokens Cardboard uses. Swatches render the actual CSS
-            variables, so this page stays in sync and reflects the current theme.
-          </p>
+        <div className="flex flex-col gap-4 mb-12">
+          <div className="flex flex-col gap-3">
+            <h1 className="text-h1 font-semibold">Colors</h1>
+            <p className="text-body-lg text-muted-foreground">
+              The live color tokens Cardboard uses. Swatches render the actual CSS
+              variables, so this page stays in sync and reflects the current theme.
+            </p>
+          </div>
+          {/* Semantics / Primitives toggle */}
+          <div className="inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
+            {(["semantics", "primitives"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setView(v)}
+                className={cn(
+                  "rounded-md px-3 py-1.5 text-body-sm font-medium capitalize transition-colors",
+                  view === v
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
         </div>
 
+        {view === "semantics" ? (
+        <>
         {/* Semantic tokens */}
         <section className="mb-14 flex flex-col gap-5">
           <div className="flex flex-col gap-1">
@@ -210,8 +260,9 @@ export default function Colors() {
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Surfaces</h2>
             <p className="text-body-sm text-muted-foreground">
-              Neutral backgrounds by prominence, with interaction states —{" "}
-              <span className="font-mono text-body-xs">bg-surface</span> and friends.
+              Backgrounds — neutral by prominence, plus pale intent surfaces —{" "}
+              <span className="font-mono text-body-xs">bg-surface</span>,{" "}
+              <span className="font-mono text-body-xs">bg-surface-info</span>, and friends.
             </p>
           </div>
           <div className="flex flex-col divide-y divide-border">
@@ -232,18 +283,7 @@ export default function Colors() {
           </div>
           <div className="flex flex-col divide-y divide-border">
             {TEXTS.map((t) => (
-              <SurfaceRow
-                key={t.token}
-                {...t}
-                swatch={
-                  <div
-                    className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-border bg-surface"
-                    style={{ color: `var(${t.v})` }}
-                  >
-                    <span className="font-heading text-body-lg">Aa</span>
-                  </div>
-                }
-              />
+              <SurfaceRow key={t.token} {...t} />
             ))}
           </div>
         </section>
@@ -259,16 +299,7 @@ export default function Colors() {
           </div>
           <div className="flex flex-col divide-y divide-border">
             {BORDERS.map((b) => (
-              <SurfaceRow
-                key={b.token}
-                {...b}
-                swatch={
-                  <div
-                    className="size-12 shrink-0 rounded-lg bg-surface"
-                    style={{ border: `2px solid var(${b.v})` }}
-                  />
-                }
-              />
+              <SurfaceRow key={b.token} {...b} />
             ))}
           </div>
         </section>
@@ -278,17 +309,19 @@ export default function Colors() {
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Intents</h2>
             <p className="text-body-sm text-muted-foreground">
-              Status colors — <span className="font-mono text-body-xs">surface-*</span> (pale
-              bg), <span className="font-mono text-body-xs">text-*</span> (accent text/border), and{" "}
-              <span className="font-mono text-body-xs">fill-*</span> (solid).
+              Status accents — <span className="font-mono text-body-xs">text-*</span> /{" "}
+              <span className="font-mono text-body-xs">border-*</span> (saturated) and{" "}
+              <span className="font-mono text-body-xs">fill-*</span> (solid). Pale intent
+              surfaces live in Surfaces above.
             </p>
           </div>
           {INTENTS.map((intent) => (
             <IntentRow key={intent} intent={intent} />
           ))}
         </section>
-
-        {/* Primitive ramps */}
+        </>
+        ) : (
+        /* Primitive ramps */
         <section className="flex flex-col gap-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Primitive ramps</h2>
@@ -301,6 +334,7 @@ export default function Colors() {
             <RampRow key={ramp.prefix} {...ramp} />
           ))}
         </section>
+        )}
       </div>
     </ContentCard>
   );
