@@ -103,8 +103,7 @@ design system already defines an `info` intent in `src/styles/semantics/intent.c
 tokens: `border-info bg-surface-info text-info`, with the description tinted
 `text-info/90` and SVG icons inheriting `text-current` (mirrors how the
 `destructive` variant is built).
-**Update 2026-07-09:** intent tokens were renamed to a PatternFly-style,
-Tailwind-native `p-` scheme (`p-{element}-{intent}[-state]`), so the info/success
+**Update 2026-07-09:** intent tokens were Tailwind-native `p-` scheme (`p-{element}-{intent}[-state]`), so the info/success
 variants now use `border-p-info bg-p-surface-info text-p-info` (and `-success`).
 See `src/styles/semantics/intent.css`.
 

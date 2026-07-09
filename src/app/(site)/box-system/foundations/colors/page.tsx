@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
+import { CopyToken } from "@/components/copy-token";
 
 /* Living reference — swatches render the ACTUAL CSS variables the app uses, so
    this page always reflects the real tokens (and updates with the theme). */
@@ -29,36 +30,44 @@ const SEMANTIC: { name: string; varName: string; fg?: string }[] = [
 // prominence (a card); each has interaction states. token = the Tailwind utility;
 // v = the live CSS var the swatch renders (theme-aware).
 const SURFACES: { token: string; v: string; description: string }[] = [
-  { token: "bg-p-bg", v: "--p-bg", description: "The default page background." },
-  { token: "bg-p-bg-inverse", v: "--p-bg-inverse", description: "High-contrast inverse background." },
-  { token: "bg-p-bg-surface", v: "--p-bg-surface", description: "Highest prominence surface, like a card." },
-  { token: "bg-p-bg-surface-hover", v: "--p-bg-surface-hover", description: "Hover state for the highest-prominence surface." },
-  { token: "bg-p-bg-surface-active", v: "--p-bg-surface-active", description: "Active (on-press) state for the highest-prominence surface." },
-  { token: "bg-p-bg-surface-selected", v: "--p-bg-surface-selected", description: "Selected state for the highest-prominence surface." },
-  { token: "bg-p-bg-surface-disabled", v: "--p-bg-surface-disabled", description: "Disabled state for elements." },
-  { token: "bg-p-bg-surface-secondary", v: "--p-bg-surface-secondary", description: "Second level of prominence." },
-  { token: "bg-p-bg-surface-secondary-hover", v: "--p-bg-surface-secondary-hover", description: "Hover state for the second level of prominence." },
-  { token: "bg-p-bg-surface-secondary-active", v: "--p-bg-surface-secondary-active", description: "Active (on-press) state for the second level of prominence." },
-  { token: "bg-p-bg-surface-secondary-selected", v: "--p-bg-surface-secondary-selected", description: "Selected state for the second level of prominence." },
-  { token: "bg-p-bg-surface-tertiary", v: "--p-bg-surface-tertiary", description: "Third level of prominence." },
-  { token: "bg-p-bg-surface-tertiary-hover", v: "--p-bg-surface-tertiary-hover", description: "Hover state for the third level of prominence." },
-  { token: "bg-p-bg-surface-tertiary-active", v: "--p-bg-surface-tertiary-active", description: "Active (on-press) state for the third level of prominence." },
+  { token: "bg-page", v: "--p-bg", description: "The default page background." },
+  { token: "bg-inverse", v: "--p-bg-inverse", description: "High-contrast inverse background." },
+  { token: "bg-surface", v: "--p-bg-surface", description: "Highest prominence surface, like a card." },
+  { token: "bg-surface-hover", v: "--p-bg-surface-hover", description: "Hover state for the highest-prominence surface." },
+  { token: "bg-surface-active", v: "--p-bg-surface-active", description: "Active (on-press) state for the highest-prominence surface." },
+  { token: "bg-surface-selected", v: "--p-bg-surface-selected", description: "Selected state for the highest-prominence surface." },
+  { token: "bg-surface-disabled", v: "--p-bg-surface-disabled", description: "Disabled state for elements." },
+  { token: "bg-surface-secondary", v: "--p-bg-surface-secondary", description: "Second level of prominence." },
+  { token: "bg-surface-secondary-hover", v: "--p-bg-surface-secondary-hover", description: "Hover state for the second level of prominence." },
+  { token: "bg-surface-secondary-active", v: "--p-bg-surface-secondary-active", description: "Active (on-press) state for the second level of prominence." },
+  { token: "bg-surface-secondary-selected", v: "--p-bg-surface-secondary-selected", description: "Selected state for the second level of prominence." },
+  { token: "bg-surface-tertiary", v: "--p-bg-surface-tertiary", description: "Third level of prominence." },
+  { token: "bg-surface-tertiary-hover", v: "--p-bg-surface-tertiary-hover", description: "Hover state for the third level of prominence." },
+  { token: "bg-surface-tertiary-active", v: "--p-bg-surface-tertiary-active", description: "Active (on-press) state for the third level of prominence." },
 ];
 
 // Text tokens — the swatch shows the color as a filled chip (text colors are
 // hard to read as a pale swatch, so we fill a chip with the text color).
 const TEXTS: { token: string; v: string; description: string }[] = [
-  { token: "text-p-text", v: "--p-text", description: "Default, highest-contrast text." },
-  { token: "text-p-text-secondary", v: "--p-text-secondary", description: "Secondary text, slightly reduced prominence." },
-  { token: "text-p-text-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
-  { token: "text-p-text-disabled", v: "--p-text-disabled", description: "Disabled text." },
-  { token: "text-p-text-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
+  { token: "text-fg", v: "--p-text", description: "The default text color." },
+  { token: "text-fg-secondary", v: "--p-text-secondary", description: "Text with a secondary level of prominence." },
+  { token: "text-fg-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
+  { token: "text-fg-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
+  { token: "text-fg-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
+  { token: "text-fg-link", v: "--p-text-link", description: "Text links." },
+  { token: "text-fg-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
+  { token: "text-fg-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
+  { token: "text-fg-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
+  { token: "text-fg-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
 ];
 
 const BORDERS: { token: string; v: string; description: string }[] = [
-  { token: "border-p-border", v: "--p-border", description: "Default border for separating elements." },
-  { token: "border-p-border-subtle", v: "--p-border-subtle", description: "Subtle, low-contrast divider." },
-  { token: "border-p-border-strong", v: "--p-border-strong", description: "Stronger, higher-contrast border." },
+  { token: "border-line", v: "--p-border", description: "Default border for separating elements." },
+  { token: "border-line-hover", v: "--p-border-hover", description: "Hover state — a stronger, darker border." },
+  { token: "border-line-disabled", v: "--p-border-disabled", description: "Disabled state border." },
+  { token: "border-line-secondary", v: "--p-border-secondary", description: "Subtle, low-contrast divider." },
+  { token: "border-line-tertiary", v: "--p-border-tertiary", description: "Stronger, higher-contrast border." },
+  { token: "border-line-focus", v: "--p-border-focus", description: "Focus ring / active outline." },
 ];
 
 function SurfaceRow({ token, v, description, swatch }: { token: string; v: string; description: string; swatch?: React.ReactNode }) {
@@ -68,23 +77,23 @@ function SurfaceRow({ token, v, description, swatch }: { token: string; v: strin
         <div className="size-12 shrink-0 rounded-lg border border-border" style={{ background: `var(${v})` }} />
       )}
       <div className="w-72 shrink-0 max-sm:w-40">
-        <div className="font-mono text-body-xs text-foreground">{token}</div>
-        <div className="font-mono text-[0.65rem] text-muted-foreground">var({v})</div>
+        <CopyToken value={token} className="-ml-1.5" />
+        <div className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">var({v})</div>
       </div>
       <div className="flex-1 text-left text-body-sm text-muted-foreground">{description}</div>
     </div>
   );
 }
 
-// Intent tokens (PatternFly-style `p-` scheme). Each intent has a pale surface
-// (+hover/active), a saturated accent (text/border), and a solid fill. Swatches
-// render the live internal vars these map to, so they stay in sync + theme-aware.
+// Intent tokens. Each intent has a pale surface (+hover/active), a saturated
+// accent (text/border), and a solid fill. Swatches render the live internal vars
+// these map to, so they stay in sync + theme-aware.
 const INTENTS = ["brand", "info", "success", "caution", "critical"] as const;
 function IntentRow({ intent }: { intent: (typeof INTENTS)[number] }) {
   const surfaces = [
-    { token: `p-surface-${intent}`, v: `--surface-${intent}` },
-    { token: `p-surface-${intent}-hover`, v: `--surface-${intent}-hover` },
-    { token: `p-surface-${intent}-active`, v: `--surface-${intent}-active` },
+    { token: `bg-surface-${intent}`, v: `--surface-${intent}` },
+    { token: `bg-surface-${intent}-hover`, v: `--surface-${intent}-hover` },
+    { token: `bg-surface-${intent}-active`, v: `--surface-${intent}-active` },
   ];
   return (
     <div className="flex flex-col gap-2">
@@ -93,10 +102,10 @@ function IntentRow({ intent }: { intent: (typeof INTENTS)[number] }) {
       </h3>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {surfaces.map((s) => (
-          <Swatch key={s.token} token={`bg-${s.token}`} v={s.v} />
+          <Swatch key={s.token} token={s.token} v={s.v} />
         ))}
-        <Swatch token={`text-p-${intent}`} v={`--accent-${intent}`} />
-        <Swatch token={`bg-p-fill-${intent}`} v={`--fill-${intent}`} />
+        <Swatch token={`text-${intent}`} v={`--accent-${intent}`} />
+        <Swatch token={`bg-fill-${intent}`} v={`--fill-${intent}`} />
       </div>
     </div>
   );
@@ -106,7 +115,7 @@ function Swatch({ token, v }: { token: string; v: string }) {
   return (
     <div className="flex flex-col gap-1">
       <div className="h-12 rounded-lg border border-border" style={{ background: `var(${v})` }} />
-      <span className="font-mono text-[0.6rem] leading-tight text-muted-foreground break-all">{token}</span>
+      <CopyToken value={token} className="text-[0.6rem] leading-tight" />
     </div>
   );
 }
@@ -131,9 +140,9 @@ function SemanticSwatch({ name, varName, fg }: { name: string; varName: string; 
       >
         <span className="font-mono text-body-xs">{name}</span>
       </div>
-      <div className="px-0.5">
-        <div className="font-mono text-body-xs text-foreground">{name}</div>
-        <div className="font-mono text-[0.65rem] text-muted-foreground">var({varName})</div>
+      <div>
+        <CopyToken value={name} className="-ml-1.5" />
+        <div className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">var({varName})</div>
       </div>
     </div>
   );
@@ -202,7 +211,7 @@ export default function Colors() {
             <h2 className="text-h3 font-semibold">Surfaces</h2>
             <p className="text-body-sm text-muted-foreground">
               Neutral backgrounds by prominence, with interaction states —{" "}
-              <span className="font-mono text-body-xs">bg-p-bg-surface</span> and friends.
+              <span className="font-mono text-body-xs">bg-surface</span> and friends.
             </p>
           </div>
           <div className="flex flex-col divide-y divide-border">
@@ -218,7 +227,7 @@ export default function Colors() {
             <h2 className="text-h3 font-semibold">Text</h2>
             <p className="text-body-sm text-muted-foreground">
               Foreground text by prominence —{" "}
-              <span className="font-mono text-body-xs">text-p-text</span> and friends.
+              <span className="font-mono text-body-xs">text-fg</span> and friends.
             </p>
           </div>
           <div className="flex flex-col divide-y divide-border">
@@ -228,7 +237,7 @@ export default function Colors() {
                 {...t}
                 swatch={
                   <div
-                    className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-border bg-p-bg-surface"
+                    className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-border bg-surface"
                     style={{ color: `var(${t.v})` }}
                   >
                     <span className="font-heading text-body-lg">Aa</span>
@@ -245,7 +254,7 @@ export default function Colors() {
             <h2 className="text-h3 font-semibold">Borders</h2>
             <p className="text-body-sm text-muted-foreground">
               Dividers and outlines by prominence —{" "}
-              <span className="font-mono text-body-xs">border-p-border</span> and friends.
+              <span className="font-mono text-body-xs">border-line</span> and friends.
             </p>
           </div>
           <div className="flex flex-col divide-y divide-border">
@@ -255,7 +264,7 @@ export default function Colors() {
                 {...b}
                 swatch={
                   <div
-                    className="size-12 shrink-0 rounded-lg bg-p-bg-surface"
+                    className="size-12 shrink-0 rounded-lg bg-surface"
                     style={{ border: `2px solid var(${b.v})` }}
                   />
                 }
@@ -269,9 +278,9 @@ export default function Colors() {
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Intents</h2>
             <p className="text-body-sm text-muted-foreground">
-              Status colors — <span className="font-mono text-body-xs">p-surface-*</span> (pale
-              bg), <span className="font-mono text-body-xs">p-*</span> (accent text/border), and{" "}
-              <span className="font-mono text-body-xs">p-fill-*</span> (solid).
+              Status colors — <span className="font-mono text-body-xs">surface-*</span> (pale
+              bg), <span className="font-mono text-body-xs">text-*</span> (accent text/border), and{" "}
+              <span className="font-mono text-body-xs">fill-*</span> (solid).
             </p>
           </div>
           {INTENTS.map((intent) => (

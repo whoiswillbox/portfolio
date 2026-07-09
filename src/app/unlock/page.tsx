@@ -241,7 +241,7 @@ function UnlockForm() {
               </TooltipProvider>
             </form>
             {error && (
-              <p className="px-1 text-body-sm text-p-critical">{error}</p>
+              <p className="px-1 text-body-sm text-critical">{error}</p>
             )}
           </div>
         </div>

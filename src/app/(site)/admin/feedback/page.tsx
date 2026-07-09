@@ -58,15 +58,15 @@ export default function FeedbackPage() {
         Thumbs up/down visitors gave AI answers (most recent first).
       </p>
 
-      {error && <p className="mt-4 text-body-sm text-p-critical">{error}</p>}
+      {error && <p className="mt-4 text-body-sm text-critical">{error}</p>}
 
       {entries && (
         <div className="mt-6 flex flex-col gap-4">
           <div className="flex items-center gap-4 text-body-sm">
-            <span className="flex items-center gap-1.5 text-p-success">
+            <span className="flex items-center gap-1.5 text-success">
               <HandThumbUpIcon className="size-4" /> {ups}
             </span>
-            <span className="flex items-center gap-1.5 text-p-critical">
+            <span className="flex items-center gap-1.5 text-critical">
               <HandThumbDownIcon className="size-4" /> {downs}
             </span>
             <span className="text-muted-foreground">
@@ -84,7 +84,7 @@ export default function FeedbackPage() {
                 <span
                   className={cn(
                     "flex items-center gap-1 font-medium",
-                    e.rating === "up" ? "text-p-success" : "text-p-critical"
+                    e.rating === "up" ? "text-success" : "text-critical"
                   )}
                 >
                   {e.rating === "up" ? (

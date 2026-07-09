@@ -39,39 +39,47 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* PatternFly-style neutral surfaces (prominence system). Backgrounds ordered
-     by prominence: `bg` (page) → `bg-surface` (highest, a card) → `-secondary`
-     → `-tertiary`, each with interaction states; plus an inverse for high
-     contrast. Utility form: bg-p-bg, bg-p-bg-surface-hover, … (theme-aware). */
-  --color-p-bg: var(--p-bg);
-  --color-p-bg-inverse: var(--p-bg-inverse);
+  /* Neutral surfaces (prominence system). Clean, Tailwind-native utilities:
+     bg-page (default) → bg-surface (highest, a card) → -secondary → -tertiary,
+     each with interaction states; plus bg-inverse for high contrast. */
+  --color-page: var(--p-bg);
+  --color-inverse: var(--p-bg-inverse);
 
-  --color-p-bg-surface: var(--p-bg-surface);
-  --color-p-bg-surface-hover: var(--p-bg-surface-hover);
-  --color-p-bg-surface-active: var(--p-bg-surface-active);
-  --color-p-bg-surface-selected: var(--p-bg-surface-selected);
-  --color-p-bg-surface-disabled: var(--p-bg-surface-disabled);
+  --color-surface: var(--p-bg-surface);
+  --color-surface-hover: var(--p-bg-surface-hover);
+  --color-surface-active: var(--p-bg-surface-active);
+  --color-surface-selected: var(--p-bg-surface-selected);
+  --color-surface-disabled: var(--p-bg-surface-disabled);
 
-  --color-p-bg-surface-secondary: var(--p-bg-surface-secondary);
-  --color-p-bg-surface-secondary-hover: var(--p-bg-surface-secondary-hover);
-  --color-p-bg-surface-secondary-active: var(--p-bg-surface-secondary-active);
-  --color-p-bg-surface-secondary-selected: var(--p-bg-surface-secondary-selected);
+  --color-surface-secondary: var(--p-bg-surface-secondary);
+  --color-surface-secondary-hover: var(--p-bg-surface-secondary-hover);
+  --color-surface-secondary-active: var(--p-bg-surface-secondary-active);
+  --color-surface-secondary-selected: var(--p-bg-surface-secondary-selected);
 
-  --color-p-bg-surface-tertiary: var(--p-bg-surface-tertiary);
-  --color-p-bg-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
-  --color-p-bg-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
+  --color-surface-tertiary: var(--p-bg-surface-tertiary);
+  --color-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
+  --color-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
 
-  /* Text — by prominence. Utility form: text-p-text, text-p-text-subtle, … */
-  --color-p-text: var(--p-text);
-  --color-p-text-secondary: var(--p-text-secondary);
-  --color-p-text-subtle: var(--p-text-subtle);
-  --color-p-text-disabled: var(--p-text-disabled);
-  --color-p-text-on-inverse: var(--p-text-on-inverse);
+  /* Foreground text — by prominence. Utility form: text-fg, text-fg-subtle, … */
+  --color-fg: var(--p-text);
+  --color-fg-secondary: var(--p-text-secondary);
+  --color-fg-subtle: var(--p-text-subtle);
+  --color-fg-disabled: var(--p-text-disabled);
+  --color-fg-on-inverse: var(--p-text-on-inverse);
+  --color-fg-brand: var(--p-text-brand);
+  --color-fg-brand-hover: var(--p-text-brand-hover);
+  --color-fg-link: var(--p-text-link);
+  --color-fg-link-hover: var(--p-text-link-hover);
+  --color-fg-link-active: var(--p-text-link-active);
 
-  /* Borders — by prominence. Utility form: border-p-border, border-p-border-strong, … */
-  --color-p-border: var(--p-border);
-  --color-p-border-subtle: var(--p-border-subtle);
-  --color-p-border-strong: var(--p-border-strong);
+  /* Neutral borders — by prominence + state. Utility form: border-line,
+     border-line-secondary, border-line-hover, … (distinct neutral shades). */
+  --color-line: var(--p-border);
+  --color-line-hover: var(--p-border-hover);
+  --color-line-disabled: var(--p-border-disabled);
+  --color-line-secondary: var(--p-border-secondary);
+  --color-line-tertiary: var(--p-border-tertiary);
+  --color-line-focus: var(--p-border-focus);
 }
 
 /* --- Light theme ------------------------------------------------------ */
@@ -133,11 +141,20 @@
   --p-text-subtle: var(--neutral-500);
   --p-text-disabled: var(--neutral-400);
   --p-text-on-inverse: var(--neutral-50);
+  --p-text-brand: var(--brand-700);
+  --p-text-brand-hover: var(--brand-800);
+  --p-text-link: var(--blue-700);
+  --p-text-link-hover: var(--blue-800);
+  --p-text-link-active: var(--blue-900);
 
-  /* Borders — light. */
+  /* Borders — light. Distinct neutral shades: default → hover (darker) →
+     secondary (lighter divider) → tertiary (darkest). */
   --p-border: var(--neutral-200);
-  --p-border-subtle: var(--neutral-100);
-  --p-border-strong: var(--neutral-300);
+  --p-border-hover: var(--neutral-400);
+  --p-border-disabled: var(--neutral-100);
+  --p-border-secondary: var(--neutral-100);
+  --p-border-tertiary: var(--neutral-300);
+  --p-border-focus: var(--brand-500);
 }
 
 /* --- Dark theme ------------------------------------------------------- */
@@ -201,9 +218,17 @@
   --p-text-subtle: var(--neutral-400);
   --p-text-disabled: var(--neutral-600);
   --p-text-on-inverse: var(--neutral-950);
+  --p-text-brand: var(--brand-300);
+  --p-text-brand-hover: var(--brand-200);
+  --p-text-link: var(--blue-300);
+  --p-text-link-hover: var(--blue-200);
+  --p-text-link-active: var(--blue-100);
 
   /* Borders — dark. */
-  --p-border: var(--white-a10);
-  --p-border-subtle: var(--white-a10);
-  --p-border-strong: var(--white-a15);
+  --p-border: var(--neutral-700);
+  --p-border-hover: var(--neutral-500);
+  --p-border-disabled: var(--neutral-800);
+  --p-border-secondary: var(--neutral-800);
+  --p-border-tertiary: var(--neutral-600);
+  --p-border-focus: var(--brand-400);
 }
