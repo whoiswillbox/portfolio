@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -112,6 +113,7 @@ export default function UnlockPage() {
 }
 
 function UnlockForm() {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -138,14 +140,13 @@ function UnlockForm() {
         setSubmitting(false);
         return;
       }
-      // Always land on the landing page (/) after unlocking. Flag the arrival in
-      // sessionStorage so the landing reads it synchronously on first render and
-      // fades in WITHOUT the slide. A full reload (not router.replace) guarantees
-      // a clean fresh mount of the (site) layout — avoids the sidebar flash and
-      // the slide that a soft SPA nav across route groups was leaving behind.
+      // Always land on the landing page (/) after unlocking. Flag the arrival so
+      // the landing zeroes its slide (fade-only). Soft SPA nav (no page reload) —
+      // the sidebar flash and slide are handled properly now (defaultOpen=false +
+      // the landing's layout-effect), so a full reload is no longer needed.
       sessionStorage.setItem("from-unlock", "1");
       setTimeout(() => {
-        window.location.href = "/";
+        router.replace("/");
       }, 800);
     } catch {
       setError(randomWrong());
