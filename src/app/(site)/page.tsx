@@ -98,9 +98,12 @@ export default function LandingPage() {
   // initializer — this avoids useSearchParams (which shifted the hydration
   // boundary and surfaced a sidebar data-state mismatch). This screen is reached
   // by client nav from /unlock, so there's no SSR frame to mismatch.
-  const [fromUnlock] = useState(
-    () => typeof document !== "undefined" && /\/unlock(?:$|[/?])/.test(document.referrer)
-  );
+  const [fromUnlock] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const flag = sessionStorage.getItem("from-unlock") === "1";
+    if (flag) sessionStorage.removeItem("from-unlock");
+    return flag;
+  });
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {

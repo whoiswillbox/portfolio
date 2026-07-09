@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,7 +112,6 @@ export default function UnlockPage() {
 }
 
 function UnlockForm() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -140,14 +138,14 @@ function UnlockForm() {
         setSubmitting(false);
         return;
       }
-      // Always land on the landing page (/) after unlocking — the site's front
-      // door — regardless of where the visitor was gated from. Keep the box
-      // loading animation up briefly (submitting stays true) so the transition
-      // matches the landing page's own "enter" feel. The landing detects arrival
-      // from here via document.referrer to fade in without the slide.
+      // Always land on the landing page (/) after unlocking. Flag the arrival in
+      // sessionStorage so the landing reads it synchronously on first render and
+      // fades in WITHOUT the slide. A full reload (not router.replace) guarantees
+      // a clean fresh mount of the (site) layout — avoids the sidebar flash and
+      // the slide that a soft SPA nav across route groups was leaving behind.
+      sessionStorage.setItem("from-unlock", "1");
       setTimeout(() => {
-        router.replace("/");
-        router.refresh();
+        window.location.href = "/";
       }, 800);
     } catch {
       setError(randomWrong());
