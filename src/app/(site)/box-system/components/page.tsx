@@ -7,7 +7,7 @@ export default function Components() {
         <div className="flex flex-col gap-3 mb-10">
           <h1 className="text-h1 font-semibold">Components</h1>
           <p className="text-body-lg text-muted-foreground">
-            Reusable UI components built on the Box foundations.
+            Reusable UI components built on the Cardboard foundations.
           </p>
         </div>
         <p className="text-body-md text-muted-foreground">Coming soon.</p>

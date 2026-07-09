@@ -7,7 +7,7 @@ export default function Foundations() {
         <div className="flex flex-col gap-3 mb-10">
           <h1 className="text-h1 font-semibold">Foundations</h1>
           <p className="text-body-lg text-muted-foreground">
-            The primitives of the Box design system — color, type, spacing, and more.
+            The primitives of Cardboard — color, type, spacing, and more.
           </p>
         </div>
         <p className="text-body-md text-muted-foreground">Coming soon.</p>

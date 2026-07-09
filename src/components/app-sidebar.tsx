@@ -135,6 +135,42 @@ export function AppSidebar({
                   </SidebarMenuItem>
                 )
               })}
+
+              {/* Cardboard (design system) — collapsible with Foundations +
+                  Components, directly under the Box item. */}
+              <Collapsible
+                asChild
+                defaultOpen={pathname.startsWith("/box-system")}
+                className="group/boxsystem"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Cardboard">
+                      <SwatchIcon />
+                      <span>Cardboard</span>
+                      <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/boxsystem:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === "/box-system/foundations"}>
+                          <Link href="/box-system/foundations">
+                            <span>Foundations</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === "/box-system/components"}>
+                          <Link href="/box-system/components">
+                            <span>Components</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -324,41 +360,6 @@ export function AppSidebar({
       <SidebarFooter>
         <SidebarSeparator className="mx-0 mb-2 bg-border/50" />
         <SidebarMenu>
-          {/* Box System — collapsible with Foundations + Components. */}
-          <Collapsible
-            asChild
-            defaultOpen={pathname.startsWith("/box-system")}
-            className="group/boxsystem"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip="Box System">
-                  <SwatchIcon />
-                  <span>Box System</span>
-                  <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/boxsystem:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  <SidebarMenuSubItem>
-                    <SidebarMenuSubButton asChild isActive={pathname === "/box-system/foundations"}>
-                      <Link href="/box-system/foundations">
-                        <span>Foundations</span>
-                      </Link>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                  <SidebarMenuSubItem>
-                    <SidebarMenuSubButton asChild isActive={pathname === "/box-system/components"}>
-                      <Link href="/box-system/components">
-                        <span>Components</span>
-                      </Link>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={pathname === "/settings"}>
               <Link href="/settings">
