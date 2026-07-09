@@ -83,16 +83,16 @@ const SURFACES: { token: string; v: string; description: string }[] = [
 // Text tokens — the swatch shows the color as a filled chip (text colors are
 // hard to read as a pale swatch, so we fill a chip with the text color).
 const TEXTS: { token: string; v: string; description: string }[] = [
-  { token: "text-content", v: "--p-text", description: "The default text color." },
-  { token: "text-content-secondary", v: "--p-text-secondary", description: "Text with a secondary level of prominence." },
-  { token: "text-content-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
-  { token: "text-content-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
-  { token: "text-content-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
-  { token: "text-content-link", v: "--p-text-link", description: "Text links." },
-  { token: "text-content-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
-  { token: "text-content-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
-  { token: "text-content-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
-  { token: "text-content-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
+  { token: "text-text", v: "--p-text", description: "The default text color." },
+  { token: "text-text-secondary", v: "--p-text-secondary", description: "Text with a secondary level of prominence." },
+  { token: "text-text-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
+  { token: "text-text-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
+  { token: "text-text-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
+  { token: "text-text-link", v: "--p-text-link", description: "Text links." },
+  { token: "text-text-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
+  { token: "text-text-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
+  { token: "text-text-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
+  { token: "text-text-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
   // Intent text (saturated accents) — text-info / text-success / …
   { token: "text-info", v: "--accent-info", description: "Text communicating information." },
   { token: "text-success", v: "--accent-success", description: "Text communicating success." },
@@ -101,12 +101,12 @@ const TEXTS: { token: string; v: string; description: string }[] = [
 ];
 
 const BORDERS: { token: string; v: string; description: string }[] = [
-  { token: "border-line", v: "--p-border", description: "Default border for separating elements." },
-  { token: "border-line-hover", v: "--p-border-hover", description: "Hover state — a stronger, darker border." },
-  { token: "border-line-disabled", v: "--p-border-disabled", description: "Disabled state border." },
-  { token: "border-line-secondary", v: "--p-border-secondary", description: "Subtle, low-contrast divider." },
-  { token: "border-line-tertiary", v: "--p-border-tertiary", description: "Stronger, higher-contrast border." },
-  { token: "border-line-focus", v: "--p-border-focus", description: "Focus ring / active outline." },
+  { token: "border", v: "--p-border", description: "Default border for separating elements." },
+  { token: "border-hover", v: "--p-border-hover", description: "Hover state — a stronger, darker border." },
+  { token: "border-disabled", v: "--p-border-disabled", description: "Disabled state border." },
+  { token: "border-subtle", v: "--p-border-secondary", description: "Subtle, low-contrast divider." },
+  { token: "border-strong", v: "--p-border-tertiary", description: "Stronger, higher-contrast border." },
+  { token: "border-focus", v: "--p-border-focus", description: "Focus ring / active outline." },
   // Intent borders (saturated accents) — border-info / border-success / …
   { token: "border-info", v: "--accent-info", description: "Border communicating information." },
   { token: "border-success", v: "--accent-success", description: "Border communicating success." },
@@ -116,10 +116,12 @@ const BORDERS: { token: string; v: string; description: string }[] = [
 
 // The public design-token var for a utility (what a consumer would reference in
 // CSS), derived from the token by stripping the property prefix: e.g.
-// "text-content-link" → "--color-content-link". Primitives (already a --var
+// "text-text-link" → "--color-content-link". Primitives (already a --var
 // passed as the token) fall through unchanged. The swatch still RENDERS from the
 // internal `v` (which may be a private --p-* var), but we never surface that.
 function publicVar(token: string, v: string): string {
+  // A bare property utility (e.g. "border") maps to --color-{property}.
+  if (/^(bg|text|border|ring|fill|stroke)$/.test(token)) return `--color-${token}`;
   // Primitive ramp rows pass a raw ramp var as `v` (e.g. --neutral-500) and the
   // token is the same name without the leading dashes → show the ramp var itself.
   if (!/^(bg|text|border|ring|fill|stroke)-/.test(token)) return v;
@@ -269,12 +271,12 @@ export default function Colors() {
             <h2 className="text-h3 font-semibold">Text</h2>
             <p className="text-body-sm text-muted-foreground">
               Foreground text by prominence —{" "}
-              <span className="font-mono text-body-xs">text-content</span> and friends.
+              <span className="font-mono text-body-xs">text-text</span> and friends.
             </p>
             <UsageHint>
-              <span className="font-mono text-body-xs">text-content</span> for body copy,{" "}
-              <span className="font-mono text-body-xs">text-content-subtle</span> for
-              captions and secondary labels, <span className="font-mono text-body-xs">text-content-link</span>{" "}
+              <span className="font-mono text-body-xs">text-text</span> for body copy,{" "}
+              <span className="font-mono text-body-xs">text-text-subtle</span> for
+              captions and secondary labels, <span className="font-mono text-body-xs">text-text-link</span>{" "}
               for links, and the intent variants (
               <span className="font-mono text-body-xs">text-critical</span>…) for
               inline status messages.

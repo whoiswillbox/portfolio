@@ -60,17 +60,17 @@
   --color-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
   --color-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
 
-  /* Foreground text — by prominence. Utility form: text-content, text-content-subtle, … */
-  --color-content: var(--p-text);
-  --color-content-secondary: var(--p-text-secondary);
-  --color-content-subtle: var(--p-text-subtle);
-  --color-content-disabled: var(--p-text-disabled);
-  --color-content-on-inverse: var(--p-text-on-inverse);
-  --color-content-brand: var(--p-text-brand);
-  --color-content-brand-hover: var(--p-text-brand-hover);
-  --color-content-link: var(--p-text-link);
-  --color-content-link-hover: var(--p-text-link-hover);
-  --color-content-link-active: var(--p-text-link-active);
+  /* Foreground text — by prominence. Utility form: text-text, text-text-subtle, … */
+  --color-text: var(--p-text);
+  --color-text-secondary: var(--p-text-secondary);
+  --color-text-subtle: var(--p-text-subtle);
+  --color-text-disabled: var(--p-text-disabled);
+  --color-text-on-inverse: var(--p-text-on-inverse);
+  --color-text-brand: var(--p-text-brand);
+  --color-text-brand-hover: var(--p-text-brand-hover);
+  --color-text-link: var(--p-text-link);
+  --color-text-link-hover: var(--p-text-link-hover);
+  --color-text-link-active: var(--p-text-link-active);
 
   /* Icon colors — utility form: text-icon, text-icon-info, … */
   --color-icon: var(--p-text);
@@ -82,20 +82,21 @@
   --color-icon-caution: var(--accent-caution);
   --color-icon-critical: var(--accent-critical);
 
-  /* Neutral borders — by prominence + state. Utility form: border-line,
-     border-line-secondary, border-line-hover, … (distinct neutral shades). */
-  --color-line: var(--p-border);
-  --color-line-hover: var(--p-border-hover);
-  --color-line-disabled: var(--p-border-disabled);
-  --color-line-secondary: var(--p-border-secondary);
-  --color-line-tertiary: var(--p-border-tertiary);
-  --color-line-focus: var(--p-border-focus);
+  /* Neutral borders — by prominence + state. The default is `border`
+     (--color-border, defined above with the shadcn roles); these extend that
+     family. Utility form: border, border-subtle, border-strong, border-focus, …
+     (distinct neutral shades). */
+  --color-border-hover: var(--p-border-hover);
+  --color-border-disabled: var(--p-border-disabled);
+  --color-border-subtle: var(--p-border-secondary);
+  --color-border-strong: var(--p-border-tertiary);
+  --color-border-focus: var(--p-border-focus);
 }
 
 /* --- Light theme ------------------------------------------------------ */
 /* shadcn role tokens are ALIASED to the Cardboard tokens below (--p-*), so the
    vendored ui/ components (which consume --card, --muted, --border, …) resolve
-   to the same values as our bg-surface / text-content / border-line utilities. One
+   to the same values as our bg-surface / text-text / border utilities. One
    unified system; the Colors page "semantic roles" are truthful. Cardboard token
    VALUES are defined in the surfaces/text/borders blocks (see @theme + below). */
 :root {
