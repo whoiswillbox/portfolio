@@ -165,14 +165,14 @@ function UnlockForm() {
                   setPassword(e.target.value);
                   setError(false);
                 }}
-                placeholder="Password"
+                placeholder="Psst… what's the password?"
                 aria-label="Password"
                 autoFocus
                 autoCapitalize="none"
                 autoCorrect="off"
                 autoComplete="off"
                 spellCheck={false}
-                className="!h-14 min-h-14 flex-1 bg-background px-4 !text-lg"
+                className="!h-14 min-h-14 flex-1 bg-background px-4 text-base"
               />
               <Button
                 type="submit"
