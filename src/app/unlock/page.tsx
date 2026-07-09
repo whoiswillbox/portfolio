@@ -203,14 +203,14 @@ function UnlockForm() {
                   </TooltipTrigger>
                   {!password.trim() && !submitting && (
                     <TooltipContent side="top">
-                      A password is required to enter the site.
+                      Type the password first
                     </TooltipContent>
                   )}
                 </Tooltip>
               </TooltipProvider>
             </form>
             {error && (
-              <p className="px-1 text-body-sm text-critical">Incorrect password. Try again.</p>
+              <p className="px-1 text-body-sm text-critical">Nice try — that&apos;s not it.</p>
             )}
           </div>
         </div>
