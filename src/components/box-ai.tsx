@@ -1043,11 +1043,11 @@ export function BoxAI({
           </button>
         </div>
       )}
-      {/* Typing-mode close (top-left): dismisses the keyboard. Portaled to
-          <body> so no transformed ancestor breaks its fixed position. Rendered
-          only while a text input is focused; visibility via inline styles (no
-          CSS-class matching to guess at). */}
-      {!embedded && !active && mounted && createPortal(
+      {/* Typing-mode close (top-right): dismisses the keyboard. Mobile only — on
+          desktop there's no keyboard, and the inline display:flex would override
+          sm:hidden. Portaled to <body> so no transformed ancestor breaks its
+          fixed position. Visibility (opacity) tracks input focus. */}
+      {!embedded && !active && mounted && isMobile && createPortal(
         <button
           type="button"
           aria-label="Done"
