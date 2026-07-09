@@ -140,9 +140,16 @@ function UnlockForm() {
         setSubmitting(false);
         return;
       }
-      const next = params.get("next") || "/";
-      router.replace(next);
-      router.refresh();
+      // Match the landing page's "enter" flow: keep the box loading animation on
+      // screen briefly and set the `entered` flag so the destination (/who)
+      // plays its one-time entrance fade — same experience as entering from the
+      // landing page. (submitting stays true so the Lottie overlay stays up.)
+      const next = params.get("next") || "/who";
+      sessionStorage.setItem("entered", "1");
+      setTimeout(() => {
+        router.replace(next);
+        router.refresh();
+      }, 800);
     } catch {
       setError(randomWrong());
       setSubmitting(false);
