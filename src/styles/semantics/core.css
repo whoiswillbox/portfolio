@@ -39,14 +39,27 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* PatternFly-style neutral surfaces (prominence system). `bg-surface` is the
-     highest-prominence surface (a card); states layer on top. Utility form:
-     bg-p-bg-surface, bg-p-bg-surface-hover, … (theme-aware). */
+  /* PatternFly-style neutral surfaces (prominence system). Backgrounds ordered
+     by prominence: `bg` (page) → `bg-surface` (highest, a card) → `-secondary`
+     → `-tertiary`, each with interaction states; plus an inverse for high
+     contrast. Utility form: bg-p-bg, bg-p-bg-surface-hover, … (theme-aware). */
+  --color-p-bg: var(--p-bg);
+  --color-p-bg-inverse: var(--p-bg-inverse);
+
   --color-p-bg-surface: var(--p-bg-surface);
   --color-p-bg-surface-hover: var(--p-bg-surface-hover);
   --color-p-bg-surface-active: var(--p-bg-surface-active);
   --color-p-bg-surface-selected: var(--p-bg-surface-selected);
   --color-p-bg-surface-disabled: var(--p-bg-surface-disabled);
+
+  --color-p-bg-surface-secondary: var(--p-bg-surface-secondary);
+  --color-p-bg-surface-secondary-hover: var(--p-bg-surface-secondary-hover);
+  --color-p-bg-surface-secondary-active: var(--p-bg-surface-secondary-active);
+  --color-p-bg-surface-secondary-selected: var(--p-bg-surface-secondary-selected);
+
+  --color-p-bg-surface-tertiary: var(--p-bg-surface-tertiary);
+  --color-p-bg-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
+  --color-p-bg-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
 }
 
 /* --- Light theme ------------------------------------------------------ */
@@ -83,12 +96,24 @@
   --sidebar-border: var(--neutral-200);
   --sidebar-ring: var(--neutral-400);
 
-  /* Neutral surfaces (highest prominence) — light. */
+  /* Neutral surfaces (prominence system) — light. */
+  --p-bg: var(--neutral-50);
+  --p-bg-inverse: var(--neutral-900);
+
   --p-bg-surface: var(--neutral-0);
   --p-bg-surface-hover: var(--neutral-100);
   --p-bg-surface-active: var(--neutral-200);
   --p-bg-surface-selected: var(--neutral-100);
   --p-bg-surface-disabled: var(--neutral-100);
+
+  --p-bg-surface-secondary: var(--neutral-100);
+  --p-bg-surface-secondary-hover: var(--neutral-200);
+  --p-bg-surface-secondary-active: var(--neutral-300);
+  --p-bg-surface-secondary-selected: var(--neutral-200);
+
+  --p-bg-surface-tertiary: var(--neutral-200);
+  --p-bg-surface-tertiary-hover: var(--neutral-300);
+  --p-bg-surface-tertiary-active: var(--neutral-400);
 }
 
 /* --- Dark theme ------------------------------------------------------- */
@@ -127,10 +152,22 @@
   --sidebar-border: var(--white-a10);
   --sidebar-ring: var(--neutral-500);
 
-  /* Neutral surfaces (highest prominence) — dark. */
+  /* Neutral surfaces (prominence system) — dark. */
+  --p-bg: var(--neutral-950);
+  --p-bg-inverse: var(--neutral-50);
+
   --p-bg-surface: var(--neutral-900);
   --p-bg-surface-hover: var(--neutral-800);
   --p-bg-surface-active: var(--neutral-700);
   --p-bg-surface-selected: var(--neutral-800);
   --p-bg-surface-disabled: var(--neutral-800);
+
+  --p-bg-surface-secondary: var(--neutral-800);
+  --p-bg-surface-secondary-hover: var(--neutral-700);
+  --p-bg-surface-secondary-active: var(--neutral-600);
+  --p-bg-surface-secondary-selected: var(--neutral-700);
+
+  --p-bg-surface-tertiary: var(--neutral-700);
+  --p-bg-surface-tertiary-hover: var(--neutral-600);
+  --p-bg-surface-tertiary-active: var(--neutral-500);
 }

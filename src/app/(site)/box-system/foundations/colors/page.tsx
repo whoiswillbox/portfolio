@@ -29,11 +29,20 @@ const SEMANTIC: { name: string; varName: string; fg?: string }[] = [
 // prominence (a card); each has interaction states. token = the Tailwind utility;
 // v = the live CSS var the swatch renders (theme-aware).
 const SURFACES: { token: string; v: string; description: string }[] = [
+  { token: "bg-p-bg", v: "--p-bg", description: "The default page background." },
+  { token: "bg-p-bg-inverse", v: "--p-bg-inverse", description: "High-contrast inverse background." },
   { token: "bg-p-bg-surface", v: "--p-bg-surface", description: "Highest prominence surface, like a card." },
   { token: "bg-p-bg-surface-hover", v: "--p-bg-surface-hover", description: "Hover state for the highest-prominence surface." },
   { token: "bg-p-bg-surface-active", v: "--p-bg-surface-active", description: "Active (on-press) state for the highest-prominence surface." },
   { token: "bg-p-bg-surface-selected", v: "--p-bg-surface-selected", description: "Selected state for the highest-prominence surface." },
   { token: "bg-p-bg-surface-disabled", v: "--p-bg-surface-disabled", description: "Disabled state for elements." },
+  { token: "bg-p-bg-surface-secondary", v: "--p-bg-surface-secondary", description: "Second level of prominence." },
+  { token: "bg-p-bg-surface-secondary-hover", v: "--p-bg-surface-secondary-hover", description: "Hover state for the second level of prominence." },
+  { token: "bg-p-bg-surface-secondary-active", v: "--p-bg-surface-secondary-active", description: "Active (on-press) state for the second level of prominence." },
+  { token: "bg-p-bg-surface-secondary-selected", v: "--p-bg-surface-secondary-selected", description: "Selected state for the second level of prominence." },
+  { token: "bg-p-bg-surface-tertiary", v: "--p-bg-surface-tertiary", description: "Third level of prominence." },
+  { token: "bg-p-bg-surface-tertiary-hover", v: "--p-bg-surface-tertiary-hover", description: "Hover state for the third level of prominence." },
+  { token: "bg-p-bg-surface-tertiary-active", v: "--p-bg-surface-tertiary-active", description: "Active (on-press) state for the third level of prominence." },
 ];
 
 function SurfaceRow({ token, v, description }: { token: string; v: string; description: string }) {
