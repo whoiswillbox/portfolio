@@ -135,20 +135,18 @@ const ICONS: { token: string; v: string; description: string }[] = [
 // Primitive ramps — raw palette values (context-free). Var names match colors.css.
 const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
 const RAMPS: { name: string; prefix: string; steps: readonly string[] }[] = [
-  { name: "Neutral (taupe)", prefix: "--neutral", steps: ["0", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950", "1000"] },
+  { name: "Neutral", prefix: "--neutral", steps: ["0", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950", "1000"] },
   { name: "Brand", prefix: "--brand", steps: [...STEPS, "950"] },
-  { name: "Blue — info", prefix: "--blue", steps: STEPS },
-  { name: "Green — success", prefix: "--green", steps: STEPS },
-  { name: "Amber — caution", prefix: "--amber", steps: STEPS },
-  { name: "Red — critical", prefix: "--red", steps: STEPS },
+  { name: "Blue", prefix: "--blue", steps: STEPS },
+  { name: "Green", prefix: "--green", steps: STEPS },
+  { name: "Amber", prefix: "--amber", steps: STEPS },
+  { name: "Red", prefix: "--red", steps: STEPS },
 ];
 
 function RampRow({ name, prefix, steps }: { name: string; prefix: string; steps: readonly string[] }) {
   return (
-    <div className="flex flex-col gap-2">
-      <h3 className="font-mono text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {name}
-      </h3>
+    <section className="mb-14 flex flex-col gap-4">
+      <h2 className="text-h3 font-semibold">{name}</h2>
       <div className="flex flex-col divide-y divide-border">
         {steps.map((step) => (
           <SurfaceRow
@@ -159,7 +157,7 @@ function RampRow({ name, prefix, steps }: { name: string; prefix: string; steps:
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -295,19 +293,12 @@ export default function Colors() {
           </div>
         </section>
         ) : (
-        /* Primitive ramps */
-        <section className="flex flex-col gap-8">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Primitive ramps</h2>
-            <p className="text-body-sm text-muted-foreground">
-              The raw palette. Reference-only — the semantic layer maps these to
-              roles.
-            </p>
-          </div>
+        /* Primitive ramps — each ramp is its own top-level section. */
+        <>
           {RAMPS.map((ramp) => (
             <RampRow key={ramp.prefix} {...ramp} />
           ))}
-        </section>
+        </>
         )}
       </div>
     </ContentCard>
