@@ -172,7 +172,7 @@ function UnlockForm() {
                 autoCorrect="off"
                 autoComplete="off"
                 spellCheck={false}
-                className="!h-14 min-h-14 flex-1 bg-background px-4 text-base"
+                className="!h-14 min-h-14 flex-1 bg-background px-4 !text-lg"
               />
               <Button
                 type="submit"
