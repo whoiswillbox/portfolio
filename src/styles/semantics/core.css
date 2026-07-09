@@ -93,24 +93,29 @@
 }
 
 /* --- Light theme ------------------------------------------------------ */
+/* shadcn role tokens are ALIASED to the Cardboard tokens below (--p-*), so the
+   vendored ui/ components (which consume --card, --muted, --border, …) resolve
+   to the same values as our bg-surface / text-fg / border-line utilities. One
+   unified system; the Colors page "semantic roles" are truthful. Cardboard token
+   VALUES are defined in the surfaces/text/borders blocks (see @theme + below). */
 :root {
-  --background: var(--neutral-0);
-  --foreground: var(--neutral-950);
-  --card: var(--neutral-0);
-  --card-foreground: var(--neutral-950);
-  --popover: var(--neutral-0);
-  --popover-foreground: var(--neutral-950);
+  --background: var(--p-bg-surface);
+  --foreground: var(--p-text);
+  --card: var(--p-bg-surface);
+  --card-foreground: var(--p-text);
+  --popover: var(--p-bg-surface);
+  --popover-foreground: var(--p-text);
   --primary: var(--neutral-800);
   --primary-foreground: var(--neutral-50);
-  --secondary: var(--neutral-100);
-  --secondary-foreground: var(--neutral-900);
-  --muted: var(--neutral-100);
-  --muted-foreground: var(--neutral-500);
-  --accent: var(--neutral-100);
-  --accent-foreground: var(--neutral-900);
+  --secondary: var(--p-bg-surface-secondary);
+  --secondary-foreground: var(--p-text);
+  --muted: var(--p-bg-surface-secondary);
+  --muted-foreground: var(--p-text-subtle);
+  --accent: var(--p-bg-surface-secondary);
+  --accent-foreground: var(--p-text);
   --destructive: var(--red-500);
-  --border: var(--neutral-200);
-  --input: var(--neutral-200);
+  --border: var(--p-border);
+  --input: var(--p-border);
   --ring: var(--neutral-400);
   --chart-1: var(--neutral-300);
   --chart-2: var(--neutral-500);
@@ -169,20 +174,23 @@
 
 /* --- Dark theme ------------------------------------------------------- */
 .dark {
-  --background: var(--neutral-950);
-  --foreground: var(--neutral-50);
-  --card: var(--neutral-900);
-  --card-foreground: var(--neutral-50);
-  --popover: var(--neutral-900);
-  --popover-foreground: var(--neutral-50);
+  /* Aliased to Cardboard tokens (--p-*), matching the previous dark values.
+     --border/--input keep the translucent-white treatment (the Cardboard
+     --p-border dark ramp is opaque neutral, used only for the docs swatches). */
+  --background: var(--p-bg);
+  --foreground: var(--p-text);
+  --card: var(--p-bg-surface);
+  --card-foreground: var(--p-text);
+  --popover: var(--p-bg-surface);
+  --popover-foreground: var(--p-text);
   --primary: var(--neutral-200);
   --primary-foreground: var(--neutral-900);
-  --secondary: var(--neutral-800);
-  --secondary-foreground: var(--neutral-50);
-  --muted: var(--neutral-800);
-  --muted-foreground: var(--neutral-400);
-  --accent: var(--neutral-800);
-  --accent-foreground: var(--neutral-50);
+  --secondary: var(--p-bg-surface-secondary);
+  --secondary-foreground: var(--p-text);
+  --muted: var(--p-bg-surface-secondary);
+  --muted-foreground: var(--p-text-subtle);
+  --accent: var(--p-bg-surface-secondary);
+  --accent-foreground: var(--p-text);
   --destructive: var(--red-400);
   --border: var(--white-a10);
   --input: var(--white-a15);
