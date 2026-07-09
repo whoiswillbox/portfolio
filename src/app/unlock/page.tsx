@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,7 +114,6 @@ export default function UnlockPage() {
 
 function UnlockForm() {
   const router = useRouter();
-  const params = useSearchParams();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -141,14 +140,12 @@ function UnlockForm() {
         setSubmitting(false);
         return;
       }
-      // Match the landing page's "enter" flow: keep the box loading animation on
-      // screen briefly and set the `entered` flag so the destination (/who)
-      // plays its one-time entrance fade — same experience as entering from the
-      // landing page. (submitting stays true so the Lottie overlay stays up.)
-      const next = params.get("next") || "/who";
-      sessionStorage.setItem("entered", "1");
+      // Always land on the landing page (/) after unlocking — the site's front
+      // door — regardless of where the visitor was gated from. Keep the box
+      // loading animation up briefly (submitting stays true) so the transition
+      // matches the landing page's own "enter" feel.
       setTimeout(() => {
-        router.replace(next);
+        router.replace("/");
         router.refresh();
       }, 800);
     } catch {
