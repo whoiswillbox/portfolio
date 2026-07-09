@@ -8,6 +8,7 @@ import {
   SunIcon,
   ShieldCheckIcon,
   WindowIcon,
+  LockClosedIcon,
   ChevronRightIcon,
   ArrowDownTrayIcon,
   CheckCircleIcon,
@@ -187,6 +188,25 @@ export function SettingsList({ isAdmin = false }: { isAdmin?: boolean }) {
                   <div className="text-sm font-medium">Landing page</div>
                   <div className="text-xs text-muted-foreground">
                     View the marketing landing page.
+                  </div>
+                </div>
+                <ChevronRightIcon className="size-4 text-muted-foreground shrink-0" />
+              </Link>
+            )}
+
+            {/* Password page — admin-only (opens the site's /unlock gate). */}
+            {isAdmin && (
+              <Link
+                href="/unlock"
+                className="flex items-center gap-4 px-3 py-4 transition-colors hover:bg-muted active:bg-muted rounded-lg"
+              >
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border">
+                  <LockClosedIcon className="size-5 text-foreground" />
+                </div>
+                <div className="flex flex-1 min-w-0 flex-col gap-1">
+                  <div className="text-sm font-medium">Password</div>
+                  <div className="text-xs text-muted-foreground">
+                    View the site password page.
                   </div>
                 </div>
                 <ChevronRightIcon className="size-4 text-muted-foreground shrink-0" />

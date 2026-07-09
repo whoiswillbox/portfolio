@@ -24,6 +24,7 @@ import {
   ShieldCheckIcon,
   ArrowDownTrayIcon,
   WindowIcon,
+  LockClosedIcon,
 } from "@heroicons/react/24/outline";
 import { InformationCircleIcon, HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from "@heroicons/react/24/solid";
 import { useTheme } from "next-themes";
@@ -1329,6 +1330,14 @@ export function BoxAI({
                 >
                   <WindowIcon className="size-5 text-muted-foreground" />
                   Landing page
+                </button>
+                <div className="mx-6 h-px bg-border/50" />
+                <button
+                  onClick={() => { setSettingsOpen(false); router.push("/unlock"); }}
+                  className="flex items-center gap-3 px-6 py-4 text-sm text-left text-muted-foreground transition-colors active:bg-muted outline-none w-full"
+                >
+                  <LockClosedIcon className="size-5 text-muted-foreground" />
+                  Password
                 </button>
               </>
             )}
