@@ -6,11 +6,12 @@ import { cn } from "@/lib/utils";
 
 /* A monospace token name that copies itself on click — for the design-system
    reference pages (Storybook-style). Shows a check for a beat after copying. */
-export function CopyToken({ value, className }: { value: string; className?: string }) {
+export function CopyToken({ value, copyValue, className }: { value: string; copyValue?: string; className?: string }) {
   const [copied, setCopied] = React.useState(false);
+  const toCopy = copyValue ?? value;
 
   const copy = () => {
-    navigator.clipboard?.writeText(value).then(() => {
+    navigator.clipboard?.writeText(toCopy).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
     }).catch(() => {});
@@ -20,7 +21,7 @@ export function CopyToken({ value, className }: { value: string; className?: str
     <button
       type="button"
       onClick={copy}
-      title={`Copy "${value}"`}
+      title={`Copy "${toCopy}"`}
       className={cn(
         "group/copy inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 font-mono text-body-xs text-foreground transition-colors hover:bg-muted",
         className

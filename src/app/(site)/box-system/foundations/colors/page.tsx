@@ -83,16 +83,16 @@ const SURFACES: { token: string; v: string; description: string }[] = [
 // Text tokens — the swatch shows the color as a filled chip (text colors are
 // hard to read as a pale swatch, so we fill a chip with the text color).
 const TEXTS: { token: string; v: string; description: string }[] = [
-  { token: "text-fg", v: "--p-text", description: "The default text color." },
-  { token: "text-fg-secondary", v: "--p-text-secondary", description: "Text with a secondary level of prominence." },
-  { token: "text-fg-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
-  { token: "text-fg-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
-  { token: "text-fg-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
-  { token: "text-fg-link", v: "--p-text-link", description: "Text links." },
-  { token: "text-fg-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
-  { token: "text-fg-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
-  { token: "text-fg-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
-  { token: "text-fg-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
+  { token: "text-content", v: "--p-text", description: "The default text color." },
+  { token: "text-content-secondary", v: "--p-text-secondary", description: "Text with a secondary level of prominence." },
+  { token: "text-content-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
+  { token: "text-content-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
+  { token: "text-content-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
+  { token: "text-content-link", v: "--p-text-link", description: "Text links." },
+  { token: "text-content-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
+  { token: "text-content-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
+  { token: "text-content-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
+  { token: "text-content-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
   // Intent text (saturated accents) — text-info / text-success / …
   { token: "text-info", v: "--accent-info", description: "Text communicating information." },
   { token: "text-success", v: "--accent-success", description: "Text communicating success." },
@@ -114,15 +114,32 @@ const BORDERS: { token: string; v: string; description: string }[] = [
   { token: "border-critical", v: "--accent-critical", description: "Border communicating a critical / error state." },
 ];
 
-function SurfaceRow({ token, v, description, swatch }: { token: string; v: string; description: string; swatch?: React.ReactNode }) {
+// The public design-token var for a utility (what a consumer would reference in
+// CSS), derived from the token by stripping the property prefix: e.g.
+// "text-content-link" → "--color-content-link". Primitives (already a --var
+// passed as the token) fall through unchanged. The swatch still RENDERS from the
+// internal `v` (which may be a private --p-* var), but we never surface that.
+function publicVar(token: string, v: string): string {
+  // Primitive ramp rows pass a raw ramp var as `v` (e.g. --neutral-500) and the
+  // token is the same name without the leading dashes → show the ramp var itself.
+  if (!/^(bg|text|border|ring|fill|stroke)-/.test(token)) return v;
+  const name = token.replace(/^(bg|text|border|ring|fill|stroke)-/, "");
+  return `--color-${name}`;
+}
+
+function SurfaceRow({ token, v, description, swatch, copyAs }: { token: string; v: string; description: string; swatch?: React.ReactNode; copyAs?: string }) {
+  // `token` is the label shown; `copyAs` (if given) is what actually gets copied
+  // — used for icons, where the label reads "icon-critical" but the working
+  // utility is "text-icon-critical". The public var is derived from copyAs.
+  const shown = publicVar(copyAs ?? token, v);
   return (
     <div className="flex items-center gap-4 py-3">
       {swatch ?? (
         <div className="size-12 shrink-0 rounded-lg border border-border" style={{ background: `var(${v})` }} />
       )}
       <div className="w-72 shrink-0 max-sm:w-40">
-        <CopyToken value={token} className="-ml-1.5" />
-        <div className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">var({v})</div>
+        <CopyToken value={token} copyValue={copyAs} className="-ml-1.5" />
+        <div className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">var({shown})</div>
       </div>
       <div className="flex-1 text-left text-body-sm text-muted-foreground">{description}</div>
     </div>
@@ -131,15 +148,17 @@ function SurfaceRow({ token, v, description, swatch }: { token: string; v: strin
 
 // Icon tokens — saturated colors for icon glyphs, mostly mirroring the intent
 // accents. Rendered as solid swatches.
-const ICONS: { token: string; v: string; description: string }[] = [
-  { token: "text-icon", v: "--p-text", description: "Default icon color." },
-  { token: "text-icon-secondary", v: "--p-text-secondary", description: "Secondary, lower-prominence icons." },
-  { token: "text-icon-subtle", v: "--p-text-subtle", description: "Subtle / muted icons." },
-  { token: "text-icon-brand", v: "--accent-brand", description: "Icons that need to pull attention." },
-  { token: "text-icon-info", v: "--accent-info", description: "Icons communicating information." },
-  { token: "text-icon-success", v: "--accent-success", description: "Icons communicating success." },
-  { token: "text-icon-caution", v: "--accent-caution", description: "Icons communicating caution." },
-  { token: "text-icon-critical", v: "--accent-critical", description: "Icons communicating a critical / error state." },
+// Icon tokens: shown as the clean "icon-*" name; copied as the working utility
+// "text-icon-*" (icons take their color from the text- utility in Tailwind).
+const ICONS: { token: string; copyAs: string; v: string; description: string }[] = [
+  { token: "icon", copyAs: "text-icon", v: "--p-text", description: "Default icon color." },
+  { token: "icon-secondary", copyAs: "text-icon-secondary", v: "--p-text-secondary", description: "Secondary, lower-prominence icons." },
+  { token: "icon-subtle", copyAs: "text-icon-subtle", v: "--p-text-subtle", description: "Subtle / muted icons." },
+  { token: "icon-brand", copyAs: "text-icon-brand", v: "--accent-brand", description: "Icons that need to pull attention." },
+  { token: "icon-info", copyAs: "text-icon-info", v: "--accent-info", description: "Icons communicating information." },
+  { token: "icon-success", copyAs: "text-icon-success", v: "--accent-success", description: "Icons communicating success." },
+  { token: "icon-caution", copyAs: "text-icon-caution", v: "--accent-caution", description: "Icons communicating caution." },
+  { token: "icon-critical", copyAs: "text-icon-critical", v: "--accent-critical", description: "Icons communicating a critical / error state." },
 ];
 
 // Primitive ramps — raw palette values (context-free). Var names match colors.css.
@@ -250,12 +269,12 @@ export default function Colors() {
             <h2 className="text-h3 font-semibold">Text</h2>
             <p className="text-body-sm text-muted-foreground">
               Foreground text by prominence —{" "}
-              <span className="font-mono text-body-xs">text-fg</span> and friends.
+              <span className="font-mono text-body-xs">text-content</span> and friends.
             </p>
             <UsageHint>
-              <span className="font-mono text-body-xs">text-fg</span> for body copy,{" "}
-              <span className="font-mono text-body-xs">text-fg-subtle</span> for
-              captions and secondary labels, <span className="font-mono text-body-xs">text-fg-link</span>{" "}
+              <span className="font-mono text-body-xs">text-content</span> for body copy,{" "}
+              <span className="font-mono text-body-xs">text-content-subtle</span> for
+              captions and secondary labels, <span className="font-mono text-body-xs">text-content-link</span>{" "}
               for links, and the intent variants (
               <span className="font-mono text-body-xs">text-critical</span>…) for
               inline status messages.

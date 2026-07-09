@@ -60,17 +60,17 @@
   --color-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
   --color-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
 
-  /* Foreground text — by prominence. Utility form: text-fg, text-fg-subtle, … */
-  --color-fg: var(--p-text);
-  --color-fg-secondary: var(--p-text-secondary);
-  --color-fg-subtle: var(--p-text-subtle);
-  --color-fg-disabled: var(--p-text-disabled);
-  --color-fg-on-inverse: var(--p-text-on-inverse);
-  --color-fg-brand: var(--p-text-brand);
-  --color-fg-brand-hover: var(--p-text-brand-hover);
-  --color-fg-link: var(--p-text-link);
-  --color-fg-link-hover: var(--p-text-link-hover);
-  --color-fg-link-active: var(--p-text-link-active);
+  /* Foreground text — by prominence. Utility form: text-content, text-content-subtle, … */
+  --color-content: var(--p-text);
+  --color-content-secondary: var(--p-text-secondary);
+  --color-content-subtle: var(--p-text-subtle);
+  --color-content-disabled: var(--p-text-disabled);
+  --color-content-on-inverse: var(--p-text-on-inverse);
+  --color-content-brand: var(--p-text-brand);
+  --color-content-brand-hover: var(--p-text-brand-hover);
+  --color-content-link: var(--p-text-link);
+  --color-content-link-hover: var(--p-text-link-hover);
+  --color-content-link-active: var(--p-text-link-active);
 
   /* Icon colors — utility form: text-icon, text-icon-info, … */
   --color-icon: var(--p-text);
@@ -95,7 +95,7 @@
 /* --- Light theme ------------------------------------------------------ */
 /* shadcn role tokens are ALIASED to the Cardboard tokens below (--p-*), so the
    vendored ui/ components (which consume --card, --muted, --border, …) resolve
-   to the same values as our bg-surface / text-fg / border-line utilities. One
+   to the same values as our bg-surface / text-content / border-line utilities. One
    unified system; the Colors page "semantic roles" are truthful. Cardboard token
    VALUES are defined in the surfaces/text/borders blocks (see @theme + below). */
 :root {
