@@ -183,8 +183,8 @@ export default function Colors() {
           <div className="flex flex-col gap-3">
             <h1 className="text-h1 font-semibold">Colors</h1>
             <p className="text-body-lg text-muted-foreground">
-              The live color tokens Cardboard uses. Swatches render the actual CSS
-              variables, so this page stays in sync and reflects the current theme.
+              Color highlights important areas, communicates status and urgency,
+              and directs attention.
             </p>
           </div>
           {/* Semantics / Primitives toggle */}
