@@ -25,6 +25,41 @@ const SEMANTIC: { name: string; varName: string; fg?: string }[] = [
   { name: "sidebar-border", varName: "--sidebar-border", fg: "--sidebar-foreground" },
 ];
 
+// Intent tokens (PatternFly-style `p-` scheme). Each intent has a pale surface
+// (+hover/active), a saturated accent (text/border), and a solid fill. Swatches
+// render the live internal vars these map to, so they stay in sync + theme-aware.
+const INTENTS = ["brand", "info", "success", "caution", "critical"] as const;
+function IntentRow({ intent }: { intent: (typeof INTENTS)[number] }) {
+  const surfaces = [
+    { token: `p-surface-${intent}`, v: `--surface-${intent}` },
+    { token: `p-surface-${intent}-hover`, v: `--surface-${intent}-hover` },
+    { token: `p-surface-${intent}-active`, v: `--surface-${intent}-active` },
+  ];
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="font-mono text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {intent}
+      </h3>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+        {surfaces.map((s) => (
+          <Swatch key={s.token} token={`bg-${s.token}`} v={s.v} />
+        ))}
+        <Swatch token={`text-p-${intent}`} v={`--accent-${intent}`} />
+        <Swatch token={`bg-p-fill-${intent}`} v={`--fill-${intent}`} />
+      </div>
+    </div>
+  );
+}
+
+function Swatch({ token, v }: { token: string; v: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="h-12 rounded-lg border border-border" style={{ background: `var(${v})` }} />
+      <span className="font-mono text-[0.6rem] leading-tight text-muted-foreground break-all">{token}</span>
+    </div>
+  );
+}
+
 // Primitive ramps — raw palette values (context-free). Var names match colors.css.
 const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
 const RAMPS: { name: string; prefix: string; steps: readonly string[] }[] = [
@@ -108,6 +143,21 @@ export default function Colors() {
               <SemanticSwatch key={t.name} {...t} />
             ))}
           </div>
+        </section>
+
+        {/* Intent tokens */}
+        <section className="mb-14 flex flex-col gap-6">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h3 font-semibold">Intents</h2>
+            <p className="text-body-sm text-muted-foreground">
+              Status colors — <span className="font-mono text-body-xs">p-surface-*</span> (pale
+              bg), <span className="font-mono text-body-xs">p-*</span> (accent text/border), and{" "}
+              <span className="font-mono text-body-xs">p-fill-*</span> (solid).
+            </p>
+          </div>
+          {INTENTS.map((intent) => (
+            <IntentRow key={intent} intent={intent} />
+          ))}
         </section>
 
         {/* Primitive ramps */}

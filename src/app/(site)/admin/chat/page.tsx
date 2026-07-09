@@ -87,7 +87,7 @@ export default function ChatLogPage() {
         What visitors have asked the AI assistant (most recent first).
       </p>
 
-      {error && <p className="mt-4 text-body-sm text-critical">{error}</p>}
+      {error && <p className="mt-4 text-body-sm text-p-critical">{error}</p>}
 
       {entries && (
         <div className="mt-6 flex flex-col gap-4">

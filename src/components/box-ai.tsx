@@ -963,9 +963,9 @@ export function BoxAI({
       footerLeft={usageNote}
       attachedSection={
         showNotice ? (
-          <Alert className="border-0 bg-transparent p-0 text-left text-info">
+          <Alert className="border-0 bg-transparent p-0 text-left text-p-info">
             <InformationCircleIcon className="size-4" />
-            <AlertDescription className="text-info/90">
+            <AlertDescription className="text-p-info/90">
               Conversations are saved to help improve Box&apos;s answers over time.
               Please don&apos;t share anything sensitive.
             </AlertDescription>
@@ -974,7 +974,7 @@ export function BoxAI({
                 type="button"
                 onClick={dismissNotice}
                 aria-label="Dismiss"
-                className="rounded p-0.5 text-info transition-colors hover:bg-info/10"
+                className="rounded p-0.5 text-p-info transition-colors hover:bg-p-info/10"
               >
                 <XMarkIcon className="size-4" />
               </button>
