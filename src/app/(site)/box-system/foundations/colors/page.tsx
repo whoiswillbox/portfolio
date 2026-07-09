@@ -189,7 +189,7 @@ export default function Colors() {
           </div>
           {/* Semantics / Primitives toggle */}
           <div className="inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
-            {(["semantics", "components", "primitives"] as const).map((v) => (
+            {(["primitives", "semantics", "components"] as const).map((v) => (
               <button
                 key={v}
                 type="button"
