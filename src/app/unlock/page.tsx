@@ -5,6 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const Lottie = lazy(() => import("lottie-react"));
@@ -174,14 +180,34 @@ function UnlockForm() {
                 spellCheck={false}
                 className="!h-14 min-h-14 flex-1 bg-background px-4 text-base"
               />
-              <Button
-                type="submit"
-                size="lg"
-                disabled={!password.trim() || submitting}
-                className="!h-14 min-h-14 text-base sm:w-40"
-              >
-                {submitting ? "Unlocking…" : "Enter"}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    {/* Not truly `disabled` when empty (disabled elements don't
+                        emit hover events, so the tooltip couldn't show) — style
+                        it disabled via aria-disabled + opacity. submit() already
+                        no-ops on an empty password. Real `disabled` only while
+                        submitting. */}
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={submitting}
+                      aria-disabled={!password.trim() || submitting}
+                      className={cn(
+                        "!h-14 min-h-14 text-base sm:w-40",
+                        !password.trim() && "opacity-50"
+                      )}
+                    >
+                      {submitting ? "Unlocking…" : "Enter"}
+                    </Button>
+                  </TooltipTrigger>
+                  {!password.trim() && !submitting && (
+                    <TooltipContent side="top">
+                      A password is required to enter the site.
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             </form>
             {error && (
               <p className="px-1 text-body-sm text-critical">Incorrect password. Try again.</p>
