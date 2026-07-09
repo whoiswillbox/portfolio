@@ -93,19 +93,18 @@ export default function LandingPage() {
   const { setOpen } = useSidebar();
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
-  // When arriving from the /unlock gate, fade in WITHOUT the slide. The slide
-  // class is rendered identically on server + client (so no hydration mismatch);
-  // if we arrived from unlock, strip it in a layout effect BEFORE paint so the
-  // slide never plays — a plain crossfade instead.
+  // When arriving from the /unlock gate, fade in WITHOUT the slide (a plain
+  // crossfade). The animate classes render identically on server + client (no
+  // hydration mismatch); if we arrived from unlock, zero out the slide DISTANCE
+  // before paint (keeping the fade) by setting tw-animate's translate var to 0.
   const cardRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     if (sessionStorage.getItem("from-unlock") === "1") {
       sessionStorage.removeItem("from-unlock");
-      // The slide class lives on the inner [data-scroll-container] div.
-      cardRef.current
-        ?.querySelector("[data-scroll-container]")
-        ?.classList.remove("slide-in-from-bottom-4");
+      const el = cardRef.current?.querySelector<HTMLElement>("[data-scroll-container]");
+      // Kill the slide offset but keep animate-in fade-in → fade only, no slide.
+      el?.style.setProperty("--tw-enter-translate-y", "0");
     }
   }, []);
 
