@@ -183,8 +183,8 @@ export default function Colors() {
           <div className="flex flex-col gap-3">
             <h1 className="text-h1 font-semibold">Colors</h1>
             <p className="text-body-lg text-muted-foreground">
-              Color highlights important areas, communicates status and urgency,
-              and directs attention.
+              Color sets tone, signals state and intent, and guides the eye to
+              what matters most.
             </p>
           </div>
           {/* Semantics / Primitives toggle */}
