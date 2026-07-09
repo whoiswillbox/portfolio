@@ -41,6 +41,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     ? { href: "/school", label: "Back" }
     : pathname === "/resume"
     ? { href: "/technergetics", label: "Back" }
+    : pathname.startsWith("/box-system/foundations/")
+    ? { href: "/box-system/foundations", label: "Back" }
     : null;
   const [isDesktop, setIsDesktop] = React.useState(true);
   React.useEffect(() => {

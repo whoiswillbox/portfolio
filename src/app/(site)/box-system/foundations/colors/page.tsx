@@ -1,16 +1,128 @@
+import Link from "next/link";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
+
+/* Living reference — swatches render the ACTUAL CSS variables the app uses, so
+   this page always reflects the real tokens (and updates with the theme). */
+
+// Semantic role tokens (shadcn vocabulary). Rendered via their CSS var so they
+// are theme-aware. `fg` is the paired foreground for showing legible text.
+const SEMANTIC: { name: string; varName: string; fg?: string }[] = [
+  { name: "background", varName: "--background", fg: "--foreground" },
+  { name: "foreground", varName: "--foreground", fg: "--background" },
+  { name: "card", varName: "--card", fg: "--card-foreground" },
+  { name: "popover", varName: "--popover", fg: "--popover-foreground" },
+  { name: "primary", varName: "--primary", fg: "--primary-foreground" },
+  { name: "secondary", varName: "--secondary", fg: "--secondary-foreground" },
+  { name: "muted", varName: "--muted", fg: "--muted-foreground" },
+  { name: "accent", varName: "--accent", fg: "--accent-foreground" },
+  { name: "destructive", varName: "--destructive", fg: "--background" },
+  { name: "border", varName: "--border", fg: "--foreground" },
+  { name: "input", varName: "--input", fg: "--foreground" },
+  { name: "ring", varName: "--ring", fg: "--background" },
+  { name: "sidebar", varName: "--sidebar", fg: "--sidebar-foreground" },
+  { name: "sidebar-accent", varName: "--sidebar-accent", fg: "--sidebar-accent-foreground" },
+  { name: "sidebar-border", varName: "--sidebar-border", fg: "--sidebar-foreground" },
+];
+
+// Primitive ramps — raw palette values (context-free). Var names match colors.css.
+const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
+const RAMPS: { name: string; prefix: string; steps: readonly string[] }[] = [
+  { name: "Neutral (taupe)", prefix: "--neutral", steps: ["0", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950", "1000"] },
+  { name: "Brand", prefix: "--brand", steps: [...STEPS, "950"] },
+  { name: "Blue — info", prefix: "--blue", steps: STEPS },
+  { name: "Green — success", prefix: "--green", steps: STEPS },
+  { name: "Amber — caution", prefix: "--amber", steps: STEPS },
+  { name: "Red — critical", prefix: "--red", steps: STEPS },
+];
+
+function SemanticSwatch({ name, varName, fg }: { name: string; varName: string; fg?: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div
+        className="flex h-20 items-end rounded-xl border border-border p-2"
+        style={{ background: `var(${varName})`, color: fg ? `var(${fg})` : undefined }}
+      >
+        <span className="font-mono text-body-xs">{name}</span>
+      </div>
+      <div className="px-0.5">
+        <div className="font-mono text-body-xs text-foreground">{name}</div>
+        <div className="font-mono text-[0.65rem] text-muted-foreground">var({varName})</div>
+      </div>
+    </div>
+  );
+}
+
+function RampRow({ name, prefix, steps }: { name: string; prefix: string; steps: readonly string[] }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="font-mono text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {name}
+      </h3>
+      <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-10">
+        {steps.map((step) => (
+          <div key={step} className="flex flex-col gap-1">
+            <div
+              className="h-12 rounded-lg border border-border"
+              style={{ background: `var(${prefix}-${step})` }}
+            />
+            <span className="text-center font-mono text-[0.6rem] text-muted-foreground">{step}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Colors() {
   return (
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
-        <div className="flex flex-col gap-3 mb-10">
+        <Link
+          href="/box-system/foundations"
+          className="mb-6 inline-flex items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground max-sm:hidden"
+        >
+          <ArrowLeftIcon className="size-4" />
+          Foundations
+        </Link>
+
+        <div className="flex flex-col gap-3 mb-12">
           <h1 className="text-h1 font-semibold">Colors</h1>
           <p className="text-body-lg text-muted-foreground">
-            Palette, semantic tokens, and themes.
+            The live color tokens Cardboard uses. Swatches render the actual CSS
+            variables, so this page stays in sync and reflects the current theme.
           </p>
         </div>
-        <p className="text-body-md text-muted-foreground">Coming soon.</p>
+
+        {/* Semantic tokens */}
+        <section className="mb-14 flex flex-col gap-5">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h3 font-semibold">Semantic roles</h2>
+            <p className="text-body-sm text-muted-foreground">
+              Theme-aware role tokens consumed by components. Always use these in
+              the UI — never a raw ramp value.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {SEMANTIC.map((t) => (
+              <SemanticSwatch key={t.name} {...t} />
+            ))}
+          </div>
+        </section>
+
+        {/* Primitive ramps */}
+        <section className="flex flex-col gap-8">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h3 font-semibold">Primitive ramps</h2>
+            <p className="text-body-sm text-muted-foreground">
+              The raw palette. Reference-only — the semantic layer maps these to
+              roles.
+            </p>
+          </div>
+          {RAMPS.map((ramp) => (
+            <RampRow key={ramp.prefix} {...ramp} />
+          ))}
+        </section>
       </div>
     </ContentCard>
   );
