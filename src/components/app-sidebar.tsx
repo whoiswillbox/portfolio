@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, ChevronRightIcon, LockClosedIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, ChevronRightIcon, LockClosedIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon, Cog6ToothIcon, SwatchIcon } from "@heroicons/react/24/outline"
 import { Cog6ToothIcon as Cog6ToothSolid } from "@heroicons/react/24/solid"
 import {
   CubeIcon as CubeSolid,
@@ -324,6 +324,41 @@ export function AppSidebar({
       <SidebarFooter>
         <SidebarSeparator className="mx-0 mb-2 bg-border/50" />
         <SidebarMenu>
+          {/* Box System — collapsible with Foundations + Components. */}
+          <Collapsible
+            asChild
+            defaultOpen={pathname.startsWith("/box-system")}
+            className="group/boxsystem"
+          >
+            <SidebarMenuItem>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton tooltip="Box System">
+                  <SwatchIcon />
+                  <span>Box System</span>
+                  <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/boxsystem:rotate-90" />
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton asChild isActive={pathname === "/box-system/foundations"}>
+                      <Link href="/box-system/foundations">
+                        <span>Foundations</span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton asChild isActive={pathname === "/box-system/components"}>
+                      <Link href="/box-system/components">
+                        <span>Components</span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </SidebarMenuItem>
+          </Collapsible>
+
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={pathname === "/settings"}>
               <Link href="/settings">
