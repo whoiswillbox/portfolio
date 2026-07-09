@@ -118,6 +118,7 @@ function UnlockForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
 
   useEffect(() => {
@@ -204,7 +205,10 @@ function UnlockForm() {
                 className="!h-14 min-h-14 flex-1 bg-background px-4 text-base"
               />
               <TooltipProvider>
-                <Tooltip>
+                {/* Controlled open = mouse-hover only (never focus / active
+                    input), and only while the button is in its empty-disabled
+                    state. */}
+                <Tooltip open={hovered && !password.trim() && !submitting}>
                   <TooltipTrigger asChild>
                     {/* Not truly `disabled` when empty (disabled elements don't
                         emit hover events, so the tooltip couldn't show) — style
@@ -216,6 +220,8 @@ function UnlockForm() {
                       size="lg"
                       disabled={submitting}
                       aria-disabled={!password.trim() || submitting}
+                      onMouseEnter={() => setHovered(true)}
+                      onMouseLeave={() => setHovered(false)}
                       className={cn(
                         "!h-14 min-h-14 text-base sm:w-40",
                         !password.trim() && "opacity-50"
@@ -224,11 +230,9 @@ function UnlockForm() {
                       {submitting ? "Unlocking…" : "Enter"}
                     </Button>
                   </TooltipTrigger>
-                  {!password.trim() && !submitting && (
-                    <TooltipContent side="top">
-                      Type the password first
-                    </TooltipContent>
-                  )}
+                  <TooltipContent side="top">
+                    Type the password first
+                  </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </form>
