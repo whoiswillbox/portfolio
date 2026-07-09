@@ -156,35 +156,37 @@ function UnlockForm() {
             <span className="text-muted-foreground">… unless you know the password.</span>
           </h1>
 
-          <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row">
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError(false);
-              }}
-              placeholder="Password"
-              aria-label="Password"
-              autoFocus
-              autoCapitalize="none"
-              autoCorrect="off"
-              autoComplete="off"
-              spellCheck={false}
-              className="h-14 flex-1 bg-background px-4 text-base"
-            />
-            <Button
-              type="submit"
-              size="lg"
-              disabled={!password.trim() || submitting}
-              className="h-14 text-base sm:w-40"
-            >
-              {submitting ? "Unlocking…" : "Enter"}
-            </Button>
-          </form>
-          {error && (
-            <p className="text-body-sm text-critical">Incorrect password. Try again.</p>
-          )}
+          <div className="flex flex-col gap-2">
+            <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row">
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(false);
+                }}
+                placeholder="Password"
+                aria-label="Password"
+                autoFocus
+                autoCapitalize="none"
+                autoCorrect="off"
+                autoComplete="off"
+                spellCheck={false}
+                className="h-14 flex-1 bg-background px-4 text-base"
+              />
+              <Button
+                type="submit"
+                size="lg"
+                disabled={!password.trim() || submitting}
+                className="h-14 text-base sm:w-40"
+              >
+                {submitting ? "Unlocking…" : "Enter"}
+              </Button>
+            </form>
+            {error && (
+              <p className="px-1 text-body-sm text-critical">Incorrect password. Try again.</p>
+            )}
+          </div>
         </div>
 
         {/* Loading state — fades in while unlocking */}
