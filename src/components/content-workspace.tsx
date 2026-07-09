@@ -58,9 +58,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     setExiting(false);
     setRendered(false);
     setSplitPct(30);
-    // Open sidebar on any non-landing page (handles hard refresh + entering flow)
+    // Open sidebar on any non-landing page (handles hard refresh + entering
+    // flow); on the landing page close it immediately so it never flashes in
+    // (e.g. arriving from the /unlock gate, where the provider is still open).
     if (pathname !== "/") {
       requestAnimationFrame(() => setSidebarOpen(true));
+    } else {
+      setSidebarOpen(false);
     }
     if (entering) sessionStorage.removeItem("entered");
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
