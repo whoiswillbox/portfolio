@@ -60,17 +60,18 @@
   --color-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
   --color-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
 
-  /* Foreground text — by prominence. Utility form: text-text, text-text-subtle, … */
-  --color-text: var(--p-text);
-  --color-text-secondary: var(--p-text-secondary);
-  --color-text-subtle: var(--p-text-subtle);
-  --color-text-disabled: var(--p-text-disabled);
-  --color-text-on-inverse: var(--p-text-on-inverse);
-  --color-text-brand: var(--p-text-brand);
-  --color-text-brand-hover: var(--p-text-brand-hover);
-  --color-text-link: var(--p-text-link);
-  --color-text-link-hover: var(--p-text-link-hover);
-  --color-text-link-active: var(--p-text-link-active);
+  /* Foreground text — by prominence. The default is `text-foreground`
+     (--color-foreground, defined above with the shadcn roles). These are the
+     clean bare variants: text-subtle, text-disabled, text-link, text-brand, …
+     (no `secondary` — `subtle` covers the mid-tone; avoids the bg collision). */
+  --color-subtle: var(--p-text-subtle);
+  --color-disabled: var(--p-text-disabled);
+  --color-on-inverse: var(--p-text-on-inverse);
+  --color-brand: var(--p-text-brand);
+  --color-brand-hover: var(--p-text-brand-hover);
+  --color-link: var(--p-text-link);
+  --color-link-hover: var(--p-text-link-hover);
+  --color-link-active: var(--p-text-link-active);
 
   /* Icon colors — utility form: text-icon, text-icon-info, … */
   --color-icon: var(--p-text);
@@ -96,7 +97,7 @@
 /* --- Light theme ------------------------------------------------------ */
 /* shadcn role tokens are ALIASED to the Cardboard tokens below (--p-*), so the
    vendored ui/ components (which consume --card, --muted, --border, …) resolve
-   to the same values as our bg-surface / text-text / border utilities. One
+   to the same values as our bg-surface / text-foreground / border utilities. One
    unified system; the Colors page "semantic roles" are truthful. Cardboard token
    VALUES are defined in the surfaces/text/borders blocks (see @theme + below). */
 :root {

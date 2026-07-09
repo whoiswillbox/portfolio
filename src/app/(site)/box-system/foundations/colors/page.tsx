@@ -83,16 +83,15 @@ const SURFACES: { token: string; v: string; description: string }[] = [
 // Text tokens — the swatch shows the color as a filled chip (text colors are
 // hard to read as a pale swatch, so we fill a chip with the text color).
 const TEXTS: { token: string; v: string; description: string }[] = [
-  { token: "text-text", v: "--p-text", description: "The default text color." },
-  { token: "text-text-secondary", v: "--p-text-secondary", description: "Text with a secondary level of prominence." },
-  { token: "text-text-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
-  { token: "text-text-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
-  { token: "text-text-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
-  { token: "text-text-link", v: "--p-text-link", description: "Text links." },
-  { token: "text-text-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
-  { token: "text-text-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
-  { token: "text-text-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
-  { token: "text-text-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
+  { token: "text-foreground", v: "--p-text", description: "The default text color." },
+  { token: "text-subtle", v: "--p-text-subtle", description: "Secondary / muted text, captions, and labels." },
+  { token: "text-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
+  { token: "text-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
+  { token: "text-link", v: "--p-text-link", description: "Text links." },
+  { token: "text-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
+  { token: "text-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },
+  { token: "text-brand", v: "--p-text-brand", description: "Text that needs to pull attention." },
+  { token: "text-brand-hover", v: "--p-text-brand-hover", description: "Hover state for attention-pulling text." },
   // Intent text (saturated accents) — text-info / text-success / …
   { token: "text-info", v: "--accent-info", description: "Text communicating information." },
   { token: "text-success", v: "--accent-success", description: "Text communicating success." },
@@ -271,12 +270,12 @@ export default function Colors() {
             <h2 className="text-h3 font-semibold">Text</h2>
             <p className="text-body-sm text-muted-foreground">
               Foreground text by prominence —{" "}
-              <span className="font-mono text-body-xs">text-text</span> and friends.
+              <span className="font-mono text-body-xs">text-foreground</span> and friends.
             </p>
             <UsageHint>
-              <span className="font-mono text-body-xs">text-text</span> for body copy,{" "}
-              <span className="font-mono text-body-xs">text-text-subtle</span> for
-              captions and secondary labels, <span className="font-mono text-body-xs">text-text-link</span>{" "}
+              <span className="font-mono text-body-xs">text-foreground</span> for body copy,{" "}
+              <span className="font-mono text-body-xs">text-subtle</span> for
+              captions and secondary labels, <span className="font-mono text-body-xs">text-link</span>{" "}
               for links, and the intent variants (
               <span className="font-mono text-body-xs">text-critical</span>…) for
               inline status messages.

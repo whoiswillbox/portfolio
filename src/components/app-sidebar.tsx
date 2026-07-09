@@ -148,6 +148,9 @@ export function AppSidebar({
                     <SidebarMenuButton tooltip="Cardboard">
                       <SwatchIcon />
                       <span>Cardboard</span>
+                      <Badge className="ml-1 bg-black px-1.5 py-0 text-[0.625rem] font-bold text-white">
+                        v1
+                      </Badge>
                       <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/boxsystem:rotate-90" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
