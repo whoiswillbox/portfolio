@@ -8,6 +8,7 @@ import {
   LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon,
   BoltIcon, XMarkIcon, ChevronRightIcon,
   ChatBubbleLeftRightIcon, Squares2X2Icon,
+  SwatchIcon, Square3Stack3DIcon,
 } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
@@ -20,6 +21,8 @@ import {
   BoltIcon as BoltSolid,
   ChatBubbleLeftRightIcon as ChatBubbleLeftRightSolid,
   Squares2X2Icon as Squares2X2Solid,
+  SwatchIcon as SwatchSolid,
+  Square3Stack3DIcon as Square3Stack3DSolid,
 } from "@heroicons/react/24/solid"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -94,6 +97,8 @@ export function MobileNav() {
       "/extracurriculars/surfing",
       "/extracurriculars/gaming",
       "/extracurriculars/music",
+      "/box-system/foundations",
+      "/box-system/components",
     ]
     hrefs.forEach((href) => router.prefetch(href))
   }, [router])
@@ -120,7 +125,7 @@ export function MobileNav() {
   if (pathname === "/") return null
 
   const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname === "/technergetics" || pathname.startsWith("/technergetics/") || pathname === "/projects/next-gen-bar" || pathname === "/resume" || pathname === "/school" || pathname.startsWith("/school/")))
-  const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && (pathname === "/extracurriculars" || pathname.startsWith("/extracurriculars/")))
+  const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && (pathname === "/extracurriculars" || pathname.startsWith("/extracurriculars/") || pathname.startsWith("/box-system")))
   const boxActive = activeNav === "box" || (!activeNav && pathname === "/who" && convoParam === null && openTray === null)
   const convsActive = activeNav === "conversations" || (!activeNav && pathname === "/conversations" && openTray === null)
 
@@ -196,6 +201,8 @@ export function MobileNav() {
                 <TrayItem label="Surfing" href="/extracurriculars/surfing" active={pathname === "/extracurriculars/surfing"} onPress={() => navigate("/extracurriculars/surfing")} icon={pathname === "/extracurriculars/surfing" ? LifebuoySolid : LifebuoyIcon} />
                 <TrayItem label="Gaming" href="/extracurriculars/gaming" active={pathname === "/extracurriculars/gaming"} onPress={() => navigate("/extracurriculars/gaming")} icon={pathname === "/extracurriculars/gaming" ? PuzzlePieceSolid : PuzzlePieceIcon} />
                 <TrayItem label="Music" href="/extracurriculars/music" active={pathname === "/extracurriculars/music"} onPress={() => navigate("/extracurriculars/music")} icon={pathname === "/extracurriculars/music" ? MusicalNoteSolid : MusicalNoteIcon} />
+                <TrayItem label="Foundations" href="/box-system/foundations" active={pathname === "/box-system/foundations"} onPress={() => navigate("/box-system/foundations")} icon={pathname === "/box-system/foundations" ? SwatchSolid : SwatchIcon} />
+                <TrayItem label="Components" href="/box-system/components" active={pathname === "/box-system/components"} onPress={() => navigate("/box-system/components")} icon={pathname === "/box-system/components" ? Square3Stack3DSolid : Square3Stack3DIcon} />
               </TraySection>
             )}
             {openTray === "conversations" && (

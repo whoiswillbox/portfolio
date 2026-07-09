@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { ContentCard } from "@/components/content-card";
 import { MobileOnly } from "@/components/mobile-only";
-import { LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, SwatchIcon, Square3Stack3DIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const items = [
   { label: "Surfing", href: "/extracurriculars/surfing", icon: LifebuoyIcon, description: "Waves, barrels, and salt water." },
   { label: "Gaming", href: "/extracurriculars/gaming", icon: PuzzlePieceIcon, description: "What I play when I'm not designing." },
   { label: "Music", href: "/extracurriculars/music", icon: MusicalNoteIcon, description: "What I listen to." },
+  { label: "Foundations", href: "/box-system/foundations", icon: SwatchIcon, description: "Box design system — primitives." },
+  { label: "Components", href: "/box-system/components", icon: Square3Stack3DIcon, description: "Box design system — components." },
 ];
 
 export default function Extracurriculars() {
