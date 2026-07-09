@@ -59,12 +59,14 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
     setRendered(false);
     setSplitPct(30);
     // Open sidebar on any non-landing page (handles hard refresh + entering
-    // flow); on the landing page close it immediately so it never flashes in
+    // flow); on the landing page close it in the next frame so it never lingers
     // (e.g. arriving from the /unlock gate, where the provider is still open).
+    // Deferring to rAF (not calling during this effect) avoids fighting the
+    // server-rendered expanded state → no hydration mismatch.
     if (pathname !== "/") {
       requestAnimationFrame(() => setSidebarOpen(true));
     } else {
-      setSidebarOpen(false);
+      requestAnimationFrame(() => setSidebarOpen(false));
     }
     if (entering) sessionStorage.removeItem("entered");
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
