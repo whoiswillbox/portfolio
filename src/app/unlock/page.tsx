@@ -172,13 +172,13 @@ function UnlockForm() {
                 autoCorrect="off"
                 autoComplete="off"
                 spellCheck={false}
-                className="h-14 flex-1 bg-background px-4 text-base"
+                className="h-16 flex-1 bg-background px-4 text-lg sm:h-14 sm:text-base"
               />
               <Button
                 type="submit"
                 size="lg"
                 disabled={!password.trim() || submitting}
-                className="h-14 text-base sm:w-40"
+                className="h-16 text-base sm:h-14 sm:w-40"
               >
                 {submitting ? "Unlocking…" : "Enter"}
               </Button>

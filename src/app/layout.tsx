@@ -32,7 +32,15 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: "/icon.svg",
+    // PNG favicons (Safari is unreliable with SVG favicons, and the previous
+    // /icon.svg didn't even exist → blank favicon). Multiple sizes so each
+    // browser picks the crisp one.
+    icon: [
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
     apple: "/apple-icon.png",
   },
 };
