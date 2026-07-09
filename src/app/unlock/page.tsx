@@ -15,6 +15,22 @@ import { cn } from "@/lib/utils";
 
 const Lottie = lazy(() => import("lottie-react"));
 
+/* Cheeky wrong-password lines — a random one shows after each failed try. */
+const WRONG_MESSAGES = [
+  "Nice try — that's not it.",
+  "Nope. Guess again.",
+  "So close… not really.",
+  "That's a no from me.",
+  "Wrong. But I admire the confidence.",
+  "Not even close, chief.",
+  "Access denied (nice attempt though).",
+  "Hmm, that's not the magic word.",
+  "Swing and a miss.",
+  "Are you just mashing keys?",
+];
+
+const randomWrong = () => WRONG_MESSAGES[Math.floor(Math.random() * WRONG_MESSAGES.length)];
+
 /* Falling-cube background — same decorative motif as the landing page so the
    gate feels like part of the site. */
 interface Box {
@@ -100,7 +116,7 @@ function UnlockForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
 
@@ -112,7 +128,7 @@ function UnlockForm() {
     e.preventDefault();
     if (!password.trim() || submitting) return;
     setSubmitting(true);
-    setError(false);
+    setError("");
     try {
       const res = await fetch("/api/unlock", {
         method: "POST",
@@ -120,7 +136,7 @@ function UnlockForm() {
         body: JSON.stringify({ password }),
       });
       if (!res.ok) {
-        setError(true);
+        setError(randomWrong());
         setSubmitting(false);
         return;
       }
@@ -128,7 +144,7 @@ function UnlockForm() {
       router.replace(next);
       router.refresh();
     } catch {
-      setError(true);
+      setError(randomWrong());
       setSubmitting(false);
     }
   };
@@ -169,7 +185,7 @@ function UnlockForm() {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  setError(false);
+                  setError("");
                 }}
                 placeholder="Psst… what's the password?"
                 aria-label="Password"
@@ -210,7 +226,7 @@ function UnlockForm() {
               </TooltipProvider>
             </form>
             {error && (
-              <p className="px-1 text-body-sm text-critical">Nice try — that&apos;s not it.</p>
+              <p className="px-1 text-body-sm text-critical">{error}</p>
             )}
           </div>
         </div>
