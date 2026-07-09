@@ -45,15 +45,33 @@ const SURFACES: { token: string; v: string; description: string }[] = [
   { token: "bg-p-bg-surface-tertiary-active", v: "--p-bg-surface-tertiary-active", description: "Active (on-press) state for the third level of prominence." },
 ];
 
-function SurfaceRow({ token, v, description }: { token: string; v: string; description: string }) {
+// Text tokens — the swatch shows the color as a filled chip (text colors are
+// hard to read as a pale swatch, so we fill a chip with the text color).
+const TEXTS: { token: string; v: string; description: string }[] = [
+  { token: "text-p-text", v: "--p-text", description: "Default, highest-contrast text." },
+  { token: "text-p-text-secondary", v: "--p-text-secondary", description: "Secondary text, slightly reduced prominence." },
+  { token: "text-p-text-subtle", v: "--p-text-subtle", description: "Subtle / muted text and captions." },
+  { token: "text-p-text-disabled", v: "--p-text-disabled", description: "Disabled text." },
+  { token: "text-p-text-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
+];
+
+const BORDERS: { token: string; v: string; description: string }[] = [
+  { token: "border-p-border", v: "--p-border", description: "Default border for separating elements." },
+  { token: "border-p-border-subtle", v: "--p-border-subtle", description: "Subtle, low-contrast divider." },
+  { token: "border-p-border-strong", v: "--p-border-strong", description: "Stronger, higher-contrast border." },
+];
+
+function SurfaceRow({ token, v, description, swatch }: { token: string; v: string; description: string; swatch?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-4 py-3">
-      <div className="size-12 shrink-0 rounded-lg border border-border" style={{ background: `var(${v})` }} />
-      <div className="w-52 shrink-0">
-        <div className="font-mono text-body-xs text-foreground break-all">{token}</div>
+      {swatch ?? (
+        <div className="size-12 shrink-0 rounded-lg border border-border" style={{ background: `var(${v})` }} />
+      )}
+      <div className="w-72 shrink-0 max-sm:w-40">
+        <div className="font-mono text-body-xs text-foreground">{token}</div>
         <div className="font-mono text-[0.65rem] text-muted-foreground">var({v})</div>
       </div>
-      <div className="text-body-sm text-muted-foreground">{description}</div>
+      <div className="flex-1 text-left text-body-sm text-muted-foreground">{description}</div>
     </div>
   );
 }
@@ -190,6 +208,58 @@ export default function Colors() {
           <div className="flex flex-col divide-y divide-border">
             {SURFACES.map((s) => (
               <SurfaceRow key={s.token} {...s} />
+            ))}
+          </div>
+        </section>
+
+        {/* Text tokens */}
+        <section className="mb-14 flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h3 font-semibold">Text</h2>
+            <p className="text-body-sm text-muted-foreground">
+              Foreground text by prominence —{" "}
+              <span className="font-mono text-body-xs">text-p-text</span> and friends.
+            </p>
+          </div>
+          <div className="flex flex-col divide-y divide-border">
+            {TEXTS.map((t) => (
+              <SurfaceRow
+                key={t.token}
+                {...t}
+                swatch={
+                  <div
+                    className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-border bg-p-bg-surface"
+                    style={{ color: `var(${t.v})` }}
+                  >
+                    <span className="font-heading text-body-lg">Aa</span>
+                  </div>
+                }
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Border tokens */}
+        <section className="mb-14 flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h3 font-semibold">Borders</h2>
+            <p className="text-body-sm text-muted-foreground">
+              Dividers and outlines by prominence —{" "}
+              <span className="font-mono text-body-xs">border-p-border</span> and friends.
+            </p>
+          </div>
+          <div className="flex flex-col divide-y divide-border">
+            {BORDERS.map((b) => (
+              <SurfaceRow
+                key={b.token}
+                {...b}
+                swatch={
+                  <div
+                    className="size-12 shrink-0 rounded-lg bg-p-bg-surface"
+                    style={{ border: `2px solid var(${b.v})` }}
+                  />
+                }
+              />
             ))}
           </div>
         </section>

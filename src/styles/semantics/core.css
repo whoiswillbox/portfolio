@@ -60,6 +60,18 @@
   --color-p-bg-surface-tertiary: var(--p-bg-surface-tertiary);
   --color-p-bg-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
   --color-p-bg-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
+
+  /* Text — by prominence. Utility form: text-p-text, text-p-text-subtle, … */
+  --color-p-text: var(--p-text);
+  --color-p-text-secondary: var(--p-text-secondary);
+  --color-p-text-subtle: var(--p-text-subtle);
+  --color-p-text-disabled: var(--p-text-disabled);
+  --color-p-text-on-inverse: var(--p-text-on-inverse);
+
+  /* Borders — by prominence. Utility form: border-p-border, border-p-border-strong, … */
+  --color-p-border: var(--p-border);
+  --color-p-border-subtle: var(--p-border-subtle);
+  --color-p-border-strong: var(--p-border-strong);
 }
 
 /* --- Light theme ------------------------------------------------------ */
@@ -114,6 +126,18 @@
   --p-bg-surface-tertiary: var(--neutral-200);
   --p-bg-surface-tertiary-hover: var(--neutral-300);
   --p-bg-surface-tertiary-active: var(--neutral-400);
+
+  /* Text — light. */
+  --p-text: var(--neutral-950);
+  --p-text-secondary: var(--neutral-700);
+  --p-text-subtle: var(--neutral-500);
+  --p-text-disabled: var(--neutral-400);
+  --p-text-on-inverse: var(--neutral-50);
+
+  /* Borders — light. */
+  --p-border: var(--neutral-200);
+  --p-border-subtle: var(--neutral-100);
+  --p-border-strong: var(--neutral-300);
 }
 
 /* --- Dark theme ------------------------------------------------------- */
@@ -170,4 +194,16 @@
   --p-bg-surface-tertiary: var(--neutral-700);
   --p-bg-surface-tertiary-hover: var(--neutral-600);
   --p-bg-surface-tertiary-active: var(--neutral-500);
+
+  /* Text — dark. */
+  --p-text: var(--neutral-50);
+  --p-text-secondary: var(--neutral-300);
+  --p-text-subtle: var(--neutral-400);
+  --p-text-disabled: var(--neutral-600);
+  --p-text-on-inverse: var(--neutral-950);
+
+  /* Borders — dark. */
+  --p-border: var(--white-a10);
+  --p-border-subtle: var(--white-a10);
+  --p-border-strong: var(--white-a15);
 }
