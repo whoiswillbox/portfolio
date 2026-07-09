@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef, Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { ContentCard } from "@/components/content-card";
@@ -89,22 +89,18 @@ function FallingBox({ box }: { box: Box }) {
 }
 
 export default function LandingPage() {
-  return (
-    <Suspense fallback={null}>
-      <LandingContent />
-    </Suspense>
-  );
-}
-
-function LandingContent() {
   const router = useRouter();
   const { setOpen } = useSidebar();
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
-  // When arriving from the /unlock gate (?from=unlock), fade in WITHOUT the
-  // slide (a plain crossfade). Read from the URL so it's available synchronously
-  // on the first render (before the entrance animation paints).
-  const fromUnlock = useSearchParams().get("from") === "unlock";
+  // When arriving from the /unlock gate, fade in WITHOUT the slide (a plain
+  // crossfade). Detect it via document.referrer read synchronously in the state
+  // initializer — this avoids useSearchParams (which shifted the hydration
+  // boundary and surfaced a sidebar data-state mismatch). This screen is reached
+  // by client nav from /unlock, so there's no SSR frame to mismatch.
+  const [fromUnlock] = useState(
+    () => typeof document !== "undefined" && /\/unlock(?:$|[/?])/.test(document.referrer)
+  );
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
