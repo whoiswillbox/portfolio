@@ -8,13 +8,10 @@ import {
   MagnifyingGlassIcon,
   HomeIcon,
   BellIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { BellIcon as BellSolid } from "@heroicons/react/24/solid";
 import * as Outline from "@heroicons/react/24/outline";
+import * as Solid from "@heroicons/react/24/solid";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
 import { cn } from "@/lib/utils";
@@ -40,26 +37,20 @@ const SIZES = [
   { token: "size-6", px: "24", use: "Prominent, touch-friendly targets." },
 ];
 
-// Icon color tokens (mirrors the Colors page). Shown as icon-* ; copied as the
-// working text-icon-* utility (icons take color from the text- utility).
-const COLORS = [
-  { token: "icon", copyAs: "text-icon", cls: "text-icon", use: "Default icon color.", Icon: HomeIcon },
-  { token: "icon-secondary", copyAs: "text-icon-secondary", cls: "text-icon-secondary", use: "Lower-prominence icons.", Icon: HomeIcon },
-  { token: "icon-subtle", copyAs: "text-icon-subtle", cls: "text-icon-subtle", use: "Subtle / decorative glyphs.", Icon: HomeIcon },
-  { token: "icon-brand", copyAs: "text-icon-brand", cls: "text-icon-brand", use: "Attention-pulling icons.", Icon: BellIcon },
-  { token: "icon-info", copyAs: "text-icon-info", cls: "text-icon-info", use: "Informational status.", Icon: InformationCircleIcon },
-  { token: "icon-success", copyAs: "text-icon-success", cls: "text-icon-success", use: "Success status.", Icon: CheckCircleIcon },
-  { token: "icon-caution", copyAs: "text-icon-caution", cls: "text-icon-caution", use: "Caution status.", Icon: ExclamationTriangleIcon },
-  { token: "icon-critical", copyAs: "text-icon-critical", cls: "text-icon-critical", use: "Critical / error status.", Icon: XCircleIcon },
-];
-
+type IconStyle = "outline" | "solid";
 type IconEntry = { name: string; Icon: React.ComponentType<React.SVGProps<SVGSVGElement>> };
 
-// The full 24/outline set, dynamically. Filter the module to component exports.
-const ALL_ICONS: IconEntry[] = Object.entries(Outline)
-  .filter(([name]) => name.endsWith("Icon"))
-  .map(([name, Icon]) => ({ name, Icon: Icon as IconEntry["Icon"] }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+// The full 24px sets, dynamically. Filter each module to component exports.
+function toEntries(mod: Record<string, unknown>): IconEntry[] {
+  return Object.entries(mod)
+    .filter(([name]) => name.endsWith("Icon"))
+    .map(([name, Icon]) => ({ name, Icon: Icon as IconEntry["Icon"] }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+const ICON_SETS: Record<IconStyle, IconEntry[]> = {
+  outline: toEntries(Outline),
+  solid: toEntries(Solid),
+};
 
 // One gallery tile — copies the import name, shows the glyph + label.
 function IconTile({ name, Icon }: IconEntry) {
@@ -87,12 +78,14 @@ function IconTile({ name, Icon }: IconEntry) {
 
 export default function Iconography() {
   const [query, setQuery] = React.useState("");
+  const [iconStyle, setIconStyle] = React.useState<IconStyle>("outline");
 
   const filtered = React.useMemo(() => {
+    const set = ICON_SETS[iconStyle];
     const q = query.trim().toLowerCase();
-    if (!q) return ALL_ICONS;
-    return ALL_ICONS.filter((i) => i.name.toLowerCase().includes(q));
-  }, [query]);
+    if (!q) return set;
+    return set.filter((i) => i.name.toLowerCase().includes(q));
+  }, [query, iconStyle]);
 
   return (
     <ContentCard className="h-full overflow-auto">
@@ -166,55 +159,44 @@ export default function Iconography() {
           </div>
         </section>
 
-        {/* Colors */}
-        <section className="mb-14 flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Colors</h2>
-            <p className="text-body-sm text-muted-foreground">
-              Icon color tokens —{" "}
-              <span className="font-mono text-body-xs">text-icon</span> by prominence,
-              plus intent variants. (Also on the Colors page.)
-            </p>
-            <UsageHint>
-              Match icon color to context — <span className="font-mono text-body-xs">text-icon</span>{" "}
-              alongside body text, <span className="font-mono text-body-xs">text-icon-subtle</span>{" "}
-              for decoration, and the intent colors when an icon reinforces a status.
-            </UsageHint>
-          </div>
-          <div className="flex flex-col divide-y divide-border">
-            {COLORS.map(({ token, copyAs, cls, use, Icon }) => (
-              <div key={token} className="flex items-center gap-6 py-4">
-                <div className="grid w-16 shrink-0 place-items-center">
-                  <Icon className={cn("size-6", cls)} />
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <CopyToken value={token} copyValue={copyAs} className="-ml-1.5 self-start" />
-                  <p className="text-body-sm text-muted-foreground">{use}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* Library gallery */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Library</h2>
             <p className="text-body-sm text-muted-foreground">
-              All {ALL_ICONS.length} icons in the 24/outline set. Click any to copy
-              its component name.
+              All {filtered.length === ICON_SETS[iconStyle].length ? ICON_SETS[iconStyle].length : `${filtered.length} of ${ICON_SETS[iconStyle].length}`} icons in the 24/{iconStyle} set. Click any to
+              copy its component name.
             </p>
           </div>
-          {/* Search */}
-          <div className="relative">
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search icons…"
-              className="h-10 w-full rounded-lg border border-border bg-surface pl-9 pr-3 text-body-sm text-foreground placeholder:text-muted-foreground focus:border-border-focus focus:outline-none"
-            />
+          {/* Style toggle + search */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="inline-flex w-fit shrink-0 items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
+              {(["outline", "solid"] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setIconStyle(s)}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-body-sm font-medium capitalize transition-colors",
+                    iconStyle === s
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <div className="relative flex-1">
+              <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search icons…"
+                className="h-10 w-full rounded-lg border border-border bg-surface pl-9 pr-3 text-body-sm text-foreground placeholder:text-muted-foreground focus:border-border-focus focus:outline-none"
+              />
+            </div>
           </div>
           {filtered.length === 0 ? (
             <p className="py-8 text-center text-body-sm text-muted-foreground">
