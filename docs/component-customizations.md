@@ -37,6 +37,27 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `select.tsx` — FORKED into Cardboard (`cardboard/select.tsx`)
+**Date:** 2026-07-10
+**Why:** Cardboard fork (Button pattern).
+**What:** Owned at `src/components/cardboard/select.tsx`; `ui/select.tsx` is a
+re-export shim. radix Select primitives kept. Rewired: trigger `border-input`→
+`border`, `data-placeholder:text-muted-foreground`→`text-subtle`, focus→`border-border-focus`,
+invalid→critical, dropped dark `bg-input/30`. Content/scroll buttons `bg-popover`→
+`bg-surface`, `text-popover-foreground`→`text-foreground`. Item `focus:bg-accent
+focus:text-accent-foreground`→`focus:bg-surface-secondary focus:text-foreground`
+(dropped the destructive-variant focus-color rule). Label `text-muted-foreground`→
+`text-subtle`. `bg-border` separator kept. **lucide Chevron{Down,Up}/Check → Heroicons.**
+
+### `accordion.tsx` (batch 6) — variant system update
+**Date:** 2026-07-10
+**What:** Added a `variant` prop (`default` | `inline`) unifying the app's two
+accordion styles; `inline` matches the Typography primitives disclosure exactly
+(text-body-xs muted, size-3.5 ChevronRight, bg-muted/50 container). The
+Technergetics drill-in nav row is intentionally NOT a variant — reserved as a
+future Sidebar-item variant. Typography page migrated to use `<Accordion
+variant="inline">` (removed its raw `<details>`).
+
 ### `tabs.tsx`, `accordion.tsx`, `dialog.tsx`, `popover.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 6 — first composite radix components (Button pattern).

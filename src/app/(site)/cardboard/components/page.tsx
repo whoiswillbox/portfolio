@@ -58,6 +58,7 @@ const components = [
   { label: "Accordion", href: "/cardboard/components/accordion", icon: ChevronDownIcon, description: "Expandable sections." },
   { label: "Dialog", href: "/cardboard/components/dialog", icon: WindowIcon, description: "Modal overlays." },
   { label: "Popover", href: "/cardboard/components/popover", icon: ChatBubbleLeftRightIcon, description: "Anchored floating content." },
+  { label: "Select", href: "/cardboard/components/select", icon: ChevronUpDownIcon, description: "Choose one from a dropdown." },
   // Custom, in-use components built on the foundations.
   { label: "Empty", href: "/cardboard/components/empty", icon: ArchiveBoxXMarkIcon, description: "Empty-state layouts." },
   { label: "Content Card", href: "/cardboard/components/content-card", icon: Square2StackIcon, description: "The full-height page surface." },
