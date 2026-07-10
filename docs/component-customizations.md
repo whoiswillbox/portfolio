@@ -37,6 +37,17 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `alert-dialog.tsx`, `hover-card.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 10 (Button pattern). Owned in `cardboard/`; `ui/`
+paths are re-export shims; doc pages added. Neither used lucide.
+**What (token rewires):**
+- **alert-dialog:** imports **Cardboard** Button; content `bg-popover
+  text-popover-foreground`→`bg-surface text-foreground`; footer `bg-muted/50`→
+  `bg-surface-secondary/50`; media `bg-muted`→`bg-surface-secondary`; description
+  `text-muted-foreground`→`text-subtle`. Overlay scrim `bg-black/10` kept.
+- **hover-card:** `bg-popover text-popover-foreground`→`bg-surface text-foreground`.
+
 ### `context-menu.tsx` — FORKED into Cardboard (`cardboard/context-menu.tsx`)
 **Date:** 2026-07-10
 **Why:** Cardboard fork (Button pattern). Same anatomy/rewiring as dropdown-menu.

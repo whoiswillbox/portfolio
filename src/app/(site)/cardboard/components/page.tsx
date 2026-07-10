@@ -32,6 +32,8 @@ import {
   DevicePhoneMobileIcon,
   EllipsisHorizontalIcon,
   CursorArrowRippleIcon,
+  ShieldExclamationIcon,
+  CreditCardIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -63,6 +65,8 @@ const components = [
   { label: "Select", href: "/cardboard/components/select", icon: ChevronUpDownIcon, description: "Choose one from a dropdown." },
   { label: "Dropdown Menu", href: "/cardboard/components/dropdown-menu", icon: EllipsisHorizontalIcon, description: "A menu of actions." },
   { label: "Context Menu", href: "/cardboard/components/context-menu", icon: CursorArrowRippleIcon, description: "Right-click menus." },
+  { label: "Alert Dialog", href: "/cardboard/components/alert-dialog", icon: ShieldExclamationIcon, description: "Confirm consequential actions." },
+  { label: "Hover Card", href: "/cardboard/components/hover-card", icon: CreditCardIcon, description: "Hover-to-preview cards." },
   // Custom, in-use components built on the foundations.
   { label: "Empty", href: "/cardboard/components/empty", icon: ArchiveBoxXMarkIcon, description: "Empty-state layouts." },
   { label: "Content Card", href: "/cardboard/components/content-card", icon: Square2StackIcon, description: "The full-height page surface." },
