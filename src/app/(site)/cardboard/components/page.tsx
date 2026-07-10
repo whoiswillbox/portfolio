@@ -21,21 +21,21 @@ import { ContentCard } from "@/components/content-card";
 /* The Components index. A living gallery — start with the components we've
    actually customized / forked, and grow it as the shadcn base is adopted. */
 const components = [
-  { label: "Button", href: "/box-system/components/button", icon: CursorArrowRaysIcon, description: "Actions, in every variant and size." },
-  { label: "Badge", href: "/box-system/components/badge", icon: TagIcon, description: "Compact status and category labels." },
-  { label: "Alert", href: "/box-system/components/alert", icon: ExclamationTriangleIcon, description: "Inline messages by intent." },
-  { label: "Tooltip", href: "/box-system/components/tooltip", icon: ChatBubbleBottomCenterTextIcon, description: "Hover hints and labels." },
-  { label: "Input", href: "/box-system/components/input", icon: PencilSquareIcon, description: "Single-line text fields." },
-  { label: "Card", href: "/box-system/components/card", icon: RectangleGroupIcon, description: "Grouped content surfaces." },
-  { label: "Switch", href: "/box-system/components/switch", icon: Bars2Icon, description: "On / off toggles." },
-  { label: "Separator", href: "/box-system/components/separator", icon: MinusIcon, description: "Dividing rules." },
-  { label: "Checkbox", href: "/box-system/components/checkbox", icon: CheckIcon, description: "Boolean selection controls." },
-  { label: "Textarea", href: "/box-system/components/textarea", icon: DocumentTextIcon, description: "Multi-line text fields." },
-  { label: "Skeleton", href: "/box-system/components/skeleton", icon: Bars3BottomLeftIcon, description: "Loading placeholders." },
-  { label: "Progress", href: "/box-system/components/progress", icon: ChartBarIcon, description: "Determinate progress bars." },
-  { label: "Avatar", href: "/box-system/components/avatar", icon: UserCircleIcon, description: "User images and initials." },
-  { label: "Toggle", href: "/box-system/components/toggle", icon: PowerIcon, description: "Two-state pressable buttons." },
-  { label: "Spinner", href: "/box-system/components/spinner", icon: ArrowPathIcon, description: "Indeterminate loading." },
+  { label: "Button", href: "/cardboard/components/button", icon: CursorArrowRaysIcon, description: "Actions, in every variant and size." },
+  { label: "Badge", href: "/cardboard/components/badge", icon: TagIcon, description: "Compact status and category labels." },
+  { label: "Alert", href: "/cardboard/components/alert", icon: ExclamationTriangleIcon, description: "Inline messages by intent." },
+  { label: "Tooltip", href: "/cardboard/components/tooltip", icon: ChatBubbleBottomCenterTextIcon, description: "Hover hints and labels." },
+  { label: "Input", href: "/cardboard/components/input", icon: PencilSquareIcon, description: "Single-line text fields." },
+  { label: "Card", href: "/cardboard/components/card", icon: RectangleGroupIcon, description: "Grouped content surfaces." },
+  { label: "Switch", href: "/cardboard/components/switch", icon: Bars2Icon, description: "On / off toggles." },
+  { label: "Separator", href: "/cardboard/components/separator", icon: MinusIcon, description: "Dividing rules." },
+  { label: "Checkbox", href: "/cardboard/components/checkbox", icon: CheckIcon, description: "Boolean selection controls." },
+  { label: "Textarea", href: "/cardboard/components/textarea", icon: DocumentTextIcon, description: "Multi-line text fields." },
+  { label: "Skeleton", href: "/cardboard/components/skeleton", icon: Bars3BottomLeftIcon, description: "Loading placeholders." },
+  { label: "Progress", href: "/cardboard/components/progress", icon: ChartBarIcon, description: "Determinate progress bars." },
+  { label: "Avatar", href: "/cardboard/components/avatar", icon: UserCircleIcon, description: "User images and initials." },
+  { label: "Toggle", href: "/cardboard/components/toggle", icon: PowerIcon, description: "Two-state pressable buttons." },
+  { label: "Spinner", href: "/cardboard/components/spinner", icon: ArrowPathIcon, description: "Indeterminate loading." },
 ];
 
 export default function Components() {

@@ -7,8 +7,8 @@ const items = [
   { label: "Surfing", href: "/extracurriculars/surfing", icon: LifebuoyIcon, description: "Waves, barrels, and salt water." },
   { label: "Gaming", href: "/extracurriculars/gaming", icon: PuzzlePieceIcon, description: "What I play when I'm not designing." },
   { label: "Music", href: "/extracurriculars/music", icon: MusicalNoteIcon, description: "What I listen to." },
-  { label: "Foundations", href: "/box-system/foundations", icon: SwatchIcon, description: "Box design system — primitives." },
-  { label: "Components", href: "/box-system/components", icon: Square3Stack3DIcon, description: "Box design system — components." },
+  { label: "Foundations", href: "/cardboard/foundations", icon: SwatchIcon, description: "Cardboard design system — primitives." },
+  { label: "Components", href: "/cardboard/components", icon: Square3Stack3DIcon, description: "Cardboard design system — components." },
 ];
 
 export default function Extracurriculars() {

@@ -140,7 +140,7 @@ export function AppSidebar({
                   Components, directly under the Box item. */}
               <Collapsible
                 asChild
-                defaultOpen={pathname.startsWith("/box-system")}
+                defaultOpen={pathname.startsWith("/cardboard")}
                 className="group/boxsystem"
               >
                 <SidebarMenuItem>
@@ -157,15 +157,15 @@ export function AppSidebar({
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={pathname === "/box-system/foundations"}>
-                          <Link href="/box-system/foundations">
+                        <SidebarMenuSubButton asChild isActive={pathname === "/cardboard/foundations"}>
+                          <Link href="/cardboard/foundations">
                             <span>Foundations</span>
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={pathname === "/box-system/components"}>
-                          <Link href="/box-system/components">
+                        <SidebarMenuSubButton asChild isActive={pathname === "/cardboard/components"}>
+                          <Link href="/cardboard/components">
                             <span>Components</span>
                           </Link>
                         </SidebarMenuSubButton>

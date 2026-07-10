@@ -10,12 +10,12 @@ import {
 } from "@heroicons/react/24/outline";
 
 const foundations = [
-  { label: "Colors", href: "/box-system/foundations/colors", icon: SwatchIcon, description: "Palette, semantic tokens, and themes." },
-  { label: "Typography", href: "/box-system/foundations/typography", icon: LanguageIcon, description: "Type scale, fonts, and text styles." },
-  { label: "Spacing", href: "/box-system/foundations/spacing", icon: Squares2X2Icon, description: "The spacing scale and layout rhythm." },
-  { label: "Radius", href: "/box-system/foundations/radius", icon: Square2StackIcon, description: "Corner radii across components." },
-  { label: "Elevation", href: "/box-system/foundations/elevation", icon: SparklesIcon, description: "Shadows and layering depth." },
-  { label: "Iconography", href: "/box-system/foundations/iconography", icon: CubeTransparentIcon, description: "Icon set, sizing, and usage." },
+  { label: "Colors", href: "/cardboard/foundations/colors", icon: SwatchIcon, description: "Palette, semantic tokens, and themes." },
+  { label: "Typography", href: "/cardboard/foundations/typography", icon: LanguageIcon, description: "Type scale, fonts, and text styles." },
+  { label: "Spacing", href: "/cardboard/foundations/spacing", icon: Squares2X2Icon, description: "The spacing scale and layout rhythm." },
+  { label: "Radius", href: "/cardboard/foundations/radius", icon: Square2StackIcon, description: "Corner radii across components." },
+  { label: "Elevation", href: "/cardboard/foundations/elevation", icon: SparklesIcon, description: "Shadows and layering depth." },
+  { label: "Iconography", href: "/cardboard/foundations/iconography", icon: CubeTransparentIcon, description: "Icon set, sizing, and usage." },
 ];
 
 export default function Foundations() {
