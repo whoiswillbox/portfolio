@@ -23,12 +23,12 @@ function UsageHint({ children }: { children: React.ReactNode }) {
 /* Primitives — the raw shadow ramp, 0 (flat) → 500 (deep). Every semantic
    shadow-* utility resolves to one of these. Theme-aware. */
 const PRIM_ELEVATION = [
-  { v: "--elevation-0", styleVar: "--elevation-0", feeds: "—" },
+  { v: "--elevation-0", styleVar: "--elevation-0", feeds: "shadow-none" },
   { v: "--elevation-100", styleVar: "--elevation-100", feeds: "shadow-xs, shadow-2xs" },
-  { v: "--elevation-200", styleVar: "--elevation-200", feeds: "shadow-sm, shadow, shadow-raised" },
+  { v: "--elevation-200", styleVar: "--elevation-200", feeds: "shadow-sm, shadow" },
   { v: "--elevation-300", styleVar: "--elevation-300", feeds: "shadow-md" },
-  { v: "--elevation-400", styleVar: "--elevation-400", feeds: "shadow-lg, shadow-overlay" },
-  { v: "--elevation-500", styleVar: "--elevation-500", feeds: "shadow-xl, shadow-2xl, shadow-popover" },
+  { v: "--elevation-400", styleVar: "--elevation-400", feeds: "shadow-lg" },
+  { v: "--elevation-500", styleVar: "--elevation-500", feeds: "shadow-xl, shadow-2xl" },
 ];
 
 // Semantic t-shirt scale — Tailwind shadow-* utilities.
@@ -38,13 +38,6 @@ const SEM_SCALE = [
   { token: "shadow-md", cls: "shadow-md", use: "Cards and raised panels." },
   { token: "shadow-lg", cls: "shadow-lg", use: "Dropdowns, sheets, floating UI." },
   { token: "shadow-xl", cls: "shadow-xl", use: "Modals and dialogs." },
-];
-
-// Semantic role aliases — intent-named elevations.
-const SEM_ROLES = [
-  { token: "shadow-raised", cls: "shadow-raised", feeds: "--elevation-200", use: "Cards and raised surfaces." },
-  { token: "shadow-overlay", cls: "shadow-overlay", feeds: "--elevation-400", use: "Dropdowns and slide-in sheets." },
-  { token: "shadow-popover", cls: "shadow-popover", feeds: "--elevation-500", use: "Popovers, modals, and dialogs." },
 ];
 
 // A card sample carrying the actual shadow, plus token + metadata.
@@ -113,8 +106,7 @@ export default function Elevation() {
         </div>
 
         {view === "semantics" ? (
-        <>
-        {/* T-shirt scale */}
+        /* T-shirt scale */
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Elevation scale</h2>
@@ -136,30 +128,6 @@ export default function Elevation() {
             ))}
           </div>
         </section>
-
-        {/* Role aliases */}
-        <section className="mb-14 flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Roles</h2>
-            <p className="text-body-sm text-muted-foreground">
-              Intent-named elevations over the same ramp —{" "}
-              <span className="font-mono text-body-xs">shadow-raised</span>,{" "}
-              <span className="font-mono text-body-xs">shadow-overlay</span>,{" "}
-              <span className="font-mono text-body-xs">shadow-popover</span>.
-            </p>
-            <UsageHint>
-              Prefer role names in component code — <span className="font-mono text-body-xs">shadow-raised</span>{" "}
-              says <em>why</em> (a card) where <span className="font-mono text-body-xs">shadow-sm</span> only
-              says how much. They resolve to the same values.
-            </UsageHint>
-          </div>
-          <div className="flex flex-col divide-y divide-border">
-            {SEM_ROLES.map((r) => (
-              <ElevationRow key={r.token} token={r.token} cls={r.cls} feeds={r.feeds} use={r.use} />
-            ))}
-          </div>
-        </section>
-        </>
         ) : (
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
