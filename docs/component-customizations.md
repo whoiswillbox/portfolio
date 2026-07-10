@@ -37,6 +37,24 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `tabs.tsx`, `accordion.tsx`, `dialog.tsx`, `popover.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 6 — first composite radix components (Button pattern).
+Owned components in `src/components/cardboard/`; `ui/` paths are re-export shims;
+doc pages added.
+**What (token rewires):**
+- **tabs:** list `bg-muted`→`bg-surface-secondary`, `text-muted-foreground`→`text-subtle`,
+  active `bg-background`→`bg-surface`, `border-input`/ring→`border`/`border-focus`.
+  Dropped the dark-mode `bg-input/30` active override (bg-surface handles both).
+- **accordion:** `text-muted-foreground`→`text-subtle`, ring→`border-border-focus`.
+  **lucide Chevron{Down,Up}Icon → Heroicons.**
+- **dialog:** imports **Cardboard** Button; `bg-popover`→`bg-surface`,
+  `text-popover-foreground`→`text-foreground`, footer `bg-muted/50`→`bg-surface-secondary/50`,
+  `text-muted-foreground`→`text-subtle`. **lucide XIcon → Heroicons XMarkIcon.**
+  Overlay scrim `bg-black/10` kept.
+- **popover:** `bg-popover`→`bg-surface`, `text-popover-foreground`→`text-foreground`,
+  `text-muted-foreground`→`text-subtle`. Uses the forked `shadow-md`.
+
 ### `aspect-ratio.tsx`, `kbd.tsx`, `empty.tsx`, `native-select.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 5 (Button pattern). Owned components in

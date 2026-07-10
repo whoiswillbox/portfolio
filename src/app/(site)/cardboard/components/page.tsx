@@ -19,6 +19,10 @@ import {
   CommandLineIcon,
   InboxIcon,
   RectangleStackIcon,
+  ViewColumnsIcon,
+  ChevronDownIcon,
+  WindowIcon,
+  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -44,6 +48,10 @@ const components = [
   { label: "Kbd", href: "/cardboard/components/kbd", icon: CommandLineIcon, description: "Keyboard keys and shortcuts." },
   { label: "Empty", href: "/cardboard/components/empty", icon: InboxIcon, description: "Empty-state layouts." },
   { label: "Aspect Ratio", href: "/cardboard/components/aspect-ratio", icon: RectangleStackIcon, description: "Fixed width-to-height boxes." },
+  { label: "Tabs", href: "/cardboard/components/tabs", icon: ViewColumnsIcon, description: "Switch between panels." },
+  { label: "Accordion", href: "/cardboard/components/accordion", icon: ChevronDownIcon, description: "Expandable sections." },
+  { label: "Dialog", href: "/cardboard/components/dialog", icon: WindowIcon, description: "Modal overlays." },
+  { label: "Popover", href: "/cardboard/components/popover", icon: ChatBubbleLeftRightIcon, description: "Anchored floating content." },
 ];
 
 export default function Components() {
