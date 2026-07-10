@@ -155,11 +155,11 @@ export default function Iconography() {
                 <div className="grid w-16 shrink-0 place-items-center">
                   <HomeIcon className={cn(s.token, "text-icon")} />
                 </div>
-                <CopyToken value={s.token} className="-ml-1.5 shrink-0 self-start" />
-                <div className="ml-auto flex shrink-0 flex-col items-end gap-0.5 text-right">
-                  <p className="text-body-sm text-muted-foreground">{s.use}</p>
-                  <span className="font-mono text-[0.65rem] text-muted-foreground">{s.px}px</span>
+                <div className="flex shrink-0 flex-col gap-0.5">
+                  <CopyToken value={s.token} className="-ml-1.5 self-start" />
+                  <span className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">{s.px}px</span>
                 </div>
+                <p className="ml-auto shrink-0 text-right text-body-sm text-muted-foreground">{s.use}</p>
               </div>
             ))}
           </div>
