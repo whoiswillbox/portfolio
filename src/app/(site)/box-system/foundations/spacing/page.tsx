@@ -88,14 +88,14 @@ function SpaceRow({ token, v, px, rem, feeds }: { token: string; v: string; px: 
 // A width row: the token + its value/use, right-aligned metadata.
 function WidthRow({ token, value, px, use, feeds }: { token: string; value: string; px: string; use?: string; feeds?: string }) {
   return (
-    <div className="flex flex-col gap-2 py-4">
-      <div className="flex items-baseline justify-between gap-4">
+    <div className="flex items-center gap-4 py-4">
+      <div className="flex shrink-0 flex-col gap-0.5">
         <CopyToken value={token} className="-ml-1.5 self-start" />
-        <span className="shrink-0 font-mono text-[0.65rem] text-muted-foreground">
+        <span className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">
           {value} · {px}px{feeds ? ` · ${feeds}` : ""}
         </span>
       </div>
-      {use && <p className="text-body-sm text-muted-foreground">{use}</p>}
+      {use && <p className="ml-auto shrink-0 text-right text-body-sm text-muted-foreground">{use}</p>}
     </div>
   );
 }

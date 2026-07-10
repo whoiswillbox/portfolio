@@ -57,16 +57,13 @@ function ElevationRow({ token, cls, styleVar, feeds, use }: { token: string; cls
         className={cn("grid size-16 shrink-0 place-items-center rounded-lg bg-surface ring-1 ring-border", cls)}
         style={styleVar ? { boxShadow: `var(${styleVar})` } : undefined}
       />
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <CopyToken value={token} className="-ml-1.5 self-start" />
+      <CopyToken value={token} className="-ml-1.5 shrink-0 self-start" />
+      <div className="ml-auto flex min-w-0 flex-col items-end gap-0.5 text-right">
         {use && <p className="text-body-sm text-muted-foreground">{use}</p>}
+        {feeds && (
+          <span className="font-mono text-[0.65rem] text-muted-foreground">Feeds {feeds}</span>
+        )}
       </div>
-      {feeds && (
-        <div className="ml-auto flex shrink-0 items-center gap-1.5">
-          <span className="text-body-xs text-muted-foreground">Feeds</span>
-          <span className="font-mono text-body-xs text-muted-foreground">{feeds}</span>
-        </div>
-      )}
     </div>
   );
 }

@@ -51,14 +51,16 @@ function RadiusRow({ token, cls, styleVar, px, note, use, feeds }: { token: stri
         className={cn("size-14 shrink-0 border border-border bg-surface-secondary", cls)}
         style={styleVar ? { borderRadius: `var(${styleVar})` } : undefined}
       />
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <div className="flex shrink-0 flex-col gap-0.5">
         <CopyToken value={token} className="-ml-1.5 self-start" />
-        {use && <p className="text-body-sm text-muted-foreground">{use}</p>}
+        <span className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">
+          {px}px{note ? ` · ${note}` : ""}
+        </span>
       </div>
-      <div className="ml-auto flex shrink-0 flex-col items-end gap-0.5 text-right">
-        <span className="font-mono text-[0.65rem] text-muted-foreground">{px}px</span>
-        {(note ?? feeds) && (
-          <span className="font-mono text-[0.65rem] text-muted-foreground">{feeds ? `Feeds ${feeds}` : note}</span>
+      <div className="ml-auto flex min-w-0 flex-col items-end gap-0.5 text-right">
+        {use && <p className="text-body-sm text-muted-foreground">{use}</p>}
+        {feeds && (
+          <span className="font-mono text-[0.65rem] text-muted-foreground">Feeds {feeds}</span>
         )}
       </div>
     </div>
