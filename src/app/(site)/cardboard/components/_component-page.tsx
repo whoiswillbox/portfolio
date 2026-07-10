@@ -56,3 +56,29 @@ export function Demo({
     </section>
   );
 }
+
+// A specs table: the anatomy of a component — part → the token(s) that style it.
+// For custom pattern components, this makes the doc a build-from template, not
+// just a picture (icon size, title size, body size, spacing, colors…).
+export function Specs({ rows }: { rows: { part: string; spec: string }[] }) {
+  return (
+    <div className="overflow-x-auto rounded-lg border border-border">
+      <table className="w-full min-w-[24rem] text-left text-body-sm">
+        <thead>
+          <tr className="border-b border-border bg-muted/50 font-mono text-body-xs text-muted-foreground">
+            <th className="px-4 py-2 font-normal">Part</th>
+            <th className="px-4 py-2 font-normal">Spec</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {rows.map((r) => (
+            <tr key={r.part}>
+              <td className="px-4 py-2 text-foreground">{r.part}</td>
+              <td className="px-4 py-2 font-mono text-body-xs text-muted-foreground">{r.spec}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

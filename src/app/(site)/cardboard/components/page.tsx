@@ -23,6 +23,13 @@ import {
   ChevronDownIcon,
   WindowIcon,
   ChatBubbleLeftRightIcon,
+  ArchiveBoxXMarkIcon,
+  Square2StackIcon,
+  PhotoIcon,
+  IdentificationIcon,
+  ClipboardDocumentIcon,
+  SparklesIcon,
+  DevicePhoneMobileIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -46,12 +53,19 @@ const components = [
   { label: "Spinner", href: "/cardboard/components/spinner", icon: ArrowPathIcon, description: "Indeterminate loading." },
   { label: "Native Select", href: "/cardboard/components/native-select", icon: ChevronUpDownIcon, description: "Styled native dropdowns." },
   { label: "Kbd", href: "/cardboard/components/kbd", icon: CommandLineIcon, description: "Keyboard keys and shortcuts." },
-  { label: "Empty", href: "/cardboard/components/empty", icon: InboxIcon, description: "Empty-state layouts." },
   { label: "Aspect Ratio", href: "/cardboard/components/aspect-ratio", icon: RectangleStackIcon, description: "Fixed width-to-height boxes." },
   { label: "Tabs", href: "/cardboard/components/tabs", icon: ViewColumnsIcon, description: "Switch between panels." },
   { label: "Accordion", href: "/cardboard/components/accordion", icon: ChevronDownIcon, description: "Expandable sections." },
   { label: "Dialog", href: "/cardboard/components/dialog", icon: WindowIcon, description: "Modal overlays." },
   { label: "Popover", href: "/cardboard/components/popover", icon: ChatBubbleLeftRightIcon, description: "Anchored floating content." },
+  // Custom, in-use components built on the foundations.
+  { label: "Empty", href: "/cardboard/components/empty", icon: ArchiveBoxXMarkIcon, description: "Empty-state layouts." },
+  { label: "Content Card", href: "/cardboard/components/content-card", icon: Square2StackIcon, description: "The full-height page surface." },
+  { label: "Image Lightbox", href: "/cardboard/components/image-lightbox", icon: PhotoIcon, description: "Click-to-zoom images." },
+  { label: "Contact Card", href: "/cardboard/components/contact-card", icon: IdentificationIcon, description: "Contact links card." },
+  { label: "Copy Token", href: "/cardboard/components/copy-token", icon: ClipboardDocumentIcon, description: "Click-to-copy token name." },
+  { label: "Logo", href: "/cardboard/components/logo", icon: SparklesIcon, description: "The TNGS mark." },
+  { label: "Mobile Only", href: "/cardboard/components/mobile-only", icon: DevicePhoneMobileIcon, description: "Mobile-only render wrapper." },
 ];
 
 export default function Components() {
