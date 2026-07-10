@@ -1,4 +1,20 @@
+import Link from "next/link";
+import {
+  CursorArrowRaysIcon,
+  TagIcon,
+  ExclamationTriangleIcon,
+  ChatBubbleBottomCenterTextIcon,
+} from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
+
+/* The Components index. A living gallery — start with the components we've
+   actually customized / use, and grow it as the shadcn base is forked. */
+const components = [
+  { label: "Button", href: "/box-system/components/button", icon: CursorArrowRaysIcon, description: "Actions, in every variant and size." },
+  { label: "Badge", href: "/box-system/components/badge", icon: TagIcon, description: "Compact status and category labels." },
+  { label: "Alert", href: "/box-system/components/alert", icon: ExclamationTriangleIcon, description: "Inline messages by intent." },
+  { label: "Tooltip", href: "/box-system/components/tooltip", icon: ChatBubbleBottomCenterTextIcon, description: "Hover hints and labels." },
+];
 
 export default function Components() {
   return (
@@ -7,10 +23,28 @@ export default function Components() {
         <div className="flex flex-col gap-3 mb-10">
           <h1 className="text-h1 font-semibold">Components</h1>
           <p className="text-body-lg text-muted-foreground">
-            Reusable UI components built on the Cardboard foundations.
+            Reusable UI built on the Cardboard foundations — each rendered live,
+            with its real variants and states.
           </p>
         </div>
-        <p className="text-body-md text-muted-foreground">Coming soon.</p>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {components.map(({ label, href, icon: Icon, description }) => (
+            <Link
+              key={href}
+              href={href}
+              className="group flex flex-col gap-3 rounded-xl border border-border bg-background p-5 transition-colors hover:bg-muted"
+            >
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border transition-colors group-hover:bg-background">
+                <Icon className="size-5 text-foreground" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="text-body-md font-medium">{label}</div>
+                <div className="text-body-sm text-muted-foreground">{description}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </ContentCard>
   );
