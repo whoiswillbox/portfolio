@@ -58,20 +58,21 @@ function AccordionTrigger({
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
   const variant = React.useContext(AccordionVariantContext)
 
+  // `inline` matches the Typography-page disclosure exactly: a compact, muted
+  // text-body-xs row with a size-3.5 ChevronRight (before the label) that rotates.
   const triggerClass = {
     default:
-      "py-2.5 text-sm font-medium hover:underline items-start",
+      "justify-between py-2.5 text-sm font-medium hover:underline items-start",
     inline:
-      "gap-1.5 py-2 text-body-xs text-muted-foreground hover:text-foreground items-center flex-row-reverse justify-end",
+      "cursor-pointer items-center gap-1.5 py-2 text-body-xs text-muted-foreground hover:text-foreground",
   }[variant]
 
-  // inline uses a rotating ChevronRight; default keeps the down/up swap.
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "group/accordion-trigger relative flex flex-1 justify-between border border-transparent text-left transition-all outline-none focus-visible:border-border-focus focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:pointer-events-none disabled:opacity-50",
+          "group/accordion-trigger relative flex flex-1 border border-transparent text-left transition-colors outline-none focus-visible:border-border-focus focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:pointer-events-none disabled:opacity-50",
           triggerClass,
           className
         )}
@@ -85,7 +86,7 @@ function AccordionTrigger({
           </>
         ) : (
           <>
-            <ChevronRightIcon className="pointer-events-none size-4 shrink-0 text-subtle transition-transform duration-200 group-aria-expanded/accordion-trigger:rotate-90" />
+            <ChevronRightIcon className="pointer-events-none size-3.5 shrink-0 transition-transform duration-200 group-aria-expanded/accordion-trigger:rotate-90" />
             {children}
           </>
         )}

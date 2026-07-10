@@ -39,9 +39,9 @@ export default function AccordionDocs() {
         caption="A compact, muted row disclosure with a rotating chevron — for revealing extra detail in dense reference tables (e.g. the Typography primitives)."
       >
         <Accordion variant="inline" type="single" collapsible className="w-full max-w-md">
-          <AccordionItem value="a">
+          <AccordionItem value="a" className="rounded-lg bg-muted/50 px-3">
             <AccordionTrigger>Primitives</AccordionTrigger>
-            <AccordionContent className="pl-5.5">
+            <AccordionContent className="pl-5">
               The raw values a token resolves to — family, size, leading, weight.
             </AccordionContent>
           </AccordionItem>
