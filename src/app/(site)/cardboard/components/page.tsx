@@ -30,6 +30,7 @@ import {
   ClipboardDocumentIcon,
   SparklesIcon,
   DevicePhoneMobileIcon,
+  EllipsisHorizontalIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -59,6 +60,7 @@ const components = [
   { label: "Dialog", href: "/cardboard/components/dialog", icon: WindowIcon, description: "Modal overlays." },
   { label: "Popover", href: "/cardboard/components/popover", icon: ChatBubbleLeftRightIcon, description: "Anchored floating content." },
   { label: "Select", href: "/cardboard/components/select", icon: ChevronUpDownIcon, description: "Choose one from a dropdown." },
+  { label: "Dropdown Menu", href: "/cardboard/components/dropdown-menu", icon: EllipsisHorizontalIcon, description: "A menu of actions." },
   // Custom, in-use components built on the foundations.
   { label: "Empty", href: "/cardboard/components/empty", icon: ArchiveBoxXMarkIcon, description: "Empty-state layouts." },
   { label: "Content Card", href: "/cardboard/components/content-card", icon: Square2StackIcon, description: "The full-height page surface." },

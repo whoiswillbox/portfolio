@@ -37,6 +37,18 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `dropdown-menu.tsx` — FORKED into Cardboard (`cardboard/dropdown-menu.tsx`)
+**Date:** 2026-07-10
+**Why:** Cardboard fork (Button pattern).
+**What:** Owned at `src/components/cardboard/dropdown-menu.tsx`; `ui/` is a
+re-export shim. radix DropdownMenu primitives kept. Rewired: content/sub-content
+`bg-popover text-popover-foreground`→`bg-surface text-foreground`; all item focus
+`bg-accent text-accent-foreground`→`bg-surface-secondary text-foreground` (dropped
+the redundant `**:text-accent-foreground` descendant rules); destructive item
+`text-destructive`/`bg-destructive/10`→`text-critical`/`bg-surface-critical`;
+label & shortcut `text-muted-foreground`→`text-subtle`; `bg-border` separator kept.
+**lucide Check/ChevronRight → Heroicons.**
+
 ### `select.tsx` — FORKED into Cardboard (`cardboard/select.tsx`)
 **Date:** 2026-07-10
 **Why:** Cardboard fork (Button pattern).
