@@ -37,6 +37,23 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `label.tsx`, `checkbox.tsx`, `textarea.tsx`, `skeleton.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 3 (Button pattern). Owned components in
+`src/components/cardboard/`; `ui/` paths are re-export shims; doc pages added
+(Label has no standalone page — token-less, shown within Checkbox/Switch).
+**What (token rewires):**
+- **label:** no design tokens — relocated only.
+- **checkbox:** `border-input`→`border`; `data-checked` `bg-primary`/`border-primary`/
+  `text-primary-foreground`→`bg-fill-solid`/`border-fill-solid`/`text-on-solid`;
+  `ring-ring`→`border-border-focus`; destructive→critical; dropped dark `bg-input/30`.
+  **Icon: lucide `CheckIcon` → Heroicons `@heroicons/react/24/solid`** (per the
+  icon convention — one component off lucide).
+- **textarea:** mirrors Cardboard Input — `border-input`→`border`,
+  `text-muted-foreground`→`text-subtle`, focus→`border-border-focus`,
+  invalid→critical, `disabled:bg-input`→`bg-surface-disabled`, dropped dark translucency.
+- **skeleton:** `bg-muted`→`bg-surface-secondary` (identical value) — relocated.
+
 ### `input.tsx`, `card.tsx`, `switch.tsx`, `separator.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 2 (Button pattern). Each now has an owned component

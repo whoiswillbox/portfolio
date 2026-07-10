@@ -1,13 +1,3 @@
-import { cn } from "@/lib/utils"
-
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="skeleton"
-      className={cn("animate-pulse rounded-md bg-muted", className)}
-      {...props}
-    />
-  )
-}
-
-export { Skeleton }
+/* Forked into Cardboard. Re-export shim — the owned component lives at
+   `@/components/cardboard/skeleton`. See docs/component-customizations.md. */
+export { Skeleton } from "@/components/cardboard/skeleton"

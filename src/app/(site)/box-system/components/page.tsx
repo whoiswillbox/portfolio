@@ -8,6 +8,9 @@ import {
   RectangleGroupIcon,
   Bars2Icon,
   MinusIcon,
+  CheckIcon,
+  DocumentTextIcon,
+  Bars3BottomLeftIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -22,6 +25,9 @@ const components = [
   { label: "Card", href: "/box-system/components/card", icon: RectangleGroupIcon, description: "Grouped content surfaces." },
   { label: "Switch", href: "/box-system/components/switch", icon: Bars2Icon, description: "On / off toggles." },
   { label: "Separator", href: "/box-system/components/separator", icon: MinusIcon, description: "Dividing rules." },
+  { label: "Checkbox", href: "/box-system/components/checkbox", icon: CheckIcon, description: "Boolean selection controls." },
+  { label: "Textarea", href: "/box-system/components/textarea", icon: DocumentTextIcon, description: "Multi-line text fields." },
+  { label: "Skeleton", href: "/box-system/components/skeleton", icon: Bars3BottomLeftIcon, description: "Loading placeholders." },
 ];
 
 export default function Components() {
