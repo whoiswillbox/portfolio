@@ -54,10 +54,10 @@ function ElevationRow({ token, cls, styleVar, feeds, use }: { token: string; cls
       {/* Sample — the shadow IS the token, so it's a true visual. Sits on the
           page bg (not the card surface) so the shadow reads. */}
       <div
-        className={cn("grid size-16 shrink-0 place-items-center rounded-lg bg-surface ring-1 ring-border", cls)}
+        className={cn("grid size-16 shrink-0 place-items-center rounded-lg border border-border bg-surface", cls)}
         style={styleVar ? { boxShadow: `var(${styleVar})` } : undefined}
       />
-      <CopyToken value={token} className="-ml-1.5 shrink-0 self-start" />
+      <CopyToken value={token} className="-ml-1.5 shrink-0" />
       <div className="ml-auto flex min-w-0 flex-col items-end gap-0.5 text-right">
         {use && <p className="text-body-sm text-muted-foreground">{use}</p>}
         {feeds && (
