@@ -5,15 +5,16 @@ import Link from "next/link";
 import {
   ArrowLeftIcon,
   LightBulbIcon,
+  MagnifyingGlassIcon,
   HomeIcon,
   BellIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
   XCircleIcon,
-  Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import { BellIcon as BellSolid } from "@heroicons/react/24/solid";
+import * as Outline from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
 import { cn } from "@/lib/utils";
@@ -42,9 +43,9 @@ const SIZES = [
 // Icon color tokens (mirrors the Colors page). Shown as icon-* ; copied as the
 // working text-icon-* utility (icons take color from the text- utility).
 const COLORS = [
-  { token: "icon", copyAs: "text-icon", cls: "text-icon", use: "Default icon color." },
-  { token: "icon-secondary", copyAs: "text-icon-secondary", cls: "text-icon-secondary", use: "Lower-prominence icons." },
-  { token: "icon-subtle", copyAs: "text-icon-subtle", cls: "text-icon-subtle", use: "Subtle / decorative glyphs." },
+  { token: "icon", copyAs: "text-icon", cls: "text-icon", use: "Default icon color.", Icon: HomeIcon },
+  { token: "icon-secondary", copyAs: "text-icon-secondary", cls: "text-icon-secondary", use: "Lower-prominence icons.", Icon: HomeIcon },
+  { token: "icon-subtle", copyAs: "text-icon-subtle", cls: "text-icon-subtle", use: "Subtle / decorative glyphs.", Icon: HomeIcon },
   { token: "icon-brand", copyAs: "text-icon-brand", cls: "text-icon-brand", use: "Attention-pulling icons.", Icon: BellIcon },
   { token: "icon-info", copyAs: "text-icon-info", cls: "text-icon-info", use: "Informational status.", Icon: InformationCircleIcon },
   { token: "icon-success", copyAs: "text-icon-success", cls: "text-icon-success", use: "Success status.", Icon: CheckCircleIcon },
@@ -52,10 +53,46 @@ const COLORS = [
   { token: "icon-critical", copyAs: "text-icon-critical", cls: "text-icon-critical", use: "Critical / error status.", Icon: XCircleIcon },
 ];
 
-type View = "primitives" | "semantics";
+type IconEntry = { name: string; Icon: React.ComponentType<React.SVGProps<SVGSVGElement>> };
+
+// The full 24/outline set, dynamically. Filter the module to component exports.
+const ALL_ICONS: IconEntry[] = Object.entries(Outline)
+  .filter(([name]) => name.endsWith("Icon"))
+  .map(([name, Icon]) => ({ name, Icon: Icon as IconEntry["Icon"] }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+// One gallery tile — copies the import name, shows the glyph + label.
+function IconTile({ name, Icon }: IconEntry) {
+  const [copied, setCopied] = React.useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(name).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    }).catch(() => {});
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      title={`Copy "${name}"`}
+      className="group flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-3 transition-colors hover:bg-surface-hover"
+    >
+      <Icon className="size-6 text-icon" />
+      <span className="w-full truncate text-center font-mono text-[0.6rem] text-muted-foreground">
+        {copied ? "Copied!" : name.replace(/Icon$/, "")}
+      </span>
+    </button>
+  );
+}
 
 export default function Iconography() {
-  const [view, setView] = React.useState<View>("semantics");
+  const [query, setQuery] = React.useState("");
+
+  const filtered = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return ALL_ICONS;
+    return ALL_ICONS.filter((i) => i.name.toLowerCase().includes(q));
+  }, [query]);
 
   return (
     <ContentCard className="h-full overflow-auto">
@@ -68,37 +105,15 @@ export default function Iconography() {
           Foundations
         </Link>
 
-        <div className="flex flex-col gap-4 mb-12">
-          <div className="flex flex-col gap-3">
-            <h1 className="text-h1 font-semibold">Iconography</h1>
-            <p className="text-body-lg text-muted-foreground">
-              Icons carry meaning at a glance. One consistent set, sized and
-              colored on the same scales as everything else.
-            </p>
-          </div>
-          {/* Primitives / Semantics toggle */}
-          <div className="inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
-            {(["primitives", "semantics"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-body-sm font-medium capitalize transition-colors",
-                  view === v
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-col gap-3 mb-12">
+          <h1 className="text-h1 font-semibold">Iconography</h1>
+          <p className="text-body-lg text-muted-foreground">
+            Icons carry meaning at a glance. One consistent set, sized and
+            colored on the same scales as everything else.
+          </p>
         </div>
 
-        {view === "semantics" ? (
-        <>
-        {/* Library */}
+        {/* Icon set */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <h2 className="text-h3 font-semibold">Icon set</h2>
@@ -167,55 +182,52 @@ export default function Iconography() {
             </UsageHint>
           </div>
           <div className="flex flex-col divide-y divide-border">
-            {COLORS.map(({ token, copyAs, cls, use, Icon }) => {
-              const Glyph = Icon ?? BellIcon;
-              return (
-                <div key={token} className="flex items-center gap-6 py-4">
-                  <div className="grid w-16 shrink-0 place-items-center">
-                    <Glyph className={cn("size-6", cls)} />
-                  </div>
-                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <CopyToken value={token} copyValue={copyAs} className="-ml-1.5 self-start" />
-                    <p className="text-body-sm text-muted-foreground">{use}</p>
-                  </div>
+            {COLORS.map(({ token, copyAs, cls, use, Icon }) => (
+              <div key={token} className="flex items-center gap-6 py-4">
+                <div className="grid w-16 shrink-0 place-items-center">
+                  <Icon className={cn("size-6", cls)} />
                 </div>
-              );
-            })}
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <CopyToken value={token} copyValue={copyAs} className="-ml-1.5 self-start" />
+                  <p className="text-body-sm text-muted-foreground">{use}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
-        </>
-        ) : (
+
+        {/* Library gallery */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Source</h2>
+            <h2 className="text-h3 font-semibold">Library</h2>
             <p className="text-body-sm text-muted-foreground">
-              Icons aren&apos;t design tokens — they&apos;re a vendored library.
-              There&apos;s no primitive layer to tune; the &quot;primitives&quot;
-              here are simply the raw import.
+              All {ALL_ICONS.length} icons in the 24/outline set. Click any to copy
+              its component name.
             </p>
           </div>
-          <div className="flex flex-col divide-y divide-border">
-            <div className="flex items-center gap-6 py-4">
-              <div className="grid w-16 shrink-0 place-items-center">
-                <Cog6ToothIcon className="size-6 text-icon" />
-              </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <CopyToken value="@heroicons/react/24/outline" className="-ml-1.5 self-start" />
-                <p className="text-body-sm text-muted-foreground">The default icon import — outline style, 24px grid.</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-6 py-4">
-              <div className="grid w-16 shrink-0 place-items-center">
-                <BellSolid className="size-6 text-icon" />
-              </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <CopyToken value="@heroicons/react/24/solid" className="-ml-1.5 self-start" />
-                <p className="text-body-sm text-muted-foreground">Filled style — for active / selected states.</p>
-              </div>
-            </div>
+          {/* Search */}
+          <div className="relative">
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search icons…"
+              className="h-10 w-full rounded-lg border border-border bg-surface pl-9 pr-3 text-body-sm text-foreground placeholder:text-muted-foreground focus:border-border-focus focus:outline-none"
+            />
           </div>
+          {filtered.length === 0 ? (
+            <p className="py-8 text-center text-body-sm text-muted-foreground">
+              No icons match &ldquo;{query}&rdquo;.
+            </p>
+          ) : (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-6">
+              {filtered.map((i) => (
+                <IconTile key={i.name} {...i} />
+              ))}
+            </div>
+          )}
         </section>
-        )}
       </div>
     </ContentCard>
   );
