@@ -37,6 +37,20 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `progress.tsx`, `avatar.tsx`, `toggle.tsx`, `spinner.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 4 (Button pattern). Owned components in
+`src/components/cardboard/`; `ui/` paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **progress:** track `bg-muted`→`bg-surface-secondary`; fill `bg-primary`→`bg-fill-solid`.
+- **avatar:** `bg-muted`→`bg-surface-secondary`, `text-muted-foreground`→`text-subtle`,
+  badge `bg-primary text-primary-foreground`→`bg-fill-solid text-on-solid`,
+  `ring-background`→`ring-surface` (all identical values). `after:border-border` kept.
+- **toggle:** hover/on `bg-muted`→`bg-surface-secondary`, `border-input`→`border`,
+  `ring-ring`→`border-border-focus`, destructive→critical.
+- **spinner:** **lucide `Loader2Icon` → Heroicons `ArrowPathIcon`** (icon convention;
+  another component off lucide).
+
 ### `label.tsx`, `checkbox.tsx`, `textarea.tsx`, `skeleton.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 3 (Button pattern). Owned components in

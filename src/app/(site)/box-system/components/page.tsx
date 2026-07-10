@@ -11,6 +11,10 @@ import {
   CheckIcon,
   DocumentTextIcon,
   Bars3BottomLeftIcon,
+  ChartBarIcon,
+  UserCircleIcon,
+  PowerIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -28,6 +32,10 @@ const components = [
   { label: "Checkbox", href: "/box-system/components/checkbox", icon: CheckIcon, description: "Boolean selection controls." },
   { label: "Textarea", href: "/box-system/components/textarea", icon: DocumentTextIcon, description: "Multi-line text fields." },
   { label: "Skeleton", href: "/box-system/components/skeleton", icon: Bars3BottomLeftIcon, description: "Loading placeholders." },
+  { label: "Progress", href: "/box-system/components/progress", icon: ChartBarIcon, description: "Determinate progress bars." },
+  { label: "Avatar", href: "/box-system/components/avatar", icon: UserCircleIcon, description: "User images and initials." },
+  { label: "Toggle", href: "/box-system/components/toggle", icon: PowerIcon, description: "Two-state pressable buttons." },
+  { label: "Spinner", href: "/box-system/components/spinner", icon: ArrowPathIcon, description: "Indeterminate loading." },
 ];
 
 export default function Components() {

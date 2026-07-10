@@ -1,10 +1,3 @@
-import { cn } from "@/lib/utils"
-import { Loader2Icon } from "lucide-react"
-
-function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
-  return (
-    <Loader2Icon role="status" aria-label="Loading" className={cn("size-4 animate-spin", className)} {...props} />
-  )
-}
-
-export { Spinner }
+/* Forked into Cardboard. Re-export shim — the owned component lives at
+   `@/components/cardboard/spinner`. See docs/component-customizations.md. */
+export { Spinner } from "@/components/cardboard/spinner"
