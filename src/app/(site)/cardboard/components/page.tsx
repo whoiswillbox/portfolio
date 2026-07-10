@@ -15,6 +15,10 @@ import {
   UserCircleIcon,
   PowerIcon,
   ArrowPathIcon,
+  ChevronUpDownIcon,
+  CommandLineIcon,
+  InboxIcon,
+  RectangleStackIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -36,6 +40,10 @@ const components = [
   { label: "Avatar", href: "/cardboard/components/avatar", icon: UserCircleIcon, description: "User images and initials." },
   { label: "Toggle", href: "/cardboard/components/toggle", icon: PowerIcon, description: "Two-state pressable buttons." },
   { label: "Spinner", href: "/cardboard/components/spinner", icon: ArrowPathIcon, description: "Indeterminate loading." },
+  { label: "Native Select", href: "/cardboard/components/native-select", icon: ChevronUpDownIcon, description: "Styled native dropdowns." },
+  { label: "Kbd", href: "/cardboard/components/kbd", icon: CommandLineIcon, description: "Keyboard keys and shortcuts." },
+  { label: "Empty", href: "/cardboard/components/empty", icon: InboxIcon, description: "Empty-state layouts." },
+  { label: "Aspect Ratio", href: "/cardboard/components/aspect-ratio", icon: RectangleStackIcon, description: "Fixed width-to-height boxes." },
 ];
 
 export default function Components() {

@@ -37,6 +37,21 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `aspect-ratio.tsx`, `kbd.tsx`, `empty.tsx`, `native-select.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 5 (Button pattern). Owned components in
+`src/components/cardboard/`; `ui/` paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **aspect-ratio:** no design tokens (pure radix wrapper) — relocated only.
+- **kbd:** `bg-muted`→`bg-surface-secondary`, `text-muted-foreground`→`text-subtle`;
+  in-tooltip `bg-background/20 text-background`→`bg-on-inverse/20 text-on-inverse`
+  (matches the forked Tooltip's inverse bubble).
+- **empty:** `bg-muted`→`bg-surface-secondary`, `text-muted-foreground`→`text-subtle`,
+  `hover:text-primary`→`hover:text-link`.
+- **native-select:** `border-input`→`border`, `selection:bg-primary/text-primary-foreground`
+  →`bg-fill-solid/text-on-solid`, `text-muted-foreground`→`text-subtle`, focus→`border-border-focus`,
+  invalid→critical, dropped dark translucency. **lucide `ChevronDownIcon` → Heroicons.**
+
 ### `progress.tsx`, `avatar.tsx`, `toggle.tsx`, `spinner.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 4 (Button pattern). Owned components in

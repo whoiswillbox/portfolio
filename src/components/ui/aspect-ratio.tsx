@@ -1,11 +1,3 @@
-"use client"
-
-import { AspectRatio as AspectRatioPrimitive } from "radix-ui"
-
-function AspectRatio({
-  ...props
-}: React.ComponentProps<typeof AspectRatioPrimitive.Root>) {
-  return <AspectRatioPrimitive.Root data-slot="aspect-ratio" {...props} />
-}
-
-export { AspectRatio }
+/* Forked into Cardboard. Re-export shim — the owned component lives at
+   `@/components/cardboard/aspect-ratio`. See docs/component-customizations.md. */
+export { AspectRatio } from "@/components/cardboard/aspect-ratio"
