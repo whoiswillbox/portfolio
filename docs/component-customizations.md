@@ -37,6 +37,26 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `input.tsx`, `card.tsx`, `switch.tsx`, `separator.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 2 (Button pattern). Each now has an owned component
+in `src/components/cardboard/` with the `ui/` path as a re-export shim, and a doc
+page under `box-system/components/`.
+**What (token rewires):**
+- **input:** `border-input`→`border`, `placeholder:text-muted-foreground`→`text-subtle`
+  (both identical values), focus `border-ring`/`ring-ring`→`border-border-focus`
+  (neutral-400 → brand-500, intentional: focus is now brand-colored), `aria-invalid`
+  destructive→critical, `disabled:bg-input`→`bg-surface-disabled`. Dropped the
+  dark-mode `bg-input/30` translucency (now transparent in both).
+- **card:** `bg-card`→`bg-surface`, `text-card-foreground`→`text-foreground`,
+  `text-muted-foreground`→`text-subtle` (all identical), footer `bg-muted/50`→
+  `bg-surface-secondary/50` (identical).
+- **switch:** `data-checked:bg-primary`→`bg-fill-solid`, `/80` hover→`bg-fill-solid-hover`,
+  `data-unchecked:bg-input`→`bg-surface-tertiary` (+ hover), thumb `bg-background`→
+  `bg-surface`, ring `ring-ring`→`border-border-focus`, destructive→critical.
+  Dropped the dark-mode thumb overrides (bg-surface/fill-solid handle both themes).
+- **separator:** already used `bg-border` (Cardboard-native) — relocated only.
+
 ### `tooltip.tsx` — FORKED into Cardboard (`cardboard/tooltip.tsx`)
 **Date:** 2026-07-10
 **Why:** Cardboard fork (follows the Button pattern). Preserves the earlier

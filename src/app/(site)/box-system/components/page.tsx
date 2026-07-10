@@ -4,16 +4,24 @@ import {
   TagIcon,
   ExclamationTriangleIcon,
   ChatBubbleBottomCenterTextIcon,
+  PencilSquareIcon,
+  RectangleGroupIcon,
+  Bars2Icon,
+  MinusIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
 /* The Components index. A living gallery — start with the components we've
-   actually customized / use, and grow it as the shadcn base is forked. */
+   actually customized / forked, and grow it as the shadcn base is adopted. */
 const components = [
   { label: "Button", href: "/box-system/components/button", icon: CursorArrowRaysIcon, description: "Actions, in every variant and size." },
   { label: "Badge", href: "/box-system/components/badge", icon: TagIcon, description: "Compact status and category labels." },
   { label: "Alert", href: "/box-system/components/alert", icon: ExclamationTriangleIcon, description: "Inline messages by intent." },
   { label: "Tooltip", href: "/box-system/components/tooltip", icon: ChatBubbleBottomCenterTextIcon, description: "Hover hints and labels." },
+  { label: "Input", href: "/box-system/components/input", icon: PencilSquareIcon, description: "Single-line text fields." },
+  { label: "Card", href: "/box-system/components/card", icon: RectangleGroupIcon, description: "Grouped content surfaces." },
+  { label: "Switch", href: "/box-system/components/switch", icon: Bars2Icon, description: "On / off toggles." },
+  { label: "Separator", href: "/box-system/components/separator", icon: MinusIcon, description: "Dividing rules." },
 ];
 
 export default function Components() {
