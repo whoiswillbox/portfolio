@@ -294,12 +294,12 @@ export default function Colors() {
             <h2 className="text-h3 font-semibold">Borders</h2>
             <p className="text-body-sm text-muted-foreground">
               Dividers and outlines by prominence —{" "}
-              <span className="font-mono text-body-xs">border-line</span> and friends.
+              <span className="font-mono text-body-xs">border</span> and friends.
             </p>
             <UsageHint>
-              <span className="font-mono text-body-xs">border-line</span> is the
-              default; <span className="font-mono text-body-xs">border-line-secondary</span>{" "}
-              for quieter dividers, <span className="font-mono text-body-xs">border-line-focus</span>{" "}
+              <span className="font-mono text-body-xs">border</span> is the
+              default; <span className="font-mono text-body-xs">border-subtle</span>{" "}
+              for quieter dividers, <span className="font-mono text-body-xs">border-focus</span>{" "}
               for focus rings, and the intent variants to outline status elements.
             </UsageHint>
           </div>

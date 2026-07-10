@@ -9,28 +9,35 @@
   --font-family-mono: var(--font-geist-mono);
   --font-family-heading: var(--font-eb-garamond);
 
-  /* --- Body sizes ----------------------------------------------------- */
-  --font-size-body-xs: 0.75rem;  /* 12px */
-  --font-size-body-sm: 0.875rem; /* 14px */
-  --font-size-body-md: 1rem;     /* 16px (base) */
-  --font-size-body-lg: 1.125rem; /* 18px */
-
-  /* --- Heading levels (h6 → h1) --------------------------------------- */
-  --font-size-h6: 1rem;       /* 16px */
-  --font-size-h5: 1.125rem;   /* 18px */
-  --font-size-h4: 1.25rem;    /* 20px */
-  --font-size-h3: 1.5rem;     /* 24px */
-  --font-size-h2: 1.875rem;   /* 30px */
-  --font-size-h1: 2.25rem;    /* 36px */
-
-  /* --- Display sizes (oversized hero headings, above h1) -------------- */
-  --font-size-display-sm: 2.5rem; /* 40px */
-  --font-size-display: 3.5rem;    /* 56px */
-  --font-size-display-lg: 4.5rem; /* 72px */
+  /* --- Sizes (t-shirt ramp) ------------------------------------------ */
+  /* A meaning-free scale, à la Tailwind. The semantic text-* tokens
+     reference these by role (e.g. --text-h1 → --font-size-4xl), so a single
+     rung serves every role that shares its value (no duplicate size vars). */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 1rem;    /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.25rem;   /* 20px */
+  --font-size-2xl: 1.5rem;   /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem;  /* 36px */
+  --font-size-5xl: 2.5rem;   /* 40px */
+  --font-size-6xl: 3.5rem;   /* 56px */
+  --font-size-7xl: 4.5rem;   /* 72px */
 
   /* --- Weights -------------------------------------------------------- */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+
+  /* --- Line heights (leading) ---------------------------------------- */
+  /* Named tight→loose ramp. Matches Tailwind's leading-* vocabulary, so
+     the semantic text-* tokens and the leading-* utilities share a scale. */
+  --line-height-none: 1;      /* display */
+  --line-height-tight: 1.1;   /* large headings */
+  --line-height-snug: 1.2;    /* headings */
+  --line-height-normal: 1.4;  /* small headings, dense UI text */
+  --line-height-relaxed: 1.5; /* body */
+  --line-height-loose: 1.6;   /* large body */
 }
