@@ -1,0 +1,41 @@
+/* ============================================================================
+   PRIMITIVES — Elevation (shadows)
+   Raw box-shadow ramp, from a barely-there lift to a deep overlay shadow.
+   Reference-only — semantics map these to elevation roles. Theme-aware: the
+   shadow color darkens/strengthens in dark mode via --shadow-color so shadows
+   stay legible on dark surfaces.
+   ========================================================================== */
+:root {
+  /* The shadow color (and its softer/stronger companions). Neutral, tuned for
+     light surfaces; overridden in .dark below. */
+  --shadow-color: 220 3% 15%;
+  --shadow-strength-1: 0.04;
+  --shadow-strength-2: 0.08;
+  --shadow-strength-3: 0.12;
+
+  /* Ramp — 0 (flat) → 500 (deep). Layered shadows (ambient + key) read more
+     natural than a single blur. */
+  --elevation-0: none;
+  --elevation-100:
+    0 1px 2px 0 hsl(var(--shadow-color) / var(--shadow-strength-1));
+  --elevation-200:
+    0 1px 2px -1px hsl(var(--shadow-color) / var(--shadow-strength-2)),
+    0 1px 3px 0 hsl(var(--shadow-color) / var(--shadow-strength-1));
+  --elevation-300:
+    0 2px 4px -2px hsl(var(--shadow-color) / var(--shadow-strength-2)),
+    0 4px 6px -1px hsl(var(--shadow-color) / var(--shadow-strength-1));
+  --elevation-400:
+    0 4px 6px -4px hsl(var(--shadow-color) / var(--shadow-strength-2)),
+    0 10px 15px -3px hsl(var(--shadow-color) / var(--shadow-strength-1));
+  --elevation-500:
+    0 8px 10px -6px hsl(var(--shadow-color) / var(--shadow-strength-3)),
+    0 20px 25px -5px hsl(var(--shadow-color) / var(--shadow-strength-2));
+}
+
+.dark {
+  /* Near-black, stronger — shadows on dark surfaces need more contrast. */
+  --shadow-color: 0 0% 0%;
+  --shadow-strength-1: 0.24;
+  --shadow-strength-2: 0.36;
+  --shadow-strength-3: 0.48;
+}

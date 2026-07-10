@@ -7,10 +7,12 @@
 @import "../styles/primitives/colors.css";
 @import "../styles/primitives/typography.css";
 @import "../styles/primitives/spacing.css";
+@import "../styles/primitives/elevation.css";
 @import "../styles/semantics/core.css";
 @import "../styles/semantics/intent.css";
 @import "../styles/semantics/typography.css";
 @import "../styles/semantics/spacing.css";
+@import "../styles/semantics/elevation.css";
 
 @custom-variant dark (&:is(.dark *));
 

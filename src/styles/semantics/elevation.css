@@ -1,0 +1,25 @@
+/* ============================================================================
+   SEMANTICS — Elevation
+   Maps the elevation primitives to Tailwind shadow-* utilities. Two vocabularies
+   over the same ramp:
+     • the t-shirt scale (shadow-sm … shadow-2xl) — familiar, drop-in
+     • role aliases (shadow-raised / -overlay / -popover) — intent-named
+   Both resolve to the same --elevation-* primitive, so there's one scale.
+   ========================================================================== */
+@theme {
+  /* Tailwind default names, repointed at our ramp (was Tailwind's built-in
+     shadows; now themed + dark-aware). shadow (DEFAULT) = shadow-sm's step. */
+  --shadow-2xs: var(--elevation-100);
+  --shadow-xs: var(--elevation-100);
+  --shadow-sm: var(--elevation-200);
+  --shadow: var(--elevation-200);
+  --shadow-md: var(--elevation-300);
+  --shadow-lg: var(--elevation-400);
+  --shadow-xl: var(--elevation-500);
+  --shadow-2xl: var(--elevation-500);
+
+  /* Role aliases — intent-named elevations for component authors. */
+  --shadow-raised: var(--elevation-200);  /* cards, raised surfaces */
+  --shadow-overlay: var(--elevation-400); /* dropdowns, sheets */
+  --shadow-popover: var(--elevation-500); /* popovers, modals, dialogs */
+}
