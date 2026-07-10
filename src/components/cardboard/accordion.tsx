@@ -2,24 +2,38 @@
 
 import * as React from "react"
 import { Accordion as AccordionPrimitive } from "radix-ui"
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline"
+import { ChevronDownIcon, ChevronUpIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 
 import { cn } from "@/lib/utils"
 
 /* Cardboard Accordion — owned. Forked from the vendored shadcn accordion:
-   rewired to Cardboard-native tokens and switched the chevrons from lucide to
-   Heroicons (per the icon convention). radix Accordion primitives kept. The old
-   ui/accordion path re-exports this. */
+   rewired to Cardboard-native tokens, chevrons swapped to Heroicons, and given a
+   `variant` system for the two real accordion styles used across the app:
+     • default — bordered sections, chevron down/up, hover:underline (shadcn base)
+     • inline  — compact per-row disclosure, ChevronRight rotates (Typography page)
+   (Navigational drill-in lists like the Technergetics sidebar item are NOT
+   accordions — those belong to the Sidebar component as a sidebar-item variant.)
+   radix Accordion primitives kept. The old ui/accordion path re-exports this. */
+
+type AccordionVariant = "default" | "inline"
+const AccordionVariantContext = React.createContext<AccordionVariant>("default")
+
 function Accordion({
   className,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Root>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Root> & {
+  variant?: AccordionVariant
+}) {
   return (
-    <AccordionPrimitive.Root
-      data-slot="accordion"
-      className={cn("flex w-full flex-col", className)}
-      {...props}
-    />
+    <AccordionVariantContext.Provider value={variant}>
+      <AccordionPrimitive.Root
+        data-slot="accordion"
+        data-variant={variant}
+        className={cn("flex w-full flex-col", className)}
+        {...props}
+      />
+    </AccordionVariantContext.Provider>
   )
 }
 
@@ -27,10 +41,11 @@ function AccordionItem({
   className,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Item>) {
+  const variant = React.useContext(AccordionVariantContext)
   return (
     <AccordionPrimitive.Item
       data-slot="accordion-item"
-      className={cn("not-last:border-b", className)}
+      className={cn(variant === "default" && "not-last:border-b", className)}
       {...props}
     />
   )
@@ -41,19 +56,39 @@ function AccordionTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+  const variant = React.useContext(AccordionVariantContext)
+
+  const triggerClass = {
+    default:
+      "py-2.5 text-sm font-medium hover:underline items-start",
+    inline:
+      "gap-1.5 py-2 text-body-xs text-muted-foreground hover:text-foreground items-center flex-row-reverse justify-end",
+  }[variant]
+
+  // inline uses a rotating ChevronRight; default keeps the down/up swap.
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "group/accordion-trigger relative flex flex-1 items-start justify-between rounded-lg border border-transparent py-2.5 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:border-border-focus focus-visible:ring-3 focus-visible:ring-border-focus/50 focus-visible:after:border-border-focus disabled:pointer-events-none disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-subtle",
+          "group/accordion-trigger relative flex flex-1 justify-between border border-transparent text-left transition-all outline-none focus-visible:border-border-focus focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:pointer-events-none disabled:opacity-50",
+          triggerClass,
           className
         )}
         {...props}
       >
-        {children}
-        <ChevronDownIcon data-slot="accordion-trigger-icon" className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden" />
-        <ChevronUpIcon data-slot="accordion-trigger-icon" className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline" />
+        {variant === "default" ? (
+          <>
+            {children}
+            <ChevronDownIcon className="pointer-events-none ml-auto size-4 shrink-0 text-subtle group-aria-expanded/accordion-trigger:hidden" />
+            <ChevronUpIcon className="pointer-events-none ml-auto hidden size-4 shrink-0 text-subtle group-aria-expanded/accordion-trigger:inline" />
+          </>
+        ) : (
+          <>
+            <ChevronRightIcon className="pointer-events-none size-4 shrink-0 text-subtle transition-transform duration-200 group-aria-expanded/accordion-trigger:rotate-90" />
+            {children}
+          </>
+        )}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )

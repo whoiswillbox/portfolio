@@ -10,9 +10,12 @@ export default function AccordionDocs() {
   return (
     <ComponentPage
       title="Accordion"
-      description="Vertically stacked sections that expand and collapse. Chevrons are Heroicons."
+      description="Vertically stacked sections that expand and collapse. Three variants unify the collapsible styles used across the app."
     >
-      <Demo title="Default">
+      <Demo
+        title="Default"
+        caption="Bordered sections with a down/up chevron — for FAQs and standalone section lists."
+      >
         <Accordion type="single" collapsible className="w-full max-w-md">
           <AccordionItem value="a">
             <AccordionTrigger>What is Cardboard?</AccordionTrigger>
@@ -28,9 +31,19 @@ export default function AccordionDocs() {
               Cardboard tokens.
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="c">
-            <AccordionTrigger>Can multiple open at once?</AccordionTrigger>
-            <AccordionContent>Set type=&quot;multiple&quot; to allow it.</AccordionContent>
+        </Accordion>
+      </Demo>
+
+      <Demo
+        title="Inline"
+        caption="A compact, muted row disclosure with a rotating chevron — for revealing extra detail in dense reference tables (e.g. the Typography primitives)."
+      >
+        <Accordion variant="inline" type="single" collapsible className="w-full max-w-md">
+          <AccordionItem value="a">
+            <AccordionTrigger>Primitives</AccordionTrigger>
+            <AccordionContent className="pl-5.5">
+              The raw values a token resolves to — family, size, leading, weight.
+            </AccordionContent>
           </AccordionItem>
         </Accordion>
       </Demo>
