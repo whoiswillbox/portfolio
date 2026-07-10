@@ -37,6 +37,20 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `pagination.tsx`, `slider.tsx`, `collapsible.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 12 (Button pattern). Owned in `cardboard/`; `ui/`
+paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **pagination:** imports **Cardboard** Button (so active/hover already use
+  Cardboard tokens). lucide `ChevronLeftIcon`/`ChevronRightIcon`/`MoreHorizontalIcon`
+  → Heroicons `ChevronLeftIcon`/`ChevronRightIcon`/`EllipsisHorizontalIcon`.
+- **slider:** track `bg-muted`→`bg-surface-secondary`; range `bg-primary`→
+  `bg-fill-solid`; thumb `border-ring`/`ring-ring/50`→`border-border-focus`/
+  `ring-border-focus/50`; thumb fill `bg-white`→`bg-background` (theme-aware).
+- **collapsible:** no color tokens — pure Radix primitive re-export, relocated to
+  Cardboard for namespace consistency.
+
 ### `radio-group.tsx`, `toggle-group.tsx`, `breadcrumb.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 11 (Button pattern). Owned in `cardboard/`; `ui/`

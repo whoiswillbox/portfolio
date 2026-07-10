@@ -37,6 +37,9 @@ import {
   QueueListIcon,
   ListBulletIcon,
   ArrowRightCircleIcon,
+  EllipsisHorizontalCircleIcon,
+  AdjustmentsHorizontalIcon,
+  ChevronUpDownIcon as ChevronUpDownIconAlt,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -73,6 +76,9 @@ const components = [
   { label: "Radio Group", href: "/cardboard/components/radio-group", icon: QueueListIcon, description: "Pick one of several options." },
   { label: "Toggle Group", href: "/cardboard/components/toggle-group", icon: ListBulletIcon, description: "Grouped toggle buttons." },
   { label: "Breadcrumb", href: "/cardboard/components/breadcrumb", icon: ArrowRightCircleIcon, description: "Path to the current page." },
+  { label: "Pagination", href: "/cardboard/components/pagination", icon: EllipsisHorizontalCircleIcon, description: "Navigate between pages of a list." },
+  { label: "Slider", href: "/cardboard/components/slider", icon: AdjustmentsHorizontalIcon, description: "Pick a value or range on a track." },
+  { label: "Collapsible", href: "/cardboard/components/collapsible", icon: ChevronUpDownIconAlt, description: "Show and hide a region." },
   // Custom, in-use components built on the foundations.
   { label: "Empty", href: "/cardboard/components/empty", icon: ArchiveBoxXMarkIcon, description: "Empty-state layouts." },
   { label: "Content Card", href: "/cardboard/components/content-card", icon: Square2StackIcon, description: "The full-height page surface." },
