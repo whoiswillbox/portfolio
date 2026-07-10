@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/cardboard/tooltip";
 import { ComponentPage, Demo } from "../_component-page";
 
 const SIDES = ["top", "right", "bottom", "left"] as const;

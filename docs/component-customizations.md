@@ -37,6 +37,40 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `tooltip.tsx` — FORKED into Cardboard (`cardboard/tooltip.tsx`)
+**Date:** 2026-07-10
+**Why:** Cardboard fork (follows the Button pattern). Preserves the earlier
+arrow-removal customization.
+**What:** Owned component at `src/components/cardboard/tooltip.tsx`; `ui/tooltip.tsx`
+is a re-export shim. radix Tooltip primitives kept. The inverted bubble rewired
+from `bg-foreground text-background` → `bg-inverse text-on-inverse` (Cardboard's
+inverse-surface tokens; neutral-950 → neutral-900, a slight shift). No arrow,
+sideOffset 4 preserved. Doc page imports from `cardboard/`.
+
+### `alert.tsx` — FORKED into Cardboard (`cardboard/alert.tsx`)
+**Date:** 2026-07-10
+**Why:** Cardboard fork (follows the Button pattern). Preserves the earlier
+info/success intent variants.
+**What:** Owned component at `src/components/cardboard/alert.tsx`; `ui/alert.tsx`
+is a re-export shim. `cva` kept. info/success already used Cardboard intent
+tokens; rewired the rest: `default` `bg-card text-card-foreground` →
+`bg-surface text-foreground` (identical values); `destructive` `text-destructive`
+→ `text-critical` (slight shift red-500→red-600); `AlertDescription`
+`text-muted-foreground` → `text-subtle` (identical). Doc page imports from
+`cardboard/`.
+
+### `badge.tsx` — FORKED into Cardboard (`cardboard/badge.tsx`)
+**Date:** 2026-07-10
+**Why:** Cardboard fork (follows the Button pattern).
+**What:** Owned component at `src/components/cardboard/badge.tsx`; `ui/badge.tsx`
+is a re-export shim. radix `Slot` + `cva` kept. Rewired to Cardboard tokens:
+`default` → `bg-fill-solid text-on-solid`; `secondary` → `bg-surface-secondary`;
+`destructive` → `bg-surface-critical text-critical`; `outline`/`ghost` →
+`bg-surface-secondary` / `text-subtle`; `warning` → `bg-surface-caution
+text-caution` (was raw `amber-100/700`; now the caution intent tokens — minor
+shade shift, keeps the mono/uppercase treatment); `link` → `text-link`; focus
+ring `ring-ring` → `border-border-focus`. Doc page imports from `cardboard/`.
+
 ### `button.tsx` — FORKED into Cardboard (`cardboard/button.tsx`)
 **Date:** 2026-07-10
 **Why:** First component of the Cardboard fork — take ownership of the shadcn

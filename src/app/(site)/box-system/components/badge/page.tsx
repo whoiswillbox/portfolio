@@ -1,5 +1,5 @@
 import { CheckIcon } from "@heroicons/react/24/outline";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/cardboard/badge";
 import { ComponentPage, Demo } from "../_component-page";
 
 const VARIANTS = ["default", "secondary", "destructive", "outline", "ghost", "warning", "link"] as const;

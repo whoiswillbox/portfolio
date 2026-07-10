@@ -3,7 +3,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "@/components/cardboard/alert";
 import { ComponentPage, Demo } from "../_component-page";
 
 export default function AlertDocs() {
