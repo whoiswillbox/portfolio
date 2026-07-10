@@ -1,7 +1,11 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
+import { cn } from "@/lib/utils";
 
 /* Living reference — every sample is rendered with the ACTUAL type utility, so
    this page always reflects the real scale (size, weight, tracking, leading). */
@@ -46,6 +50,47 @@ const WEIGHTS = [
   { token: "font-bold", name: "Bold", value: "700", cls: "font-bold" },
 ];
 
+/* Primitives — the raw type values the semantic tokens map to. Reference-only. */
+const PRIM_FAMILIES = [
+  { v: "--font-family-heading", value: "EB Garamond" },
+  { v: "--font-family-sans", value: "Plus Jakarta Sans" },
+  { v: "--font-family-mono", value: "Geist Mono" },
+];
+const PRIM_SIZES = [
+  { v: "--font-size-display-lg", value: "4.5rem", px: "72" },
+  { v: "--font-size-display", value: "3.5rem", px: "56" },
+  { v: "--font-size-display-sm", value: "2.5rem", px: "40" },
+  { v: "--font-size-h1", value: "2.25rem", px: "36" },
+  { v: "--font-size-h2", value: "1.875rem", px: "30" },
+  { v: "--font-size-h3", value: "1.5rem", px: "24" },
+  { v: "--font-size-h4", value: "1.25rem", px: "20" },
+  { v: "--font-size-h5", value: "1.125rem", px: "18" },
+  { v: "--font-size-h6", value: "1rem", px: "16" },
+  { v: "--font-size-body-lg", value: "1.125rem", px: "18" },
+  { v: "--font-size-body-md", value: "1rem", px: "16" },
+  { v: "--font-size-body-sm", value: "0.875rem", px: "14" },
+  { v: "--font-size-body-xs", value: "0.75rem", px: "12" },
+];
+const PRIM_WEIGHTS = [
+  { v: "--font-weight-regular", value: "400" },
+  { v: "--font-weight-medium", value: "500" },
+  { v: "--font-weight-semibold", value: "600" },
+  { v: "--font-weight-bold", value: "700" },
+];
+
+// A plain reference row: copyable var name + its value.
+function VarRow({ v, value, note }: { v: string; value: string; note?: string }) {
+  return (
+    <div className="flex items-center gap-4 py-3">
+      <div className="w-72 shrink-0 max-sm:w-44">
+        <CopyToken value={v} className="-ml-1.5" />
+      </div>
+      <div className="font-mono text-body-sm text-foreground">{value}</div>
+      {note && <div className="font-mono text-[0.65rem] text-muted-foreground">{note}px</div>}
+    </div>
+  );
+}
+
 function TypeRow({ token, px, sample, heading }: TypeToken & { heading?: boolean }) {
   return (
     <div className="flex flex-col gap-2 py-4">
@@ -60,7 +105,11 @@ function TypeRow({ token, px, sample, heading }: TypeToken & { heading?: boolean
   );
 }
 
+type View = "primitives" | "semantics";
+
 export default function Typography() {
+  const [view, setView] = React.useState<View>("semantics");
+
   return (
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
@@ -72,14 +121,36 @@ export default function Typography() {
           Foundations
         </Link>
 
-        <div className="flex flex-col gap-3 mb-12">
-          <h1 className="text-h1 font-semibold">Typography</h1>
-          <p className="text-body-lg text-muted-foreground">
-            Type sets hierarchy and rhythm — a small, deliberate scale keeps the
-            interface legible and consistent.
-          </p>
+        <div className="flex flex-col gap-4 mb-12">
+          <div className="flex flex-col gap-3">
+            <h1 className="text-h1 font-semibold">Typography</h1>
+            <p className="text-body-lg text-muted-foreground">
+              Type sets hierarchy and rhythm — a small, deliberate scale keeps the
+              interface legible and consistent.
+            </p>
+          </div>
+          {/* Primitives / Semantics toggle */}
+          <div className="inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
+            {(["primitives", "semantics"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setView(v)}
+                className={cn(
+                  "rounded-md px-3 py-1.5 text-body-sm font-medium capitalize transition-colors",
+                  view === v
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
         </div>
 
+        {view === "semantics" ? (
+        <>
         {/* Fonts */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -174,6 +245,40 @@ export default function Typography() {
             ))}
           </div>
         </section>
+        </>
+        ) : (
+        <>
+        {/* Font families */}
+        <section className="mb-14 flex flex-col gap-4">
+          <h2 className="text-h3 font-semibold">Font families</h2>
+          <div className="flex flex-col divide-y divide-border">
+            {PRIM_FAMILIES.map((f) => (
+              <VarRow key={f.v} {...f} />
+            ))}
+          </div>
+        </section>
+
+        {/* Font sizes */}
+        <section className="mb-14 flex flex-col gap-4">
+          <h2 className="text-h3 font-semibold">Font sizes</h2>
+          <div className="flex flex-col divide-y divide-border">
+            {PRIM_SIZES.map((s) => (
+              <VarRow key={s.v} v={s.v} value={s.value} note={s.px} />
+            ))}
+          </div>
+        </section>
+
+        {/* Font weights */}
+        <section className="mb-14 flex flex-col gap-4">
+          <h2 className="text-h3 font-semibold">Font weights</h2>
+          <div className="flex flex-col divide-y divide-border">
+            {PRIM_WEIGHTS.map((w) => (
+              <VarRow key={w.v} {...w} />
+            ))}
+          </div>
+        </section>
+        </>
+        )}
       </div>
     </ContentCard>
   );
