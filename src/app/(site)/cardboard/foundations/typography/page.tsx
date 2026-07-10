@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeftIcon, ChevronRightIcon, LightBulbIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, LightBulbIcon } from "@heroicons/react/24/outline";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/cardboard/accordion";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
 import { cn } from "@/lib/utils";
@@ -153,19 +159,19 @@ function TypeRow({ token, family, size, px, lh, weight, use, sample, heading }: 
         <p className="shrink-0 text-body-sm text-muted-foreground">{use}</p>
       </div>
 
-      {/* Composition — the primitives this token resolves to, in a disclosure. */}
-      <details className="group/spec rounded-lg bg-muted/50 [&[open]]:pb-2.5">
-        <summary className="flex cursor-pointer list-none items-center gap-1.5 px-3 py-2 text-body-xs text-muted-foreground transition-colors hover:text-foreground">
-          <ChevronRightIcon className="size-3.5 transition-transform group-open/spec:rotate-90" />
-          Primitives
-        </summary>
-        <div className="flex flex-col gap-1.5 px-3">
-          <Spec label="Family" v={`--font-family-${family}`} />
-          <Spec label={`Size · ${px}px`} v={`--font-size-${size}`} />
-          <Spec label="Leading" v={`--line-height-${lh}`} />
-          <Spec label="Weight" v={`--font-weight-${weight}`} />
-        </div>
-      </details>
+      {/* Composition — the primitives this token resolves to, in the inline
+          Accordion (the Cardboard component this disclosure style is a variant of). */}
+      <Accordion variant="inline" type="single" collapsible>
+        <AccordionItem value="primitives" className="rounded-lg bg-muted/50 px-3">
+          <AccordionTrigger>Primitives</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-1.5 pl-5">
+            <Spec label="Family" v={`--font-family-${family}`} />
+            <Spec label={`Size · ${px}px`} v={`--font-size-${size}`} />
+            <Spec label="Leading" v={`--line-height-${lh}`} />
+            <Spec label="Weight" v={`--font-weight-${weight}`} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
