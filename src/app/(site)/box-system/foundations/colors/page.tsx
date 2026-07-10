@@ -51,6 +51,9 @@ const SURFACES: { token: string; v: string; description: string }[] = [
   { token: "bg-surface-tertiary", v: "--p-bg-surface-tertiary", description: "Third level of prominence." },
   { token: "bg-surface-tertiary-hover", v: "--p-bg-surface-tertiary-hover", description: "Hover state for the third level of prominence." },
   { token: "bg-surface-tertiary-active", v: "--p-bg-surface-tertiary-active", description: "Active (on-press) state for the third level of prominence." },
+  // Solid action fill — the high-contrast neutral for primary buttons.
+  { token: "bg-fill-solid", v: "--p-fill-solid", description: "Solid neutral fill for the primary action (buttons)." },
+  { token: "bg-fill-solid-hover", v: "--p-fill-solid-hover", description: "Hover state for the solid action fill." },
   // Intent surfaces (pale tinted backgrounds) — bg-surface-info / bg-surface-success / …
   { token: "bg-surface-brand", v: "--surface-brand", description: "Pale surface communicating brand." },
   { token: "bg-surface-brand-hover", v: "--surface-brand-hover", description: "Hover state for the brand surface." },
@@ -87,6 +90,7 @@ const TEXTS: { token: string; v: string; description: string }[] = [
   { token: "text-subtle", v: "--p-text-subtle", description: "Secondary / muted text, captions, and labels." },
   { token: "text-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
   { token: "text-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
+  { token: "text-on-solid", v: "--p-text-on-solid", description: "Text/icon on top of a solid action fill." },
   { token: "text-link", v: "--p-text-link", description: "Text links." },
   { token: "text-link-hover", v: "--p-text-link-hover", description: "Hover state for text links." },
   { token: "text-link-active", v: "--p-text-link-active", description: "Active (on-press) state for text links." },

@@ -60,6 +60,12 @@
   --color-surface-tertiary-hover: var(--p-bg-surface-tertiary-hover);
   --color-surface-tertiary-active: var(--p-bg-surface-tertiary-active);
 
+  /* Solid action fill — the high-contrast neutral used for primary buttons.
+     bg-fill-solid + text-on-solid. (Matches the old shadcn --primary exactly.) */
+  --color-fill-solid: var(--p-fill-solid);
+  --color-fill-solid-hover: var(--p-fill-solid-hover);
+  --color-on-solid: var(--p-text-on-solid);
+
   /* Foreground text — by prominence. The default is `text-foreground`
      (--color-foreground, defined above with the shadcn roles). These are the
      clean bare variants: text-subtle, text-disabled, text-link, text-brand, …
@@ -164,6 +170,12 @@
   --p-text-link-hover: var(--blue-800);
   --p-text-link-active: var(--blue-900);
 
+  /* Solid action fill — light. Was shadcn --primary (neutral-800) with a /80
+     hover; the hover is now a real neutral step. */
+  --p-fill-solid: var(--neutral-800);
+  --p-fill-solid-hover: var(--neutral-700);
+  --p-text-on-solid: var(--neutral-50);
+
   /* Borders — light. Distinct neutral shades: default → hover (darker) →
      secondary (lighter divider) → tertiary (darkest). */
   --p-border: var(--neutral-200);
@@ -243,6 +255,11 @@
   --p-text-link: var(--blue-300);
   --p-text-link-hover: var(--blue-200);
   --p-text-link-active: var(--blue-100);
+
+  /* Solid action fill — dark. Was shadcn --primary (neutral-200). */
+  --p-fill-solid: var(--neutral-200);
+  --p-fill-solid-hover: var(--neutral-300);
+  --p-text-on-solid: var(--neutral-900);
 
   /* Borders — dark. */
   --p-border: var(--neutral-700);

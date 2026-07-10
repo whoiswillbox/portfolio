@@ -1,5 +1,5 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/cardboard/button";
 import { ComponentPage, Demo } from "../_component-page";
 
 const VARIANTS = ["default", "outline", "secondary", "ghost", "destructive", "link"] as const;

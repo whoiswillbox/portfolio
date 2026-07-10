@@ -37,6 +37,32 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `button.tsx` — FORKED into Cardboard (`cardboard/button.tsx`)
+**Date:** 2026-07-10
+**Why:** First component of the Cardboard fork — take ownership of the shadcn
+base and rewire it to Cardboard-native tokens so the design system is the source
+of truth (not shadcn role names).
+**What:**
+- Owned component now lives at `src/components/cardboard/button.tsx`.
+  `src/components/ui/button.tsx` is a thin re-export shim (existing
+  `@/components/ui/button` imports keep working; migrate to `cardboard/` over time).
+- radix `Slot` + `cva` kept as implementation detail (design layer only forked).
+- Rewired token classes to Cardboard-native utilities:
+  - `default`: `bg-primary text-primary-foreground hover:bg-primary/80` →
+    `bg-fill-solid text-on-solid hover:bg-fill-solid-hover`. **New tokens added**
+    to `semantics/core.css`: `--color-fill-solid`/`-hover` (= neutral-800/700
+    light, 200/300 dark — matches old `--primary` exactly) and `--color-on-solid`.
+    The `/80` opacity hover became a real neutral step.
+  - `outline`/`secondary`/`ghost`: → `bg-surface*` / `bg-surface-secondary*`
+    (same values as the old `--background`/`--secondary`/`--muted` aliases; the
+    color-mix secondary hover became `bg-surface-secondary-hover`).
+  - `destructive`: `bg-destructive/10` → `bg-surface-critical` (slight shift:
+    red tint → red-50 surface token).
+  - `link`: `text-primary` → `text-link` (now link-blue, was neutral).
+  - focus ring / aria-invalid: `ring-ring`/`border-destructive` →
+    `border-border-focus` / `border-critical`.
+- Doc page (`box-system/components/button`) imports from `cardboard/button`.
+
 ### `tooltip.tsx` — remove the arrow
 **Date:** 2026-06-17
 **Why:** Preferred a clean tooltip bubble with no pointer arrow.
