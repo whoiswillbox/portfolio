@@ -142,6 +142,12 @@ export default function Iconography() {
               Icon sizing uses the Tailwind <span className="font-mono text-body-xs">size-*</span>{" "}
               scale — <span className="font-mono text-body-xs">size-4</span> is the default.
             </p>
+            <UsageHint>
+              Match the icon to its neighbor: <span className="font-mono text-body-xs">size-4</span>{" "}
+              pairs with body text and buttons, <span className="font-mono text-body-xs">size-3</span>{" "}
+              with small / dense UI, and <span className="font-mono text-body-xs">size-5</span>+ for
+              standalone or touch targets. Keep icon and label optically balanced.
+            </UsageHint>
           </div>
           <div className="flex flex-col divide-y divide-border">
             {SIZES.map((s) => (
@@ -149,11 +155,11 @@ export default function Iconography() {
                 <div className="grid w-16 shrink-0 place-items-center">
                   <HomeIcon className={cn(s.token, "text-icon")} />
                 </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <CopyToken value={s.token} className="-ml-1.5 self-start" />
+                <CopyToken value={s.token} className="-ml-1.5 shrink-0 self-start" />
+                <div className="ml-auto flex shrink-0 flex-col items-end gap-0.5 text-right">
                   <p className="text-body-sm text-muted-foreground">{s.use}</p>
+                  <span className="font-mono text-[0.65rem] text-muted-foreground">{s.px}px</span>
                 </div>
-                <span className="ml-auto shrink-0 font-mono text-[0.65rem] text-muted-foreground">{s.px}px</span>
               </div>
             ))}
           </div>
