@@ -25,6 +25,18 @@ const PRIM_RADIUS = [
   { v: "--radius-base", value: "0.625rem", px: "10", feeds: "the whole --radius-* scale" },
 ];
 
+/* Derivation — every semantic step is base × N. Shown in the primitive view so
+   the parametric design (one seed, multiplied) is visible. */
+const DERIVATION = [
+  { step: "rounded-sm", mult: "0.2", px: "2" },
+  { step: "rounded-md", mult: "0.4", px: "4" },
+  { step: "rounded / -lg", mult: "0.6", px: "6" },
+  { step: "rounded-xl", mult: "0.8", px: "8" },
+  { step: "rounded-2xl", mult: "1.0", px: "10" },
+  { step: "rounded-3xl", mult: "1.4", px: "14" },
+  { step: "rounded-4xl", mult: "1.8", px: "18" },
+];
+
 /* Semantic scale — Tailwind rounded-* utilities. Each is a multiple of the base
    (rounded-md ≈ base × 0.4). token = utility; cls = the class the swatch uses. */
 const SEM_RADIUS = [
@@ -148,6 +160,35 @@ export default function Radius() {
             {PRIM_RADIUS.map((r) => (
               <RadiusRow key={r.v} token={r.v} styleVar={r.v} px={r.px} feeds={r.feeds} />
             ))}
+          </div>
+
+          {/* Derivation — makes the parametric (one seed × N) design visible. */}
+          <div className="mt-2 flex flex-col gap-3">
+            <p className="text-body-sm text-muted-foreground">
+              The scale is <span className="font-medium text-foreground">parametric</span> —
+              each step is <span className="font-mono text-body-xs">--radius-base</span> × a
+              multiplier, so there&apos;s one value to tune, not a ramp to maintain.
+            </p>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full min-w-[20rem] text-left text-body-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/50 font-mono text-body-xs text-muted-foreground">
+                    <th className="px-4 py-2 font-normal">Step</th>
+                    <th className="px-4 py-2 font-normal">Multiplier</th>
+                    <th className="px-4 py-2 text-right font-normal">Result</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {DERIVATION.map((d) => (
+                    <tr key={d.step}>
+                      <td className="px-4 py-2 font-mono text-body-xs text-foreground">{d.step}</td>
+                      <td className="px-4 py-2 font-mono text-body-xs text-muted-foreground">base × {d.mult}</td>
+                      <td className="px-4 py-2 text-right font-mono text-body-xs text-muted-foreground">{d.px}px</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
         )}
