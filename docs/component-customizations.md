@@ -37,6 +37,20 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `radio-group.tsx`, `toggle-group.tsx`, `breadcrumb.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 11 (Button pattern). Owned in `cardboard/`; `ui/`
+paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **radio-group:** `border-input`→`border`; `data-checked` `bg-primary`/`border-primary`/
+  `text-primary-foreground`→`bg-fill-solid`/`border-fill-solid`/`text-on-solid`;
+  indicator dot `bg-primary-foreground`→`bg-on-solid`; ring→`border-border-focus`;
+  destructive→critical; dropped dark `bg-input/30`.
+- **toggle-group:** no direct color tokens — delegates to the forked Cardboard
+  `toggleVariants`; only change is importing from `cardboard/toggle`.
+- **breadcrumb:** `text-muted-foreground`→`text-subtle`. **lucide ChevronRight /
+  MoreHorizontal → Heroicons (ChevronRight / EllipsisHorizontal).**
+
 ### `alert-dialog.tsx`, `hover-card.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 10 (Button pattern). Owned in `cardboard/`; `ui/`

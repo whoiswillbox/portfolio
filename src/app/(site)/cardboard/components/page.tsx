@@ -34,6 +34,9 @@ import {
   CursorArrowRippleIcon,
   ShieldExclamationIcon,
   CreditCardIcon,
+  QueueListIcon,
+  ListBulletIcon,
+  ArrowRightCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -67,6 +70,9 @@ const components = [
   { label: "Context Menu", href: "/cardboard/components/context-menu", icon: CursorArrowRippleIcon, description: "Right-click menus." },
   { label: "Alert Dialog", href: "/cardboard/components/alert-dialog", icon: ShieldExclamationIcon, description: "Confirm consequential actions." },
   { label: "Hover Card", href: "/cardboard/components/hover-card", icon: CreditCardIcon, description: "Hover-to-preview cards." },
+  { label: "Radio Group", href: "/cardboard/components/radio-group", icon: QueueListIcon, description: "Pick one of several options." },
+  { label: "Toggle Group", href: "/cardboard/components/toggle-group", icon: ListBulletIcon, description: "Grouped toggle buttons." },
+  { label: "Breadcrumb", href: "/cardboard/components/breadcrumb", icon: ArrowRightCircleIcon, description: "Path to the current page." },
   // Custom, in-use components built on the foundations.
   { label: "Empty", href: "/cardboard/components/empty", icon: ArchiveBoxXMarkIcon, description: "Empty-state layouts." },
   { label: "Content Card", href: "/cardboard/components/content-card", icon: Square2StackIcon, description: "The full-height page surface." },
