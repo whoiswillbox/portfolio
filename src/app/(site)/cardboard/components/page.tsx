@@ -734,7 +734,7 @@ const components: {
 export default function Components() {
   return (
     <ContentCard className="h-full overflow-auto">
-      <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
+      <div className="mx-auto w-full max-w-6xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <div className="flex flex-col gap-3 mb-10">
           <h1 className="text-h1 font-semibold">Components</h1>
           <p className="text-body-lg text-muted-foreground">
@@ -743,15 +743,15 @@ export default function Components() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {[...components]
             .sort((a, b) => a.label.localeCompare(b.label))
             .map(({ label, href, description, preview }) => (
-              <Link key={href} href={href} className="group flex flex-col gap-4">
-                <div className="flex h-44 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted p-6 transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg">
-                  {preview}
+              <Link key={href} href={href} className="group flex flex-col gap-3">
+                <div className="flex h-32 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted p-4 transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg">
+                  <div className="scale-[0.85]">{preview}</div>
                 </div>
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <div className="text-body-md font-semibold text-foreground">{label}</div>
                   <div className="text-body-sm text-muted-foreground">{description}</div>
                 </div>
