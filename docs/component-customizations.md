@@ -37,6 +37,28 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `calendar.tsx`, `chart.tsx`, `carousel.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 18 — the last three vendored components on the
+fork list. Owned in `cardboard/`; `ui/` paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **calendar (react-day-picker):** imports **Cardboard** Button; lucide chevrons
+  (`ChevronLeft/Right/DownIcon`)→Heroicons; root `bg-background`→`bg-surface`;
+  dropdown `bg-popover`→`bg-surface`; weekday / week-number / outside / disabled /
+  caption-icon `text-muted-foreground`→`text-subtle`; range start/middle/end +
+  today `bg-muted`→`bg-surface-secondary`; day button selected/range
+  `bg-primary`/`text-primary-foreground`→`bg-fill-solid`/`text-on-solid`, range-middle
+  `bg-muted`→`bg-surface-secondary`, focus ring `border-ring`/`ring-ring/50`→
+  `border-border-focus`/`ring-border-focus/50`. **Preserved** the v10 `month_grid`
+  key customization (see older entry below).
+- **chart (recharts):** no icons. Axis-tick `fill-muted-foreground`→`fill-subtle`;
+  radial-bg / tooltip-cursor `fill-muted`→`fill-surface-secondary`; tooltip surface
+  `bg-background`→`bg-surface`; indicator/legend `text-muted-foreground`→`text-subtle`;
+  `border-border`/`stroke-border` unchanged (already Cardboard token). Series colors
+  still come from the caller's `ChartConfig`.
+- **carousel (embla):** imports **Cardboard** Button; lucide `ChevronLeft/RightIcon`→
+  Heroicons. No color tokens in the component itself.
+
 ### `command.tsx`, `combobox.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 17 (Button pattern). Coupled pair — both build on the

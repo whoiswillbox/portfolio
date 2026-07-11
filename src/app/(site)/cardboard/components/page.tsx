@@ -62,6 +62,12 @@ import {
   TableRow,
   TableCell,
 } from "@/components/cardboard/table";
+import { Calendar } from "@/components/cardboard/calendar";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/cardboard/carousel";
 import { CaseStudyEmptyState } from "@/components/case-study-empty-state";
 
 /* The Components index. A living gallery — each card shows a real, live preview
@@ -156,7 +162,7 @@ const components: {
     href: "/cardboard/components/input-otp",
     description: "One-time passcode field.",
     preview: (
-      <InputOTP maxLength={4} defaultValue="12">
+      <InputOTP maxLength={4} value="12" readOnly onChange={() => {}}>
         <InputOTPGroup>
           <InputOTPSlot index={0} />
           <InputOTPSlot index={1} />
@@ -762,6 +768,52 @@ const components: {
       </div>
     ),
   },
+  {
+    label: "Calendar",
+    href: "/cardboard/components/calendar",
+    description: "Pick a date or a range.",
+    preview: (
+      <div className="pointer-events-none scale-90 origin-center">
+        <Calendar mode="single" className="rounded-lg border border-border" />
+      </div>
+    ),
+  },
+  {
+    label: "Carousel",
+    href: "/cardboard/components/carousel",
+    description: "Swipeable slides.",
+    preview: (
+      <div className="w-28">
+        <Carousel>
+          <CarouselContent>
+            {[1, 2, 3].map((n) => (
+              <CarouselItem key={n}>
+                <div className="flex aspect-square items-center justify-center rounded-lg border border-border bg-muted text-h3 font-semibold">
+                  {n}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
+    ),
+  },
+  {
+    label: "Chart",
+    href: "/cardboard/components/chart",
+    description: "Themed Recharts wrapper.",
+    preview: (
+      <div className="flex h-16 items-end gap-1.5">
+        {[9, 14, 7, 16, 11, 13].map((h, i) => (
+          <div
+            key={i}
+            className="w-3 rounded-t-sm bg-fill-solid"
+            style={{ height: `${h * 4}px` }}
+          />
+        ))}
+      </div>
+    ),
+  },
 ];
 
 export default function Components() {
@@ -780,15 +832,20 @@ export default function Components() {
           {[...components]
             .sort((a, b) => a.label.localeCompare(b.label))
             .map(({ label, href, description, preview }) => (
-              <Link key={href} href={href} className="group flex flex-col gap-3">
+              <div key={href} className="group relative flex flex-col gap-3">
                 <div className="flex h-32 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted p-4 transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg">
-                  <div className="scale-[0.85]">{preview}</div>
+                  <div className="pointer-events-none scale-[0.85]">{preview}</div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <div className="text-body-md font-semibold text-foreground">{label}</div>
+                  <Link
+                    href={href}
+                    className="text-body-md font-semibold text-foreground after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+                  >
+                    {label}
+                  </Link>
                   <div className="text-body-sm text-muted-foreground">{description}</div>
                 </div>
-              </Link>
+              </div>
             ))}
         </div>
       </div>
