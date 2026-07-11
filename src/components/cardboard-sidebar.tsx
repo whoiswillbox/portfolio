@@ -2,12 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  SwatchIcon,
-  Squares2X2Icon,
-  ChevronRightIcon,
-  Cog6ToothIcon,
-} from "@heroicons/react/24/outline"
+import { ChevronRightIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
 import {
   Collapsible,
   CollapsibleContent,
@@ -19,6 +14,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -31,19 +27,123 @@ import {
 } from "@/components/ui/sidebar"
 
 const foundations = [
-  { title: "Overview", href: "/cardboard/foundations" },
-  { title: "Colors", href: "/cardboard/foundations/colors" },
-  { title: "Typography", href: "/cardboard/foundations/typography" },
-  { title: "Spacing", href: "/cardboard/foundations/spacing" },
-  { title: "Radius", href: "/cardboard/foundations/radius" },
-  { title: "Elevation", href: "/cardboard/foundations/elevation" },
-  { title: "Iconography", href: "/cardboard/foundations/iconography" },
+  { title: "Overview", slug: "" },
+  { title: "Colors", slug: "colors" },
+  { title: "Typography", slug: "typography" },
+  { title: "Spacing", slug: "spacing" },
+  { title: "Radius", slug: "radius" },
+  { title: "Elevation", slug: "elevation" },
+  { title: "Iconography", slug: "iconography" },
 ]
+
+// A flat, alphabetical component list. A leaf is a single doc page ([Title,
+// slug]); a group is a collapsible parent whose `children` are related variants
+// (e.g. Button → Button, Button Group, Toggle…). Sorted by top-level title.
+type Leaf = { title: string; slug: string }
+type Group = { title: string; children: Leaf[] }
+type Entry = Leaf | Group
+
+const isGroup = (e: Entry): e is Group => "children" in e
+
+const leaf = (title: string, slug: string): Leaf => ({ title, slug })
+
+const components: Entry[] = [
+  leaf("Accordion", "accordion"),
+  leaf("Alert", "alert"),
+  leaf("Aspect Ratio", "aspect-ratio"),
+  leaf("Avatar", "avatar"),
+  leaf("Badge", "badge"),
+  leaf("Breadcrumb", "breadcrumb"),
+  {
+    title: "Button",
+    children: [
+      leaf("Button", "button"),
+      leaf("Button Group", "button-group"),
+      leaf("Toggle", "toggle"),
+      leaf("Toggle Group", "toggle-group"),
+    ],
+  },
+  leaf("Calendar", "calendar"),
+  {
+    title: "Card",
+    children: [
+      leaf("Card", "card"),
+      leaf("Contact Card", "contact-card"),
+      leaf("Content Card", "content-card"),
+    ],
+  },
+  leaf("Carousel", "carousel"),
+  leaf("Chart", "chart"),
+  leaf("Checkbox", "checkbox"),
+  leaf("Collapsible", "collapsible"),
+  leaf("Copy Token", "copy-token"),
+  {
+    title: "Dialog",
+    children: [
+      leaf("Dialog", "dialog"),
+      leaf("Alert Dialog", "alert-dialog"),
+      leaf("Drawer", "drawer"),
+      leaf("Sheet", "sheet"),
+    ],
+  },
+  leaf("Direction", "direction"),
+  leaf("Empty", "empty"),
+  leaf("Field", "field"),
+  leaf("Hover Card", "hover-card"),
+  leaf("Image Lightbox", "image-lightbox"),
+  {
+    title: "Input",
+    children: [
+      leaf("Input", "input"),
+      leaf("Input Group", "input-group"),
+      leaf("Input OTP", "input-otp"),
+    ],
+  },
+  leaf("Item", "item"),
+  leaf("Kbd", "kbd"),
+  leaf("Logo", "logo"),
+  {
+    title: "Menu",
+    children: [
+      leaf("Command", "command"),
+      leaf("Context Menu", "context-menu"),
+      leaf("Dropdown Menu", "dropdown-menu"),
+      leaf("Menubar", "menubar"),
+      leaf("Navigation Menu", "navigation-menu"),
+    ],
+  },
+  leaf("Mobile Only", "mobile-only"),
+  leaf("Pagination", "pagination"),
+  leaf("Popover", "popover"),
+  leaf("Progress", "progress"),
+  leaf("Radio Group", "radio-group"),
+  leaf("Resizable", "resizable"),
+  leaf("Scroll Area", "scroll-area"),
+  {
+    title: "Select",
+    children: [
+      leaf("Select", "select"),
+      leaf("Combobox", "combobox"),
+      leaf("Native Select", "native-select"),
+    ],
+  },
+  leaf("Separator", "separator"),
+  leaf("Sidebar", "sidebar"),
+  leaf("Skeleton", "skeleton"),
+  leaf("Slider", "slider"),
+  leaf("Sonner", "sonner"),
+  leaf("Spinner", "spinner"),
+  leaf("Switch", "switch"),
+  leaf("Table", "table"),
+  leaf("Tabs", "tabs"),
+  leaf("Textarea", "textarea"),
+  leaf("Tooltip", "tooltip"),
+].sort((a, b) => a.title.localeCompare(b.title))
 
 export function CardboardSidebar() {
   const pathname = usePathname()
-  const inFoundations = pathname.startsWith("/cardboard/foundations")
-  const inComponents = pathname.startsWith("/cardboard/components")
+  const base = "/cardboard/components"
+  const hrefFor = (slug: string) => `${base}/${slug}`
 
   return (
     <Sidebar
@@ -56,52 +156,101 @@ export function CardboardSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
+        {/* FOUNDATIONS — eyebrow group header, items listed directly. */}
         <SidebarGroup>
+          <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+            Foundations
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Foundations — expanded sub-tree */}
-              <Collapsible
-                asChild
-                defaultOpen={inFoundations}
-                className="group/foundations"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip="Foundations">
-                      <SwatchIcon />
-                      <span>Foundations</span>
-                      <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/foundations:rotate-90" />
+              {foundations.map((f) => {
+                const href = f.slug
+                  ? `/cardboard/foundations/${f.slug}`
+                  : "/cardboard/foundations"
+                return (
+                  <SidebarMenuItem key={href}>
+                    <SidebarMenuButton asChild isActive={pathname === href}>
+                      <Link href={href}>
+                        <span>{f.title}</span>
+                      </Link>
                     </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {foundations.map((f) => (
-                        <SidebarMenuSubItem key={f.href}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={pathname === f.href}
-                          >
-                            <Link href={f.href}>
-                              <span>{f.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-              {/* Components — a single link to the live gallery (the gallery is
-                  the browser; a flat 65-item tree would be unusable). */}
+        {/* COMPONENTS — eyebrow group header; flat A–Z list, some collapsible. */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+            Components
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {/* Gallery overview link */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={inComponents}>
-                  <Link href="/cardboard/components">
-                    <Squares2X2Icon />
-                    <span>Components</span>
+                <SidebarMenuButton asChild isActive={pathname === base}>
+                  <Link href={base}>
+                    <span>Overview</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+
+              {components.map((entry) => {
+                if (!isGroup(entry)) {
+                  const href = hrefFor(entry.slug)
+                  return (
+                    <SidebarMenuItem key={entry.slug}>
+                      <SidebarMenuButton asChild isActive={pathname === href}>
+                        <Link href={href}>
+                          <span>{entry.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                }
+
+                const groupActive = entry.children.some(
+                  (c) => pathname === hrefFor(c.slug)
+                )
+                return (
+                  <Collapsible
+                    key={entry.title}
+                    asChild
+                    defaultOpen={groupActive}
+                    className="group/comp"
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={entry.title}>
+                          <span>{entry.title}</span>
+                          <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/comp:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {entry.children.map((c) => {
+                            const href = hrefFor(c.slug)
+                            return (
+                              <SidebarMenuSubItem key={c.slug}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={pathname === href}
+                                >
+                                  <Link href={href}>
+                                    <span>{c.title}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            )
+                          })}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

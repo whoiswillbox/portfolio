@@ -1,16 +1,16 @@
-import { TngsLogo } from "@/components/tngs-logo";
+import { BoxLogo } from "@/components/box-logo";
 import { ComponentPage, Demo, Specs } from "../_component-page";
 
 export default function LogoDocs() {
   return (
     <ComponentPage
       title="Logo"
-      description="The Technergetics (TNGS) mark. Inherits color from currentColor; size with utility classes."
+      description="The Box cube mark. An isometric 3-face cube that inherits color from currentColor; size with utility classes."
     >
       <Demo title="Sizes">
-        <TngsLogo className="h-6 w-auto text-foreground" />
-        <TngsLogo className="h-10 w-auto text-foreground" />
-        <TngsLogo className="h-16 w-auto text-foreground" />
+        <BoxLogo className="size-6 text-foreground" />
+        <BoxLogo className="size-10 text-foreground" />
+        <BoxLogo className="size-16 text-foreground" />
       </Demo>
 
       <section className="mb-12 flex flex-col gap-4">
@@ -19,8 +19,9 @@ export default function LogoDocs() {
         </div>
         <Specs
           rows={[
+            { part: "Faces", spec: "3 paths (left, right, top) with graduated fill-opacity" },
             { part: "Color", spec: "currentColor — set via text-* utility" },
-            { part: "Size", spec: "h-* w-auto (scales to the type it sits beside)" },
+            { part: "Size", spec: "size-* (viewBox 0 0 24 28)" },
             { part: "Props", spec: "className" },
           ]}
         />

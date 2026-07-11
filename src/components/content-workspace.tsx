@@ -15,7 +15,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   const [rendered, setRendered] = React.useState(false);
   const [exiting, setExiting] = React.useState(false);
-  const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/settings" && pathname !== "/" && pathname !== "/extracurriculars" && pathname !== "/technergetics" && pathname !== "/school";
+  const enabled = pathname !== "/who" && pathname !== "/conversations" && pathname !== "/settings" && pathname !== "/" && pathname !== "/extracurriculars" && pathname !== "/technergetics" && pathname !== "/school" && !pathname.startsWith("/cardboard");
   const searchParams = useSearchParams();
   const boxParam = searchParams.get("box");
   const enteredParam = searchParams.get("entered");
@@ -93,11 +93,20 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // Measure the outer container height and set it explicitly on the column
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
 
+  {/* Desktop sidebar-expand trigger — shown whenever the sidebar is collapsed,
+      independent of Box AI (so Cardboard pages, where Box AI is disabled, still
+      have a way to reopen the nav). */}
+  const expandTrigger = !open && showTrigger && (
+    <div className="absolute left-3 top-3 z-30 max-sm:hidden">
+      <SidebarTrigger />
+    </div>
+  );
+
   const controls = enabled && (
     <div className="contents">
-      {/* Desktop: cube icon top-left */}
-      <div className="absolute left-3 top-3 z-30 flex items-center gap-1 max-sm:hidden">
-        {!open && showTrigger && <SidebarTrigger />}
+      {/* Desktop: cube launcher top-left (the sidebar trigger renders
+          separately via expandTrigger, shifted right to sit beside it). */}
+      <div className="absolute left-11 top-3 z-30 flex items-center gap-1 max-sm:hidden">
         {!open && launcherEnabled && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -243,6 +252,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             {boxAI}
           </div>
         )}
+        {expandTrigger}
         {controls}
         <div className="h-full min-h-0">
           {children}

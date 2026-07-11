@@ -37,6 +37,20 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `select.tsx` — default to `position="popper"` (drop below the trigger)
+**Date:** 2026-07-10
+**Why:** shadcn's Select defaults `SelectContent` to `position="item-aligned"`,
+which overlays the popup on the trigger (centering the selected item over it).
+That needs vertical room above the trigger and breaks when the trigger sits at
+the top of the viewport — the product switcher in the top bar opened a clipped/
+empty menu.
+**What:** In the Cardboard-forked `select.tsx`, changed `SelectContent` defaults
+to `position="popper"`, `align="start"`, `sideOffset={4}` (drop-below dropdown),
+passed `sideOffset` through to the radix Content, and removed the popper-mode
+`h-(--radix-select-trigger-height)` on the Viewport (it clamped the list to a
+single trigger-height row). Callers can still pass `position="item-aligned"` to
+opt back in.
+
 ### `sheet.tsx`, `sidebar.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 19 — the final pass. Both were **already customized**

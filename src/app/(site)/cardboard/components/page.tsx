@@ -69,6 +69,7 @@ import {
   CarouselItem,
 } from "@/components/cardboard/carousel";
 import { CaseStudyEmptyState } from "@/components/case-study-empty-state";
+import { BoxLogo } from "@/components/box-logo";
 
 /* The Components index. A living gallery — each card shows a real, live preview
    of the component rendered on a muted panel, then title + description below.
@@ -754,8 +755,8 @@ const components: {
   {
     label: "Logo",
     href: "/cardboard/components/logo",
-    description: "The TNGS mark.",
-    preview: <span className="font-heading text-h2 font-semibold">TNGS</span>,
+    description: "The Box cube mark.",
+    preview: <BoxLogo className="size-10 text-foreground" />,
   },
   {
     label: "Mobile Only",
