@@ -37,6 +37,26 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `menubar.tsx`, `navigation-menu.tsx`, `drawer.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 16 (Button pattern). Owned in `cardboard/`; `ui/`
+paths are re-export shims; doc pages added. Same menu/overlay rewrite map as the
+already-forked dropdown-menu / context-menu.
+**What (token rewires):**
+- **menubar:** lucide `CheckIcon`/`ChevronRightIcon`→Heroicons; content `bg-popover`/
+  `text-popover-foreground`→`bg-surface`/`text-foreground`; item focus `bg-accent`/
+  `text-accent-foreground`→`bg-surface-secondary`/`text-foreground`; destructive
+  `text-destructive`/`bg-destructive/10`→`text-critical`/`bg-surface-critical`;
+  trigger + shortcut `hover:bg-muted`/`text-muted-foreground`→`bg-surface-secondary`/
+  `text-subtle`.
+- **navigation-menu:** lucide `ChevronDownIcon`→Heroicons; trigger + link
+  `hover:bg-muted`/`focus:bg-muted`/`data-*:bg-muted/50`→`bg-surface-secondary`(/50);
+  `ring-ring/50`→`ring-border-focus/50`; content + viewport `bg-popover`/
+  `text-popover-foreground`→`bg-surface`/`text-foreground`. Indicator `bg-border` kept.
+- **drawer (vaul):** no lucide; content `bg-popover`/`text-popover-foreground`→
+  `bg-surface`/`text-foreground`; drag handle `bg-muted`→`bg-surface-secondary`;
+  description `text-muted-foreground`→`text-subtle`. Overlay `bg-black/10` kept.
+
 ### `direction.tsx`, `sonner.tsx`, `resizable.tsx`, `table.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 15 (Button pattern). Owned in `cardboard/`; `ui/`

@@ -607,6 +607,55 @@ const components: {
       </div>
     ),
   },
+  {
+    label: "Menubar",
+    href: "/cardboard/components/menubar",
+    description: "Desktop-style menu bar.",
+    preview: (
+      <div className="flex flex-col items-center gap-2">
+        <div className="flex h-8 items-center gap-0.5 rounded-lg border border-border p-[3px] text-body-sm font-medium">
+          <span className="rounded-sm bg-surface-secondary px-1.5 py-[2px]">File</span>
+          <span className="px-1.5 py-[2px]">Edit</span>
+          <span className="px-1.5 py-[2px]">View</span>
+        </div>
+        <div className="w-32 rounded-lg border border-border bg-surface p-1 shadow-md">
+          <div className="rounded-md bg-surface-secondary px-1.5 py-1 text-body-sm">New Tab</div>
+          <div className="px-1.5 py-1 text-body-sm text-muted-foreground">New Window</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    label: "Navigation Menu",
+    href: "/cardboard/components/navigation-menu",
+    description: "Site nav with flyout panels.",
+    preview: (
+      <div className="flex flex-col items-center gap-2">
+        <div className="flex items-center gap-1 text-body-sm font-medium">
+          <span className="rounded-lg bg-surface-secondary px-2.5 py-1.5">Products ⌄</span>
+          <span className="px-2.5 py-1.5">Docs</span>
+        </div>
+        <div className="w-40 rounded-lg border border-border bg-surface p-2 shadow-md">
+          <div className="rounded-md bg-surface-secondary p-2 text-body-sm">Introduction</div>
+          <div className="p-2 text-body-sm text-muted-foreground">Installation</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    label: "Drawer",
+    href: "/cardboard/components/drawer",
+    description: "Edge-anchored sliding panel.",
+    preview: (
+      <div className="flex h-28 w-full max-w-[14rem] flex-col justify-end overflow-hidden rounded-lg bg-surface-secondary/40 ring-1 ring-border">
+        <div className="rounded-t-xl border-t border-border bg-surface px-4 pb-4 pt-2 shadow-lg">
+          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-surface-secondary" />
+          <div className="text-body-sm font-medium">Are you sure?</div>
+          <div className="text-body-xs text-muted-foreground">This archives the chat.</div>
+        </div>
+      </div>
+    ),
+  },
   // Custom, in-use components built on the foundations.
   {
     label: "Empty",
