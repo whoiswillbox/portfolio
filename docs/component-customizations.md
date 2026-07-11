@@ -37,6 +37,21 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `scroll-area.tsx`, `button-group.tsx`, `field.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 13 (Button pattern). Owned in `cardboard/`; `ui/`
+paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **scroll-area:** viewport `focus-visible:ring-ring/50`→`ring-border-focus/50`.
+  Thumb already `bg-border` (Cardboard-native) — no change.
+- **button-group:** imports **Cardboard** Separator; text addon `bg-muted`→
+  `bg-surface-secondary`; separator `bg-input`→`bg-border`.
+- **field:** imports **Cardboard** Label + Separator; `data-[invalid]:text-destructive`
+  and `FieldError` `text-destructive`→`text-critical`; `text-muted-foreground`→
+  `text-subtle` (description + separator content); checked-label
+  `border-primary/30`/`bg-primary/5` (+ dark `/20`,`/10`)→`border-fill-solid`/
+  `bg-fill-solid`; link `hover:text-primary`→`hover:text-fill-solid`.
+
 ### `pagination.tsx`, `slider.tsx`, `collapsible.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 12 (Button pattern). Owned in `cardboard/`; `ui/`

@@ -40,6 +40,9 @@ import {
   EllipsisHorizontalCircleIcon,
   AdjustmentsHorizontalIcon,
   ChevronUpDownIcon as ChevronUpDownIconAlt,
+  ArrowsUpDownIcon,
+  RectangleGroupIcon as RectangleGroupIconAlt,
+  Bars4Icon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
@@ -79,6 +82,9 @@ const components = [
   { label: "Pagination", href: "/cardboard/components/pagination", icon: EllipsisHorizontalCircleIcon, description: "Navigate between pages of a list." },
   { label: "Slider", href: "/cardboard/components/slider", icon: AdjustmentsHorizontalIcon, description: "Pick a value or range on a track." },
   { label: "Collapsible", href: "/cardboard/components/collapsible", icon: ChevronUpDownIconAlt, description: "Show and hide a region." },
+  { label: "Scroll Area", href: "/cardboard/components/scroll-area", icon: ArrowsUpDownIcon, description: "Custom-thumb scroll container." },
+  { label: "Button Group", href: "/cardboard/components/button-group", icon: RectangleGroupIconAlt, description: "Join buttons into a segmented control." },
+  { label: "Field", href: "/cardboard/components/field", icon: Bars4Icon, description: "The form-row primitive." },
   // Custom, in-use components built on the foundations.
   { label: "Empty", href: "/cardboard/components/empty", icon: ArchiveBoxXMarkIcon, description: "Empty-state layouts." },
   { label: "Content Card", href: "/cardboard/components/content-card", icon: Square2StackIcon, description: "The full-height page surface." },
