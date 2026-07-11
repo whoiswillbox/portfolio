@@ -37,6 +37,25 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `item.tsx`, `input-group.tsx`, `input-otp.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 14 (Button pattern). Owned in `cardboard/`; `ui/`
+paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **item:** imports **Cardboard** Separator; focus `border-ring`/`ring-ring/50`→
+  `border-border-focus`/`ring-border-focus/50`; hover + muted `bg-muted`/`bg-muted/50`→
+  `bg-surface-secondary`; `text-muted-foreground`→`text-subtle`; description link
+  `hover:text-primary`→`hover:text-fill-solid`.
+- **input-group:** imports **Cardboard** Button/Input/Textarea; `border-input`→
+  `border`; focus-within `border-ring`/`ring-ring/50`→`border-border-focus`/
+  `ring-border-focus/50`; invalid `border-destructive`/`ring-destructive/20`→
+  `border-critical`/`ring-critical/20`; `text-muted-foreground`→`text-subtle`;
+  dropped all `dark:bg-input/*` translucency + dark destructive-ring variants.
+- **input-otp:** lucide `MinusIcon`→Heroicons `MinusIcon`; slot `border-input`→
+  `border`; active `border-ring`/`ring-ring/50`→`border-border-focus`/
+  `ring-border-focus/50`; `border-destructive`/`ring-destructive/20`→`border-critical`/
+  `ring-critical/20`; dropped `dark:bg-input/30` + dark destructive-ring variant.
+
 ### `scroll-area.tsx`, `button-group.tsx`, `field.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 13 (Button pattern). Owned in `cardboard/`; `ui/`

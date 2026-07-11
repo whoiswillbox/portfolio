@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { StarIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { StarIcon, MagnifyingGlassIcon, UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
 import { Button } from "@/components/cardboard/button";
@@ -37,6 +37,23 @@ import {
   ButtonGroup,
   ButtonGroupText,
 } from "@/components/cardboard/button-group";
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+} from "@/components/cardboard/item";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/cardboard/input-group";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/cardboard/input-otp";
 import { CaseStudyEmptyState } from "@/components/case-study-empty-state";
 
 /* The Components index. A living gallery — each card shows a real, live preview
@@ -112,6 +129,51 @@ const components: {
     href: "/cardboard/components/input",
     description: "Single-line text fields.",
     preview: <Input placeholder="Search…" className="max-w-[13rem]" />,
+  },
+  {
+    label: "Input Group",
+    href: "/cardboard/components/input-group",
+    description: "An input with attached addons.",
+    preview: (
+      <InputGroup className="max-w-[13rem]">
+        <InputGroupAddon>
+          <MagnifyingGlassIcon />
+        </InputGroupAddon>
+        <InputGroupInput placeholder="Search…" />
+      </InputGroup>
+    ),
+  },
+  {
+    label: "Input OTP",
+    href: "/cardboard/components/input-otp",
+    description: "One-time passcode field.",
+    preview: (
+      <InputOTP maxLength={4} defaultValue="12">
+        <InputOTPGroup>
+          <InputOTPSlot index={0} />
+          <InputOTPSlot index={1} />
+          <InputOTPSlot index={2} />
+          <InputOTPSlot index={3} />
+        </InputOTPGroup>
+      </InputOTP>
+    ),
+  },
+  {
+    label: "Item",
+    href: "/cardboard/components/item",
+    description: "A flexible list row.",
+    preview: (
+      <Item variant="outline" className="max-w-[14rem]">
+        <ItemMedia variant="icon">
+          <UserCircleIcon />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>Will Box</ItemTitle>
+          <ItemDescription>Designer & engineer</ItemDescription>
+        </ItemContent>
+        <ChevronRightIcon className="size-4 text-muted-foreground" />
+      </Item>
+    ),
   },
   {
     label: "Card",
