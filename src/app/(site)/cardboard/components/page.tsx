@@ -563,7 +563,7 @@ export default function Components() {
             .sort((a, b) => a.label.localeCompare(b.label))
             .map(({ label, href, description, preview }) => (
               <Link key={href} href={href} className="group flex flex-col gap-4">
-                <div className="flex h-44 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted p-6 transition-colors group-hover:border-border-focus">
+                <div className="flex h-44 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted p-6 transition-all duration-200 group-hover:scale-[1.02] group-hover:border-border-focus group-hover:shadow-lg">
                   {preview}
                 </div>
                 <div className="flex flex-col gap-1.5">
