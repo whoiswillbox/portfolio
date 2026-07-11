@@ -567,7 +567,7 @@ export default function Components() {
                   {preview}
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <div className="text-h4 font-semibold text-link">{label}</div>
+                  <div className="text-h4 font-semibold text-foreground">{label}</div>
                   <div className="text-body-sm text-muted-foreground">{description}</div>
                 </div>
               </Link>
