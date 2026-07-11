@@ -37,6 +37,25 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `sheet.tsx`, `sidebar.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 19 — the final pass. Both were **already customized**
+(sheet scrim/slide/`draggable`; sidebar trigger tooltip), so these were moved in
+place **preserving every prior customization**, not blind-overwritten. Owned in
+`cardboard/`; `ui/` paths are re-export shims; doc pages added.
+**What (token rewires + preserved customizations):**
+- **sheet (radix Dialog):** imports **Cardboard** Button; lucide `XIcon`→Heroicons
+  `XMarkIcon`; description `text-muted-foreground`→`text-subtle`. **Preserved** the
+  translucent-scrim GPU fade, the `tw-animate` real slide (per-side, `420ms`
+  easeOutCubic, transform-only), and the `draggable` opt-out — all carried over
+  byte-for-byte (see the two older `sheet.tsx` entries below).
+- **sidebar (composable primitives):** imports **Cardboard** Button / Input /
+  Separator / Sheet / Skeleton / Tooltip. No token rewires — the sidebar has its
+  own first-class `--sidebar-*` token family (bg-sidebar, sidebar-accent,
+  sidebar-border, sidebar-ring…), already mapped to the neutral ramp. **Kept**
+  lucide's `PanelLeftIcon` on the trigger (Heroicons has no panel glyph) and the
+  `SidebarTrigger` tooltip + state-aware label (see older `sidebar.tsx` entry below).
+
 ### `calendar.tsx`, `chart.tsx`, `carousel.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 18 — the last three vendored components on the

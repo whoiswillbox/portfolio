@@ -814,6 +814,39 @@ const components: {
       </div>
     ),
   },
+  {
+    label: "Sheet",
+    href: "/cardboard/components/sheet",
+    description: "Panel that slides in from an edge.",
+    preview: (
+      <div className="relative h-24 w-40 overflow-hidden rounded-lg border border-border bg-muted">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-y-0 right-0 w-24 border-l border-border bg-surface p-2 shadow-lg">
+          <div className="h-2 w-12 rounded-full bg-border" />
+          <div className="mt-2 h-1.5 w-16 rounded-full bg-surface-secondary" />
+          <div className="mt-1 h-1.5 w-14 rounded-full bg-surface-secondary" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    label: "Sidebar",
+    href: "/cardboard/components/sidebar",
+    description: "Collapsible app navigation.",
+    preview: (
+      <div className="flex h-24 w-40 overflow-hidden rounded-lg border border-border">
+        <div className="flex w-14 flex-col gap-1.5 bg-sidebar p-2">
+          <div className="h-2 w-full rounded-sm bg-sidebar-accent" />
+          <div className="h-2 w-8 rounded-sm bg-sidebar-accent" />
+          <div className="h-2 w-9 rounded-sm bg-sidebar-accent" />
+        </div>
+        <div className="flex-1 bg-surface p-2">
+          <div className="h-1.5 w-10 rounded-full bg-surface-secondary" />
+          <div className="mt-1.5 h-1.5 w-14 rounded-full bg-surface-secondary" />
+        </div>
+      </div>
+    ),
+  },
 ];
 
 export default function Components() {
