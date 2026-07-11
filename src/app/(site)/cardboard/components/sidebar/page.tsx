@@ -30,10 +30,15 @@ export default function SidebarDocs() {
       title="Sidebar"
       description="A collapsible app sidebar (composable primitives + provider). Colors come from the dedicated --sidebar-* token family; the trigger has a state-aware tooltip. On mobile it slides in as a Sheet."
     >
-      <Demo title="Basic" caption="Toggle with the trigger, ⌘B, or the rail.">
-        <div className="h-[22rem] w-full overflow-hidden rounded-xl border border-border">
-          <SidebarProvider className="min-h-full">
-            <Sidebar collapsible="icon" className="absolute">
+      <Demo title="Basic" caption="Toggle with the trigger or ⌘B; collapses to icons.">
+        {/*
+          The desktop sidebar container is position:fixed. `translateZ(0)` makes
+          this card the containing block for it, so the whole thing stays boxed
+          in the example area instead of pinning to the viewport edge.
+        */}
+        <div className="relative h-[24rem] w-full overflow-hidden rounded-xl border border-border [transform:translateZ(0)]">
+          <SidebarProvider className="!min-h-0 h-full">
+            <Sidebar collapsible="icon" className="absolute h-full">
               <SidebarHeader className="px-3 py-2 font-heading text-base font-medium">
                 Acme
               </SidebarHeader>
@@ -61,7 +66,7 @@ export default function SidebarDocs() {
                 v1.0.0
               </SidebarFooter>
             </Sidebar>
-            <SidebarInset className="bg-surface">
+            <SidebarInset className="min-w-0 bg-surface">
               <div className="flex items-center gap-2 border-b border-border p-3">
                 <SidebarTrigger />
                 <span className="text-body-sm text-muted-foreground">
