@@ -54,6 +54,14 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/cardboard/input-otp";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/cardboard/table";
 import { CaseStudyEmptyState } from "@/components/case-study-empty-state";
 
 /* The Components index. A living gallery — each card shows a real, live preview
@@ -530,6 +538,72 @@ const components: {
         <Label className="text-body-sm">Email</Label>
         <Input placeholder="you@example.com" />
         <span className="text-body-xs text-muted-foreground">We’ll never share it.</span>
+      </div>
+    ),
+  },
+  {
+    label: "Table",
+    href: "/cardboard/components/table",
+    description: "Simple data tables.",
+    preview: (
+      <div className="w-full max-w-[15rem]">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Invoice</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium">INV001</TableCell>
+              <TableCell className="text-right">$250</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium">INV002</TableCell>
+              <TableCell className="text-right">$150</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    ),
+  },
+  {
+    label: "Resizable",
+    href: "/cardboard/components/resizable",
+    description: "Draggable split panels.",
+    preview: (
+      <div className="flex h-24 w-full max-w-[15rem] items-stretch overflow-hidden rounded-lg border border-border text-body-xs text-muted-foreground">
+        <div className="flex flex-1 items-center justify-center">One</div>
+        <div className="relative flex w-px items-center justify-center bg-border">
+          <div className="z-10 h-6 w-1 rounded-lg bg-border" />
+        </div>
+        <div className="flex flex-1 items-center justify-center">Two</div>
+      </div>
+    ),
+  },
+  {
+    label: "Sonner (Toast)",
+    href: "/cardboard/components/sonner",
+    description: "Transient notifications.",
+    preview: (
+      <div className="flex w-full max-w-[15rem] items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2.5 shadow-md">
+        <StarIcon className="size-4 shrink-0 text-foreground" />
+        <div className="flex flex-col">
+          <span className="text-body-sm font-medium">Event created</span>
+          <span className="text-body-xs text-muted-foreground">Just now</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    label: "Direction",
+    href: "/cardboard/components/direction",
+    description: "LTR / RTL layout provider.",
+    preview: (
+      <div dir="rtl" className="w-full max-w-[13rem] rounded-lg border border-border p-3 text-body-sm">
+        <p className="font-medium">مرحبا</p>
+        <p className="text-body-xs text-muted-foreground">Right-to-left flow.</p>
       </div>
     ),
   },

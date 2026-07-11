@@ -37,6 +37,25 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `direction.tsx`, `sonner.tsx`, `resizable.tsx`, `table.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 15 (Button pattern). Owned in `cardboard/`; `ui/`
+paths are re-export shims; doc pages added.
+**What (token rewires):**
+- **direction:** no styling — pure Radix DirectionProvider re-export, relocated
+  to Cardboard for namespace consistency.
+- **sonner:** lucide status icons (`CircleCheckIcon`/`InfoIcon`/`TriangleAlertIcon`/
+  `OctagonXIcon`/`Loader2Icon`) → Heroicons (`CheckCircleIcon`/`InformationCircleIcon`/
+  `ExclamationTriangleIcon`/`XCircleIcon`/`ArrowPathIcon`). CSS vars repointed from
+  shadcn role vars (`--popover`/`--popover-foreground`/`--border`) to Cardboard
+  public tokens (`--color-surface`/`--color-foreground`/`--color-border`). NOTE:
+  no `<Toaster />` is mounted app-wide; the doc page mounts one locally for the demo.
+- **resizable:** handle `focus-visible:ring-ring`→`ring-border-focus`. Handle +
+  grip already `bg-border` (native) — no change.
+- **table:** `bg-muted/50`→`bg-surface-secondary/50` (footer, hover, expanded);
+  `data-[state=selected]:bg-muted`→`bg-surface-secondary`; caption
+  `text-muted-foreground`→`text-subtle`.
+
 ### `item.tsx`, `input-group.tsx`, `input-otp.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 14 (Button pattern). Owned in `cardboard/`; `ui/`
