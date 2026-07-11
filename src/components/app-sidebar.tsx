@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, ChevronRightIcon, LockClosedIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon, Cog6ToothIcon, SwatchIcon } from "@heroicons/react/24/outline"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, ChevronRightIcon, LockClosedIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
 import { Cog6ToothIcon as Cog6ToothSolid } from "@heroicons/react/24/solid"
 import {
   CubeIcon as CubeSolid,
@@ -106,7 +106,7 @@ export function AppSidebar({
   return (
     <Sidebar
       variant="floating"
-      className="max-sm:hidden [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
+      className="max-sm:hidden sm:top-14 sm:!h-[calc(100svh-3.5rem)] [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
     >
       <SidebarHeader>
         <div className="flex items-center justify-end">
@@ -135,45 +135,6 @@ export function AppSidebar({
                   </SidebarMenuItem>
                 )
               })}
-
-              {/* Cardboard (design system) — collapsible with Foundations +
-                  Components, directly under the Box item. */}
-              <Collapsible
-                asChild
-                defaultOpen={pathname.startsWith("/cardboard")}
-                className="group/boxsystem"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip="Cardboard">
-                      <SwatchIcon />
-                      <span>Cardboard</span>
-                      <Badge className="ml-1 bg-black px-1.5 py-0 text-[0.625rem] font-bold text-white">
-                        v1
-                      </Badge>
-                      <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/boxsystem:rotate-90" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={pathname === "/cardboard/foundations"}>
-                          <Link href="/cardboard/foundations">
-                            <span>Foundations</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={pathname === "/cardboard/components"}>
-                          <Link href="/cardboard/components">
-                            <span>Components</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

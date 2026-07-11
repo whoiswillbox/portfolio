@@ -1,10 +1,7 @@
 import { Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { ContentWorkspace } from "@/components/content-workspace";
+import { AppShell } from "@/components/app-shell";
 import { MobileNav } from "@/components/mobile-nav";
-import { BoxSeedProvider } from "@/components/box-seed";
 
 export default async function SiteLayout({
   children,
@@ -15,25 +12,15 @@ export default async function SiteLayout({
 
   return (
     <TooltipProvider>
-      {/* defaultOpen=false so SSR always renders the sidebar collapsed — matching
-          the landing page (which stays collapsed on the client). ContentWorkspace
-          opens it on the client for every non-landing page (rAF after mount), so
-          those still show it. This avoids a data-state hydration mismatch that
-          `defaultOpen` (SSR expanded) caused on a full load of the landing page. */}
-      <SidebarProvider defaultOpen={false} className="h-full min-h-0 bg-background max-sm:bg-sidebar">
-        <Suspense fallback={null}>
-          <AppSidebar showLock={showLock} />
-        </Suspense>
-        <SidebarInset className="h-full min-h-0 m-2 max-sm:m-0 max-sm:h-full sm:h-[calc(100%-1rem)] bg-transparent max-sm:bg-sidebar">
-          <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
-            <BoxSeedProvider>
-              <Suspense fallback={null}>
-                <ContentWorkspace>{children}</ContentWorkspace>
-              </Suspense>
-            </BoxSeedProvider>
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
+      {/* AppShell (client) renders the full-width top bar + product switcher and
+          picks the sidebar by route (Cardboard vs. the portfolio nav).
+          SidebarProvider uses defaultOpen=false so SSR always renders collapsed —
+          matching the landing page; ContentWorkspace opens it on the client for
+          non-landing pages. This avoids the data-state hydration mismatch that
+          SSR-expanded caused on a full load of the landing page. */}
+      <Suspense fallback={null}>
+        <AppShell showLock={showLock}>{children}</AppShell>
+      </Suspense>
       <div className="sm:hidden">
         <Suspense fallback={null}>
           <MobileNav />
