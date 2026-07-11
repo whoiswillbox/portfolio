@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { StarIcon, MagnifyingGlassIcon, UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { StarIcon, MagnifyingGlassIcon, UserCircleIcon, ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 
 import { Button } from "@/components/cardboard/button";
@@ -652,6 +652,39 @@ const components: {
           <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-surface-secondary" />
           <div className="text-body-sm font-medium">Are you sure?</div>
           <div className="text-body-xs text-muted-foreground">This archives the chat.</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    label: "Command",
+    href: "/cardboard/components/command",
+    description: "Filterable command palette.",
+    preview: (
+      <div className="w-full max-w-[15rem] rounded-xl border border-border bg-surface p-1 shadow-md">
+        <div className="mb-1 flex items-center gap-2 rounded-lg bg-surface-secondary px-2 py-1.5 text-body-sm text-muted-foreground">
+          <MagnifyingGlassIcon className="size-4" />
+          Search…
+        </div>
+        <div className="rounded-md bg-surface-secondary px-2 py-1 text-body-sm">Calendar</div>
+        <div className="px-2 py-1 text-body-sm text-muted-foreground">Search people</div>
+      </div>
+    ),
+  },
+  {
+    label: "Combobox",
+    href: "/cardboard/components/combobox",
+    description: "Autocomplete input.",
+    preview: (
+      <div className="w-full max-w-[13rem]">
+        <div className="flex items-center justify-between rounded-lg border border-border-focus px-3 py-1.5 text-body-sm ring-3 ring-border-focus/50">
+          <span className="text-muted-foreground">Search</span>
+          <ChevronDownIcon className="size-4 text-muted-foreground" />
+        </div>
+        <div className="mt-1 rounded-lg border border-border bg-surface p-1 shadow-md">
+          <div className="rounded-md bg-surface-secondary px-2 py-1 text-body-sm">Lounge wear</div>
+          <div className="px-2 py-1 text-body-sm text-muted-foreground">Accessories</div>
+          <div className="px-2 py-1 text-body-sm text-muted-foreground">Cosmetics</div>
         </div>
       </div>
     ),

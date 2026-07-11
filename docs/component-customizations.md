@@ -37,6 +37,26 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `command.tsx`, `combobox.tsx` — FORKED into Cardboard
+**Date:** 2026-07-10
+**Why:** Cardboard fork batch 17 (Button pattern). Coupled pair — both build on the
+already-forked Dialog / Input Group / Button. Owned in `cardboard/`; `ui/` paths are
+re-export shims; doc pages added.
+**What (token rewires):**
+- **command (cmdk):** imports **Cardboard** Dialog + Input Group; lucide
+  `SearchIcon`/`CheckIcon`→Heroicons `MagnifyingGlassIcon`/`CheckIcon`; root `bg-popover`/
+  `text-popover-foreground`→`bg-surface`/`text-foreground`; selected item `bg-muted`→
+  `bg-surface-secondary`; search field dropped the translucent `border-input/30 bg-input/30`
+  tint for `bg-surface-secondary`; group-heading + shortcut `text-muted-foreground`→`text-subtle`.
+- **combobox (@base-ui/react):** imports **Cardboard** Button + Input Group; lucide
+  `ChevronDownIcon`/`XIcon`/`CheckIcon`→Heroicons (`XIcon`→`XMarkIcon`); popup `bg-popover`/
+  `text-popover-foreground`→`bg-surface`/`text-foreground` + inner field tint
+  `border-input/30 bg-input/30`→`bg-surface-secondary`; item `data-highlighted:bg-accent`/
+  `text-accent-foreground`→`bg-surface-secondary`/`text-foreground`; chips `border-input`/
+  `border-ring`/`ring-ring/50`→`border`/`border-border-focus`/`ring-border-focus/50` +
+  destructive→critical + dropped dark `bg-input/30`/dark destructive variants; chip
+  `bg-muted`→`bg-surface-secondary`; labels/empty `text-muted-foreground`→`text-subtle`.
+
 ### `menubar.tsx`, `navigation-menu.tsx`, `drawer.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 16 (Button pattern). Owned in `cardboard/`; `ui/`
