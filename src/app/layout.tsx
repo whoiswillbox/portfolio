@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono, EB_Garamond } from "next/font/google";
+import { Plus_Jakarta_Sans, EB_Garamond } from "next/font/google";
+// Self-hosted licensed Klim webfonts (Söhne + Signifier). Ship to production.
+import { fontVars } from "./fonts";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeColorMeta } from "@/components/theme-color-meta";
 import { Analytics } from "@vercel/analytics/next";
@@ -7,11 +9,6 @@ import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -61,7 +58,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${plusJakartaSans.variable} ${geistMono.variable} ${ebGaramond.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${ebGaramond.variable} ${fontVars} h-full antialiased`}
     >
       <head>
         <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />

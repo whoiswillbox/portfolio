@@ -4,10 +4,26 @@
    Sizes are in rem (1rem = 16px); px shown in comments for reference.
    ========================================================================== */
 :root {
-  /* Font families (the --font-geist-* vars come from next/font in layout.tsx) */
-  --font-family-sans: var(--font-geist-sans);
-  --font-family-mono: var(--font-geist-mono);
-  --font-family-heading: var(--font-eb-garamond);
+  /* Font families. Söhne + Signifier are self-hosted licensed Klim webfonts
+     (see src/app/fonts.ts); the --font-geist and --font-eb-garamond vars come
+     from next/font/google. Fallbacks keep text rendering if a face fails. */
+  --font-family-sans: var(--font-sohne, var(--font-geist-sans));
+  /* "mono" role now points at Signifier serif (Geist Mono removed) — used for
+     token names, code labels, and metadata chrome. Note: Signifier is
+     proportional, not monospaced, so tabular alignment no longer applies. */
+  --font-family-mono: var(--font-signifier, var(--font-eb-garamond));
+
+  /* Serif reading voice (body + eyebrow) — Signifier. */
+  --font-family-serif: var(--font-signifier, var(--font-eb-garamond));
+  --font-family-serif-display: var(--font-signifier, var(--font-eb-garamond));
+
+  /* Headings (h1–h6) — Söhne. Weight is driven by the consuming utility
+     (font-medium etc.); Söhne ships its 400/500 cuts. */
+  --font-family-heading: var(--font-sohne, var(--font-eb-garamond));
+
+  /* Display (oversized hero type) — Signifier serif, distinct from the sans
+     headings for an editorial hero moment. */
+  --font-family-display: var(--font-signifier, var(--font-eb-garamond));
 
   /* --- Sizes (t-shirt ramp) ------------------------------------------ */
   /* A meaning-free scale, à la Tailwind. The semantic text-* tokens
@@ -40,4 +56,16 @@
   --line-height-normal: 1.4;  /* small headings, dense UI text */
   --line-height-relaxed: 1.5; /* body */
   --line-height-loose: 1.6;   /* large body */
+
+  /* --- Letter spacing (tracking) ------------------------------------- */
+  /* Named tight→wide ramp (parallel to --line-height-*). Large display type is
+     set tight (optical size wants less spacing); eyebrows / small caps are set
+     wide. Semantic text-* tokens reference these by name. Named --letter-spacing-*
+     (not --tracking-*) to avoid colliding with Tailwind's tracking-* theme keys. */
+  --letter-spacing-tighter: -0.045em; /* largest display */
+  --letter-spacing-tight: -0.025em;   /* display */
+  --letter-spacing-snug: -0.01em;     /* small display */
+  --letter-spacing-normal: 0em;       /* default */
+  --letter-spacing-wide: 0.01em;      /* headings */
+  --letter-spacing-wider: 0.05em;     /* eyebrows / small caps */
 }

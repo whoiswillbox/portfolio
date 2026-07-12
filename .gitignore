@@ -46,3 +46,9 @@ public/projects/surfing/*.mov
 public/projects/surfing/*.MP4
 public/projects/surfing/revo-trimmed.mp4
 !public/projects/surfing/*-compressed.mp4
+
+# Fonts: ignore everything in src/fonts EXCEPT the licensed/ webfonts we've paid
+# to self-host (Söhne + Signifier, Klim Web licence — committable & deployed).
+# Any test/eval fonts dropped here stay ignored (Test Font Licence forbids deploy).
+/src/fonts/*
+!/src/fonts/licensed/
