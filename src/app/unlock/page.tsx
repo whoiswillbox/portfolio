@@ -184,9 +184,9 @@ function UnlockForm() {
             submitting ? "opacity-0 pointer-events-none" : "opacity-100"
           )}
         >
-          <h1 className="text-[clamp(2.25rem,6vw,5.5rem)] font-medium leading-[1.05] tracking-tighter">
+          <h1 className="font-display text-display">
             <span className="text-muted-foreground">I&apos;m currently working on this — </span>
-            <span className="font-mono" style={{ fontFamily: "inherit" }}>check back later</span>
+            <span style={{ fontFamily: "inherit" }}>check back later</span>
             <span className="text-muted-foreground">… unless you know the password.</span>
           </h1>
 

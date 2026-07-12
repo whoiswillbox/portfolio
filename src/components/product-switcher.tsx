@@ -66,7 +66,7 @@ export function ProductSwitcher() {
               </span>
               <span className="flex flex-col leading-none">
                 <span className="text-body-sm font-medium">{product.name}</span>
-                <span className="text-body-xs text-subtle">{product.tagline}</span>
+                <span className="text-body-xs text-tertiary">{product.tagline}</span>
               </span>
             </SelectItem>
           )

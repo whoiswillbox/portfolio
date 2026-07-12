@@ -84,6 +84,9 @@ export function AppSidebar({
   const searchParams = useSearchParams()
   const convoParam = searchParams.get("c")
   const boxParam = searchParams.get("box")
+  // Landing (/) is a full-bleed splash: no top bar, and no sidebar collapse
+  // trigger chrome over the hero.
+  const isLanding = pathname === "/"
 
   // Box AI conversations, kept in sync with the chat (same localStorage store).
   const [conversations, setConversations] = React.useState<Conversation[]>([])
@@ -106,11 +109,13 @@ export function AppSidebar({
   return (
     <Sidebar
       variant="floating"
-      className="max-sm:hidden sm:top-14 sm:!h-[calc(100svh-3.5rem)] [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
+      className={`max-sm:hidden ${
+        isLanding ? "" : "sm:top-14 sm:!h-[calc(100svh-3.5rem)]"
+      } [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal`}
     >
       <SidebarHeader>
         <div className="flex items-center justify-end">
-          <SidebarTrigger className="max-sm:hidden" />
+          {!isLanding && <SidebarTrigger className="max-sm:hidden" />}
         </div>
       </SidebarHeader>
       <SidebarContent>

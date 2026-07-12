@@ -145,8 +145,8 @@ export default function LandingPage() {
         <div className={cn("absolute inset-0 flex flex-col items-center justify-center gap-8 px-12 transition-opacity duration-500", loading ? "opacity-0 pointer-events-none" : "opacity-100")}>
           <FallingBoxes />
           <div className="relative z-10 flex w-full max-w-4xl flex-col gap-8">
-            <h1 className="text-[clamp(3rem,7vw,7rem)] font-medium leading-[1.05] tracking-tighter">
-              <span className="text-muted-foreground">William Box is a </span><span className="font-mono" style={{ fontFamily: "inherit" }}>product designer</span><span className="text-muted-foreground"> that pulls, branches, and merges.</span>
+            <h1 className="font-display text-display text-secondary">
+              William Box is a product designer that pulls, branches, and merges.
             </h1>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button size="lg" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>

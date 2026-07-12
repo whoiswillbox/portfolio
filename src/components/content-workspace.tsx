@@ -95,8 +95,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   {/* Desktop sidebar-expand trigger — shown whenever the sidebar is collapsed,
       independent of Box AI (so Cardboard pages, where Box AI is disabled, still
-      have a way to reopen the nav). */}
-  const expandTrigger = !open && showTrigger && (
+      have a way to reopen the nav). Hidden on the landing splash (/). */}
+  const expandTrigger = pathname !== "/" && !open && showTrigger && (
     <div className="absolute left-3 top-3 z-30 max-sm:hidden">
       <SidebarTrigger />
     </div>

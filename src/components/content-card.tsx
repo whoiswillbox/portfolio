@@ -4,12 +4,20 @@ export function ContentCard({
   className,
   children,
   ref,
+  flush = false,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & {
+  /** Drop the card chrome (bg/rounded/shadow/ring) so content sits directly on
+      the page background. Keeps the scroll structure. Used by Cardboard pages. */
+  flush?: boolean;
+}) {
   return (
     <div
       ref={ref}
-      className="min-h-0 h-full overflow-hidden sm:bg-sidebar sm:rounded-xl sm:shadow-lg sm:ring-1 sm:ring-sidebar-border"
+      className={cn(
+        "min-h-0 h-full overflow-hidden",
+        !flush && "sm:bg-sidebar sm:rounded-xl sm:shadow-lg sm:ring-1 sm:ring-sidebar-border"
+      )}
       {...props}
     >
       {/* The SidebarInset no longer reserves space for the floating nav, so the

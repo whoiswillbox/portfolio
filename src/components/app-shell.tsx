@@ -20,6 +20,8 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const inCardboard = pathname.startsWith("/cardboard")
+  // The landing page (/) is a full-bleed splash — no top bar, no sidebar chrome.
+  const isLanding = pathname === "/"
   const home = inCardboard
     ? { name: "Cardboard", href: "/cardboard/foundations" }
     : { name: "Box", href: "/who" }
@@ -27,22 +29,29 @@ export function AppShell({
   return (
     // --topbar-h is consumed by ContentWorkspace/BoxAI, which need an explicit
     // pixel height (100dvh minus the top bar) for their h-full to resolve.
-    // 0 on mobile (no top bar), 3.5rem on desktop where the header shows.
-    <div className="flex h-svh flex-col overflow-hidden [--topbar-h:0px] sm:[--topbar-h:3.5rem]">
+    // 0 on mobile (no top bar) and on the landing page (top bar hidden);
+    // 3.5rem on desktop everywhere else where the header shows.
+    <div
+      className={`flex h-svh flex-col overflow-hidden [--topbar-h:0px] ${
+        isLanding ? "" : "sm:[--topbar-h:3.5rem]"
+      }`}
+    >
       {/* Full-width top bar (Tailwind-docs style): the Box logo home link + the
           product switcher pill. Desktop only — mobile uses MobileNav. Sits
           ABOVE the SidebarProvider so the provider keeps its original row
-          layout / height behavior unchanged. */}
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border/60 bg-background px-4 max-sm:hidden">
-        <Link
-          href={home.href}
-          aria-label={home.name}
-          className="flex items-center rounded-md text-foreground outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
-        >
-          <BoxLogo className="size-6" />
-        </Link>
-        <ProductSwitcher />
-      </header>
+          layout / height behavior unchanged. Hidden on the landing splash. */}
+      {!isLanding && (
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border/60 bg-background px-4 max-sm:hidden">
+          <Link
+            href={home.href}
+            aria-label={home.name}
+            className="flex items-center rounded-md text-foreground outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+          >
+            <BoxLogo className="size-6" />
+          </Link>
+          <ProductSwitcher />
+        </header>
+      )}
 
       <SidebarProvider
         defaultOpen={false}
