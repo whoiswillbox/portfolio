@@ -10,6 +10,78 @@ import { cn } from "@/lib/utils";
 /* Living reference — swatches render the ACTUAL CSS variables the app uses, so
    this page always reflects the real tokens (and updates with the theme). */
 
+/* Build a map of custom-property → its RAW declared value by scanning every
+   stylesheet rule (computed style flattens var() chains, so we must read the
+   source declarations). Dark-mode overrides (later rules / .dark selectors) win
+   because we assign in document order and re-read the currently-active value
+   through a probe below. */
+function collectVarDeclarations(): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const sheet of Array.from(document.styleSheets)) {
+    let rules: CSSRuleList;
+    try {
+      rules = sheet.cssRules;
+    } catch {
+      continue; // cross-origin sheet — skip
+    }
+    const walk = (list: CSSRuleList) => {
+      for (const rule of Array.from(list)) {
+        if (rule instanceof CSSStyleRule) {
+          const style = rule.style;
+          for (let i = 0; i < style.length; i++) {
+            const prop = style[i];
+            if (prop.startsWith("--")) map.set(prop, style.getPropertyValue(prop).trim());
+          }
+        } else if ("cssRules" in rule) {
+          walk((rule as CSSGroupingRule).cssRules);
+        }
+      }
+    };
+    walk(rules);
+  }
+  return map;
+}
+
+/* Resolve a semantic color var to the leaf PRIMITIVE it references (e.g.
+   --p-text-tertiary → --neutral-500, --surface-success → --green-50). Follows the
+   raw var() chain via the declaration map, then confirms against the live
+   computed value so the theme-dependent hop resolves correctly. Returns the
+   terminal ramp var name (with leading --), or null. */
+function useLeafPrimitive(v: string | undefined): string | null {
+  const [leaf, setLeaf] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!v || !v.startsWith("--")) {
+      setLeaf(null);
+      return;
+    }
+    const resolve = () => {
+      const decls = collectVarDeclarations();
+      const computed = getComputedStyle(document.documentElement);
+      const target = computed.getPropertyValue(v).trim(); // the live (theme) value
+      let name = v;
+      for (let i = 0; i < 10; i++) {
+        const raw = decls.get(name);
+        if (!raw) break;
+        const match = /var\(\s*(--[\w-]+)/.exec(raw);
+        if (!match) break; // literal color → name is the leaf
+        // If a var has light/dark variants, pick the branch whose computed value
+        // matches the live target (so dark mode resolves to its own ramp step).
+        const candidates = Array.from(raw.matchAll(/var\(\s*(--[\w-]+)/g)).map((m) => m[1]);
+        const next =
+          candidates.find((c) => computed.getPropertyValue(c).trim() === target) ?? match[1];
+        if (next === name) break;
+        name = next;
+      }
+      setLeaf(name !== v ? name : null);
+    };
+    resolve();
+    const obs = new MutationObserver(resolve);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-theme"] });
+    return () => obs.disconnect();
+  }, [v]);
+  return leaf;
+}
+
 // Small guidance line shown under a section's description — how/when to use.
 function UsageHint({ children }: { children: React.ReactNode }) {
   return (
@@ -86,8 +158,10 @@ const SURFACES: { token: string; v: string; description: string }[] = [
 // Text tokens — the swatch shows the color as a filled chip (text colors are
 // hard to read as a pale swatch, so we fill a chip with the text color).
 const TEXTS: { token: string; v: string; description: string }[] = [
-  { token: "text-foreground", v: "--p-text", description: "The default text color." },
-  { token: "text-subtle", v: "--p-text-subtle", description: "Secondary / muted text, captions, and labels." },
+  { token: "text-foreground", v: "--p-text", description: "The default text color (highest prominence)." },
+  { token: "text-secondary", v: "--p-text-secondary", description: "Supporting text — subheads and secondary labels." },
+  { token: "text-tertiary", v: "--p-text-tertiary", description: "Muted text, captions, and metadata." },
+  { token: "text-quaternary", v: "--p-text-quaternary", description: "Lowest-prominence text — placeholders, hints." },
   { token: "text-disabled", v: "--p-text-disabled", description: "Text in a disabled state." },
   { token: "text-on-inverse", v: "--p-text-on-inverse", description: "Text on top of an inverse background." },
   { token: "text-on-solid", v: "--p-text-on-solid", description: "Text/icon on top of a solid action fill." },
@@ -137,6 +211,11 @@ function SurfaceRow({ token, v, description, swatch, copyAs }: { token: string; 
   // — used for icons, where the label reads "icon-critical" but the working
   // utility is "text-icon-critical". The public var is derived from copyAs.
   const shown = publicVar(copyAs ?? token, v);
+  // The leaf primitive the semantic token ultimately resolves to (e.g.
+  // --green-50), walked live so it's theme-correct. Only shown when it differs
+  // from the public var (primitive-ramp rows already ARE the leaf).
+  const leaf = useLeafPrimitive(v);
+  const primitive = leaf && leaf !== shown ? leaf : null;
   return (
     <div className="flex items-center gap-4 py-3">
       {swatch ?? (
@@ -146,7 +225,12 @@ function SurfaceRow({ token, v, description, swatch, copyAs }: { token: string; 
         <CopyToken value={token} copyValue={copyAs} className="-ml-1.5" />
         <div className="px-1.5 font-mono text-[0.65rem] text-muted-foreground">var({shown})</div>
       </div>
-      <div className="flex-1 text-left text-body-sm text-muted-foreground">{description}</div>
+      {/* Primitive column — the leaf ramp var this semantic color resolves to
+          (theme-correct, e.g. --green-50). */}
+      <div className="w-48 shrink-0 max-sm:hidden">
+        {primitive && <CopyToken value={primitive} className="-ml-1.5 text-[0.65rem]" />}
+      </div>
+      <div className="flex-1 text-right text-body-sm text-muted-foreground">{description}</div>
     </div>
   );
 }
@@ -158,7 +242,7 @@ function SurfaceRow({ token, v, description, swatch, copyAs }: { token: string; 
 const ICONS: { token: string; copyAs: string; v: string; description: string }[] = [
   { token: "icon", copyAs: "text-icon", v: "--p-text", description: "Default icon color." },
   { token: "icon-secondary", copyAs: "text-icon-secondary", v: "--p-text-secondary", description: "Secondary, lower-prominence icons." },
-  { token: "icon-subtle", copyAs: "text-icon-subtle", v: "--p-text-subtle", description: "Subtle / muted icons." },
+  { token: "icon-subtle", copyAs: "text-icon-subtle", v: "--p-text-tertiary", description: "Subtle / muted icons." },
   { token: "icon-brand", copyAs: "text-icon-brand", v: "--accent-brand", description: "Icons that need to pull attention." },
   { token: "icon-info", copyAs: "text-icon-info", v: "--accent-info", description: "Icons communicating information." },
   { token: "icon-success", copyAs: "text-icon-success", v: "--accent-success", description: "Icons communicating success." },
@@ -180,7 +264,7 @@ const RAMPS: { name: string; prefix: string; steps: readonly string[] }[] = [
 function RampRow({ name, prefix, steps }: { name: string; prefix: string; steps: readonly string[] }) {
   return (
     <section className="mb-14 flex flex-col gap-4">
-      <h2 className="text-h3 font-semibold">{name}</h2>
+      <h2 className="text-h3">{name}</h2>
       <div className="flex flex-col divide-y divide-border">
         {steps.map((step) => (
           <SurfaceRow
@@ -201,7 +285,7 @@ export default function Colors() {
   const [view, setView] = React.useState<View>("semantics");
 
   return (
-    <ContentCard className="h-full overflow-auto">
+    <ContentCard flush className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <Link
           href="/cardboard/foundations"
@@ -213,7 +297,7 @@ export default function Colors() {
 
         <div className="flex flex-col gap-4 mb-12">
           <div className="flex flex-col gap-3">
-            <h1 className="text-h1 font-semibold">Colors</h1>
+            <h1 className="text-h1">Colors</h1>
             <p className="text-body-lg text-muted-foreground">
               Color sets tone, signals state and intent, and guides the eye to
               what matters most.
@@ -244,7 +328,7 @@ export default function Colors() {
         {/* Neutral surfaces (PatternFly prominence system) */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Background</h2>
+            <h2 className="text-h3">Background</h2>
             <p className="text-body-sm text-muted-foreground">
               All background tokens — neutral surfaces by prominence, pale intent
               surfaces, and solid fills —{" "}
@@ -271,16 +355,20 @@ export default function Colors() {
         {/* Text tokens */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Text</h2>
+            <h2 className="text-h3">Text</h2>
             <p className="text-body-sm text-muted-foreground">
               Foreground text by prominence —{" "}
               <span className="font-mono text-body-xs">text-foreground</span> and friends.
             </p>
             <UsageHint>
-              <span className="font-mono text-body-xs">text-foreground</span> for body copy,{" "}
-              <span className="font-mono text-body-xs">text-subtle</span> for
-              captions and secondary labels, <span className="font-mono text-body-xs">text-link</span>{" "}
-              for links, and the intent variants (
+              A prominence ramp:{" "}
+              <span className="font-mono text-body-xs">text-foreground</span> →{" "}
+              <span className="font-mono text-body-xs">text-secondary</span> →{" "}
+              <span className="font-mono text-body-xs">text-tertiary</span> →{" "}
+              <span className="font-mono text-body-xs">text-quaternary</span>{" "}
+              (most → least prominent). Plus{" "}
+              <span className="font-mono text-body-xs">text-link</span> for links
+              and the intent variants (
               <span className="font-mono text-body-xs">text-critical</span>…) for
               inline status messages.
             </UsageHint>
@@ -295,7 +383,7 @@ export default function Colors() {
         {/* Border tokens */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Borders</h2>
+            <h2 className="text-h3">Borders</h2>
             <p className="text-body-sm text-muted-foreground">
               Dividers and outlines by prominence —{" "}
               <span className="font-mono text-body-xs">border</span> and friends.
@@ -317,7 +405,7 @@ export default function Colors() {
         {/* Icon tokens */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Icons</h2>
+            <h2 className="text-h3">Icons</h2>
             <p className="text-body-sm text-muted-foreground">
               Colors for icon glyphs, by prominence and intent —{" "}
               <span className="font-mono text-body-xs">text-icon</span>,{" "}
@@ -342,7 +430,7 @@ export default function Colors() {
         /* Component-specific roles */
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Component roles</h2>
+            <h2 className="text-h3">Component roles</h2>
             <p className="text-body-sm text-muted-foreground">
               Tokens tied to specific components — button color, focus ring, and
               the sidebar theming.

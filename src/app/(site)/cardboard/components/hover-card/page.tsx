@@ -22,7 +22,7 @@ export default function HoverCardDocs() {
           <HoverCardContent>
             <div className="flex flex-col gap-1">
               <p className="text-body-md font-medium text-foreground">Will Box</p>
-              <p className="text-body-sm text-subtle">
+              <p className="text-body-sm text-tertiary">
                 Product designer & engineer. Building Cardboard.
               </p>
             </div>

@@ -106,7 +106,7 @@ export default function Spacing() {
   const [view, setView] = React.useState<View>("semantics");
 
   return (
-    <ContentCard className="h-full overflow-auto">
+    <ContentCard flush className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <Link
           href="/cardboard/foundations"
@@ -118,7 +118,7 @@ export default function Spacing() {
 
         <div className="flex flex-col gap-4 mb-12">
           <div className="flex flex-col gap-3">
-            <h1 className="text-h1 font-semibold">Spacing</h1>
+            <h1 className="text-h1">Spacing</h1>
             <p className="text-body-lg text-muted-foreground">
               A consistent scale gives the interface rhythm — even spacing makes
               layouts feel calm and intentional.
@@ -149,7 +149,7 @@ export default function Spacing() {
         {/* Spacing roles */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Spacing roles</h2>
+            <h2 className="text-h3">Spacing roles</h2>
             <p className="text-body-sm text-muted-foreground">
               Named layout tokens for page-level rhythm —{" "}
               <span className="font-mono text-body-xs">p-section</span> and{" "}
@@ -172,7 +172,7 @@ export default function Spacing() {
         {/* Container widths */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Container widths</h2>
+            <h2 className="text-h3">Container widths</h2>
             <p className="text-body-sm text-muted-foreground">
               Max-width caps —{" "}
               <span className="font-mono text-body-xs">max-w-content</span> and{" "}
@@ -197,7 +197,7 @@ export default function Spacing() {
         {/* Spacing scale */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Spacing scale</h2>
+            <h2 className="text-h3">Spacing scale</h2>
             <p className="text-body-sm text-muted-foreground">
               The raw scale. Numeric naming, Polaris-style — the number is roughly
               px × 100, so <span className="font-mono text-body-xs">--space-400</span>{" "}
@@ -214,7 +214,7 @@ export default function Spacing() {
         {/* Layout widths */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Layout widths</h2>
+            <h2 className="text-h3">Layout widths</h2>
             <p className="text-body-sm text-muted-foreground">
               Column caps — not on the spacing scale. The semantic{" "}
               <span className="font-mono text-body-xs">max-w-*</span> tokens

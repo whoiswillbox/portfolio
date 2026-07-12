@@ -67,7 +67,7 @@ export default function Elevation() {
   const [view, setView] = React.useState<View>("semantics");
 
   return (
-    <ContentCard className="h-full overflow-auto">
+    <ContentCard flush className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <Link
           href="/cardboard/foundations"
@@ -79,7 +79,7 @@ export default function Elevation() {
 
         <div className="flex flex-col gap-4 mb-12">
           <div className="flex flex-col gap-3">
-            <h1 className="text-h1 font-semibold">Elevation</h1>
+            <h1 className="text-h1">Elevation</h1>
             <p className="text-body-lg text-muted-foreground">
               Shadow lifts an element off the page. Higher elevation signals more
               importance — and that a surface floats above the rest.
@@ -109,7 +109,7 @@ export default function Elevation() {
         /* T-shirt scale */
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Elevation scale</h2>
+            <h2 className="text-h3">Elevation scale</h2>
             <p className="text-body-sm text-muted-foreground">
               Tailwind <span className="font-mono text-body-xs">shadow-*</span>{" "}
               utilities, from <span className="font-mono text-body-xs">shadow-none</span>{" "}
@@ -131,7 +131,7 @@ export default function Elevation() {
         ) : (
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Shadow ramp</h2>
+            <h2 className="text-h3">Shadow ramp</h2>
             <p className="text-body-sm text-muted-foreground">
               The raw ramp, <span className="font-mono text-body-xs">--elevation-0</span> (flat)
               → <span className="font-mono text-body-xs">--elevation-500</span> (deep). Every

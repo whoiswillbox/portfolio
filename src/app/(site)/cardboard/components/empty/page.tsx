@@ -29,7 +29,7 @@ export default function EmptyDocs() {
       {/* Specs — the anatomy, so this reads as a build-from template. */}
       <section className="mb-12 flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-h3 font-semibold">Anatomy</h2>
+          <h2 className="text-h3">Anatomy</h2>
           <p className="text-body-sm text-muted-foreground">
             The specs that make up the empty state — build other empty states to match.
           </p>

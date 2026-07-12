@@ -14,9 +14,9 @@ export default function TabsDocs() {
             <TabsTrigger value="activity">Activity</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
-          <TabsContent value="overview" className="pt-2 text-subtle">The overview panel.</TabsContent>
-          <TabsContent value="activity" className="pt-2 text-subtle">Recent activity.</TabsContent>
-          <TabsContent value="settings" className="pt-2 text-subtle">Your settings.</TabsContent>
+          <TabsContent value="overview" className="pt-2 text-tertiary">The overview panel.</TabsContent>
+          <TabsContent value="activity" className="pt-2 text-tertiary">Recent activity.</TabsContent>
+          <TabsContent value="settings" className="pt-2 text-tertiary">Your settings.</TabsContent>
         </Tabs>
       </Demo>
 
@@ -26,8 +26,8 @@ export default function TabsDocs() {
             <TabsTrigger value="one">One</TabsTrigger>
             <TabsTrigger value="two">Two</TabsTrigger>
           </TabsList>
-          <TabsContent value="one" className="pt-2 text-subtle">First panel.</TabsContent>
-          <TabsContent value="two" className="pt-2 text-subtle">Second panel.</TabsContent>
+          <TabsContent value="one" className="pt-2 text-tertiary">First panel.</TabsContent>
+          <TabsContent value="two" className="pt-2 text-tertiary">Second panel.</TabsContent>
         </Tabs>
       </Demo>
     </ComponentPage>

@@ -789,7 +789,7 @@ const components: {
           <CarouselContent>
             {[1, 2, 3].map((n) => (
               <CarouselItem key={n}>
-                <div className="flex aspect-square items-center justify-center rounded-lg border border-border bg-muted text-h3 font-semibold">
+                <div className="flex aspect-square items-center justify-center rounded-lg border border-border bg-muted text-h3">
                   {n}
                 </div>
               </CarouselItem>
@@ -852,10 +852,10 @@ const components: {
 
 export default function Components() {
   return (
-    <ContentCard className="h-full overflow-auto">
+    <ContentCard flush className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-6xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <div className="flex flex-col gap-3 mb-10">
-          <h1 className="text-h1 font-semibold">Components</h1>
+          <h1 className="text-h1">Components</h1>
           <p className="text-body-lg text-muted-foreground">
             Reusable UI built on the Cardboard foundations — each rendered live,
             with its real variants and states.

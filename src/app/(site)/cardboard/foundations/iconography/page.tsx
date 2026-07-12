@@ -88,7 +88,7 @@ export default function Iconography() {
   }, [query, iconStyle]);
 
   return (
-    <ContentCard className="h-full overflow-auto">
+    <ContentCard flush className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <Link
           href="/cardboard/foundations"
@@ -99,7 +99,7 @@ export default function Iconography() {
         </Link>
 
         <div className="flex flex-col gap-3 mb-12">
-          <h1 className="text-h1 font-semibold">Iconography</h1>
+          <h1 className="text-h1">Iconography</h1>
           <p className="text-body-lg text-muted-foreground">
             Icons carry meaning at a glance. One consistent set, sized and
             colored on the same scales as everything else.
@@ -109,7 +109,7 @@ export default function Iconography() {
         {/* Icon set */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Icon set</h2>
+            <h2 className="text-h3">Icon set</h2>
             <p className="text-body-sm text-muted-foreground">
               We use <span className="font-mono text-body-xs">@heroicons/react</span> —
               the <span className="font-medium">24px outline</span> style by default,
@@ -137,7 +137,7 @@ export default function Iconography() {
         {/* Sizes */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Sizes</h2>
+            <h2 className="text-h3">Sizes</h2>
             <p className="text-body-sm text-muted-foreground">
               Icon sizing uses the Tailwind <span className="font-mono text-body-xs">size-*</span>{" "}
               scale — <span className="font-mono text-body-xs">size-4</span> is the default.
@@ -168,7 +168,7 @@ export default function Iconography() {
         {/* Library gallery */}
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Library</h2>
+            <h2 className="text-h3">Library</h2>
             <p className="text-body-sm text-muted-foreground">
               All {filtered.length === ICON_SETS[iconStyle].length ? ICON_SETS[iconStyle].length : `${filtered.length} of ${ICON_SETS[iconStyle].length}`} icons in the 24/{iconStyle} set. Click any to
               copy its component name.

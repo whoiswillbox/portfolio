@@ -21,7 +21,7 @@ export default function CarouselDocs() {
             <CarouselContent>
               {Array.from({ length: 5 }).map((_, i) => (
                 <CarouselItem key={i}>
-                  <div className="flex aspect-square items-center justify-center rounded-xl border border-border bg-muted text-h2 font-semibold text-foreground">
+                  <div className="flex aspect-square items-center justify-center rounded-xl border border-border bg-muted text-h2 text-foreground">
                     {i + 1}
                   </div>
                 </CarouselItem>

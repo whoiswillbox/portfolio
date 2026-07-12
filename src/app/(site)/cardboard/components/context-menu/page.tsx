@@ -21,7 +21,7 @@ export default function ContextMenuDocs() {
     >
       <Demo title="Right-click the area" caption="Opens on secondary click / long-press.">
         <ContextMenu>
-          <ContextMenuTrigger className="flex h-32 w-full max-w-md items-center justify-center rounded-xl border border-dashed border-border text-body-sm text-subtle">
+          <ContextMenuTrigger className="flex h-32 w-full max-w-md items-center justify-center rounded-xl border border-dashed border-border text-body-sm text-tertiary">
             Right-click here
           </ContextMenuTrigger>
           <ContextMenuContent className="w-52">

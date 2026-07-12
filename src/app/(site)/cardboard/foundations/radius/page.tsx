@@ -85,7 +85,7 @@ export default function Radius() {
   const [view, setView] = React.useState<View>("semantics");
 
   return (
-    <ContentCard className="h-full overflow-auto">
+    <ContentCard flush className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <Link
           href="/cardboard/foundations"
@@ -97,7 +97,7 @@ export default function Radius() {
 
         <div className="flex flex-col gap-4 mb-12">
           <div className="flex flex-col gap-3">
-            <h1 className="text-h1 font-semibold">Radius</h1>
+            <h1 className="text-h1">Radius</h1>
             <p className="text-body-lg text-muted-foreground">
               Corner radius softens the interface. A shared scale keeps every
               surface feeling like it belongs to the same family.
@@ -126,7 +126,7 @@ export default function Radius() {
         {view === "semantics" ? (
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Radius scale</h2>
+            <h2 className="text-h3">Radius scale</h2>
             <p className="text-body-sm text-muted-foreground">
               Tailwind <span className="font-mono text-body-xs">rounded-*</span>{" "}
               utilities, from <span className="font-mono text-body-xs">rounded-none</span>{" "}
@@ -149,7 +149,7 @@ export default function Radius() {
         ) : (
         <section className="mb-14 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-h3 font-semibold">Base radius</h2>
+            <h2 className="text-h3">Base radius</h2>
             <p className="text-body-sm text-muted-foreground">
               A single primitive. Every semantic step is a multiple of it, so
               retuning <span className="font-mono text-body-xs">--radius-base</span>{" "}

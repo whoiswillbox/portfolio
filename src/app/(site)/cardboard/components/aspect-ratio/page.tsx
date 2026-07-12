@@ -10,7 +10,7 @@ export default function AspectRatioDocs() {
       <Demo title="16 / 9">
         <div className="w-full max-w-md">
           <AspectRatio ratio={16 / 9}>
-            <div className="flex size-full items-center justify-center rounded-lg bg-surface-secondary text-body-sm text-subtle">
+            <div className="flex size-full items-center justify-center rounded-lg bg-surface-secondary text-body-sm text-tertiary">
               16 / 9
             </div>
           </AspectRatio>
@@ -20,7 +20,7 @@ export default function AspectRatioDocs() {
       <Demo title="1 / 1">
         <div className="w-40">
           <AspectRatio ratio={1}>
-            <div className="flex size-full items-center justify-center rounded-lg bg-surface-secondary text-body-sm text-subtle">
+            <div className="flex size-full items-center justify-center rounded-lg bg-surface-secondary text-body-sm text-tertiary">
               1 / 1
             </div>
           </AspectRatio>

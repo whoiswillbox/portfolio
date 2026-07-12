@@ -28,7 +28,7 @@ export default function CardDocs() {
             </CardAction>
           </CardHeader>
           <CardContent>
-            <p className="text-subtle">
+            <p className="text-tertiary">
               Cards use <span className="font-mono text-body-xs">bg-surface</span> with a
               subtle ring, and pad from a single <span className="font-mono text-body-xs">--card-spacing</span> var.
             </p>
@@ -46,7 +46,7 @@ export default function CardDocs() {
             <CardDescription>Tighter padding for dense layouts.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-subtle">Same anatomy, smaller rhythm.</p>
+            <p className="text-tertiary">Same anatomy, smaller rhythm.</p>
           </CardContent>
         </Card>
       </Demo>

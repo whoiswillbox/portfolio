@@ -9,14 +9,14 @@ export default function SeparatorDocs() {
     >
       <Demo title="Horizontal">
         <div className="w-full max-w-sm">
-          <p className="text-body-sm text-subtle">Above</p>
+          <p className="text-body-sm text-tertiary">Above</p>
           <Separator className="my-3" />
-          <p className="text-body-sm text-subtle">Below</p>
+          <p className="text-body-sm text-tertiary">Below</p>
         </div>
       </Demo>
 
       <Demo title="Vertical">
-        <div className="flex h-8 items-center gap-3 text-body-sm text-subtle">
+        <div className="flex h-8 items-center gap-3 text-body-sm text-tertiary">
           <span>Home</span>
           <Separator orientation="vertical" />
           <span>Docs</span>
