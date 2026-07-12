@@ -97,7 +97,7 @@ export default function Resume() {
         {/* Header */}
         <div className="mb-10 grid items-center gap-4 md:grid-cols-[1fr_200px]">
           <div>
-            <h1 className="text-h1 font-bold tracking-tight">William Box</h1>
+            <h1 className="text-h1 tracking-tight">William Box</h1>
             <p className="font-heading text-body-lg text-muted-foreground">Product Designer</p>
           </div>
           <div className="font-mono text-body-xs text-muted-foreground">
@@ -111,7 +111,7 @@ export default function Resume() {
           <div className="flex flex-col gap-10">
             {/* Experience */}
             <section className="flex flex-col gap-6">
-              <h2 className="text-h3 font-semibold tracking-tight">Experience</h2>
+              <h2 className="text-h3 tracking-tight">Experience</h2>
               {EXPERIENCE.map((job) => (
                 <div key={`${job.company}-${job.role}`} className="flex flex-col gap-2">
                   <div>
@@ -136,7 +136,7 @@ export default function Resume() {
 
             {/* Education */}
             <section className="flex flex-col gap-4">
-              <h2 className="text-h3 font-semibold tracking-tight">Education</h2>
+              <h2 className="text-h3 tracking-tight">Education</h2>
               {EDUCATION.map((e) => (
                 <div key={e.institution} className="flex flex-col gap-0.5">
                   <p className="text-body-md font-semibold">{e.institution}</p>
@@ -152,7 +152,7 @@ export default function Resume() {
 
             {/* Certifications */}
             <section className="flex flex-col gap-4">
-              <h2 className="text-h3 font-semibold tracking-tight">Certifications</h2>
+              <h2 className="text-h3 tracking-tight">Certifications</h2>
               {CERTIFICATIONS.map((c) => (
                 <div key={c.institution} className="flex flex-col gap-0.5">
                   <p className="text-body-md font-semibold">{c.institution}</p>
@@ -169,7 +169,7 @@ export default function Resume() {
 
           {/* Right: Skills */}
           <div className="flex flex-col gap-6">
-            <h2 className="text-h3 font-semibold tracking-tight">Skills</h2>
+            <h2 className="text-h3 tracking-tight">Skills</h2>
             {SKILLS.map((s) => (
               <div key={s.category} className="flex flex-col gap-1">
                 <p className="font-mono text-body-xs font-medium uppercase tracking-wide text-foreground">

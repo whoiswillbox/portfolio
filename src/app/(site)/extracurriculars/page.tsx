@@ -17,7 +17,7 @@ export default function Extracurriculars() {
     <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:[@media(display-mode:standalone)]:pt-24 pb-10">
         <div className="flex flex-col gap-3 mb-10">
-          <h1 className="text-h1 font-semibold">Extracurriculars</h1>
+          <h1 className="text-h1">Extracurriculars</h1>
           <p className="text-body-lg text-muted-foreground">Outside of work.</p>
         </div>
         <div className="flex flex-col divide-y divide-border border-y border-border">

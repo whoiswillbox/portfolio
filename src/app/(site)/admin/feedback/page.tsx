@@ -53,7 +53,7 @@ export default function FeedbackPage() {
   return (
     <div className="mx-auto w-full max-w-3xl">
       <AdminTabs />
-      <h1 className="text-h3 font-semibold tracking-tight">Feedback</h1>
+      <h1 className="text-h3 tracking-tight">Feedback</h1>
       <p className="mt-1 text-body-sm text-muted-foreground">
         Thumbs up/down visitors gave AI answers (most recent first).
       </p>

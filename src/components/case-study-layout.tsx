@@ -105,7 +105,7 @@ export function CaseStudyLayout({
       {/* Hero */}
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-3">
-          <h1 className="text-h1 font-bold">{title}</h1>
+          <h1 className="text-display-sm font-display">{title}</h1>
           {summary && <p className="max-w-xl font-sans text-body-lg text-muted-foreground">{summary}</p>}
         </div>
         {headerExtra && <div className="shrink-0">{headerExtra}</div>}
@@ -175,7 +175,7 @@ export function CaseStudyLayout({
 
           {sections.map((s) => (
             <section key={s.heading} className="flex flex-col gap-3">
-              <h2 className="text-h3 font-semibold">{s.heading}</h2>
+              <h2 className="text-h3">{s.heading}</h2>
               {s.paragraphs.map((p, i) => (
                 <p key={i} className="whitespace-pre-line font-sans text-body-md leading-relaxed text-foreground">
                   {p}
@@ -194,7 +194,7 @@ export function CaseStudyLayout({
         <div className="mt-32 flex flex-col gap-32">
           {groups.map((g) => (
             <div key={g.label} className="grid gap-10 @md:grid-cols-[180px_1fr]">
-              <h2 className="text-h3 font-semibold text-foreground @md:sticky @md:top-20 @md:self-start">
+              <h2 className="text-h3 text-foreground @md:sticky @md:top-20 @md:self-start">
                 {g.label}
               </h2>
               <div className={`flex flex-col ${g.compact ? "gap-8" : "gap-20"}`}>

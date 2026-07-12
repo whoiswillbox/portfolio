@@ -53,7 +53,7 @@ export function SettingsList({ isAdmin = false }: { isAdmin?: boolean }) {
       <div className="min-h-0 flex-1 overflow-auto">
         <div className="mx-auto w-full max-w-4xl px-6 pb-10 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36">
           <header className="flex flex-col gap-3 mb-10">
-            <h1 className="text-h1 font-semibold">Settings</h1>
+            <h1 className="text-h1">Settings</h1>
             <p className="text-body-lg text-muted-foreground">
               Preferences and shortcuts.
             </p>

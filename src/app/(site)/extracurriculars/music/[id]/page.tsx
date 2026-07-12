@@ -92,7 +92,7 @@ export default async function PlaylistPage({
             <span className="font-mono text-body-xs uppercase tracking-[0.2em] text-muted-foreground">
               Playlist
             </span>
-            <h1 className="text-h1 font-bold tracking-tight">{meta?.name ?? "Playlist"}</h1>
+            <h1 className="text-h1 tracking-tight">{meta?.name ?? "Playlist"}</h1>
             <span className="text-body-sm text-muted-foreground">
               {meta?.owner?.display_name ? `${meta.owner.display_name} · ` : ""}
               {total} tracks

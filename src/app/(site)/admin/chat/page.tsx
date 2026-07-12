@@ -82,7 +82,7 @@ export default function ChatLogPage() {
   return (
     <div className="mx-auto w-full max-w-3xl">
       <AdminTabs />
-      <h1 className="text-h3 font-semibold tracking-tight">Chat log</h1>
+      <h1 className="text-h3 tracking-tight">Chat log</h1>
       <p className="mt-1 text-body-sm text-muted-foreground">
         What visitors have asked the AI assistant (most recent first).
       </p>
