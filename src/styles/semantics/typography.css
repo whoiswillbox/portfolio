@@ -9,53 +9,85 @@
   --font-sans: var(--font-family-sans);
   --font-mono: var(--font-family-mono);
   --font-heading: var(--font-family-heading);
+  /* Oversized display type — Signifier serif. -> font-display utility. */
+  --font-display: var(--font-family-display);
+  /* Serif reading voice + its display cut (eyebrow / editorial headings).
+     -> font-serif, font-serif-display utilities. */
+  --font-serif: var(--font-family-serif);
+  --font-serif-display: var(--font-family-serif-display);
 }
 
 @theme {
   /* --- Body -> text-body-xs … text-body-lg --------------------------- */
   --text-body-xs: var(--font-size-xs);
   --text-body-xs--line-height: var(--line-height-normal);
+  --text-body-xs--letter-spacing: var(--letter-spacing-normal);
   --text-body-sm: var(--font-size-sm);
   --text-body-sm--line-height: var(--line-height-normal);
+  --text-body-sm--letter-spacing: var(--letter-spacing-normal);
   --text-body-md: var(--font-size-base);
   --text-body-md--line-height: var(--line-height-relaxed);
+  --text-body-md--letter-spacing: var(--letter-spacing-normal);
   --text-body-lg: var(--font-size-lg);
   --text-body-lg--line-height: var(--line-height-loose);
+  --text-body-lg--letter-spacing: var(--letter-spacing-normal);
 
   /* --- Headings -> text-h1 … text-h6 --------------------------------- */
+  /* h1–h4 are FLUID (clamp): min = mobile size, max = the desktop size (= the
+     old fixed --font-size rung), so they shrink smoothly on phones and are
+     unchanged on desktop. h5/h6 stay fixed — already mobile-appropriate. */
   --text-h6: var(--font-size-base);
   --text-h6--line-height: var(--line-height-normal);
-  --text-h6--font-weight: var(--font-weight-semibold);
+  --text-h6--letter-spacing: var(--letter-spacing-normal);
+  --text-h6--font-weight: var(--font-weight-medium);
   --text-h5: var(--font-size-lg);
   --text-h5--line-height: var(--line-height-normal);
-  --text-h5--font-weight: var(--font-weight-semibold);
-  --text-h4: var(--font-size-xl);
+  --text-h5--letter-spacing: var(--letter-spacing-normal);
+  --text-h5--font-weight: var(--font-weight-medium);
+  --text-h4: clamp(1.125rem, 2vw, 1.25rem);   /* 18 → 20px */
   --text-h4--line-height: var(--line-height-snug);
-  --text-h4--font-weight: var(--font-weight-semibold);
-  --text-h3: var(--font-size-2xl);
+  --text-h4--letter-spacing: var(--letter-spacing-normal);
+  --text-h4--font-weight: var(--font-weight-medium);
+  --text-h3: clamp(1.25rem, 2.5vw, 1.5rem);    /* 20 → 24px */
   --text-h3--line-height: var(--line-height-snug);
-  --text-h3--letter-spacing: 0.01em;
-  --text-h3--font-weight: var(--font-weight-semibold);
-  --text-h2: var(--font-size-3xl);
+  --text-h3--letter-spacing: var(--letter-spacing-normal);
+  --text-h3--font-weight: var(--font-weight-medium);
+  --text-h2: clamp(1.5rem, 3.5vw, 1.875rem);   /* 24 → 30px */
   --text-h2--line-height: var(--line-height-snug);
-  --text-h2--letter-spacing: 0.01em;
-  --text-h2--font-weight: var(--font-weight-semibold);
-  --text-h1: var(--font-size-4xl);
+  --text-h2--letter-spacing: var(--letter-spacing-normal);
+  --text-h2--font-weight: var(--font-weight-medium);
+  --text-h1: clamp(1.75rem, 4vw, 2.25rem);     /* 28 → 36px */
   --text-h1--line-height: var(--line-height-tight);
-  --text-h1--letter-spacing: 0.01em;
-  --text-h1--font-weight: var(--font-weight-bold);
+  --text-h1--letter-spacing: var(--letter-spacing-normal);
+  --text-h1--font-weight: var(--font-weight-medium);
 
   /* --- Display -> text-display-sm / text-display / text-display-lg ---- */
   --text-display-sm: var(--font-size-5xl);
   --text-display-sm--line-height: var(--line-height-tight);
-  --text-display-sm--letter-spacing: -0.01em;
-  --text-display-sm--font-weight: var(--font-weight-semibold);
-  --text-display: var(--font-size-6xl);
-  --text-display--line-height: var(--line-height-none);
-  --text-display--letter-spacing: -0.025em;
-  --text-display--font-weight: var(--font-weight-semibold);
-  --text-display-lg: var(--font-size-7xl);
-  --text-display-lg--line-height: var(--line-height-none);
-  --text-display-lg--letter-spacing: -0.03em;
-  --text-display-lg--font-weight: var(--font-weight-bold);
+  --text-display-sm--letter-spacing: var(--letter-spacing-snug);
+  --text-display-sm--font-weight: var(--font-weight-regular);
+  /* Fluid: 40px (mobile) → 72px (wide), ~56px at typical widths. Like display-lg
+     it scales with the viewport rather than mapping to a fixed --font-size rung,
+     so every text-display use (both hero pages) stays responsive from one knob. */
+  --text-display: clamp(2.5rem, 5.5vw, 4.5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: var(--letter-spacing-tight);
+  --text-display--font-weight: var(--font-weight-regular);
+  /* Fluid hero: scales with the viewport (48px → 112px) so the splash grows on
+     wide screens and stays readable on narrow ones. The landing + unlock heroes
+     consume this token, so tuning it here updates both. (Fluid, so it doesn't
+     map to a fixed --font-size rung.) */
+  --text-display-lg: clamp(3rem, 7vw, 7rem);
+  --text-display-lg--line-height: 1.05;
+  --text-display-lg--letter-spacing: var(--letter-spacing-tighter);
+  --text-display-lg--font-weight: var(--font-weight-regular);
+
+  /* --- Eyebrow -> text-eyebrow --------------------------------------- */
+  /* The kicker/label above a heading (e.g. "CASE STUDY —"). Small, wide-tracked,
+     tight leading. Pair with `uppercase` + a serif/display family in markup —
+     text-transform can't live on a text-* token. */
+  --text-eyebrow: var(--font-size-sm);
+  --text-eyebrow--line-height: var(--line-height-none);
+  --text-eyebrow--letter-spacing: var(--letter-spacing-wider);
+  --text-eyebrow--font-weight: var(--font-weight-medium);
 }

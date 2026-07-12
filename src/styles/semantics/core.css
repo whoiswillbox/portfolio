@@ -15,7 +15,10 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
+  /* NOTE: the shadcn surface `secondary` utility (bg-secondary) is unused — our
+     forked components use `surface-secondary` instead — so --color-secondary is
+     now repurposed as a TEXT prominence step (see the text ramp below). The raw
+     --secondary / --secondary-foreground vars remain for shadcn theme parity. */
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
@@ -66,11 +69,14 @@
   --color-fill-solid-hover: var(--p-fill-solid-hover);
   --color-on-solid: var(--p-text-on-solid);
 
-  /* Foreground text — by prominence. The default is `text-foreground`
-     (--color-foreground, defined above with the shadcn roles). These are the
-     clean bare variants: text-subtle, text-disabled, text-link, text-brand, …
-     (no `secondary` — `subtle` covers the mid-tone; avoids the bg collision). */
-  --color-subtle: var(--p-text-subtle);
+  /* Foreground text — a prominence scale. The default is `text-foreground`
+     (--color-foreground, defined above), then a descending ramp:
+     text-secondary → text-tertiary → text-quaternary. (The shadcn surface
+     `secondary` color has moved to --color-surface-secondary, so `secondary`
+     here is the text prominence step, not a bg.) */
+  --color-secondary: var(--p-text-secondary);
+  --color-tertiary: var(--p-text-tertiary);
+  --color-quaternary: var(--p-text-quaternary);
   --color-disabled: var(--p-text-disabled);
   --color-on-inverse: var(--p-text-on-inverse);
   --color-brand: var(--p-text-brand);
@@ -82,7 +88,7 @@
   /* Icon colors — utility form: text-icon, text-icon-info, … */
   --color-icon: var(--p-text);
   --color-icon-secondary: var(--p-text-secondary);
-  --color-icon-subtle: var(--p-text-subtle);
+  --color-icon-subtle: var(--p-text-tertiary);
   --color-icon-brand: var(--accent-brand);
   --color-icon-info: var(--accent-info);
   --color-icon-success: var(--accent-success);
@@ -118,7 +124,7 @@
   --secondary: var(--p-bg-surface-secondary);
   --secondary-foreground: var(--p-text);
   --muted: var(--p-bg-surface-secondary);
-  --muted-foreground: var(--p-text-subtle);
+  --muted-foreground: var(--p-text-tertiary);
   --accent: var(--p-bg-surface-secondary);
   --accent-foreground: var(--p-text);
   --destructive: var(--red-500);
@@ -158,10 +164,12 @@
   --p-bg-surface-tertiary-hover: var(--neutral-300);
   --p-bg-surface-tertiary-active: var(--neutral-400);
 
-  /* Text — light. */
+  /* Text — light. Prominence ramp: text → secondary → tertiary → quaternary. */
   --p-text: var(--neutral-950);
   --p-text-secondary: var(--neutral-700);
-  --p-text-subtle: var(--neutral-500);
+  --p-text-tertiary: var(--neutral-500);
+  --p-text-quaternary: var(--neutral-400);
+  --p-text-tertiary: var(--neutral-500); /* legacy alias → tertiary; retire after rename */
   --p-text-disabled: var(--neutral-400);
   --p-text-on-inverse: var(--neutral-50);
   --p-text-brand: var(--brand-700);
@@ -202,7 +210,7 @@
   --secondary: var(--p-bg-surface-secondary);
   --secondary-foreground: var(--p-text);
   --muted: var(--p-bg-surface-secondary);
-  --muted-foreground: var(--p-text-subtle);
+  --muted-foreground: var(--p-text-tertiary);
   --accent: var(--p-bg-surface-secondary);
   --accent-foreground: var(--p-text);
   --destructive: var(--red-400);
@@ -244,10 +252,12 @@
   --p-bg-surface-tertiary-hover: var(--neutral-600);
   --p-bg-surface-tertiary-active: var(--neutral-500);
 
-  /* Text — dark. */
+  /* Text — dark. Prominence ramp: text → secondary → tertiary → quaternary. */
   --p-text: var(--neutral-50);
   --p-text-secondary: var(--neutral-300);
-  --p-text-subtle: var(--neutral-400);
+  --p-text-tertiary: var(--neutral-400);
+  --p-text-quaternary: var(--neutral-500);
+  --p-text-tertiary: var(--neutral-400); /* legacy alias → tertiary; retire after rename */
   --p-text-disabled: var(--neutral-600);
   --p-text-on-inverse: var(--neutral-950);
   --p-text-brand: var(--brand-300);
