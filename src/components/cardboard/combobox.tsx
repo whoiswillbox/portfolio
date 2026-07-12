@@ -31,7 +31,7 @@ function ComboboxTrigger({
       {...props}
     >
       {children}
-      <ChevronDownIcon className="pointer-events-none size-4 text-subtle" />
+      <ChevronDownIcon className="pointer-events-none size-4 text-tertiary" />
     </ComboboxPrimitive.Trigger>
   )
 }
@@ -176,7 +176,7 @@ function ComboboxLabel({
   return (
     <ComboboxPrimitive.GroupLabel
       data-slot="combobox-label"
-      className={cn("px-2 py-1.5 text-xs text-subtle", className)}
+      className={cn("px-2 py-1.5 text-xs text-tertiary", className)}
       {...props}
     />
   )
@@ -193,7 +193,7 @@ function ComboboxEmpty({ className, ...props }: ComboboxPrimitive.Empty.Props) {
     <ComboboxPrimitive.Empty
       data-slot="combobox-empty"
       className={cn(
-        "hidden w-full justify-center py-2 text-center text-sm text-subtle group-data-empty/combobox-content:flex",
+        "hidden w-full justify-center py-2 text-center text-sm text-tertiary group-data-empty/combobox-content:flex",
         className
       )}
       {...props}

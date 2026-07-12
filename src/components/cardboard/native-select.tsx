@@ -28,11 +28,11 @@ function NativeSelect({
       <select
         data-slot="native-select"
         data-size={size}
-        className="h-8 w-full min-w-0 appearance-none rounded-lg border border-border bg-transparent py-1 pr-8 pl-2.5 text-sm transition-colors outline-none select-none selection:bg-fill-solid selection:text-on-solid placeholder:text-subtle focus-visible:border-border-focus focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:pointer-events-none disabled:cursor-not-allowed aria-invalid:border-critical aria-invalid:ring-3 aria-invalid:ring-critical/20 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] data-[size=sm]:py-0.5"
+        className="h-8 w-full min-w-0 appearance-none rounded-lg border border-border bg-transparent py-1 pr-8 pl-2.5 text-sm transition-colors outline-none select-none selection:bg-fill-solid selection:text-on-solid placeholder:text-tertiary focus-visible:border-border-focus focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:pointer-events-none disabled:cursor-not-allowed aria-invalid:border-critical aria-invalid:ring-3 aria-invalid:ring-critical/20 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] data-[size=sm]:py-0.5"
         {...props}
       />
       <ChevronDownIcon
-        className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-subtle select-none"
+        className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-tertiary select-none"
         aria-hidden="true"
         data-slot="native-select-icon"
       />

@@ -75,7 +75,7 @@ function PopoverDescription({
   return (
     <p
       data-slot="popover-description"
-      className={cn("text-subtle", className)}
+      className={cn("text-tertiary", className)}
       {...props}
     />
   )

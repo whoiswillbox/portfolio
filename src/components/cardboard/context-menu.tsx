@@ -209,7 +209,7 @@ function ContextMenuLabel({
       data-slot="context-menu-label"
       data-inset={inset}
       className={cn(
-        "px-1.5 py-1 text-xs font-medium text-subtle data-inset:pl-7",
+        "px-1.5 py-1 text-xs font-medium text-tertiary data-inset:pl-7",
         className
       )}
       {...props}
@@ -238,7 +238,7 @@ function ContextMenuShortcut({
     <span
       data-slot="context-menu-shortcut"
       className={cn(
-        "ml-auto text-xs tracking-widest text-subtle group-focus/context-menu-item:text-foreground",
+        "ml-auto text-xs tracking-widest text-tertiary group-focus/context-menu-item:text-foreground",
         className
       )}
       {...props}

@@ -37,6 +37,30 @@ We are migrating off lucide-react incrementally, not all at once:
 
 ## Log
 
+### `select.tsx` — spacing rewired to the `--space-*` scale
+**Date:** 2026-07-10
+**Why:** The forked Select used raw Tailwind spacing utilities (`p-2`, `pl-2.5`,
+`gap-1.5`…) rather than the design system's `--space-*` primitive scale, so the
+Select doc page's token reference couldn't show real tokens. First forked
+component to consume `--space-*` directly (per the deferred-spacing plan: add
+the consumer at fork time).
+**What:** Rewired all padding/gap/margin to `--space-*` via Tailwind v4's
+`p-(--space-200)` var syntax across trigger, group, item, label, separator, and
+scroll buttons. `pl-2.5` (10px, off-scale) snapped to `--space-200` (8px, a 2px
+tighter left pad). Heights (`h-7`/`h-8`) intentionally left as raw utilities
+(sizing, not spacing; 28px has no token). Mapping: 4px `--space-100`, 6px
+`--space-150`, 8px `--space-200`, 32px `--space-800`.
+**Trigger sizing is now padding-driven** (deliberate model choice): removed the
+fixed heights (`h-8`/`h-7`) so the trigger's height falls out of `py` +
+text line-height — changing the padding resizes the control. Size variants differ
+by `py`: default `--space-200` (8px), sm `--space-150` (6px); `px-(--space-300)`
+(12px) constant. (Padding bumped up one step on the ramp 2026-07-10 — was py
+`--space-150`/`--space-100`, px `--space-200`.) Trade-off vs. the fixed-height model (shadcn default): padding is the
+single knob, but row-alignment with other controls now depends on keeping their
+padding consistent rather than a shared fixed height. When other controls
+(Button, Input) are forked, tokenize their vertical size the same way so they
+stay aligned.
+
 ### `select.tsx` — default to `position="popper"` (drop below the trigger)
 **Date:** 2026-07-10
 **Why:** shadcn's Select defaults `SelectContent` to `position="item-aligned"`,

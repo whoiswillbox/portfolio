@@ -18,9 +18,9 @@ const badgeVariants = cva(
         destructive:
           "bg-surface-critical text-critical focus-visible:ring-critical/20 [a]:hover:bg-surface-critical-hover",
         outline:
-          "border-border text-foreground [a]:hover:bg-surface-secondary [a]:hover:text-subtle",
+          "border-border text-foreground [a]:hover:bg-surface-secondary [a]:hover:text-tertiary",
         ghost:
-          "hover:bg-surface-secondary hover:text-subtle",
+          "hover:bg-surface-secondary hover:text-tertiary",
         warning:
           "bg-surface-caution text-caution font-mono uppercase tracking-wide font-semibold",
         link: "text-link underline-offset-4 hover:underline",

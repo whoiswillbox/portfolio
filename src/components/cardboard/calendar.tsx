@@ -88,14 +88,14 @@ function Calendar({
           "font-medium select-none",
           captionLayout === "label"
             ? "text-sm"
-            : "flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-subtle",
+            : "flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-tertiary",
           defaultClassNames.caption_label
         ),
         // v10: `month_grid` is the grid <table> key (renamed from `table`). Preserved.
         month_grid: "w-full border-collapse",
         weekdays: cn("flex", defaultClassNames.weekdays),
         weekday: cn(
-          "flex-1 rounded-(--cell-radius) text-[0.8rem] font-normal text-subtle select-none",
+          "flex-1 rounded-(--cell-radius) text-[0.8rem] font-normal text-tertiary select-none",
           defaultClassNames.weekday
         ),
         week: cn("mt-2 flex w-full", defaultClassNames.week),
@@ -104,7 +104,7 @@ function Calendar({
           defaultClassNames.week_number_header
         ),
         week_number: cn(
-          "text-[0.8rem] text-subtle select-none",
+          "text-[0.8rem] text-tertiary select-none",
           defaultClassNames.week_number
         ),
         day: cn(
@@ -128,11 +128,11 @@ function Calendar({
           defaultClassNames.today
         ),
         outside: cn(
-          "text-subtle aria-selected:text-subtle",
+          "text-tertiary aria-selected:text-tertiary",
           defaultClassNames.outside
         ),
         disabled: cn(
-          "text-subtle opacity-50",
+          "text-tertiary opacity-50",
           defaultClassNames.disabled
         ),
         hidden: cn("invisible", defaultClassNames.hidden),

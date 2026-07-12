@@ -81,8 +81,8 @@ function AccordionTrigger({
         {variant === "default" ? (
           <>
             {children}
-            <ChevronDownIcon className="pointer-events-none ml-auto size-4 shrink-0 text-subtle group-aria-expanded/accordion-trigger:hidden" />
-            <ChevronUpIcon className="pointer-events-none ml-auto hidden size-4 shrink-0 text-subtle group-aria-expanded/accordion-trigger:inline" />
+            <ChevronDownIcon className="pointer-events-none ml-auto size-4 shrink-0 text-tertiary group-aria-expanded/accordion-trigger:hidden" />
+            <ChevronUpIcon className="pointer-events-none ml-auto hidden size-4 shrink-0 text-tertiary group-aria-expanded/accordion-trigger:inline" />
           </>
         ) : (
           <>
