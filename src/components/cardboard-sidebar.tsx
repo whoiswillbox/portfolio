@@ -119,6 +119,7 @@ const components: Entry[] = [
   leaf("Radio Group", "radio-group"),
   leaf("Resizable", "resizable"),
   leaf("Scroll Area", "scroll-area"),
+  leaf("Segmented Control", "segmented-control"),
   {
     title: "Select",
     children: [
@@ -148,7 +149,7 @@ export function CardboardSidebar() {
   return (
     <Sidebar
       variant="floating"
-      className="max-sm:hidden sm:top-14 sm:!h-[calc(100svh-3.5rem)] [&_[data-slot=sidebar-container]]:!p-0 [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-inner]]:!rounded-none [&_[data-slot=sidebar-inner]]:border-r [&_[data-slot=sidebar-inner]]:border-border [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
+      className="max-sm:hidden !p-0 sm:!inset-y-auto sm:!top-14 sm:!bottom-0 sm:!h-auto [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-inner]]:!rounded-none [&_[data-slot=sidebar-inner]]:border-r [&_[data-slot=sidebar-inner]]:border-border [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
     >
       <SidebarHeader>
         <div className="flex items-center justify-end">
@@ -255,8 +256,12 @@ export function CardboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarSeparator className="mx-0 mb-2 bg-border/50" />
+      {/* Footer's own p-2 holds the divider off the panel edge. Kill the
+          horizontal padding so the full-bleed separator reaches both edges (the
+          Settings button re-adds its own inset via the menu button padding). */}
+      <SidebarFooter className="px-0">
+        <SidebarSeparator className="mx-0 w-full mb-2 bg-border" />
+        <div className="px-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={pathname === "/settings"}>
@@ -267,6 +272,7 @@ export function CardboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        </div>
       </SidebarFooter>
     </Sidebar>
   )
