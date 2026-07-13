@@ -1,6 +1,10 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, SunIcon, MoonIcon, CheckIcon, ClipboardIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
+import { cn } from "@/lib/utils";
 
 /* Shared scaffold for the per-component reference pages — keeps the back link,
    header, and spacing identical across every component doc. */
@@ -33,6 +37,46 @@ export function ComponentPage({
   );
 }
 
+// The rendered preview surface with a per-card light/dark toggle (scoped `.dark`
+// class) so you can check the component in both themes without flipping the
+// whole site. Shared by Demo and Variants.
+// A subtle checkerboard (transparency grid) behind the preview so component
+// edges and any transparency read clearly. The tint is driven from the `dark`
+// state directly (not the `dark:` variant — our variant is `.dark *`, which
+// wouldn't match the element that carries .dark itself): faint black in light,
+// brighter white in dark, since 2% white is invisible on the dark surface.
+const checkerStyle = (dark: boolean): React.CSSProperties => {
+  const tint = dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
+  return {
+    backgroundImage: `conic-gradient(${tint} 25%, transparent 0 50%, ${tint} 0 75%, transparent 0)`,
+    backgroundSize: "20px 20px",
+  };
+};
+
+function PreviewSurface({ children }: { children: React.ReactNode }) {
+  const [dark, setDark] = React.useState(false);
+  return (
+    <div
+      style={checkerStyle(dark)}
+      className={cn(
+        "relative flex min-h-64 flex-wrap items-center justify-center gap-3 rounded-xl border border-border bg-background p-6",
+        dark && "dark"
+      )}
+    >
+      <button
+        type="button"
+        onClick={() => setDark((d) => !d)}
+        aria-label={dark ? "Preview in light mode" : "Preview in dark mode"}
+        title={dark ? "Light" : "Dark"}
+        className="absolute right-3 top-3 z-10 flex size-7 items-center justify-center rounded-md text-tertiary transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+      >
+        {dark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+      </button>
+      {children}
+    </div>
+  );
+}
+
 // A titled demo block: a heading + optional caption, then a rendered preview
 // surface holding the live component(s).
 export function Demo({
@@ -50,9 +94,201 @@ export function Demo({
         <h2 className="text-h3">{title}</h2>
         {caption && <p className="text-body-sm text-muted-foreground">{caption}</p>}
       </div>
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-background p-6">
-        {children}
+      <PreviewSurface>{children}</PreviewSurface>
+    </section>
+  );
+}
+
+export type Variant = {
+  /** Chip label. */
+  label: string;
+  /** Optional note shown under the preview for this variant. */
+  caption?: string;
+  /** The live component for this variant. */
+  preview: React.ReactNode;
+  /** Optional usage snippet (tsx) shown below the preview. */
+  code?: string;
+  /** Optional "Styles" tab: the component's source className strings, showing
+      how Cardboard tokens (--space-*, bg-surface, --radius-*, …) style it. */
+  styles?: string;
+};
+
+// Lightweight JSX/TS syntax highlighter → colored spans. Not a full parser: it
+// tokenizes in priority order (strings, comments, JSX tags/attrs, keywords,
+// numbers) so the doc snippets read like code without a highlighting library
+// (which the artifact CSP / self-contained build can't load anyway).
+const CODE_KEYWORDS =
+  /\b(const|let|var|function|return|import|from|export|if|else|for|while|new|await|async|true|false|null|undefined|typeof)\b/;
+
+function highlightCode(code: string): React.ReactNode[] {
+  // Ordered token patterns; first match wins at each position.
+  const patterns: { type: string; re: RegExp }[] = [
+    { type: "comment", re: /^\/\/[^\n]*/ },
+    { type: "string", re: /^"[^"]*"|^'[^']*'|^`[^`]*`/ },
+    { type: "tag", re: /^<\/?[A-Za-z][\w.]*|^\/?>/ },
+    { type: "keyword", re: new RegExp(`^${CODE_KEYWORDS.source}`) },
+    { type: "attr", re: /^[A-Za-z_][\w-]*(?==)/ },
+    { type: "number", re: /^\b\d+\b/ },
+    { type: "punct", re: /^[{}()[\];,=>]+/ },
+    { type: "ws", re: /^\s+/ },
+    { type: "text", re: /^[^\s<>"'`{}()[\];,=]+/ },
+  ];
+  // GitHub-light palette (works on a white surface). In dark mode the block's
+  // .dark scope swaps these to the light-on-dark set via CSS vars below.
+  const color: Record<string, string> = {
+    comment: "italic text-[var(--sx-comment)]",
+    string: "text-[var(--sx-string)]",
+    tag: "text-[var(--sx-tag)]",
+    keyword: "text-[var(--sx-keyword)]",
+    attr: "text-[var(--sx-attr)]",
+    number: "text-[var(--sx-number)]",
+    punct: "text-[var(--sx-text)]",
+    text: "text-[var(--sx-text)]",
+    ws: "",
+  };
+  const out: React.ReactNode[] = [];
+  let rest = code;
+  let key = 0;
+  while (rest.length) {
+    let matched = false;
+    for (const { type, re } of patterns) {
+      const m = re.exec(rest);
+      if (m && m[0].length) {
+        const text = m[0];
+        out.push(
+          type === "ws" ? (
+            text
+          ) : (
+            <span key={key++} className={color[type]}>
+              {text}
+            </span>
+          )
+        );
+        rest = rest.slice(text.length);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      out.push(rest[0]);
+      rest = rest.slice(1);
+    }
+  }
+  return out;
+}
+
+const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
+
+// GitHub-light syntax palette (works on a white surface), with light-on-dark
+// overrides scoped under .dark so the block matches the page theme.
+const SYNTAX_VARS =
+  "[--sx-comment:#6e7781] [--sx-string:#0a3069] [--sx-tag:#116329] [--sx-keyword:#cf222e] [--sx-attr:#0550ae] [--sx-number:#0550ae] [--sx-text:#1f2328] " +
+  "dark:[--sx-comment:#8b949e] dark:[--sx-string:#a5d6ff] dark:[--sx-tag:#7ee787] dark:[--sx-keyword:#ff7b72] dark:[--sx-attr:#79c0ff] dark:[--sx-number:#79c0ff] dark:[--sx-text:#c9d1d9]";
+
+export type CodeTab = { lang: string; code: string };
+
+// A read-only code snippet: theme-aware surface (white in light, dark in dark),
+// a header bar with a tab per language + copy button, and syntax highlighting.
+// Pass multiple tabs to switch between e.g. usage ("tsx") and the component's
+// source styles ("styles").
+function CodeBlock({ tabs }: { tabs: CodeTab[] }) {
+  const [active, setActive] = React.useState(0);
+  const [copied, setCopied] = React.useState(false);
+  // Clamp: switching variant chips can shrink `tabs` while this block persists
+  // (React reuses it), so a stale `active` could index past the array.
+  const idx = Math.min(active, tabs.length - 1);
+  const current = tabs[idx];
+  if (!current) return null;
+  const copy = () => {
+    navigator.clipboard?.writeText(current.code).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <div className={cn("overflow-hidden rounded-xl border border-border bg-surface", SYNTAX_VARS)}>
+      {/* Header bar: language tabs + copy */}
+      <div className="flex items-center justify-between border-b border-border pr-2">
+        <div className="flex">
+          {tabs.map((t, i) => (
+            <button
+              key={t.lang}
+              type="button"
+              onClick={() => { setActive(i); setCopied(false); }}
+              style={{ fontFamily: MONO }}
+              className={cn(
+                "border-b-2 px-3 py-1.5 text-body-xs font-medium transition-colors -mb-px",
+                i === idx
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-tertiary hover:text-foreground"
+              )}
+            >
+              {t.lang}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={copy}
+          aria-label="Copy code"
+          className="flex size-6 items-center justify-center rounded-md text-tertiary transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+        >
+          {copied ? (
+            <CheckIcon className="size-4 text-success" />
+          ) : (
+            <ClipboardIcon className="size-4" />
+          )}
+        </button>
       </div>
+      {/* Native mono stack on <code> — font-mono now maps to Signifier
+          (proportional) since Geist Mono was removed; and it must live on the
+          <code> because Tailwind preflight resets code/pre font-family. */}
+      <pre className="overflow-x-auto p-4 text-body-xs leading-relaxed">
+        <code style={{ fontFamily: MONO }}>{highlightCode(current.code)}</code>
+      </pre>
+    </div>
+  );
+}
+
+// A filterable chip row (Polaris-style) that switches the shown variant: one
+// chip active at a time, and the preview surface below renders only that
+// variant's demo + caption.
+export function Variants({ variants }: { variants: Variant[] }) {
+  const [active, setActive] = React.useState(0);
+  const current = variants[active];
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      {/* Chip row */}
+      <div className="flex flex-wrap gap-2">
+        {variants.map((v, i) => (
+          <button
+            key={v.label}
+            type="button"
+            onClick={() => setActive(i)}
+            aria-pressed={i === active}
+            className={cn(
+              "rounded-lg border px-3 py-1.5 text-body-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus",
+              i === active
+                ? "border-foreground bg-surface text-foreground"
+                : "border-border text-tertiary hover:border-border-hover hover:text-foreground"
+            )}
+          >
+            {v.label}
+          </button>
+        ))}
+      </div>
+      {current?.caption && (
+        <p className="text-body-sm text-muted-foreground">{current.caption}</p>
+      )}
+      <PreviewSurface>{current?.preview}</PreviewSurface>
+      {current?.code && (
+        <CodeBlock
+          tabs={[
+            { lang: "tsx", code: current.code },
+            ...(current.styles ? [{ lang: "styles", code: current.styles }] : []),
+          ]}
+        />
+      )}
     </section>
   );
 }

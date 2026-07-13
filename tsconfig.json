@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@cardboard": ["./src/components/cardboard/index.ts"]
     }
   },
   "include": [
