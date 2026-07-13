@@ -309,14 +309,24 @@ export default function SegmentedControlDocs() {
                 "No extra dependencies or providers required.",
               ]}
             />
-            <Variants variants={VARIANTS} />
+            <Variants variants={VARIANTS} preview={false} />
             <PropsTable
-              rows={[
-                { name: "value", type: "string", desc: "The selected item's value (controlled)." },
-                { name: "onValueChange", type: "(value: string) => void", desc: "Fires when the selection changes." },
-                { name: "size", type: '"default" | "sm"', default: '"default"', desc: "Control size." },
-                { name: "SegmentedControlItem · value", type: "string", desc: "Unique value identifying the segment." },
-                { name: "SegmentedControlItem · disabled", type: "boolean", default: "false", desc: "Disable an individual segment." },
+              groups={[
+                {
+                  interfaceName: "SegmentedControlProps",
+                  rows: [
+                    { name: "value", type: "string", desc: "The selected item's value (controlled)." },
+                    { name: "onValueChange", type: "(value: string) => void", desc: "Fires when the selection changes." },
+                    { name: "size?", type: '"default" | "sm"', default: '"default"', desc: "Control size." },
+                  ],
+                },
+                {
+                  interfaceName: "SegmentedControlItemProps",
+                  rows: [
+                    { name: "value", type: "string", desc: "Unique value identifying the segment." },
+                    { name: "disabled?", type: "boolean", default: "false", desc: "Disable an individual segment." },
+                  ],
+                },
               ]}
             />
             <Accessibility
@@ -326,10 +336,24 @@ export default function SegmentedControlDocs() {
                 { keys: ["↑", "↓"], does: "Same as ← / → (selection follows focus)." },
                 { keys: ["Home", "End"], does: "Selects the first / last segment." },
               ]}
+              aria={[
+                { attr: 'role="tablist"', on: "Track", purpose: "Groups the segments as a single-select set." },
+                { attr: 'role="tab"', on: "Each segment", purpose: "Identifies a selectable option." },
+                { attr: "aria-selected", on: "Each segment", purpose: 'Set to "true" on the active segment.' },
+                { attr: "tabindex", on: "Each segment", purpose: "Roving: 0 on the active segment, -1 on the rest." },
+              ]}
+              labeling={[
+                "The control has no built-in label — wrap it with a visible label or pass aria-label / aria-labelledby to name the group.",
+                "Each segment is labeled by its own text content, so keep labels meaningful (avoid icon-only segments without an aria-label).",
+              ]}
+              screenReader={[
+                'Each segment announces as a tab with its position and state, e.g. "Item, tab, 2 of 3, selected".',
+                "Because selection follows focus, arrowing to a segment both moves focus and announces the new selection.",
+                "Disabled segments are skipped by arrow navigation and not announced as focusable.",
+              ]}
+              reducedMotion="The only animation is a short color fade (transition-colors) on selection — no motion or position change — so it's safe for users with prefers-reduced-motion."
               notes={[
-                "Rendered as role=\"tablist\" with role=\"tab\" segments; the active segment sets aria-selected.",
                 "Roving tabindex — only the selected segment is tabbable, so the group is one Tab stop and arrows move within it.",
-                "Disabled segments are skipped by arrow navigation and not selectable.",
                 "Focus shows a visible ring (focus-visible:ring-2 ring-border-focus).",
               ]}
             />

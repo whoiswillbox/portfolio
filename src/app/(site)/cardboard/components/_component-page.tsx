@@ -430,10 +430,14 @@ function CodeBlock({ tabs }: { tabs: CodeTab[] }) {
 export function Variants({
   variants,
   showCode = true,
+  preview = true,
 }: {
   variants: Variant[];
   /** Show the code block below the preview (Dev tab). Design tab passes false. */
   showCode?: boolean;
+  /** Show the rendered preview surface. Dev tab passes false so the variant is
+      shown as code only — the live preview lives once, on the Design tab. */
+  preview?: boolean;
 }) {
   const [active, setActive] = React.useState(0);
   const current = variants[active];
@@ -461,7 +465,7 @@ export function Variants({
       {current?.caption && (
         <p className="text-body-sm text-muted-foreground">{current.caption}</p>
       )}
-      <PreviewSurface>{current?.preview}</PreviewSurface>
+      {preview && <PreviewSurface>{current?.preview}</PreviewSurface>}
       {showCode && current?.code && (
         <CodeBlock
           tabs={[
@@ -474,34 +478,98 @@ export function Variants({
   );
 }
 
-// A props/API reference table for the Dev tab.
-export type PropRow = { name: string; type: string; default?: string; desc: string };
-export function PropsTable({ rows }: { rows: PropRow[] }) {
+// A props/API reference for the Dev tab — Polaris-style: an `interface` header,
+// then one stacked row per prop with a syntax-colored name + type, description,
+// and optional default / deprecated hints. A trailing `?` on the name marks the
+// prop optional (rendered in the accent color, like TS).
+export type PropRow = {
+  /** Prop name; a trailing "?" marks it optional (e.g. "size?"). */
+  name: string;
+  type: string;
+  default?: string;
+  desc: string;
+  /** If set, shows a "Deprecated" pill with this reason. */
+  deprecated?: string;
+};
+export type PropGroup = { interfaceName?: string; rows: PropRow[] };
+
+// One `interface` card: an optional header + a stacked, syntax-colored row list.
+function PropInterface({ interfaceName, rows }: PropGroup) {
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl border border-border bg-surface",
+        SYNTAX_VARS
+      )}
+    >
+      {interfaceName && (
+        <div
+          className="border-b border-border px-4 py-2.5 text-body-xs"
+          style={{ fontFamily: MONO }}
+        >
+          <span className="text-[var(--sx-keyword)]">interface</span>{" "}
+          <span className="text-[var(--sx-tag)]">{interfaceName}</span>
+        </div>
+      )}
+      <div className="divide-y divide-border">
+        {rows.map((r) => {
+          const optional = r.name.endsWith("?");
+          const base = optional ? r.name.slice(0, -1) : r.name;
+          return (
+            <div key={r.name} className="flex flex-col gap-1 px-4 py-3">
+              <div className="text-body-sm" style={{ fontFamily: MONO }}>
+                <span className="font-medium text-foreground">{base}</span>
+                {optional && <span className="text-[var(--sx-attr)]">?</span>}
+                <span className="text-muted-foreground">: </span>
+                {highlightCode(r.type, "tsx")}
+              </div>
+              <p className="text-body-sm text-muted-foreground">{r.desc}</p>
+              {r.default !== undefined && (
+                <p className="text-body-xs text-tertiary">
+                  Defaults to{" "}
+                  <span style={{ fontFamily: MONO }} className="text-[var(--sx-string)]">
+                    {r.default}
+                  </span>
+                  .
+                </p>
+              )}
+              {r.deprecated && (
+                <p className="mt-0.5 flex items-center gap-1.5 text-body-xs text-muted-foreground">
+                  <span className="rounded-md bg-surface-caution px-1.5 py-0.5 font-medium text-icon-caution">
+                    Deprecated
+                  </span>
+                  {r.deprecated}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// The Props section. Pass `rows` (+ optional `interfaceName`) for a single
+// interface, or `groups` to stack several interface cards under one "Props"
+// heading (e.g. a component and its item subcomponent).
+export function PropsTable({
+  rows,
+  interfaceName,
+  groups,
+}: {
+  rows?: PropRow[];
+  /** Header shown as `interface <name>` (e.g. "SegmentedControlProps"). */
+  interfaceName?: string;
+  /** Multiple interface cards under one heading. Takes precedence over `rows`. */
+  groups?: PropGroup[];
+}) {
+  const list: PropGroup[] = groups ?? (rows ? [{ interfaceName, rows }] : []);
   return (
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">Props</h2>
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full min-w-[32rem] text-left text-body-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
-              <th className="px-4 py-2 font-normal">Prop</th>
-              <th className="px-4 py-2 font-normal">Type</th>
-              <th className="px-4 py-2 font-normal">Default</th>
-              <th className="px-4 py-2 font-normal">Description</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {rows.map((r) => (
-              <tr key={r.name}>
-                <td className="px-4 py-2 text-body-xs text-foreground" style={{ fontFamily: MONO }}>{r.name}</td>
-                <td className="px-4 py-2 text-body-xs text-muted-foreground" style={{ fontFamily: MONO }}>{r.type}</td>
-                <td className="px-4 py-2 text-body-xs text-muted-foreground" style={{ fontFamily: MONO }}>{r.default ?? "—"}</td>
-                <td className="px-4 py-2 text-muted-foreground">{r.desc}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {list.map((g, i) => (
+        <PropInterface key={g.interfaceName ?? i} {...g} />
+      ))}
     </section>
   );
 }
@@ -674,19 +742,46 @@ export function Install({ code }: { code: string }) {
   );
 }
 
-// Accessibility notes — keyboard interactions (rendered with Kbd) + ARIA notes.
+// Accessibility notes — a keyboard-interaction table (rendered with Kbd), an
+// optional ARIA roles/attributes table, plus free-form behavioral notes.
 export function Accessibility({
   keyboard,
+  aria,
+  labeling,
+  screenReader,
+  reducedMotion,
   notes,
 }: {
   // `keys` is a list of individual keys shown as separate <Kbd> chips; multiple
   // keys read as alternatives (e.g. ["←", "→"] → ← / →).
   keyboard: { keys: string[]; does: string }[];
+  // ARIA roles/attributes the component sets: what, on which part, and why.
+  aria?: { attr: string; on: string; purpose: string }[];
+  // How the component is named + what the author must supply for it to be labeled.
+  labeling?: string[];
+  // What a screen reader announces / how the component behaves for AT users.
+  screenReader?: string[];
+  // How the component honors prefers-reduced-motion (one line or a few).
+  reducedMotion?: string;
   notes?: string[];
 }) {
+  // A titled bullet list — shared shape for the prose subsections below.
+  const Subsection = ({ title, items }: { title: string; items: string[] }) => (
+    <>
+      <h3 className="mt-2 text-body-sm font-medium text-foreground">{title}</h3>
+      <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+        {items.map((n) => (
+          <li key={n} className="flex gap-2">
+            <span className="text-tertiary">•</span> {n}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
   return (
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">Accessibility</h2>
+      <h3 className="text-body-sm font-medium text-foreground">Keyboard</h3>
       <div className="overflow-x-auto rounded-lg border border-border">
         <table className="w-full min-w-[24rem] text-left text-body-sm">
           <thead>
@@ -714,15 +809,43 @@ export function Accessibility({
           </tbody>
         </table>
       </div>
-      {notes && notes.length > 0 && (
-        <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
-          {notes.map((n) => (
-            <li key={n} className="flex gap-2">
-              <span className="text-tertiary">•</span> {n}
-            </li>
-          ))}
-        </ul>
+      {aria && aria.length > 0 && (
+        <>
+          <h3 className="mt-2 text-body-sm font-medium text-foreground">ARIA</h3>
+          <div className={cn("overflow-x-auto rounded-lg border border-border", SYNTAX_VARS)}>
+            <table className="w-full min-w-[28rem] text-left text-body-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
+                  <th className="px-4 py-2 font-normal">Attribute</th>
+                  <th className="px-4 py-2 font-normal">Applied to</th>
+                  <th className="px-4 py-2 font-normal">Purpose</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {aria.map((a) => (
+                  <tr key={a.attr}>
+                    <td className="px-4 py-2 text-body-xs" style={{ fontFamily: MONO }}>
+                      {highlightCode(a.attr, "tsx")}
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">{a.on}</td>
+                    <td className="px-4 py-2 text-muted-foreground">{a.purpose}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
+      {labeling && labeling.length > 0 && (
+        <Subsection title="Labeling" items={labeling} />
+      )}
+      {screenReader && screenReader.length > 0 && (
+        <Subsection title="Screen reader" items={screenReader} />
+      )}
+      {reducedMotion && (
+        <Subsection title="Reduced motion" items={[reducedMotion]} />
+      )}
+      {notes && notes.length > 0 && <Subsection title="Notes" items={notes} />}
     </section>
   );
 }
