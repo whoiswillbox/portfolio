@@ -37,6 +37,42 @@ export function ComponentPage({
   );
 }
 
+// Audience tabs — split component docs by reader: Design (states, tokens, usage
+// guidance) vs Dev (code, props/API). Sits above the content; the shared preview
+// typically lives inside each tab's slot. Renders the active tab's node.
+export function AudienceTabs({
+  design,
+  dev,
+}: {
+  design: React.ReactNode;
+  dev: React.ReactNode;
+}) {
+  const [tab, setTab] = React.useState<"design" | "dev">("design");
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex gap-6 border-b border-border">
+        {(["design", "dev"] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setTab(t)}
+            aria-selected={tab === t}
+            className={cn(
+              "-mb-px border-b-2 pb-3 text-body-sm font-medium capitalize transition-colors focus-visible:outline-none",
+              tab === t
+                ? "border-foreground text-foreground"
+                : "border-transparent text-tertiary hover:text-foreground"
+            )}
+          >
+            {t === "dev" ? "Develop" : "Design"}
+          </button>
+        ))}
+      </div>
+      {tab === "design" ? design : dev}
+    </div>
+  );
+}
+
 // The rendered preview surface with a per-card light/dark toggle (scoped `.dark`
 // class) so you can check the component in both themes without flipping the
 // whole site. Shared by Demo and Variants.
@@ -269,7 +305,14 @@ function CodeBlock({ tabs }: { tabs: CodeTab[] }) {
 // A filterable chip row (Polaris-style) that switches the shown variant: one
 // chip active at a time, and the preview surface below renders only that
 // variant's demo + caption.
-export function Variants({ variants }: { variants: Variant[] }) {
+export function Variants({
+  variants,
+  showCode = true,
+}: {
+  variants: Variant[];
+  /** Show the code block below the preview (Dev tab). Design tab passes false. */
+  showCode?: boolean;
+}) {
   const [active, setActive] = React.useState(0);
   const current = variants[active];
   return (
@@ -297,7 +340,7 @@ export function Variants({ variants }: { variants: Variant[] }) {
         <p className="text-body-sm text-muted-foreground">{current.caption}</p>
       )}
       <PreviewSurface>{current?.preview}</PreviewSurface>
-      {current?.code && (
+      {showCode && current?.code && (
         <CodeBlock
           tabs={[
             { lang: "tsx", code: current.code },
@@ -305,6 +348,38 @@ export function Variants({ variants }: { variants: Variant[] }) {
           ]}
         />
       )}
+    </section>
+  );
+}
+
+// A props/API reference table for the Dev tab.
+export type PropRow = { name: string; type: string; default?: string; desc: string };
+export function PropsTable({ rows }: { rows: PropRow[] }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Props</h2>
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[32rem] text-left text-body-sm">
+          <thead>
+            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
+              <th className="px-4 py-2 font-normal">Prop</th>
+              <th className="px-4 py-2 font-normal">Type</th>
+              <th className="px-4 py-2 font-normal">Default</th>
+              <th className="px-4 py-2 font-normal">Description</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {rows.map((r) => (
+              <tr key={r.name}>
+                <td className="px-4 py-2 text-body-xs text-foreground" style={{ fontFamily: MONO }}>{r.name}</td>
+                <td className="px-4 py-2 text-body-xs text-muted-foreground" style={{ fontFamily: MONO }}>{r.type}</td>
+                <td className="px-4 py-2 text-body-xs text-muted-foreground" style={{ fontFamily: MONO }}>{r.default ?? "—"}</td>
+                <td className="px-4 py-2 text-muted-foreground">{r.desc}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

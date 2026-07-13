@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { SegmentedControl, SegmentedControlItem } from "@cardboard";
-import { ComponentPage, Variants, States } from "../_component-page";
+import { ComponentPage, AudienceTabs, Variants, States, PropsTable } from "../_component-page";
 
 // A single segment rendered with its state classes FORCED, so each interaction
 // state is visible statically. `extra` layers the state-specific utilities on
@@ -64,14 +64,7 @@ function DisabledOption() {
   );
 }
 
-export default function SegmentedControlDocs() {
-  return (
-    <ComponentPage
-      title="Segmented Control"
-      description="A single-select pill-on-track switch for toggling between a few mutually exclusive views. Use it for view modes (e.g. Primitives / Semantics); for actions, use Toggle Group."
-    >
-      <Variants
-        variants={[
+const VARIANTS = [
           {
             label: "Default",
             caption: "Two mutually exclusive options.",
@@ -148,11 +141,20 @@ function Example() {
   <SegmentedControlItem value="3" disabled>Item</SegmentedControlItem>
 </SegmentedControl>`,
           },
-        ]}
-      />
+];
 
-      <States
-        states={[
+export default function SegmentedControlDocs() {
+  return (
+    <ComponentPage
+      title="Segmented Control"
+      description="A single-select pill-on-track switch for toggling between a few mutually exclusive views. Use it for view modes (e.g. Primitives / Semantics); for actions, use Toggle Group."
+    >
+      <AudienceTabs
+        design={
+          <>
+            <Variants variants={VARIANTS} showCode={false} />
+            <States
+              states={[
           {
             name: "Rest",
             node: <StateSegment extra="text-tertiary" />,
@@ -173,12 +175,29 @@ function Example() {
             node: <StateSegment extra="text-tertiary ring-2 ring-border-focus" />,
             tokens: "focus-visible:ring-2 ring-border-focus",
           },
-          {
-            name: "Disabled",
-            node: <StateSegment extra="text-tertiary opacity-50" />,
-            tokens: "disabled: opacity-50 · pointer-events-none",
-          },
-        ]}
+                {
+                  name: "Disabled",
+                  node: <StateSegment extra="text-tertiary opacity-50" />,
+                  tokens: "disabled: opacity-50 · pointer-events-none",
+                },
+              ]}
+            />
+          </>
+        }
+        dev={
+          <>
+            <Variants variants={VARIANTS} />
+            <PropsTable
+              rows={[
+                { name: "value", type: "string", desc: "The selected item's value (controlled)." },
+                { name: "onValueChange", type: "(value: string) => void", desc: "Fires when the selection changes." },
+                { name: "size", type: '"default" | "sm"', default: '"default"', desc: "Control size." },
+                { name: "SegmentedControlItem · value", type: "string", desc: "Unique value identifying the segment." },
+                { name: "SegmentedControlItem · disabled", type: "boolean", default: "false", desc: "Disable an individual segment." },
+              ]}
+            />
+          </>
+        }
       />
     </ComponentPage>
   );
