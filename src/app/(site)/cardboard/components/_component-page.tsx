@@ -120,9 +120,22 @@ export type Variant = {
 const CODE_KEYWORDS =
   /\b(const|let|var|function|return|import|from|export|if|else|for|while|new|await|async|true|false|null|undefined|typeof)\b/;
 
-function highlightCode(code: string): React.ReactNode[] {
-  // Ordered token patterns; first match wins at each position.
-  const patterns: { type: string; re: RegExp }[] = [
+function highlightCode(code: string, lang = "tsx"): React.ReactNode[] {
+  // Ordered token patterns; first match wins at each position. CSS gets its own
+  // set (selectors, `prop:`, var(), /* */ comments); everything else uses JSX.
+  const cssPatterns: { type: string; re: RegExp }[] = [
+    { type: "comment", re: /^\/\*[\s\S]*?\*\//},
+    { type: "keyword", re: /^var\b/ },                    // var()
+    { type: "attr", re: /^--[\w-]+/ },                    // custom props (tokens)
+    { type: "tag", re: /^\.[-\w]+/ },                     // .selector
+    { type: "attr", re: /^[-a-z]+(?=\s*:)/ },             // property name
+    { type: "number", re: /^-?\d+(\.\d+)?(px|rem|em|%|s|ms|deg|fr)?\b/ },
+    { type: "string", re: /^"[^"]*"|^'[^']*'/ },
+    { type: "punct", re: /^[{}():;,]+/ },
+    { type: "ws", re: /^\s+/ },
+    { type: "text", re: /^[^\s{}():;,"']+/ },
+  ];
+  const jsxPatterns: { type: string; re: RegExp }[] = [
     { type: "comment", re: /^\/\/[^\n]*/ },
     { type: "string", re: /^"[^"]*"|^'[^']*'|^`[^`]*`/ },
     { type: "tag", re: /^<\/?[A-Za-z][\w.]*|^\/?>/ },
@@ -133,6 +146,7 @@ function highlightCode(code: string): React.ReactNode[] {
     { type: "ws", re: /^\s+/ },
     { type: "text", re: /^[^\s<>"'`{}()[\];,=]+/ },
   ];
+  const patterns = lang === "css" ? cssPatterns : jsxPatterns;
   // GitHub-light palette (works on a white surface). In dark mode the block's
   // .dark scope swaps these to the light-on-dark set via CSS vars below.
   const color: Record<string, string> = {
@@ -244,7 +258,9 @@ function CodeBlock({ tabs }: { tabs: CodeTab[] }) {
           (proportional) since Geist Mono was removed; and it must live on the
           <code> because Tailwind preflight resets code/pre font-family. */}
       <pre className="overflow-x-auto p-4 text-body-xs leading-relaxed">
-        <code style={{ fontFamily: MONO }}>{highlightCode(current.code)}</code>
+        <code style={{ fontFamily: MONO }}>
+          {highlightCode(current.code, /css|styles/.test(current.lang) ? "css" : "tsx")}
+        </code>
       </pre>
     </div>
   );
@@ -285,7 +301,7 @@ export function Variants({ variants }: { variants: Variant[] }) {
         <CodeBlock
           tabs={[
             { lang: "tsx", code: current.code },
-            ...(current.styles ? [{ lang: "styles", code: current.styles }] : []),
+            ...(current.styles ? [{ lang: "css", code: current.styles }] : []),
           ]}
         />
       )}
@@ -316,5 +332,63 @@ export function Specs({ rows }: { rows: { part: string; spec: string }[] }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+export type StateSpec = {
+  /** State name — Rest, Hover, Selected, Focus, Disabled … */
+  name: string;
+  /** The element rendered FORCED into this state (so it's visible statically). */
+  node: React.ReactNode;
+  /** The token(s)/classes that define this state. */
+  tokens: string;
+};
+
+// Documents a component's interaction states: a visual row showing each state
+// forced (so you SEE rest/hover/selected/focus/disabled without interacting),
+// plus a State → tokens spec table beneath it.
+export function States({ title = "States", states }: { title?: string; states: StateSpec[] }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">{title}</h2>
+
+      {/* Visual row — each state forced, labeled */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {states.map((s) => (
+          <div
+            key={s.name}
+            className="flex flex-col items-center gap-3 rounded-xl border border-border bg-background p-5"
+          >
+            <div className="flex flex-1 items-center justify-center">{s.node}</div>
+            <span className="text-body-xs font-medium text-tertiary">{s.name}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Spec table — State → tokens */}
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[24rem] text-left text-body-sm">
+          <thead>
+            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
+              <th className="px-4 py-2 font-normal">State</th>
+              <th className="px-4 py-2 font-normal">Tokens</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {states.map((s) => (
+              <tr key={s.name}>
+                <td className="px-4 py-2 text-foreground">{s.name}</td>
+                <td
+                  className="px-4 py-2 text-body-xs text-muted-foreground"
+                  style={{ fontFamily: MONO }}
+                >
+                  {s.tokens}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
