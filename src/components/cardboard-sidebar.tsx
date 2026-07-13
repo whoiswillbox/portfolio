@@ -39,13 +39,32 @@ const foundations = [
 // A flat, alphabetical component list. A leaf is a single doc page ([Title,
 // slug]); a group is a collapsible parent whose `children` are related variants
 // (e.g. Button → Button, Button Group, Toggle…). Sorted by top-level title.
-type Leaf = { title: string; slug: string }
+type Status = "stable" | "beta" | "experimental" | "deprecated"
+type Leaf = { title: string; slug: string; status?: Status }
 type Group = { title: string; children: Leaf[] }
 type Entry = Leaf | Group
 
 const isGroup = (e: Entry): e is Group => "children" in e
 
-const leaf = (title: string, slug: string): Leaf => ({ title, slug })
+const leaf = (title: string, slug: string, status?: Status): Leaf => ({ title, slug, status })
+
+// A small maturity dot shown after a nav item's title. Tone matches the doc
+// page's StatusBadge (success = stable, caution = beta/experimental, etc.).
+const statusTone: Record<Status, string> = {
+  stable: "bg-icon-success",
+  beta: "bg-icon-caution",
+  experimental: "bg-icon-caution",
+  deprecated: "bg-icon-critical",
+}
+function StatusDot({ status }: { status: Status }) {
+  return (
+    <span
+      className={`ml-auto size-1.5 shrink-0 rounded-full ${statusTone[status]}`}
+      title={status}
+      aria-label={status}
+    />
+  )
+}
 
 const components: Entry[] = [
   leaf("Accordion", "accordion"),
@@ -119,7 +138,7 @@ const components: Entry[] = [
   leaf("Radio Group", "radio-group"),
   leaf("Resizable", "resizable"),
   leaf("Scroll Area", "scroll-area"),
-  leaf("Segmented Control", "segmented-control"),
+  leaf("Segmented Control", "segmented-control", "stable"),
   {
     title: "Select",
     children: [
@@ -206,6 +225,7 @@ export function CardboardSidebar() {
                       <SidebarMenuButton asChild isActive={pathname === href}>
                         <Link href={href}>
                           <span>{entry.title}</span>
+                          {entry.status && <StatusDot status={entry.status} />}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

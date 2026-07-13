@@ -12,7 +12,13 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
-import { Kbd } from "@cardboard";
+import {
+  Kbd,
+  NativeSelect,
+  NativeSelectOption,
+  Switch,
+  Input,
+} from "@cardboard";
 import { getComponent, ComponentCard } from "./component-registry";
 import { cn } from "@/lib/utils";
 
@@ -22,17 +28,27 @@ import { cn } from "@/lib/utils";
 export function ComponentPage({
   title,
   description,
+  status,
+  version,
   children,
 }: {
   title: string;
   description: string;
+  /** Maturity of the component; shows a colored badge next to the title. */
+  status?: "stable" | "beta" | "experimental" | "deprecated";
+  /** Version the component was added / last changed, e.g. "1.0". */
+  version?: string;
   children: React.ReactNode;
 }) {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
     <ContentCard flush className="h-full overflow-auto">
-      <div className="mx-auto flex w-full max-w-6xl gap-16 px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
-        <div ref={contentRef} className="min-w-0 flex-1 lg:max-w-3xl">
+      {/* Content is centered (flex-1 + max-w-3xl within a justify-center row);
+          the ToC aside animates its own width/opacity, so as it collapses the
+          centered content glides over smoothly with no snap. The aside carries
+          its own left gap, which collapses with it. */}
+      <div className="mx-auto flex w-full max-w-6xl justify-center px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
+        <div ref={contentRef} className="w-full min-w-0 flex-1 lg:max-w-3xl">
           <Link
             href="/cardboard/components"
             className="mb-6 inline-flex items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground max-sm:hidden"
@@ -41,7 +57,10 @@ export function ComponentPage({
             Components
           </Link>
           <div className="flex flex-col gap-3 mb-12">
-            <h1 className="text-h1">{title}</h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-h1">{title}</h1>
+              {(status || version) && <StatusBadge status={status} version={version} />}
+            </div>
             <p className="text-body-lg text-muted-foreground">{description}</p>
           </div>
           {children}
@@ -49,6 +68,36 @@ export function ComponentPage({
         <OnThisPage contentRef={contentRef} />
       </div>
     </ContentCard>
+  );
+}
+
+// A small maturity badge (+ optional version) shown next to the component title.
+function StatusBadge({
+  status,
+  version,
+}: {
+  status?: "stable" | "beta" | "experimental" | "deprecated";
+  version?: string;
+}) {
+  const tone: Record<NonNullable<typeof status>, string> = {
+    stable: "bg-surface-success text-icon-success",
+    beta: "bg-surface-caution text-icon-caution",
+    experimental: "bg-surface-caution text-icon-caution",
+    deprecated: "bg-surface-critical text-icon-critical",
+  };
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-border px-2.5 py-0.5 text-body-xs">
+      {status && (
+        <span className={cn("inline-flex items-center gap-1 rounded-full px-1.5 font-medium capitalize", tone[status])}>
+          {status}
+        </span>
+      )}
+      {version && (
+        <span className="text-tertiary" style={{ fontFamily: MONO }}>
+          v{version}
+        </span>
+      )}
+    </span>
   );
 }
 
@@ -65,6 +114,10 @@ function OnThisPage({
   type Item = { id: string; text: string; level: 2 | 3 };
   const [items, setItems] = React.useState<Item[]>([]);
   const [activeId, setActiveId] = React.useState<string>("");
+  // While a click-initiated smooth scroll is in flight, lock the active id so
+  // the observer/scroll handlers don't fight it (the target section may sit at
+  // the bottom and never reach the observer's top band).
+  const lockRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     const content = contentRef.current;
@@ -78,6 +131,9 @@ function OnThisPage({
         .replace(/[^\w\s-]/g, "")
         .trim()
         .replace(/\s+/g, "-");
+
+    // Ids of the current headings, kept fresh for the bottom-of-page override.
+    let ids: string[] = [];
 
     const scan = () => {
       const heads = Array.from(
@@ -93,11 +149,13 @@ function OnThisPage({
         h.style.scrollMarginTop = "5rem";
         return { id, text: h.textContent || "", level: h.tagName === "H3" ? 3 : 2 };
       });
+      ids = next.map((n) => n.id);
       setItems(next);
 
       // Highlight the heading nearest the top of the scroll viewport.
       const io = new IntersectionObserver(
         (entries) => {
+          if (lockRef.current !== null) return; // click scroll in progress
           const visible = entries
             .filter((e) => e.isIntersecting)
             .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -109,6 +167,16 @@ function OnThisPage({
       return io;
     };
 
+    // Bottom-of-page override: the last sections can't reach the top band the
+    // observer watches, so at (near) the bottom force-activate the last heading.
+    const onScroll = () => {
+      const el = scroll;
+      if (!el || ids.length === 0 || lockRef.current !== null) return;
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 2;
+      if (atBottom) setActiveId(ids[ids.length - 1]);
+    };
+    scroll?.addEventListener("scroll", onScroll, { passive: true });
+
     let io = scan();
     // The audience tabs swap the whole content subtree — re-scan on mutation.
     const mo = new MutationObserver(() => {
@@ -119,6 +187,7 @@ function OnThisPage({
     return () => {
       io.disconnect();
       mo.disconnect();
+      scroll?.removeEventListener("scroll", onScroll);
     };
   }, [contentRef]);
 
@@ -126,15 +195,32 @@ function OnThisPage({
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
     setActiveId(id);
+    // Lock the highlight to the clicked link until the smooth scroll settles,
+    // so the observer doesn't reset it (e.g. a bottom section that can't reach
+    // the top band). Cleared on a debounce after scrolling stops.
+    if (lockRef.current !== null) window.clearTimeout(lockRef.current);
+    lockRef.current = window.setTimeout(() => {
+      lockRef.current = null;
+    }, 700);
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  if (items.length === 0) return null;
+  const has = items.length > 0;
 
+  // Always rendered (not unmounted) so the layout can glide: the aside animates
+  // its width + opacity between full (w-72, incl. the left gap via pl-16) and
+  // collapsed (w-0). As it collapses, the centered content slides over smoothly
+  // instead of snapping. overflow-hidden clips the content during the shrink.
   return (
-    <aside className="sticky top-16 hidden h-fit w-56 shrink-0 self-start lg:block">
-      <p className="mb-3 text-body-xs font-medium uppercase tracking-wide text-tertiary">
+    <aside
+      aria-hidden={!has}
+      className={cn(
+        "sticky top-16 hidden h-fit shrink-0 self-start overflow-hidden transition-[width,opacity] duration-300 ease-out lg:block",
+        has ? "w-72 pl-16 opacity-100" : "pointer-events-none w-0 pl-0 opacity-0"
+      )}
+    >
+      <p className="mb-3 whitespace-nowrap text-body-xs font-medium uppercase tracking-wide text-tertiary">
         On this page
       </p>
       <nav className="flex flex-col gap-1 border-l border-border">
@@ -144,7 +230,7 @@ function OnThisPage({
             href={`#${it.id}`}
             onClick={(e) => onClick(e, it.id)}
             className={cn(
-              "-ml-px border-l py-1 text-body-sm transition-colors",
+              "-ml-px whitespace-nowrap border-l py-1 text-body-xs transition-colors",
               it.level === 3 ? "pl-6" : "pl-3",
               activeId === it.id
                 ? "border-foreground font-medium text-foreground"
@@ -163,34 +249,42 @@ function OnThisPage({
 // guidance) vs Dev (code, props/API). Sits above the content; the shared preview
 // typically lives inside each tab's slot. Renders the active tab's node.
 export function AudienceTabs({
+  playground,
   design,
   dev,
 }: {
+  /** Optional interactive playground — when present it's the first, default tab. */
+  playground?: React.ReactNode;
   design: React.ReactNode;
   dev: React.ReactNode;
 }) {
-  const [tab, setTab] = React.useState<"design" | "dev">("design");
+  const tabs = [
+    ...(playground ? [{ id: "playground", label: "Playground" } as const] : []),
+    { id: "design", label: "Design" } as const,
+    { id: "dev", label: "Develop" } as const,
+  ];
+  const [tab, setTab] = React.useState<string>(tabs[0].id);
   return (
     <div className="flex flex-col gap-8">
       <div className="flex gap-6 border-b border-border">
-        {(["design", "dev"] as const).map((t) => (
+        {tabs.map((t) => (
           <button
-            key={t}
+            key={t.id}
             type="button"
-            onClick={() => setTab(t)}
-            aria-selected={tab === t}
+            onClick={() => setTab(t.id)}
+            aria-selected={tab === t.id}
             className={cn(
-              "-mb-px border-b-2 pb-3 text-body-sm font-medium capitalize transition-colors focus-visible:outline-none",
-              tab === t
+              "-mb-px border-b-2 pb-3 text-body-sm font-medium transition-colors focus-visible:outline-none",
+              tab === t.id
                 ? "border-foreground text-foreground"
                 : "border-transparent text-tertiary hover:text-foreground"
             )}
           >
-            {t === "dev" ? "Develop" : "Design"}
+            {t.label}
           </button>
         ))}
       </div>
-      {tab === "design" ? design : dev}
+      {tab === "playground" ? playground : tab === "dev" ? dev : design}
     </div>
   );
 }
@@ -232,6 +326,83 @@ function PreviewSurface({ children }: { children: React.ReactNode }) {
       </button>
       {children}
     </div>
+  );
+}
+
+/* ─── Playground ─────────────────────────────────────────────────────────── */
+
+// A single configurable control. `select` renders a NativeSelect over `options`;
+// `boolean` renders a Switch; `text` renders an Input. `default` seeds the state.
+export type Control =
+  | { prop: string; label?: string; type: "select"; options: (string | number)[]; default: string | number }
+  | { prop: string; label?: string; type: "boolean"; default: boolean }
+  | { prop: string; label?: string; type: "text"; default: string };
+
+export type ControlValues = Record<string, string | number | boolean>;
+
+// Interactive playground — a live preview on top, then a controls panel that
+// live-updates it. `render(values)` receives the current control values keyed by
+// prop. Reusable across components: declare `controls`, read them in `render`.
+export function Playground({
+  controls,
+  render,
+}: {
+  controls: Control[];
+  render: (values: ControlValues) => React.ReactNode;
+}) {
+  const [values, setValues] = React.useState<ControlValues>(() =>
+    Object.fromEntries(controls.map((c) => [c.prop, c.default]))
+  );
+  const set = (prop: string, v: string | number | boolean) =>
+    setValues((s) => ({ ...s, [prop]: v }));
+
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <PreviewSurface>{render(values)}</PreviewSurface>
+      <div className="flex flex-col divide-y divide-border rounded-xl border border-border">
+        {controls.map((c) => (
+          <div key={c.prop} className="flex items-center justify-between gap-4 px-4 py-3">
+            <div className="flex flex-col">
+              <span className="text-body-sm font-medium text-foreground" style={{ fontFamily: MONO }}>
+                {c.label ?? c.prop}
+              </span>
+            </div>
+            {c.type === "select" && (
+              <NativeSelect
+                size="sm"
+                value={String(values[c.prop])}
+                onChange={(e) => {
+                  // Preserve number-typed options.
+                  const raw = e.target.value;
+                  const asNum = c.options.find((o) => String(o) === raw);
+                  set(c.prop, typeof asNum === "number" ? asNum : raw);
+                }}
+              >
+                {c.options.map((o) => (
+                  <NativeSelectOption key={String(o)} value={String(o)}>
+                    {String(o)}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            )}
+            {c.type === "boolean" && (
+              <Switch
+                checked={Boolean(values[c.prop])}
+                onCheckedChange={(v) => set(c.prop, v)}
+                aria-label={c.label ?? c.prop}
+              />
+            )}
+            {c.type === "text" && (
+              <Input
+                className="h-8 w-48"
+                value={String(values[c.prop])}
+                onChange={(e) => set(c.prop, e.target.value)}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -966,6 +1137,33 @@ export function ContentGuidelines({ rules }: { rules: string[] }) {
   );
 }
 
+// Responsive / overflow behavior — how the component adapts to width. A prose
+// list of rules, plus an optional live demo (e.g. shown in a constrained box).
+export function Responsive({
+  rules,
+  children,
+}: {
+  rules: string[];
+  /** Optional live demo of the behavior (rendered in a bordered surface). */
+  children?: React.ReactNode;
+}) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Responsive</h2>
+      <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+        {rules.map((r) => (
+          <li key={r} className="flex gap-2">
+            <span className="text-tertiary">•</span> {r}
+          </li>
+        ))}
+      </ul>
+      {children && (
+        <div className="rounded-xl border border-border bg-background p-6">{children}</div>
+      )}
+    </section>
+  );
+}
+
 export type RelatedItem = { href: string; when: string };
 // Related components — real gallery cards (live preview + name + description)
 // pulled from the shared registry by href, each with a "reach for this when"
@@ -1006,6 +1204,36 @@ export function ApiNotes({ notes }: { notes: string[] }) {
           </li>
         ))}
       </ul>
+    </section>
+  );
+}
+
+export type ChangelogEntry = { version: string; date?: string; changes: string[] };
+// A per-component changelog — newest first. Each release lists its version, an
+// optional date, and the changes.
+export function Changelog({ entries }: { entries: ChangelogEntry[] }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Changelog</h2>
+      <ol className="flex flex-col gap-4">
+        {entries.map((e) => (
+          <li key={e.version} className="flex flex-col gap-1.5">
+            <div className="flex items-baseline gap-2">
+              <span className="text-body-sm font-medium text-foreground" style={{ fontFamily: MONO }}>
+                v{e.version}
+              </span>
+              {e.date && <span className="text-body-xs text-tertiary">{e.date}</span>}
+            </div>
+            <ul className="flex flex-col gap-1 text-body-sm text-muted-foreground">
+              {e.changes.map((c) => (
+                <li key={c} className="flex gap-2">
+                  <span className="text-tertiary">•</span> {c}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }

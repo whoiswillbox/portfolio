@@ -21,6 +21,7 @@ type SegmentedControlContextValue = {
   value: string
   onValueChange: (value: string) => void
   size: "sm" | "default"
+  fullWidth: boolean
 }
 
 const SegmentedControlContext = React.createContext<SegmentedControlContextValue | null>(null)
@@ -35,6 +36,7 @@ function SegmentedControl({
   value,
   onValueChange,
   size = "default",
+  fullWidth = false,
   className,
   children,
   ...props
@@ -42,6 +44,9 @@ function SegmentedControl({
   value: string
   onValueChange: (value: string) => void
   size?: "sm" | "default"
+  /** Stretch to fill the container; segments share the width evenly. Useful on
+      mobile / full-bleed layouts. */
+  fullWidth?: boolean
 }) {
   const ref = React.useRef<HTMLDivElement>(null)
 
@@ -71,15 +76,17 @@ function SegmentedControl({
   }
 
   return (
-    <SegmentedControlContext.Provider value={{ value, onValueChange, size }}>
+    <SegmentedControlContext.Provider value={{ value, onValueChange, size, fullWidth }}>
       <div
         ref={ref}
         data-slot="segmented-control"
         data-size={size}
+        data-full-width={fullWidth}
         role="tablist"
         onKeyDown={onKeyDown}
         className={cn(
-          "inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border",
+          "flex items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border",
+          fullWidth ? "w-full" : "w-fit",
           className
         )}
         {...props}
@@ -92,11 +99,16 @@ function SegmentedControl({
 
 function SegmentedControlItem({
   value,
+  icon,
   className,
   children,
   ...props
-}: Omit<React.ComponentProps<"button">, "value"> & { value: string }) {
-  const { value: selected, onValueChange, size } = useSegmentedControl()
+}: Omit<React.ComponentProps<"button">, "value"> & {
+  value: string
+  /** Optional leading icon, rendered before the label. */
+  icon?: React.ReactNode
+}) {
+  const { value: selected, onValueChange, size, fullWidth } = useSegmentedControl()
   const active = selected === value
   return (
     <button
@@ -111,15 +123,21 @@ function SegmentedControlItem({
       data-state={active ? "active" : "inactive"}
       onClick={() => onValueChange(value)}
       className={cn(
-        "rounded-md font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center gap-1.5 rounded-md whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:pointer-events-none disabled:opacity-50",
         size === "sm" ? "px-2.5 py-1 text-body-xs" : "px-3 py-1.5 text-body-sm",
+        fullWidth && "flex-1",
         active
-          ? "bg-background text-foreground shadow-sm"
-          : "text-tertiary hover:text-foreground",
+          ? "bg-background text-foreground shadow-sm font-medium"
+          : "text-tertiary hover:text-foreground font-normal",
         className
       )}
       {...props}
     >
+      {icon && (
+        <span className="[&_svg]:size-4 shrink-0" aria-hidden="true">
+          {icon}
+        </span>
+      )}
       {children}
     </button>
   )

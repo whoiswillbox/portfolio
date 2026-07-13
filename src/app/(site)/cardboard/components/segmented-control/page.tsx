@@ -1,10 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { Squares2X2Icon } from "@heroicons/react/24/outline";
 import { SegmentedControl, SegmentedControlItem } from "@cardboard";
 import {
   ComponentPage,
   AudienceTabs,
+  Playground,
   Variants,
   States,
   PropsTable,
@@ -17,20 +19,32 @@ import {
   ContentGuidelines,
   Related,
   ApiNotes,
+  Changelog,
 } from "../_component-page";
 
-// A single segment rendered with its state classes FORCED, so each interaction
-// state is visible statically. `extra` layers the state-specific utilities on
-// top of the shared item base.
-function StateSegment({ extra, label = "Item" }: { extra: string; label?: string }) {
+// Each state renders the REAL SegmentedControl so the States doc stays truthful
+// automatically — change the component and these update. Rest/Selected/Disabled
+// are forced via real props; Hover/Focus are :hover / :focus-visible pseudo-
+// classes React can't statically force, so they layer the matching utilities
+// onto the real item via `force` (merged through the item's own className).
+function StateSegment({
+  selected = false,
+  disabled = false,
+  force,
+  label = "Item",
+}: {
+  selected?: boolean;
+  disabled?: boolean;
+  /** Utilities to force a pseudo-class look (hover/focus) onto the real item. */
+  force?: string;
+  label?: string;
+}) {
   return (
-    <div className="inline-flex items-center rounded-lg bg-muted p-1 ring-1 ring-border">
-      <span
-        className={`rounded-md px-3 py-1.5 text-body-sm font-medium whitespace-nowrap ${extra}`}
-      >
+    <SegmentedControl value={selected ? "1" : ""} onValueChange={() => {}}>
+      <SegmentedControlItem value="1" disabled={disabled} className={force}>
         {label}
-      </span>
-    </div>
+      </SegmentedControlItem>
+    </SegmentedControl>
   );
 }
 
@@ -62,6 +76,29 @@ function Small() {
       <SegmentedControlItem value="1">Item</SegmentedControlItem>
       <SegmentedControlItem value="2">Item</SegmentedControlItem>
       <SegmentedControlItem value="3">Item</SegmentedControlItem>
+    </SegmentedControl>
+  );
+}
+
+function FullWidth() {
+  const [v, setV] = React.useState("1");
+  return (
+    <div className="w-full max-w-md">
+      <SegmentedControl fullWidth value={v} onValueChange={setV}>
+        <SegmentedControlItem value="1">Item</SegmentedControlItem>
+        <SegmentedControlItem value="2">Item</SegmentedControlItem>
+        <SegmentedControlItem value="3">Item</SegmentedControlItem>
+      </SegmentedControl>
+    </div>
+  );
+}
+
+function WithIcon() {
+  const [v, setV] = React.useState("1");
+  return (
+    <SegmentedControl value={v} onValueChange={setV}>
+      <SegmentedControlItem value="1" icon={<Squares2X2Icon />}>Item</SegmentedControlItem>
+      <SegmentedControlItem value="2" icon={<Squares2X2Icon />}>Item</SegmentedControlItem>
     </SegmentedControl>
   );
 }
@@ -112,7 +149,7 @@ function Example() {
 /* A segment — the active one lifts onto a raised surface pill. */
 .segmented-control-item {
   padding: var(--space-150) var(--space-300); /* 6px 12px */
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-normal);
   color: var(--color-tertiary);
   border-radius: var(--radius-md);
 }
@@ -121,6 +158,7 @@ function Example() {
   background: var(--color-background);
   color: var(--color-foreground);
   box-shadow: var(--shadow-sm);
+  font-weight: var(--font-weight-medium);
 }`,
           },
           {
@@ -146,6 +184,27 @@ function Example() {
 </SegmentedControl>`,
           },
           {
+            label: "Full width",
+            caption: "Fills the container; segments share the width evenly. Use on mobile.",
+            preview: <FullWidth />,
+            code: `<SegmentedControl fullWidth value={value} onValueChange={setValue}>
+  <SegmentedControlItem value="1">Item</SegmentedControlItem>
+  <SegmentedControlItem value="2">Item</SegmentedControlItem>
+  <SegmentedControlItem value="3">Item</SegmentedControlItem>
+</SegmentedControl>`,
+          },
+          {
+            label: "With icon",
+            caption: "Add a leading icon to each segment.",
+            preview: <WithIcon />,
+            code: `import { Squares2X2Icon } from "@heroicons/react/24/outline";
+
+<SegmentedControl value={value} onValueChange={setValue}>
+  <SegmentedControlItem value="1" icon={<Squares2X2Icon />}>Item</SegmentedControlItem>
+  <SegmentedControlItem value="2" icon={<Squares2X2Icon />}>Item</SegmentedControlItem>
+</SegmentedControl>`,
+          },
+          {
             label: "Disabled option",
             caption: "Individual segments can be disabled.",
             preview: <DisabledOption />,
@@ -158,21 +217,86 @@ function Example() {
           },
 ];
 
+// The live component wired for the Playground: reads config values (size,
+// disabled, item count) and keeps its own selection state.
+function PlaygroundDemo({
+  size,
+  disabled,
+  items,
+  label,
+  icon,
+  fullWidth,
+}: {
+  size: "default" | "sm";
+  disabled: boolean;
+  items: number;
+  label: string;
+  icon: boolean;
+  fullWidth: boolean;
+}) {
+  const [v, setV] = React.useState("1");
+  const values = Array.from({ length: items }, (_, i) => String(i + 1));
+  // Keep selection valid if the item count shrinks below it.
+  React.useEffect(() => {
+    if (!values.includes(v)) setV("1");
+  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
+  const control = (
+    <SegmentedControl size={size} fullWidth={fullWidth} value={v} onValueChange={setV}>
+      {values.map((val, i) => (
+        <SegmentedControlItem
+          key={val}
+          value={val}
+          disabled={disabled && i === items - 1}
+          icon={icon ? <Squares2X2Icon /> : undefined}
+        >
+          {label || "Item"}
+        </SegmentedControlItem>
+      ))}
+    </SegmentedControl>
+  );
+  // fullWidth fills its container — give it a bounded one so the demo shows the
+  // stretch without spanning the whole preview surface.
+  return fullWidth ? <div className="w-full max-w-md">{control}</div> : control;
+}
+
 export default function SegmentedControlDocs() {
   return (
     <ComponentPage
       title="Segmented Control"
+      status="stable"
+      version="1.1"
       description="A single-select pill-on-track switch for toggling between a few mutually exclusive views. Use it for view modes (e.g. Primitives / Semantics); for actions, use Toggle Group."
     >
       <AudienceTabs
+        playground={
+          <Playground
+            controls={[
+              { prop: "label", label: "label", type: "text", default: "Item" },
+              { prop: "size", label: "size", type: "select", options: ["default", "sm"], default: "default" },
+              { prop: "items", label: "items", type: "select", options: [2, 3, 4], default: 3 },
+              { prop: "icon", label: "with icon", type: "boolean", default: false },
+              { prop: "fullWidth", label: "full width", type: "boolean", default: false },
+              { prop: "disabled", label: "disabled last", type: "boolean", default: false },
+            ]}
+            render={(v) => (
+              <PlaygroundDemo
+                label={String(v.label)}
+                size={v.size as "default" | "sm"}
+                items={Number(v.items)}
+                icon={Boolean(v.icon)}
+                fullWidth={Boolean(v.fullWidth)}
+                disabled={Boolean(v.disabled)}
+              />
+            )}
+          />
+        }
         design={
           <>
-            <Variants variants={VARIANTS} showCode={false} />
             <Anatomy
               parts={[
                 { n: 1, part: "Track — the container that holds the segments.", tokens: "bg-muted · --radius-lg · ring-border" },
                 { n: 2, part: "Segment — a selectable option (inactive).", tokens: "text-tertiary" },
-                { n: 3, part: "Active pill — the raised, selected segment.", tokens: "bg-background · shadow-sm · text-foreground" },
+                { n: 3, part: "Active pill — the raised, selected segment.", tokens: "bg-background · shadow-sm · text-foreground · font-medium" },
               ]}
             >
               <SegmentedControl value="2" onValueChange={() => {}}>
@@ -206,6 +330,18 @@ export default function SegmentedControlDocs() {
                   caption: "Keep labels short and parallel so segments stay even.",
                   example: <TwoOption />,
                 },
+                {
+                  caption: "On narrow / mobile layouts, use fullWidth so segments fill and share the width.",
+                  example: (
+                    <div className="w-full max-w-64">
+                      <SegmentedControl fullWidth value="1" onValueChange={() => {}}>
+                        <SegmentedControlItem value="1">Item</SegmentedControlItem>
+                        <SegmentedControlItem value="2">Item</SegmentedControlItem>
+                        <SegmentedControlItem value="3">Item</SegmentedControlItem>
+                      </SegmentedControl>
+                    </div>
+                  ),
+                },
               ]}
               donts={[
                 {
@@ -217,33 +353,45 @@ export default function SegmentedControlDocs() {
                     </SegmentedControl>
                   ),
                 },
+                {
+                  caption: "Don't exceed ~5 options — switch to a Select at that point.",
+                  example: (
+                    <SegmentedControl value="1" onValueChange={() => {}}>
+                      {["1", "2", "3", "4", "5", "6", "7"].map((n) => (
+                        <SegmentedControlItem key={n} value={n}>
+                          {n}
+                        </SegmentedControlItem>
+                      ))}
+                    </SegmentedControl>
+                  ),
+                },
               ]}
             />
             <States
               states={[
           {
             name: "Rest",
-            node: <StateSegment extra="text-tertiary" />,
+            node: <StateSegment />,
             tokens: "text-tertiary",
           },
           {
             name: "Hover",
-            node: <StateSegment extra="text-foreground" />,
+            node: <StateSegment force="text-foreground" />,
             tokens: "hover:text-foreground",
           },
           {
             name: "Selected",
-            node: <StateSegment extra="bg-background text-foreground shadow-sm" />,
-            tokens: "data-[state=active]: bg-background · text-foreground · shadow-sm",
+            node: <StateSegment selected />,
+            tokens: "data-[state=active]: bg-background · text-foreground · shadow-sm · font-medium",
           },
           {
             name: "Focus",
-            node: <StateSegment extra="text-tertiary ring-2 ring-border-focus" />,
+            node: <StateSegment force="ring-2 ring-border-focus" />,
             tokens: "focus-visible:ring-2 ring-border-focus",
           },
                 {
                   name: "Disabled",
-                  node: <StateSegment extra="text-tertiary opacity-50" />,
+                  node: <StateSegment disabled />,
                   tokens: "disabled: opacity-50 · pointer-events-none",
                 },
               ]}
@@ -309,7 +457,7 @@ export default function SegmentedControlDocs() {
                 "No extra dependencies or providers required.",
               ]}
             />
-            <Variants variants={VARIANTS} preview={false} />
+            <Variants variants={VARIANTS} />
             <PropsTable
               groups={[
                 {
@@ -318,12 +466,14 @@ export default function SegmentedControlDocs() {
                     { name: "value", type: "string", desc: "The selected item's value (controlled)." },
                     { name: "onValueChange", type: "(value: string) => void", desc: "Fires when the selection changes." },
                     { name: "size?", type: '"default" | "sm"', default: '"default"', desc: "Control size." },
+                    { name: "fullWidth?", type: "boolean", default: "false", desc: "Stretch to fill the container; segments share the width evenly." },
                   ],
                 },
                 {
                   interfaceName: "SegmentedControlItemProps",
                   rows: [
                     { name: "value", type: "string", desc: "Unique value identifying the segment." },
+                    { name: "icon?", type: "ReactNode", desc: "Optional leading icon, rendered before the label." },
                     { name: "disabled?", type: "boolean", default: "false", desc: "Disable an individual segment." },
                   ],
                 },
@@ -355,6 +505,12 @@ export default function SegmentedControlDocs() {
               notes={[
                 "Roving tabindex — only the selected segment is tabbable, so the group is one Tab stop and arrows move within it.",
                 "Focus shows a visible ring (focus-visible:ring-2 ring-border-focus).",
+              ]}
+            />
+            <Changelog
+              entries={[
+                { version: "1.1", changes: ["Added the icon prop for leading icons on segments.", "Added the fullWidth prop for mobile / full-bleed layouts.", "Selected segment now uses medium weight."] },
+                { version: "1.0", changes: ["Initial release — controlled pill-on-track selector with roving-tabindex keyboard nav."] },
               ]}
             />
           </>
