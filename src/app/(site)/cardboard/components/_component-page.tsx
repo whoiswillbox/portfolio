@@ -17,7 +17,8 @@ import { getComponent, ComponentCard } from "./component-registry";
 import { cn } from "@/lib/utils";
 
 /* Shared scaffold for the per-component reference pages — keeps the back link,
-   header, and spacing identical across every component doc. */
+   header, and spacing identical across every component doc. The content sits in
+   a scroll container next to a sticky "On this page" table of contents. */
 export function ComponentPage({
   title,
   description,
@@ -27,23 +28,134 @@ export function ComponentPage({
   description: string;
   children: React.ReactNode;
 }) {
+  const contentRef = React.useRef<HTMLDivElement>(null);
   return (
     <ContentCard flush className="h-full overflow-auto">
-      <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
-        <Link
-          href="/cardboard/components"
-          className="mb-6 inline-flex items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground max-sm:hidden"
-        >
-          <ArrowLeftIcon className="size-4" />
-          Components
-        </Link>
-        <div className="flex flex-col gap-3 mb-12">
-          <h1 className="text-h1">{title}</h1>
-          <p className="text-body-lg text-muted-foreground">{description}</p>
+      <div className="mx-auto flex w-full max-w-6xl gap-16 px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
+        <div ref={contentRef} className="min-w-0 flex-1 lg:max-w-3xl">
+          <Link
+            href="/cardboard/components"
+            className="mb-6 inline-flex items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground max-sm:hidden"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Components
+          </Link>
+          <div className="flex flex-col gap-3 mb-12">
+            <h1 className="text-h1">{title}</h1>
+            <p className="text-body-lg text-muted-foreground">{description}</p>
+          </div>
+          {children}
         </div>
-        {children}
+        <OnThisPage contentRef={contentRef} />
       </div>
     </ContentCard>
+  );
+}
+
+// Sticky right-rail "On this page" jump links. Scans the content column for
+// section headings (h2/h3), slugifies + assigns ids on mount, then renders
+// anchor links; an IntersectionObserver highlights the section in view. Hidden
+// under lg (no room). Re-scans when the content changes (e.g. audience tab
+// switch swaps the whole subtree).
+function OnThisPage({
+  contentRef,
+}: {
+  contentRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  type Item = { id: string; text: string; level: 2 | 3 };
+  const [items, setItems] = React.useState<Item[]>([]);
+  const [activeId, setActiveId] = React.useState<string>("");
+
+  React.useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    // ContentCard's inner div is the scroll container (not the outer ref).
+    const scroll = content.closest<HTMLElement>("[data-scroll-container]");
+
+    const slug = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-");
+
+    const scan = () => {
+      const heads = Array.from(
+        content.querySelectorAll<HTMLHeadingElement>("h2, h3")
+      );
+      const seen = new Set<string>();
+      const next: Item[] = heads.map((h) => {
+        let id = h.id || slug(h.textContent || "section");
+        while (seen.has(id)) id = `${id}-2`;
+        seen.add(id);
+        h.id = id;
+        // Offset anchor scrolling for the sticky top padding.
+        h.style.scrollMarginTop = "5rem";
+        return { id, text: h.textContent || "", level: h.tagName === "H3" ? 3 : 2 };
+      });
+      setItems(next);
+
+      // Highlight the heading nearest the top of the scroll viewport.
+      const io = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          if (visible[0]) setActiveId(visible[0].target.id);
+        },
+        { root: scroll ?? null, rootMargin: "0px 0px -70% 0px", threshold: 0 }
+      );
+      heads.forEach((h) => io.observe(h));
+      return io;
+    };
+
+    let io = scan();
+    // The audience tabs swap the whole content subtree — re-scan on mutation.
+    const mo = new MutationObserver(() => {
+      io.disconnect();
+      io = scan();
+    });
+    mo.observe(content, { childList: true, subtree: true });
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
+  }, [contentRef]);
+
+  const onClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveId(id);
+  };
+
+  if (items.length === 0) return null;
+
+  return (
+    <aside className="sticky top-16 hidden h-fit w-56 shrink-0 self-start lg:block">
+      <p className="mb-3 text-body-xs font-medium uppercase tracking-wide text-tertiary">
+        On this page
+      </p>
+      <nav className="flex flex-col gap-1 border-l border-border">
+        {items.map((it) => (
+          <a
+            key={it.id}
+            href={`#${it.id}`}
+            onClick={(e) => onClick(e, it.id)}
+            className={cn(
+              "-ml-px border-l py-1 text-body-sm transition-colors",
+              it.level === 3 ? "pl-6" : "pl-3",
+              activeId === it.id
+                ? "border-foreground font-medium text-foreground"
+                : "border-transparent text-tertiary hover:text-foreground"
+            )}
+          >
+            {it.text}
+          </a>
+        ))}
+      </nav>
+    </aside>
   );
 }
 
