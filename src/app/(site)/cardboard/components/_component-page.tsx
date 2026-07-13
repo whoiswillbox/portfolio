@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeftIcon, SunIcon, MoonIcon, CheckIcon, ClipboardIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftIcon,
+  SunIcon,
+  MoonIcon,
+  CheckIcon,
+  ClipboardIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { cn } from "@/lib/utils";
 
@@ -464,6 +472,132 @@ export function States({ title = "States", states }: { title?: string; states: S
           </tbody>
         </table>
       </div>
+    </section>
+  );
+}
+
+/* ─── Design-tab building blocks ─────────────────────────────────────────── */
+
+// When-to-use / when-to-avoid guidance — two bulleted columns.
+export function Guidelines({ use, avoid }: { use: string[]; avoid: string[] }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Usage</h2>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2 rounded-xl border border-border p-4">
+          <div className="flex items-center gap-1.5 text-body-sm font-medium text-success">
+            <CheckCircleIcon className="size-4" /> Use when
+          </div>
+          <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+            {use.map((u) => (
+              <li key={u} className="flex gap-2">
+                <span className="text-tertiary">•</span> {u}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border p-4">
+          <div className="flex items-center gap-1.5 text-body-sm font-medium text-critical">
+            <XCircleIcon className="size-4" /> Avoid when
+          </div>
+          <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+            {avoid.map((a) => (
+              <li key={a} className="flex gap-2">
+                <span className="text-tertiary">•</span> {a}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export type DoDontItem = { caption: string; example: React.ReactNode };
+
+// Side-by-side Do / Don't examples with a live sample in each.
+export function DoDont({ dos, donts }: { dos: DoDontItem[]; donts: DoDontItem[] }) {
+  const Card = ({ ok, item }: { ok: boolean; item: DoDontItem }) => (
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border">
+      <div className="flex min-h-32 items-center justify-center bg-background p-6">
+        {item.example}
+      </div>
+      <div
+        className={cn(
+          "flex items-start gap-1.5 border-t px-4 py-3 text-body-sm",
+          ok ? "border-success/30 text-foreground" : "border-critical/30 text-foreground"
+        )}
+      >
+        {ok ? (
+          <CheckCircleIcon className="mt-0.5 size-4 shrink-0 text-success" />
+        ) : (
+          <XCircleIcon className="mt-0.5 size-4 shrink-0 text-critical" />
+        )}
+        <span>{item.caption}</span>
+      </div>
+    </div>
+  );
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Best practices</h2>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {dos.map((d, i) => <Card key={`do${i}`} ok item={d} />)}
+        {donts.map((d, i) => <Card key={`dont${i}`} ok={false} item={d} />)}
+      </div>
+    </section>
+  );
+}
+
+/* ─── Develop-tab building blocks ────────────────────────────────────────── */
+
+// An install / import snippet block.
+export function Install({ code }: { code: string }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Import</h2>
+      <CodeBlock tabs={[{ lang: "tsx", code }]} />
+    </section>
+  );
+}
+
+// Accessibility notes — keyboard interactions + ARIA behavior.
+export function Accessibility({
+  keyboard,
+  notes,
+}: {
+  keyboard: { keys: string; does: string }[];
+  notes?: string[];
+}) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Accessibility</h2>
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[24rem] text-left text-body-sm">
+          <thead>
+            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
+              <th className="px-4 py-2 font-normal">Key</th>
+              <th className="px-4 py-2 font-normal">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {keyboard.map((k) => (
+              <tr key={k.keys}>
+                <td className="px-4 py-2 text-body-xs text-foreground" style={{ fontFamily: MONO }}>{k.keys}</td>
+                <td className="px-4 py-2 text-muted-foreground">{k.does}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {notes && notes.length > 0 && (
+        <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+          {notes.map((n) => (
+            <li key={n} className="flex gap-2">
+              <span className="text-tertiary">•</span> {n}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

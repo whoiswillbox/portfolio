@@ -2,7 +2,17 @@
 
 import * as React from "react";
 import { SegmentedControl, SegmentedControlItem } from "@cardboard";
-import { ComponentPage, AudienceTabs, Variants, States, PropsTable } from "../_component-page";
+import {
+  ComponentPage,
+  AudienceTabs,
+  Variants,
+  States,
+  PropsTable,
+  Guidelines,
+  DoDont,
+  Install,
+  Accessibility,
+} from "../_component-page";
 
 // A single segment rendered with its state classes FORCED, so each interaction
 // state is visible statically. `extra` layers the state-specific utilities on
@@ -153,6 +163,37 @@ export default function SegmentedControlDocs() {
         design={
           <>
             <Variants variants={VARIANTS} showCode={false} />
+            <Guidelines
+              use={[
+                "Switching between 2–5 mutually exclusive views (e.g. tabs of one panel).",
+                "Options are short, equal-weight, and always visible.",
+                "The choice changes what's shown, not a destructive action.",
+              ]}
+              avoid={[
+                "More than ~5 options — use a Select or Tabs instead.",
+                "Triggering actions (Save, Delete) — use Buttons or a Toggle Group.",
+                "Long or uneven labels that make segments different widths.",
+              ]}
+            />
+            <DoDont
+              dos={[
+                {
+                  caption: "Keep labels short and parallel so segments stay even.",
+                  example: <TwoOption />,
+                },
+              ]}
+              donts={[
+                {
+                  caption: "Don't cram long, uneven labels into segments.",
+                  example: (
+                    <SegmentedControl value="a" onValueChange={() => {}}>
+                      <SegmentedControlItem value="a">Primitives</SegmentedControlItem>
+                      <SegmentedControlItem value="b">Semantic tokens &amp; roles</SegmentedControlItem>
+                    </SegmentedControl>
+                  ),
+                },
+              ]}
+            />
             <States
               states={[
           {
@@ -186,6 +227,7 @@ export default function SegmentedControlDocs() {
         }
         dev={
           <>
+            <Install code={`import { SegmentedControl, SegmentedControlItem } from "@cardboard";`} />
             <Variants variants={VARIANTS} />
             <PropsTable
               rows={[
@@ -194,6 +236,18 @@ export default function SegmentedControlDocs() {
                 { name: "size", type: '"default" | "sm"', default: '"default"', desc: "Control size." },
                 { name: "SegmentedControlItem · value", type: "string", desc: "Unique value identifying the segment." },
                 { name: "SegmentedControlItem · disabled", type: "boolean", default: "false", desc: "Disable an individual segment." },
+              ]}
+            />
+            <Accessibility
+              keyboard={[
+                { keys: "Tab", does: "Moves focus to the next segment." },
+                { keys: "Shift + Tab", does: "Moves focus to the previous segment." },
+                { keys: "Space / Enter", does: "Selects the focused segment." },
+              ]}
+              notes={[
+                "Rendered as role=\"tablist\" with role=\"tab\" segments; the active segment sets aria-selected.",
+                "Disabled segments have disabled buttons — skipped by Tab and not selectable.",
+                "Focus shows a visible ring (focus-visible:ring-2 ring-border-focus).",
               ]}
             />
           </>
