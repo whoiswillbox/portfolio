@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeftIcon, LightBulbIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
-import { cn } from "@/lib/utils";
+import { SegmentedControl, SegmentedControlItem } from "@/components/cardboard/segmented-control";
 
 /* Living reference — swatches render the ACTUAL CSS variables the app uses, so
    this page always reflects the real tokens (and updates with the theme). */
@@ -304,23 +304,11 @@ export default function Colors() {
             </p>
           </div>
           {/* Semantics / Primitives toggle */}
-          <div className="inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
-            {(["primitives", "semantics", "components"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-body-sm font-medium capitalize transition-colors",
-                  view === v
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl value={view} onValueChange={(v) => setView(v as View)}>
+            <SegmentedControlItem value="primitives">Primitives</SegmentedControlItem>
+            <SegmentedControlItem value="semantics">Semantics</SegmentedControlItem>
+            <SegmentedControlItem value="components">Components</SegmentedControlItem>
+          </SegmentedControl>
         </div>
 
         {view === "semantics" ? (

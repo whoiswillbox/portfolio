@@ -11,7 +11,7 @@ import {
 } from "@/components/cardboard/accordion";
 import { ContentCard } from "@/components/content-card";
 import { CopyToken } from "@/components/copy-token";
-import { cn } from "@/lib/utils";
+import { SegmentedControl, SegmentedControlItem } from "@/components/cardboard/segmented-control";
 
 // Small guidance line shown under a section's description — how/when to use.
 function UsageHint({ children }: { children: React.ReactNode }) {
@@ -240,23 +240,10 @@ export default function Typography() {
             </p>
           </div>
           {/* Primitives / Semantics toggle */}
-          <div className="inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
-            {(["primitives", "semantics"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-body-sm font-medium capitalize transition-colors",
-                  view === v
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl value={view} onValueChange={(v) => setView(v as View)}>
+            <SegmentedControlItem value="primitives">Primitives</SegmentedControlItem>
+            <SegmentedControlItem value="semantics">Semantics</SegmentedControlItem>
+          </SegmentedControl>
         </div>
 
         {view === "semantics" && (

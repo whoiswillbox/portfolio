@@ -392,6 +392,17 @@ const components: {
     ),
   },
   {
+    label: "Segmented Control",
+    href: "/cardboard/components/segmented-control",
+    description: "Single-select pill-on-track switch.",
+    preview: (
+      <div className="inline-flex items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
+        <div className="rounded-md px-3 py-1.5 text-body-sm text-tertiary">Primitives</div>
+        <div className="rounded-md bg-background px-3 py-1.5 text-body-sm font-medium text-foreground shadow-sm">Semantics</div>
+      </div>
+    ),
+  },
+  {
     label: "Dropdown Menu",
     href: "/cardboard/components/dropdown-menu",
     description: "A menu of actions.",
@@ -873,7 +884,7 @@ export default function Components() {
                 <div className="flex flex-col gap-1">
                   <Link
                     href={href}
-                    className="text-body-md font-semibold text-foreground after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+                    className="text-body-md font-medium text-foreground after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
                   >
                     {label}
                   </Link>
