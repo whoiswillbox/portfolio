@@ -12,6 +12,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
+import { Kbd } from "@cardboard";
 import { cn } from "@/lib/utils";
 
 /* Shared scaffold for the per-component reference pages — keeps the back link,
@@ -560,12 +561,14 @@ export function Install({ code }: { code: string }) {
   );
 }
 
-// Accessibility notes — keyboard interactions + ARIA behavior.
+// Accessibility notes — keyboard interactions (rendered with Kbd) + ARIA notes.
 export function Accessibility({
   keyboard,
   notes,
 }: {
-  keyboard: { keys: string; does: string }[];
+  // `keys` is a list of individual keys shown as separate <Kbd> chips; multiple
+  // keys read as alternatives (e.g. ["←", "→"] → ← / →).
+  keyboard: { keys: string[]; does: string }[];
   notes?: string[];
 }) {
   return (
@@ -581,8 +584,17 @@ export function Accessibility({
           </thead>
           <tbody className="divide-y divide-border">
             {keyboard.map((k) => (
-              <tr key={k.keys}>
-                <td className="px-4 py-2 text-body-xs text-foreground" style={{ fontFamily: MONO }}>{k.keys}</td>
+              <tr key={k.keys.join("/")}>
+                <td className="px-4 py-2">
+                  <span className="inline-flex items-center gap-1.5">
+                    {k.keys.map((key, i) => (
+                      <React.Fragment key={key}>
+                        {i > 0 && <span className="text-tertiary">/</span>}
+                        <Kbd>{key}</Kbd>
+                      </React.Fragment>
+                    ))}
+                  </span>
+                </td>
                 <td className="px-4 py-2 text-muted-foreground">{k.does}</td>
               </tr>
             ))}
@@ -598,6 +610,70 @@ export function Accessibility({
           ))}
         </ul>
       )}
+    </section>
+  );
+}
+
+// Design-facing accessibility: a WCAG/ADA criteria checklist (contrast, touch
+// target, focus, text sizing, color independence, motion) — each row a
+// criterion, a pass/status badge, and the measured detail. Complements the
+// Develop-tab Accessibility (keyboard + ARIA).
+export type WcagRow = {
+  criterion: string;
+  /** pass = meets AA; note = meets with a caveat; fail = does not meet. */
+  status: "pass" | "note" | "fail";
+  /** Short status label shown in the badge, e.g. "AA", "AA·caveat", "Fail". */
+  label: string;
+  detail: string;
+};
+export function WcagChecklist({ rows }: { rows: WcagRow[] }) {
+  const badge: Record<WcagRow["status"], string> = {
+    pass: "bg-surface-success text-icon-success",
+    note: "bg-surface-caution text-icon-caution",
+    fail: "bg-surface-critical text-icon-critical",
+  };
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-h3">Accessibility</h2>
+        <p className="text-body-sm text-muted-foreground">
+          How the component meets WCAG 2.2 AA / ADA design criteria.
+        </p>
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[32rem] text-left text-body-sm">
+          <thead>
+            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
+              <th className="px-4 py-2 font-normal">Criterion</th>
+              <th className="px-4 py-2 font-normal">Status</th>
+              <th className="px-4 py-2 font-normal">Detail</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {rows.map((r) => (
+              <tr key={r.criterion}>
+                <td className="px-4 py-2 text-foreground">{r.criterion}</td>
+                <td className="px-4 py-2">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-body-xs font-medium",
+                      badge[r.status]
+                    )}
+                  >
+                    {r.status === "fail" ? (
+                      <XCircleIcon className="size-3.5" />
+                    ) : (
+                      <CheckCircleIcon className="size-3.5" />
+                    )}
+                    {r.label}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-muted-foreground">{r.detail}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

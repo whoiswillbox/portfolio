@@ -12,6 +12,7 @@ import {
   DoDont,
   Install,
   Accessibility,
+  WcagChecklist,
 } from "../_component-page";
 
 // A single segment rendered with its state classes FORCED, so each interaction
@@ -223,6 +224,46 @@ export default function SegmentedControlDocs() {
                 },
               ]}
             />
+            <WcagChecklist
+              rows={[
+                {
+                  criterion: "Text contrast (1.4.3)",
+                  status: "pass",
+                  label: "AA",
+                  detail: "Active label foreground/background ≈ 17:1; inactive tertiary/muted ≈ 4.6:1 (≥ 4.5).",
+                },
+                {
+                  criterion: "Non-text contrast (1.4.11)",
+                  status: "pass",
+                  label: "AA",
+                  detail: "Track ring and focus ring meet ≥ 3:1 against adjacent colors.",
+                },
+                {
+                  criterion: "Focus visible (2.4.7)",
+                  status: "pass",
+                  label: "AA",
+                  detail: "2px ring (ring-border-focus) on keyboard focus, ≥ 3:1 contrast.",
+                },
+                {
+                  criterion: "Target size (2.5.8)",
+                  status: "note",
+                  label: "AA · note",
+                  detail: "Default height ≈ 32px (meets the 24px AA minimum). For 44px AAA / touch, add padding or use larger labels.",
+                },
+                {
+                  criterion: "Use of color (1.4.1)",
+                  status: "pass",
+                  label: "AA",
+                  detail: "Selection is shown by a raised pill + shadow, not color alone.",
+                },
+                {
+                  criterion: "Reflow / text sizing (1.4.4)",
+                  status: "pass",
+                  label: "AA",
+                  detail: "Labels use rem type tokens and scale to 200% without loss of content.",
+                },
+              ]}
+            />
           </>
         }
         dev={
@@ -240,13 +281,15 @@ export default function SegmentedControlDocs() {
             />
             <Accessibility
               keyboard={[
-                { keys: "Tab", does: "Moves focus to the next segment." },
-                { keys: "Shift + Tab", does: "Moves focus to the previous segment." },
-                { keys: "Space / Enter", does: "Selects the focused segment." },
+                { keys: ["Tab"], does: "Moves focus into / out of the control (single tab stop)." },
+                { keys: ["←", "→"], does: "Moves the selection to the previous / next segment." },
+                { keys: ["↑", "↓"], does: "Same as ← / → (selection follows focus)." },
+                { keys: ["Home", "End"], does: "Selects the first / last segment." },
               ]}
               notes={[
                 "Rendered as role=\"tablist\" with role=\"tab\" segments; the active segment sets aria-selected.",
-                "Disabled segments have disabled buttons — skipped by Tab and not selectable.",
+                "Roving tabindex — only the selected segment is tabbable, so the group is one Tab stop and arrows move within it.",
+                "Disabled segments are skipped by arrow navigation and not selectable.",
                 "Focus shows a visible ring (focus-visible:ring-2 ring-border-focus).",
               ]}
             />
