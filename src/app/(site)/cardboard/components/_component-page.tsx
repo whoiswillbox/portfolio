@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { Kbd } from "@cardboard";
+import { getComponent, ComponentCard } from "./component-registry";
 import { cn } from "@/lib/utils";
 
 /* Shared scaffold for the per-component reference pages — keeps the back link,
@@ -674,6 +675,102 @@ export function WcagChecklist({ rows }: { rows: WcagRow[] }) {
           </tbody>
         </table>
       </div>
+    </section>
+  );
+}
+
+/* ─── More Design-tab blocks ─────────────────────────────────────────────── */
+
+export type AnatomyPart = { n: number; part: string; tokens: string };
+// Anatomy: a live component with numbered callouts, plus a legend mapping each
+// number → the part and the Cardboard tokens that style it.
+export function Anatomy({
+  children,
+  parts,
+}: {
+  /** The component to display (annotate it with data-anatomy numbers if desired). */
+  children: React.ReactNode;
+  parts: AnatomyPart[];
+}) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Anatomy</h2>
+      <div className="flex min-h-40 items-center justify-center rounded-xl border border-border bg-background p-8">
+        {children}
+      </div>
+      <ol className="flex flex-col gap-2">
+        {parts.map((p) => (
+          <li key={p.n} className="flex items-start gap-3 text-body-sm">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-secondary text-body-xs font-medium text-foreground">
+              {p.n}
+            </span>
+            <span className="text-foreground">{p.part}</span>
+            <span className="ml-auto text-body-xs text-muted-foreground" style={{ fontFamily: MONO }}>
+              {p.tokens}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+// Content guidelines — rules for the words inside the component.
+export function ContentGuidelines({ rules }: { rules: string[] }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Content</h2>
+      <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+        {rules.map((r) => (
+          <li key={r} className="flex gap-2">
+            <span className="text-tertiary">•</span> {r}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export type RelatedItem = { href: string; when: string };
+// Related components — real gallery cards (live preview + name + description)
+// pulled from the shared registry by href, each with a "reach for this when"
+// note. Falls back to a plain link if the href isn't in the registry.
+export function Related({ items }: { items: RelatedItem[] }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">Related</h2>
+      <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((it) => {
+          const entry = getComponent(it.href);
+          if (!entry) {
+            return (
+              <Link key={it.href} href={it.href} className="text-body-sm text-link hover:underline">
+                {it.href}
+              </Link>
+            );
+          }
+          // Override the gallery description with the contextual "when" note.
+          return <ComponentCard key={it.href} {...entry} description={it.when} />;
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* ─── More Develop-tab blocks ────────────────────────────────────────────── */
+
+// API / composition notes — a titled bullet list of behavioral contract notes.
+export function ApiNotes({ notes }: { notes: string[] }) {
+  return (
+    <section className="mb-12 flex flex-col gap-4">
+      <h2 className="text-h3">API notes</h2>
+      <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+        {notes.map((n) => (
+          <li key={n} className="flex gap-2">
+            <span className="text-tertiary">•</span> {n}
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

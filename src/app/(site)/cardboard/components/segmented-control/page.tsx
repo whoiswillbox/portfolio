@@ -13,6 +13,10 @@ import {
   Install,
   Accessibility,
   WcagChecklist,
+  Anatomy,
+  ContentGuidelines,
+  Related,
+  ApiNotes,
 } from "../_component-page";
 
 // A single segment rendered with its state classes FORCED, so each interaction
@@ -164,6 +168,18 @@ export default function SegmentedControlDocs() {
         design={
           <>
             <Variants variants={VARIANTS} showCode={false} />
+            <Anatomy
+              parts={[
+                { n: 1, part: "Track — the container that holds the segments.", tokens: "bg-muted · --radius-lg · ring-border" },
+                { n: 2, part: "Segment — a selectable option (inactive).", tokens: "text-tertiary" },
+                { n: 3, part: "Active pill — the raised, selected segment.", tokens: "bg-background · shadow-sm · text-foreground" },
+              ]}
+            >
+              <SegmentedControl value="2" onValueChange={() => {}}>
+                <SegmentedControlItem value="1">Item</SegmentedControlItem>
+                <SegmentedControlItem value="2">Item</SegmentedControlItem>
+              </SegmentedControl>
+            </Anatomy>
             <Guidelines
               use={[
                 "Switching between 2–5 mutually exclusive views (e.g. tabs of one panel).",
@@ -174,6 +190,14 @@ export default function SegmentedControlDocs() {
                 "More than ~5 options — use a Select or Tabs instead.",
                 "Triggering actions (Save, Delete) — use Buttons or a Toggle Group.",
                 "Long or uneven labels that make segments different widths.",
+              ]}
+            />
+            <ContentGuidelines
+              rules={[
+                "Keep labels to 1–2 words so all segments stay a similar width.",
+                "Use sentence case; no trailing punctuation.",
+                "Write parallel labels (all nouns or all verbs), not a mix.",
+                "Avoid icons-only segments unless the meaning is unmistakable.",
               ]}
             />
             <DoDont
@@ -264,11 +288,27 @@ export default function SegmentedControlDocs() {
                 },
               ]}
             />
+            <Related
+              items={[
+                { href: "/cardboard/components/select", when: "For more than ~5 options." },
+                { href: "/cardboard/components/toggle-group", when: "For actions, or multi-select." },
+                { href: "/cardboard/components/tabs", when: "For switching larger content panels." },
+              ]}
+            />
           </>
         }
         dev={
           <>
             <Install code={`import { SegmentedControl, SegmentedControlItem } from "@cardboard";`} />
+            <ApiNotes
+              notes={[
+                "Controlled only — always pass value and onValueChange (there is no defaultValue).",
+                "SegmentedControlItem must be rendered inside a SegmentedControl (it reads context).",
+                "Each item needs a unique value; it's passed back to onValueChange on select.",
+                "Style hooks: the track exposes data-slot=\"segmented-control\"; items expose data-state (active/inactive) and data-value.",
+                "No extra dependencies or providers required.",
+              ]}
+            />
             <Variants variants={VARIANTS} />
             <PropsTable
               rows={[
