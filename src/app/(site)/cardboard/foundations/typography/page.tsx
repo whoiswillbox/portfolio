@@ -38,6 +38,7 @@ type TypeToken = {
   weight: string; // weight primitive label
   tracking?: string; // letter-spacing primitive suffix (--letter-spacing-*)
   clamp?: string; // literal clamp() value for fluid (size === "fluid") tokens
+  color?: string; // text-color primitive var (--color-*) when the token sets one
   use: string; // per-token usage note
   sample?: string;
 };
@@ -60,9 +61,10 @@ const HEADINGS: TypeToken[] = [
 ];
 
 // Eyebrow — the kicker/label above a heading. Composed: text-eyebrow token +
-// uppercase + a serif family. (font-serif = Signifier.)
+// a serif family, in the tertiary text color. (font-serif = Signifier.)
 const EYEBROW: TypeToken = {
   token: "text-eyebrow", family: "serif", size: "sm", px: "14", lh: "none", weight: "medium", tracking: "wider",
+  color: "tertiary",
   use: "Kicker / label above a heading.", sample: "Case study —",
 };
 
@@ -171,11 +173,11 @@ function Spec({ label, v }: { label: string; v: string }) {
   );
 }
 
-function TypeRow({ token, family, size, px, lh, weight, tracking, clamp, use, sample, variant = "body" }: TypeToken & { variant?: "body" | "heading" | "display" | "eyebrow" }) {
+function TypeRow({ token, family, size, px, lh, weight, tracking, clamp, color, use, sample, variant = "body" }: TypeToken & { variant?: "body" | "heading" | "display" | "eyebrow" }) {
   const fontClass =
     variant === "display" ? "font-display"
     : variant === "heading" ? "font-heading"
-    : variant === "eyebrow" ? "font-serif uppercase text-tertiary"
+    : variant === "eyebrow" ? "font-serif text-tertiary"
     : "font-sans";
   return (
     <div className="flex flex-col gap-3 py-6">
@@ -208,6 +210,7 @@ function TypeRow({ token, family, size, px, lh, weight, tracking, clamp, use, sa
             )}
             <Spec label="Tracking" v={`--letter-spacing-${tracking ?? "normal"}`} />
             <Spec label="Weight" v={`--font-weight-${weight}`} />
+            {color && <Spec label="Color" v={`--color-${color}`} />}
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -308,16 +311,13 @@ export default function Typography() {
               The kicker/label above a heading. The{" "}
               <span className="font-mono text-body-xs">text-eyebrow</span> token
               carries the size, wide tracking, and tight leading; pair it with{" "}
-              <span className="font-mono text-body-xs">uppercase</span> and{" "}
-              <span className="font-mono text-body-xs">font-serif</span> in markup.
+              <span className="font-mono text-body-xs">font-serif</span> in the{" "}
+              <span className="font-mono text-body-xs">text-tertiary</span> color.
             </p>
             <UsageHint>
-              <span className="font-mono text-body-xs">text-transform</span> can&apos;t
-              live on a <span className="font-mono text-body-xs">text-*</span> token,
-              so the <span className="font-mono text-body-xs">uppercase</span> comes
-              from the utility. Typically set in{" "}
-              <span className="font-mono text-body-xs">text-tertiary</span> above a
-              display or heading.
+              Set in <span className="font-mono text-body-xs">text-tertiary</span>{" "}
+              above a display or heading. Use sentence case — the wide tracking and
+              serif cut carry the label styling without uppercasing.
             </UsageHint>
           </div>
           <div className="flex flex-col divide-y divide-border">

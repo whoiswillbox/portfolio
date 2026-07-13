@@ -142,7 +142,7 @@ const components: Entry[] = [
   {
     title: "Select",
     children: [
-      leaf("Select", "select"),
+      leaf("Select", "select", "stable"),
       leaf("Combobox", "combobox"),
       leaf("Native Select", "native-select"),
     ],
@@ -178,7 +178,7 @@ export function CardboardSidebar() {
       <SidebarContent>
         {/* FOUNDATIONS — eyebrow group header, items listed directly. */}
         <SidebarGroup>
-          <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+          <SidebarGroupLabel className="font-mono tracking-wide">
             Foundations
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -203,7 +203,7 @@ export function CardboardSidebar() {
 
         {/* COMPONENTS — eyebrow group header; flat A–Z list, some collapsible. */}
         <SidebarGroup>
-          <SidebarGroupLabel className="font-mono uppercase tracking-wide">
+          <SidebarGroupLabel className="font-mono tracking-wide">
             Components
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -261,6 +261,7 @@ export function CardboardSidebar() {
                                 >
                                   <Link href={href}>
                                     <span>{c.title}</span>
+                                    {c.status && <StatusDot status={c.status} />}
                                   </Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
