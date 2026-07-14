@@ -1,13 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { CubeIcon, SwatchIcon } from "@heroicons/react/24/outline";
 import { BoxLogo } from "@/components/box-logo";
+import { ProductSwitcher } from "@/components/product-switcher";
 import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
   NavBar as NavBarRoot,
   NavBarLogo,
   NavBarNav,
@@ -22,7 +18,7 @@ import {
   DoDont,
   Anatomy,
   ContentGuidelines,
-  ApiNotes,
+  Slots,
   PropsTable,
   States,
   WcagChecklist,
@@ -35,14 +31,15 @@ import {
 
 // Renders the REAL NavBar component (framed for the docs) so the preview is
 // truthful. `logo` toggles the logo slot; children are extra trailing content.
+// The product switcher is the REAL <ProductSwitcher /> — the same component the
+// app shell mounts — so the demo can't drift from production (icons + taglines,
+// active state, behavior all come from the real thing).
 function NavBar({
   children,
   logo = true,
-  product = "cardboard",
 }: {
   children?: React.ReactNode;
   logo?: boolean;
-  product?: string;
 }) {
   return (
     <div className="w-full overflow-hidden">
@@ -52,7 +49,7 @@ function NavBar({
             <BoxLogo className="size-6" />
           </NavBarLogo>
         )}
-        <Switcher product={product} />
+        <ProductSwitcher demo />
         {children}
       </NavBarRoot>
     </div>
@@ -83,33 +80,6 @@ function NavItems() {
   );
 }
 
-const PRODUCTS = [
-  { id: "box", name: "Box", Icon: CubeIcon },
-  { id: "cardboard", name: "Cardboard", Icon: SwatchIcon },
-];
-
-function Switcher({ product = "cardboard" }: { product?: string }) {
-  const [v, setV] = React.useState(product);
-  React.useEffect(() => setV(product), [product]);
-  const active = PRODUCTS.find((p) => p.id === v) ?? PRODUCTS[1];
-  return (
-    <Select value={v} onValueChange={setV}>
-      <SelectTrigger variant="ghost" size="sm" aria-label="Switch product">
-        {/* Show just the name in the trigger — not the item's icon. */}
-        <span>{active.name}</span>
-      </SelectTrigger>
-      <SelectContent className="w-48">
-        {PRODUCTS.map(({ id, name, Icon }) => (
-          <SelectItem key={id} value={id}>
-            <Icon className="size-4" />
-            {name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-}
-
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
 export default function NavBarDocs() {
@@ -124,12 +94,11 @@ export default function NavBarDocs() {
         playground={
           <Playground
             controls={[
-              { prop: "product", label: "product", type: "select", options: ["box", "cardboard"], default: "cardboard" },
               { prop: "logo", label: "logo", type: "boolean", default: true },
               { prop: "navItems", label: "nav items", type: "boolean", default: true },
             ]}
             render={(v) => (
-              <NavBar logo={Boolean(v.logo)} product={String(v.product)}>
+              <NavBar logo={Boolean(v.logo)}>
                 {v.navItems ? <NavItems /> : null}
               </NavBar>
             )}
@@ -139,9 +108,9 @@ export default function NavBarDocs() {
           <>
             <Anatomy
               parts={[
-                { n: 1, part: "Bar — the fixed strip; sits above the sidebar.", tokens: "NavBar · h-14 · border-b border-divider" },
+                { n: 1, part: "Bar — the fixed strip; sits above the SidebarProvider so the provider's row layout / height is unchanged.", tokens: "NavBar · h-14 · border-b border-divider" },
                 { n: 2, part: "Logo — the product mark; links home.", tokens: "NavBarLogo · size-6" },
-                { n: 3, part: "Product switcher — a ghost Select to change product.", tokens: "SelectTrigger variant=ghost · size-sm" },
+                { n: 3, part: "Product switcher — the ProductSwitcher (a ghost Select); each item shows an icon + name + tagline.", tokens: "ProductSwitcher · SelectTrigger variant=ghost" },
                 { n: 4, part: "Nav items — optional top-level links, right-aligned; the current one is active.", tokens: "NavBarNav · NavBarNavItem[active]" },
               ]}
             >
@@ -244,12 +213,11 @@ import { BoxLogo } from "@/components/box-logo";`} />
                   label: "Default",
                   caption: "The assembled bar — logo, product switcher, and top-level nav items.",
                   preview: <NavBar><NavItems /></NavBar>,
-                  code: `import { NavBar, NavBarLogo, NavBarNav, NavBarNavItem,
-  Select, SelectTrigger, SelectContent, SelectItem } from "@cardboard";
+                  code: `import { NavBar, NavBarLogo, NavBarNav, NavBarNavItem } from "@cardboard";
 import { BoxLogo } from "@/components/box-logo";
+import { ProductSwitcher } from "@/components/product-switcher";
 
 function AppNavBar() {
-  const [product, setProduct] = useState("cardboard");
   return (
     <NavBar className="max-sm:hidden">
       {/* Logo → home */}
@@ -257,16 +225,9 @@ function AppNavBar() {
         <BoxLogo className="size-6" />
       </NavBarLogo>
 
-      {/* Product switcher — the Select ghost variant (see Select → No border) */}
-      <Select value={product} onValueChange={setProduct}>
-        <SelectTrigger variant="ghost" size="sm" aria-label="Switch product">
-          <span>{product === "box" ? "Box" : "Cardboard"}</span>
-        </SelectTrigger>
-        <SelectContent className="w-48">
-          <SelectItem value="box">Box</SelectItem>
-          <SelectItem value="cardboard">Cardboard</SelectItem>
-        </SelectContent>
-      </Select>
+      {/* Product switcher — the ghost-variant Select, with icon + tagline
+          per product. Self-contained (reads the route for the active one). */}
+      <ProductSwitcher />
 
       {/* Optional top-level nav items (right-aligned) */}
       <NavBarNav>
@@ -295,16 +256,6 @@ function AppNavBar() {
                 },
               ]}
             />
-            <ApiNotes
-              notes={[
-                "NavBar is the <header> strip; compose NavBarLogo (home link), a switcher, and an optional NavBarNav of NavBarNavItems inside it.",
-                "NavBarLogo defaults href to \"/\" and aria-label to \"Home\"; pass your own for other products.",
-                "NavBarNav is right-aligned (ml-auto); NavBarNavItem takes an `active` prop for the current section.",
-                "Desktop only — add max-sm:hidden; the mobile nav takes over there.",
-                "Sits ABOVE the SidebarProvider so the provider's row layout / height is unchanged.",
-                "The product switcher is a ghost-variant Select (see Select → No border).",
-              ]}
-            />
             <PropsTable
               groups={[
                 {
@@ -320,6 +271,28 @@ function AppNavBar() {
                     { name: "active?", type: "boolean", default: "false", desc: "Marks the current section (foreground + medium weight)." },
                     { name: "href", type: "string", desc: "The item's route (extends next/link)." },
                   ],
+                },
+              ]}
+            />
+            <Slots
+              intro="The Nav Bar is a layout shell — compose its parts as children. It owns no fixed switcher; drop in a ProductSwitcher (a Select) as a child."
+              slots={[
+                {
+                  name: "NavBarLogo",
+                  type: "ReactNode",
+                  desc: "The product mark, wrapped in a home link. Give it an accessible label since it's typically icon-only.",
+                },
+                {
+                  name: "ProductSwitcher",
+                  type: "ReactNode",
+                  optional: true,
+                  desc: "The product switcher — a ghost-variant Select with an icon, name, and tagline per product. Any inline control can go here; it's just a child, not a fixed slot.",
+                },
+                {
+                  name: "NavBarNav",
+                  type: "NavBarNavItem[]",
+                  optional: true,
+                  desc: "Optional top-level nav, right-aligned (ml-auto). Holds NavBarNavItem links; mark the current section with `active`.",
                 },
               ]}
             />

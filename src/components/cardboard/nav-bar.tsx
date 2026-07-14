@@ -13,7 +13,16 @@ import { cn } from "@/lib/utils"
        <NavBarNav>…links…</NavBarNav>   // optional, right-aligned
      </NavBar>
 
-   Desktop-only in the app shell (hidden under sm; the mobile nav takes over). */
+   Desktop-only in the app shell (hidden under sm; the mobile nav takes over).
+
+   NavBar is a layout shell only — it takes free children, it does NOT own the
+   switcher. The product switcher is a real Select (ProductSwitcher), dropped in
+   as a child, because it has genuine listbox semantics: a selected value, a
+   checkmark, a listbox popup. Deliberately NOT folded into NavBarNavItem as a
+   "disclosure" prop (a nav item is a Link that navigates; conflating the two
+   would overload one component with two ARIA roles) and NOT exposed as a fixed
+   `switcher` slot (would bake "has a switcher" into every bar). Keep it
+   compositional. */
 
 function NavBar({ className, children, ...props }: React.ComponentProps<"header">) {
   return (
