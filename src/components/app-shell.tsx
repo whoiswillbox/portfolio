@@ -21,7 +21,10 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const inCardboard = pathname.startsWith("/cardboard")
-  // The landing page (/) is a full-bleed splash — no top bar, no sidebar chrome.
+  // TRIAL (try/nav-bar-shell, one-page model): "/" now hosts the live Box AI with
+  // a splash OVERLAY on top (fixed, full-viewport) — so "/" uses the SAME layout
+  // as /who (topbar reserved, Box AI centered). The nav bar just fades its opacity
+  // via --enter-progress while the splash is up. No special full-bleed casing.
   const isLanding = pathname === "/"
   const home = inCardboard
     ? { name: "Cardboard", href: "/cardboard/foundations" }
@@ -33,9 +36,7 @@ export function AppShell({
     // 0 on mobile (no top bar) and on the landing splash (full-bleed, nav bar
     // overlays); 3.5rem on desktop everywhere else where the header shows.
     <div
-      className={`flex h-svh flex-col overflow-hidden [--topbar-h:0px] ${
-        isLanding ? "" : "sm:[--topbar-h:3.5rem]"
-      }`}
+      className="flex h-svh flex-col overflow-hidden [--topbar-h:0px] sm:[--topbar-h:3.5rem]"
     >
       {/* Full-width top bar (Tailwind-docs style): the Box logo home link + the
           product switcher pill. Desktop only — mobile uses MobileNav. Sits
@@ -48,7 +49,7 @@ export function AppShell({
           On landing it OVERLAYS absolutely (full-bleed splash keeps --topbar-h:0,
           no reserved white gap); it just fades in over the splash. */}
       <NavBar
-        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"} ${isLanding ? "absolute inset-x-0 top-0 z-30" : ""}`}
+        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"}`}
         style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
       >
         <NavBarLogo href={home.href} aria-label={home.name}>
