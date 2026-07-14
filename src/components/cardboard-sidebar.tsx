@@ -69,20 +69,9 @@ function StatusDot({ status }: { status: Status }) {
 const components: Entry[] = [
   leaf("Accordion", "accordion"),
   leaf("Alert", "alert"),
-  leaf("Aspect Ratio", "aspect-ratio"),
-  leaf("Avatar", "avatar"),
   leaf("Badge", "badge"),
   leaf("Breadcrumb", "breadcrumb"),
-  {
-    title: "Button",
-    children: [
-      leaf("Button", "button"),
-      leaf("Button Group", "button-group"),
-      leaf("Toggle", "toggle"),
-      leaf("Toggle Group", "toggle-group"),
-    ],
-  },
-  leaf("Calendar", "calendar"),
+  leaf("Button", "button"),
   {
     title: "Card",
     children: [
@@ -91,10 +80,6 @@ const components: Entry[] = [
       leaf("Content Card", "content-card"),
     ],
   },
-  leaf("Carousel", "carousel"),
-  leaf("Chart", "chart"),
-  leaf("Checkbox", "checkbox"),
-  leaf("Collapsible", "collapsible"),
   leaf("Copy Token", "copy-token"),
   {
     title: "Dialog",
@@ -105,10 +90,8 @@ const components: Entry[] = [
       leaf("Sheet", "sheet"),
     ],
   },
-  leaf("Direction", "direction"),
   leaf("Empty", "empty"),
   leaf("Field", "field"),
-  leaf("Hover Card", "hover-card"),
   leaf("Image Lightbox", "image-lightbox"),
   {
     title: "Input",
@@ -132,12 +115,10 @@ const components: Entry[] = [
     ],
   },
   leaf("Mobile Only", "mobile-only"),
-  leaf("Pagination", "pagination"),
+  leaf("Nav Bar", "nav-bar", "stable"),
   leaf("Popover", "popover"),
   leaf("Progress", "progress"),
-  leaf("Radio Group", "radio-group"),
   leaf("Resizable", "resizable"),
-  leaf("Scroll Area", "scroll-area"),
   leaf("Segmented Control", "segmented-control", "stable"),
   {
     title: "Select",
@@ -281,7 +262,7 @@ export function CardboardSidebar() {
           horizontal padding so the full-bleed separator reaches both edges (the
           Settings button re-adds its own inset via the menu button padding). */}
       <SidebarFooter className="px-0">
-        <SidebarSeparator className="mx-0 w-full mb-2 bg-border" />
+        <SidebarSeparator className="mx-0 w-full mb-2 bg-border-divider" />
         <div className="px-2">
         <SidebarMenu>
           <SidebarMenuItem>

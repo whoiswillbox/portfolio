@@ -14,20 +14,14 @@ import { Input } from "@/components/cardboard/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/cardboard/card";
 import { Switch } from "@/components/cardboard/switch";
 import { Separator } from "@/components/cardboard/separator";
-import { Checkbox } from "@/components/cardboard/checkbox";
 import { Textarea } from "@/components/cardboard/textarea";
 import { Skeleton } from "@/components/cardboard/skeleton";
 import { Progress } from "@/components/cardboard/progress";
 import { Avatar, AvatarFallback } from "@/components/cardboard/avatar";
-import { Toggle } from "@/components/cardboard/toggle";
-import { Spinner } from "@/components/cardboard/spinner";
 import { NativeSelect } from "@/components/cardboard/native-select";
 import { Kbd } from "@/components/cardboard/kbd";
 import { Label } from "@/components/cardboard/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/cardboard/tabs";
-import { Slider } from "@/components/cardboard/slider";
-import { RadioGroup, RadioGroupItem } from "@/components/cardboard/radio-group";
-import { ToggleGroup, ToggleGroupItem } from "@/components/cardboard/toggle-group";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -36,10 +30,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/cardboard/breadcrumb";
-import {
-  ButtonGroup,
-  ButtonGroupText,
-} from "@/components/cardboard/button-group";
 import {
   Item,
   ItemMedia,
@@ -65,12 +55,6 @@ import {
   TableRow,
   TableCell,
 } from "@/components/cardboard/table";
-import { Calendar } from "@/components/cardboard/calendar";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/cardboard/carousel";
 import { CaseStudyEmptyState } from "@/components/case-study-empty-state";
 import { BoxLogo } from "@/components/box-logo";
 
@@ -232,17 +216,6 @@ export const components: {
     ),
   },
   {
-    label: "Checkbox",
-    href: "/cardboard/components/checkbox",
-    description: "Boolean selection controls.",
-    preview: (
-      <div className="flex flex-col gap-2 text-body-sm">
-        <Label className="flex items-center gap-2"><Checkbox /> Unchecked</Label>
-        <Label className="flex items-center gap-2"><Checkbox defaultChecked /> Checked</Label>
-      </div>
-    ),
-  },
-  {
     label: "Textarea",
     href: "/cardboard/components/textarea",
     description: "Multi-line text fields.",
@@ -269,35 +242,6 @@ export const components: {
     preview: <Progress value={62} className="max-w-[13rem]" />,
   },
   {
-    label: "Avatar",
-    href: "/cardboard/components/avatar",
-    description: "User images and initials.",
-    preview: (
-      <div className="flex items-center -space-x-2">
-        <Avatar><AvatarFallback>WB</AvatarFallback></Avatar>
-        <Avatar><AvatarFallback>JS</AvatarFallback></Avatar>
-        <Avatar><AvatarFallback>AK</AvatarFallback></Avatar>
-      </div>
-    ),
-  },
-  {
-    label: "Toggle",
-    href: "/cardboard/components/toggle",
-    description: "Two-state pressable buttons.",
-    preview: (
-      <div className="flex items-center gap-2">
-        <Toggle defaultPressed><StarIcon className="size-4" /></Toggle>
-        <Toggle>Toggle</Toggle>
-      </div>
-    ),
-  },
-  {
-    label: "Spinner",
-    href: "/cardboard/components/spinner",
-    description: "Indeterminate loading.",
-    preview: <Spinner className="size-6" />,
-  },
-  {
     label: "Native Select",
     href: "/cardboard/components/native-select",
     description: "Styled native dropdowns.",
@@ -315,18 +259,6 @@ export const components: {
     preview: (
       <div className="flex items-center gap-1 text-body-sm">
         <Kbd>⌘</Kbd><Kbd>K</Kbd>
-      </div>
-    ),
-  },
-  {
-    label: "Aspect Ratio",
-    href: "/cardboard/components/aspect-ratio",
-    description: "Fixed width-to-height boxes.",
-    preview: (
-      <div className="w-full max-w-[13rem]">
-        <div className="flex aspect-video items-center justify-center rounded-lg bg-surface-secondary text-body-xs text-muted-foreground ring-1 ring-border">
-          16 : 9
-        </div>
       </div>
     ),
   },
@@ -445,43 +377,6 @@ export const components: {
     ),
   },
   {
-    label: "Hover Card",
-    href: "/cardboard/components/hover-card",
-    description: "Hover-to-preview cards.",
-    preview: (
-      <Window>
-        <div className="flex items-center gap-2">
-          <Avatar className="size-8"><AvatarFallback>WB</AvatarFallback></Avatar>
-          <div className="text-body-sm font-medium">@willbox</div>
-        </div>
-        <div className="mt-2 text-body-xs text-muted-foreground">Designer & engineer.</div>
-      </Window>
-    ),
-  },
-  {
-    label: "Radio Group",
-    href: "/cardboard/components/radio-group",
-    description: "Pick one of several options.",
-    preview: (
-      <RadioGroup defaultValue="b" className="text-body-sm">
-        <Label className="flex items-center gap-2"><RadioGroupItem value="a" /> Default</Label>
-        <Label className="flex items-center gap-2"><RadioGroupItem value="b" /> Comfortable</Label>
-      </RadioGroup>
-    ),
-  },
-  {
-    label: "Toggle Group",
-    href: "/cardboard/components/toggle-group",
-    description: "Grouped toggle buttons.",
-    preview: (
-      <ToggleGroup type="single" variant="outline" spacing={0} defaultValue="l">
-        <ToggleGroupItem value="l">Left</ToggleGroupItem>
-        <ToggleGroupItem value="c">Center</ToggleGroupItem>
-        <ToggleGroupItem value="r">Right</ToggleGroupItem>
-      </ToggleGroup>
-    ),
-  },
-  {
     label: "Breadcrumb",
     href: "/cardboard/components/breadcrumb",
     description: "Path to the current page.",
@@ -496,58 +391,18 @@ export const components: {
     ),
   },
   {
-    label: "Pagination",
-    href: "/cardboard/components/pagination",
-    description: "Navigate between pages of a list.",
+    label: "Nav Bar",
+    href: "/cardboard/components/nav-bar",
+    description: "Top app bar — brand mark and product switcher.",
     preview: (
-      <div className="flex items-center gap-1">
-        <Button size="icon" variant="ghost">1</Button>
-        <Button size="icon" variant="outline">2</Button>
-        <Button size="icon" variant="ghost">3</Button>
-      </div>
-    ),
-  },
-  {
-    label: "Slider",
-    href: "/cardboard/components/slider",
-    description: "Pick a value or range on a track.",
-    preview: <Slider defaultValue={[40]} className="max-w-[13rem]" />,
-  },
-  {
-    label: "Collapsible",
-    href: "/cardboard/components/collapsible",
-    description: "Show and hide a region.",
-    preview: (
-      <div className="flex w-full max-w-[13rem] flex-col gap-2 text-body-sm">
-        <div className="flex items-center justify-between rounded-lg border border-border px-3 py-1.5 font-medium">
-          Repositories <span className="text-muted-foreground">⌄</span>
+      <div className="w-full max-w-[13rem] overflow-hidden rounded-md border border-border bg-background">
+        <div className="flex h-9 items-center gap-2 border-b border-border/60 px-2.5">
+          <div className="size-4 rounded bg-foreground" />
+          <span className="text-body-xs font-medium text-foreground">Cardboard</span>
+          <ChevronDownIcon className="size-3 text-tertiary" />
         </div>
-        <div className="rounded-lg border border-border px-3 py-1.5 text-muted-foreground">@radix-ui</div>
+        <div className="h-6" />
       </div>
-    ),
-  },
-  {
-    label: "Scroll Area",
-    href: "/cardboard/components/scroll-area",
-    description: "Custom-thumb scroll container.",
-    preview: (
-      <div className="relative h-24 w-full max-w-[13rem] overflow-hidden rounded-lg border border-border px-3 py-2 text-body-sm">
-        <div className="flex flex-col gap-1 text-muted-foreground">
-          <span>v1.2.0</span><span>v1.1.4</span><span>v1.1.0</span><span>v1.0.9</span><span>v1.0.2</span>
-        </div>
-        <div className="absolute top-1 right-1 h-14 w-1.5 rounded-full bg-border" />
-      </div>
-    ),
-  },
-  {
-    label: "Button Group",
-    href: "/cardboard/components/button-group",
-    description: "Join buttons into a segmented control.",
-    preview: (
-      <ButtonGroup>
-        <ButtonGroupText>https://</ButtonGroupText>
-        <Button variant="outline" size="sm">willbox.com</Button>
-      </ButtonGroup>
     ),
   },
   {
@@ -600,31 +455,6 @@ export const components: {
           <div className="z-10 h-6 w-1 rounded-lg bg-border" />
         </div>
         <div className="flex flex-1 items-center justify-center">Two</div>
-      </div>
-    ),
-  },
-  {
-    label: "Sonner (Toast)",
-    href: "/cardboard/components/sonner",
-    description: "Transient notifications.",
-    preview: (
-      <div className="flex w-full max-w-[15rem] items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2.5 shadow-md">
-        <StarIcon className="size-4 shrink-0 text-foreground" />
-        <div className="flex flex-col">
-          <span className="text-body-sm font-medium">Event created</span>
-          <span className="text-body-xs text-muted-foreground">Just now</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    label: "Direction",
-    href: "/cardboard/components/direction",
-    description: "LTR / RTL layout provider.",
-    preview: (
-      <div dir="rtl" className="w-full max-w-[13rem] rounded-lg border border-border p-3 text-body-sm">
-        <p className="font-medium">مرحبا</p>
-        <p className="text-body-xs text-muted-foreground">Right-to-left flow.</p>
       </div>
     ),
   },
@@ -780,52 +610,6 @@ export const components: {
       <div className="flex h-24 w-14 flex-col rounded-[1rem] border-2 border-border bg-background p-1">
         <div className="mx-auto mt-0.5 h-1 w-6 rounded-full bg-border" />
         <div className="flex-1" />
-      </div>
-    ),
-  },
-  {
-    label: "Calendar",
-    href: "/cardboard/components/calendar",
-    description: "Pick a date or a range.",
-    preview: (
-      <div className="pointer-events-none scale-90 origin-center">
-        <Calendar mode="single" className="rounded-lg border border-border" />
-      </div>
-    ),
-  },
-  {
-    label: "Carousel",
-    href: "/cardboard/components/carousel",
-    description: "Swipeable slides.",
-    preview: (
-      <div className="w-28">
-        <Carousel>
-          <CarouselContent>
-            {[1, 2, 3].map((n) => (
-              <CarouselItem key={n}>
-                <div className="flex aspect-square items-center justify-center rounded-lg border border-border bg-muted text-h3">
-                  {n}
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      </div>
-    ),
-  },
-  {
-    label: "Chart",
-    href: "/cardboard/components/chart",
-    description: "Themed Recharts wrapper.",
-    preview: (
-      <div className="flex h-16 items-end gap-1.5">
-        {[9, 14, 7, 16, 11, 13].map((h, i) => (
-          <div
-            key={i}
-            className="w-3 rounded-t-sm bg-fill-solid"
-            style={{ height: `${h * 4}px` }}
-          />
-        ))}
       </div>
     ),
   },

@@ -439,7 +439,6 @@ export default function SegmentedControlDocs() {
             <Related
               items={[
                 { href: "/cardboard/components/select", when: "For more than ~5 options." },
-                { href: "/cardboard/components/toggle-group", when: "For actions, or multi-select." },
                 { href: "/cardboard/components/tabs", when: "For switching larger content panels." },
               ]}
             />
