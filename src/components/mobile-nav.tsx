@@ -126,7 +126,7 @@ export function MobileNav() {
 
   const experienceActive = activeNav === "experience" || (!activeNav && openTray === null && (pathname === "/technergetics" || pathname.startsWith("/technergetics/") || pathname === "/projects/next-gen-bar" || pathname === "/resume" || pathname === "/school" || pathname.startsWith("/school/")))
   const extrasActive = activeNav === "extras" || (!activeNav && openTray === null && (pathname === "/extracurriculars" || pathname.startsWith("/extracurriculars/") || pathname.startsWith("/cardboard")))
-  const boxActive = activeNav === "box" || (!activeNav && pathname === "/who" && convoParam === null && openTray === null)
+  const boxActive = activeNav === "box" || (!activeNav && (pathname === "/" || pathname === "/who") && convoParam === null && openTray === null)
   const convsActive = activeNav === "conversations" || (!activeNav && pathname === "/conversations" && openTray === null)
 
   const navItems = [
@@ -136,7 +136,7 @@ export function MobileNav() {
       iconOutline: CubeIcon,
       iconSolid: CubeSolid,
       active: boxActive,
-      onPress: () => { closeTray(); setActiveNav("box"); router.push("/who") },
+      onPress: () => { closeTray(); setActiveNav("box"); router.push("/") },
     },
     {
       id: "experience" as const,
@@ -212,10 +212,10 @@ export function MobileNav() {
                 ) : (
                   conversations.slice(0, 8).map((c) => {
                     const study = caseStudyForConversation(c)
-                    const href = study ? `${study.href}?box=${c.id}` : `/who?c=${c.id}`
+                    const href = study ? `${study.href}?box=${c.id}` : `/?c=${c.id}`
                     const active = study
                       ? pathname === study.href && boxParam === c.id
-                      : pathname === "/who" && convoParam === c.id
+                      : pathname === "/" && convoParam === c.id
                     return (
                       <div key={c.id} className="flex items-center">
                         <button

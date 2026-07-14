@@ -27,7 +27,7 @@ const products: Product[] = [
     name: "Box",
     tagline: "Portfolio",
     icon: CubeIcon,
-    href: "/who",
+    href: "/?box-home=1",
     match: (p) => !p.startsWith("/cardboard"),
   },
   {

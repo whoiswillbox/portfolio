@@ -95,12 +95,16 @@ export default function LandingPage() {
   // as you scroll (progress 0→1), revealing the live Box AI beneath. There is NO
   // navigation to /who and no remount — so there's no reflow/jump. /who still
   // exists as the direct-access Box home (conversations, switcher, logo).
-  // When arriving via /who's scroll-back, start at full progress (Box AI already
-  // revealed, splash out of the way) and consume the flag — so the incoming
-  // upward scroll SCRUBS the splash back in smoothly instead of the splash
-  // snapping to fully-shown on mount.
+  // Start at full progress (Box AI revealed, splash cleared) when either:
+  //  - navigating to the Box HOME via the nav logo / switcher (?box-home=1) — the
+  //    logo must land on the live Box AI, NOT re-show the landing splash, or
+  //  - deep-linking into a conversation (?c=<id>) — the splash must not cover it, or
+  //  - arriving via /who's scroll-back (return-to-landing flag), so the incoming
+  //    upward scroll scrubs the splash back in smoothly (no snap).
   const [progress, setProgress] = useState(() => {
     if (typeof window === "undefined") return 0;
+    const q = new URLSearchParams(window.location.search);
+    if (q.has("box-home") || q.has("c")) return 1;
     if (sessionStorage.getItem("return-to-landing") === "1") {
       sessionStorage.removeItem("return-to-landing");
       return 1;
@@ -108,6 +112,15 @@ export default function LandingPage() {
     return 0;
   });
   const progressRef = useRef(progress);
+
+  // Clean the ?box-home=1 marker out of the URL after using it (keep ?c=).
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("box-home")) {
+      url.searchParams.delete("box-home");
+      window.history.replaceState(null, "", url.pathname + url.search);
+    }
+  }, []);
   const reducedMotion = useRef(false);
   const revealed = progress >= 1;
 

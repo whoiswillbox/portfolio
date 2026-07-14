@@ -42,7 +42,7 @@ const FILTER_LABELS: Record<Filter, string> = {
 /** Where a conversation reopens — its project page (case studies) or /who. */
 function hrefFor(c: Conversation): string {
   const study = caseStudyForConversation(c);
-  return study ? `${study.href}?box=${c.id}` : `/who?c=${c.id}`;
+  return study ? `${study.href}?box=${c.id}` : `/?c=${c.id}`;
 }
 
 /** Short preview: the latest message, with chat markers stripped out. */
@@ -134,7 +134,7 @@ export default function ConversationsPage() {
             </p>
           </div>
           <Button asChild>
-            <Link href="/who">
+            <Link href="/?box-home=1">
               <PlusIcon className="size-4" />
               New chat
             </Link>

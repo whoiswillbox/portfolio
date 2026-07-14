@@ -300,10 +300,10 @@ export function AppSidebar({
                   // Box AI toggled on (conversation beside the case study);
                   // everything else opens on the full /who page.
                   const study = caseStudyForConversation(c)
-                  const href = study ? `${study.href}?box=${c.id}` : `/who?c=${c.id}`
+                  const href = study ? `${study.href}?box=${c.id}` : `/?c=${c.id}`
                   const active = study
                     ? pathname === study.href && boxParam === c.id
-                    : pathname === "/who" && convoParam === c.id
+                    : pathname === "/" && convoParam === c.id
                   return (
                   <SidebarMenuItem key={c.id}>
                     <SidebarMenuButton asChild isActive={active} tooltip={c.title}>

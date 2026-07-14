@@ -26,9 +26,14 @@ export function AppShell({
   // as /who (topbar reserved, Box AI centered). The nav bar just fades its opacity
   // via --enter-progress while the splash is up. No special full-bleed casing.
   const isLanding = pathname === "/"
+  // Box home is "/" — it already hosts the live (warm) Box AI in the one-page
+  // model, so keeping the home there avoids remounting the heavy Box AI on every
+  // nav (which caused first-scroll lag). The ?box-home=1 marker tells "/" to skip
+  // the landing splash and show Box AI directly (the logo must NOT re-show the
+  // splash); "/" strips the marker after reading it.
   const home = inCardboard
     ? { name: "Cardboard", href: "/cardboard/foundations" }
-    : { name: "Box", href: "/who" }
+    : { name: "Box", href: "/?box-home=1" }
 
   return (
     // --topbar-h is consumed by ContentWorkspace/BoxAI, which need an explicit

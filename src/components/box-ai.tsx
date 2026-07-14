@@ -894,9 +894,9 @@ export function BoxAI({
     setHeading(randomHeading());
     setOpenCaseStudy(null); // close the case study panel when leaving the chat
     setContextStudy(null);
-    // Drop the ?c=<id> param so the sidebar returns to the BOX home item
-    // (this conversation was opened from there).
-    if (!embedded) router.replace("/who");
+    // Drop the ?c=<id> param and return to the Box home ("/", the warm one-page
+    // Box AI) without re-showing the landing splash (box-home marker).
+    if (!embedded) router.replace("/?box-home=1");
   };
 
   // Open a conversation and restore its case study panel, so reopening it (from
