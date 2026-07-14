@@ -137,15 +137,17 @@ function LandingInner() {
           });
         }
       }
-      raf = requestAnimationFrame(measure);
+      // Keep tracking while the splash is up; stop once fully revealed (cube is
+      // hidden then and the slot won't move). Read the ref so the dep array
+      // stays constant ([]) — no effect re-subscribe on the reveal toggle.
+      if (progressRef.current < 1) raf = requestAnimationFrame(measure);
     };
     // Track the slot while the splash is up: Box AI's empty state mounts async
     // and its column height (and thus the cube's Y) shifts as content/opacity
-    // settle, so a rAF loop keeps the splash cube pinned to the real slot. Stop
-    // once fully revealed — the cube is hidden then and the slot won't move.
-    if (!revealed) raf = requestAnimationFrame(measure);
+    // settle, so a rAF loop keeps the splash cube pinned to the real slot.
+    raf = requestAnimationFrame(measure);
     return () => cancelAnimationFrame(raf);
-  }, [revealed]);
+  }, []);
 
   // The splash cube stands in for Box AI's empty-state cube. Once a conversation
   // or case study opens, that empty state (and its cube slot) is gone — so hide
