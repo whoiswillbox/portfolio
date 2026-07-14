@@ -40,6 +40,7 @@ import { showContactCard, stripContactMarker } from "@/lib/contact";
 import { caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
 import { ContentCard } from "@/components/content-card";
 import { CaseStudyPanel } from "@/components/case-study-panel";
+import { hasRealPage } from "@/components/case-study-pages";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -1381,7 +1382,13 @@ export function BoxAI({
         className="min-h-0 min-w-0"
         style={{ overflow: "visible" }}
       >
-        <ContentCard className={cn("flex h-full w-full min-w-0 flex-col", !skipCaseStudyAnim.current && "duration-300 ease-out animate-in fade-in slide-in-from-right-4")}>
+        {/* Studies with a hand-authored page bring their own ContentCard, so
+            render flush here (no double card chrome / scroll). Registry-article
+            studies use the normal card wrapper. */}
+        <ContentCard
+          flush={hasRealPage(openCaseStudy.slug)}
+          className={cn("flex h-full w-full min-w-0 flex-col", !skipCaseStudyAnim.current && "duration-300 ease-out animate-in fade-in slide-in-from-right-4")}
+        >
           <CaseStudyPanel study={openCaseStudy} />
         </ContentCard>
       </ResizablePanel>
