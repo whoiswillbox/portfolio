@@ -100,7 +100,7 @@ body.input-focused .mobile-nav {
    Unlayered + !important beats the button's utility classes. visibility:hidden
    (not display:none) keeps the slot's box so the splash cube can measure it and
    the heading doesn't jump. */
-.landing-box:not(.landing-revealed) .box-cube {
+.landing-box.landing-scrubbing .box-cube {
   visibility: hidden !important;
 }
 /* Extra breathing room below the cube slot so the heading sits lower (applies

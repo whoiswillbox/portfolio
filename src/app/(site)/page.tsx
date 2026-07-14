@@ -149,19 +149,6 @@ function LandingInner() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // The splash cube stands in for Box AI's empty-state cube. Once a conversation
-  // or case study opens, that empty state (and its cube slot) is gone — so hide
-  // the splash cube too, else it floats over the conversation. Watch the
-  // [data-box-empty] marker Box AI sets on its root.
-  const [boxIsEmpty, setBoxIsEmpty] = useState(true);
-  useEffect(() => {
-    const check = () => setBoxIsEmpty(!!document.querySelector("[data-box-empty]"));
-    check();
-    const observer = new MutationObserver(check);
-    observer.observe(document.body, { subtree: true, attributes: true, childList: true });
-    return () => observer.disconnect();
-  }, []);
-
   // React to the box-home / c param: force full progress (splash cleared) and
   // strip the transient ?box-home marker from the URL (keep ?c=).
   useEffect(() => {
@@ -277,7 +264,10 @@ function LandingInner() {
       {/* Live Box AI — in normal flow, same layout as /who. Fades in as the
           splash scrubs away; interactive only once fully revealed. */}
       <div
-        className={`who-shell landing-box h-full ${revealed ? "landing-revealed" : ""}`}
+        // Hide Box AI's own cube ONLY mid-scrub (0 < progress < 1), where the
+        // animated splash cube stands in. At rest (splash up = 0, or revealed =
+        // 1) Box AI's real cube shows, positioned by its own layout.
+        className={`who-shell landing-box h-full ${progress > 0 && progress < 1 ? "landing-scrubbing" : ""}`}
         style={{
           opacity: Math.max(0, (progress - 0.4) / 0.6),
           transition: "opacity 0.12s linear",
@@ -329,14 +319,12 @@ function LandingInner() {
                   const rot = (1 - ease) * -35;
                   return `translate(${x}px, ${y}px) scale(${scale}) rotate(${rot}deg)`;
                 })(),
-                // Fade in across the WHOLE scrub, reaching full opacity as the
-                // cube lands — then, once fully revealed, HAND OFF to Box AI's
-                // real empty-state cube (which is correctly positioned by its own
-                // layout) and hide this one. This avoids depending on a runtime
-                // measurement at rest (direct ?box-home entry never scrubs, so
-                // the measured target may be stale/zero → cube sat too close to
-                // the h1). Also hidden when Box AI isn't empty (slot is gone).
-                opacity: revealed || !boxIsEmpty ? 0 : progress,
+                // Visible ONLY mid-scrub (0 < progress < 1): fades in as it
+                // animates toward the slot. At rest (progress 0 or 1) it's
+                // hidden and Box AI's real cube shows — so a direct ?box-home
+                // entry (never scrubs, no measurement) is always positioned
+                // correctly by Box AI's own layout, not by a stale target.
+                opacity: progress > 0 && progress < 1 ? progress : 0,
                 transition: "transform 0.12s linear, opacity 0.12s linear",
               }}
             >
