@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useLayoutEffect, useRef, Suspense, lazy } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { BoxLogo } from "@/components/box-logo";
 import { ContentCard } from "@/components/content-card";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -234,6 +235,31 @@ export default function LandingPage() {
           )}
         >
           <FallingBoxes progress={progress} />
+
+          {/* Hero box — the one deliberate box. It scrubs from high/small/faint
+              (progress 0) down into the center, growing and solidifying, landing
+              as the Box logo (progress 1) that the product page carries. This is
+              the "the box becomes the product" moment as you scroll into Box. */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 z-20"
+            style={{
+              // Ease the scrub for a softer settle.
+              transform: (() => {
+                const p = progress;
+                const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
+                const y = -220 + ease * 220; // -220px (high) → 0 (center)
+                const x = "-50%";
+                const scale = 0.5 + ease * 1.9; // 0.5 → 2.4 (logo size)
+                const rot = (1 - ease) * -35; // -35deg → 0
+                return `translate(${x}, calc(-50% + ${y}px)) scale(${scale}) rotate(${rot}deg)`;
+              })(),
+              opacity: 0.15 + progress * 0.85, // faint → solid
+              transition: "transform 0.1s linear, opacity 0.1s linear",
+            }}
+          >
+            <BoxLogo className="size-16 text-foreground" />
+          </div>
+
           <div
             className="relative z-10 flex w-full max-w-4xl flex-col gap-8"
             style={{
