@@ -34,7 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertAction } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ChatInput } from "@/components/chat-input";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 import { ContactCard } from "@/components/contact-card";
 import { showContactCard, stripContactMarker } from "@/lib/contact";
 import { caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
@@ -663,10 +663,7 @@ export function BoxAI({
     return () => el.removeEventListener("scroll", onScroll);
   }, [active]);
 
-  // This view owns its top bar (SiteTopbar is hidden on /who), so it exposes
-  // the sidebar trigger when the sidebar is collapsed / on mobile.
-  const { state: sidebarState, isMobile } = useSidebar();
-  const showTrigger = sidebarState === "collapsed" || isMobile;
+  const { isMobile } = useSidebar();
 
   React.useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -991,9 +988,8 @@ export function BoxAI({
       data-box-empty={!embedded && !openCaseStudy && !activeId ? "" : undefined}
       className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0 max-sm:[@media(display-mode:standalone)]:pb-0"
     >
-      {!embedded && (showTrigger || openCaseStudy || activeId) && (
+      {!embedded && (openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
-          {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
           {activeId && !openCaseStudy && (
             <button
               type="button"
@@ -1033,7 +1029,7 @@ export function BoxAI({
       )}
       {/* Same absolute positioning as content-workspace back/cube so all
           mobile toolbar buttons line up and the gear can't drift in flow. */}
-      {!embedded && !showTrigger && !openCaseStudy && !activeId && (
+      {!embedded && !openCaseStudy && !activeId && (
         <div className="box-settings sm:hidden absolute right-4 top-6 max-sm:[@media(display-mode:standalone)]:top-[4.5rem] z-30">
           <button
             type="button"
