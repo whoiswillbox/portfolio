@@ -26,9 +26,9 @@ import {
   WcagChecklist,
   Anatomy,
   ContentGuidelines,
-  ApiNotes,
   Changelog,
 } from "../_component-page";
+import { cn } from "@/lib/utils";
 
 /* ── Live demos ──────────────────────────────────────────────────────────── */
 
@@ -109,10 +109,13 @@ function LabeledSelect() {
 
 // A trigger rendered with its state classes FORCED (via `extra`) so each
 // interaction state is visible statically. Mirrors the real trigger's base.
-function StateTrigger({ extra = "", placeholder = "Pick a fruit" }: { extra?: string; placeholder?: string }) {
+function StateTrigger({ extra = "", placeholder = "Select" }: { extra?: string; placeholder?: string }) {
   return (
     <div
-      className={`inline-flex w-44 items-center justify-between gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-tertiary ${extra}`}
+      className={cn(
+        "flex w-full items-center justify-between gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-tertiary",
+        extra
+      )}
     >
       {placeholder}
       <svg viewBox="0 0 20 20" fill="none" className="size-4 text-tertiary" aria-hidden="true">
@@ -257,18 +260,20 @@ function PlaygroundDemo({
   size,
   disabled,
   placeholder,
+  showLabel,
   label,
 }: {
   variant: "default" | "ghost";
   size: "default" | "sm";
   disabled: boolean;
   placeholder: string;
+  showLabel: boolean;
   label: string;
 }) {
   const [v, setV] = React.useState<string | undefined>(undefined);
   return (
     <div className="flex flex-col gap-1.5">
-      {label && <Label htmlFor="pg-select">{label}</Label>}
+      {showLabel && label && <Label htmlFor="pg-select">{label}</Label>}
       <Select value={v} onValueChange={setV} disabled={disabled}>
         <SelectTrigger id="pg-select" size={size} variant={variant} className="w-56">
           <SelectValue placeholder={placeholder || "Select…"} />
@@ -290,7 +295,7 @@ export default function SelectDocs() {
     <ComponentPage
       title="Select"
       status="stable"
-      version="1.0"
+      version="1.2"
       description="A single-select dropdown for picking one value from a known, moderately-sized list. For a few options prefer a Radio Group; for many searchable options prefer a Combobox."
     >
       <AudienceTabs
@@ -298,7 +303,8 @@ export default function SelectDocs() {
           <Playground
             controls={[
               { prop: "variant", label: "variant", type: "select", options: ["default", "ghost"], default: "default" },
-              { prop: "label", label: "label", type: "text", default: "Fruit" },
+              { prop: "showLabel", label: "label", type: "boolean", default: true },
+              { prop: "label", label: "label text", type: "text", default: "Fruit", visibleIf: (v) => Boolean(v.showLabel) },
               { prop: "placeholder", label: "placeholder", type: "text", default: "Pick a fruit" },
               { prop: "size", label: "size", type: "select", options: ["default", "sm"], default: "default" },
               { prop: "disabled", label: "disabled", type: "boolean", default: false },
@@ -306,6 +312,7 @@ export default function SelectDocs() {
             render={(v) => (
               <PlaygroundDemo
                 variant={v.variant as "default" | "ghost"}
+                showLabel={Boolean(v.showLabel)}
                 label={String(v.label)}
                 placeholder={String(v.placeholder)}
                 size={v.size as "default" | "sm"}
@@ -318,7 +325,7 @@ export default function SelectDocs() {
           <>
             <Anatomy
               parts={[
-                { n: 1, part: "Trigger — the bordered control that opens the list.", tokens: "bg-surface · border · --radius-lg" },
+                { n: 1, part: "Trigger — the bordered control that opens the list.", tokens: "bg-surface · border · --radius-lg · data-slot=select-trigger · data-size" },
                 { n: 2, part: "Value / placeholder — the selection (or hint).", tokens: "text-foreground · placeholder: text-tertiary" },
                 { n: 3, part: "Chevron — affordance that it opens a menu.", tokens: "text-tertiary · size-4" },
                 { n: 4, part: "Content — the popover list of options.", tokens: "bg-surface · shadow-md · ring-foreground/10" },
@@ -369,8 +376,8 @@ export default function SelectDocs() {
             <States
               states={[
                 { name: "Rest", node: <StateTrigger />, tokens: "bg-surface · border · text-tertiary (placeholder)" },
-                { name: "Selected", node: <StateTrigger extra="text-foreground" placeholder="Apple" />, tokens: "text-foreground (value set)" },
-                { name: "Hover", node: <StateTrigger extra="border-border-hover" />, tokens: "hover:border-border-hover" },
+                { name: "Hover", node: <StateTrigger extra="border-border-hover text-secondary" />, tokens: "hover / open: border-border-hover · placeholder text-secondary" },
+                { name: "Selected", node: <StateTrigger extra="text-foreground" placeholder="Select" />, tokens: "text-foreground (value set)" },
                 { name: "Focus", node: <StateTrigger extra="border-border-focus ring-3 ring-border-focus/50" />, tokens: "focus-visible: border-border-focus · ring-3" },
                 { name: "Disabled", node: <StateTrigger extra="opacity-50" />, tokens: "disabled: opacity-50 · cursor-not-allowed" },
               ]}
@@ -431,16 +438,6 @@ export default function SelectDocs() {
   SelectSeparator,
 } from "@cardboard";`}
             />
-            <ApiNotes
-              notes={[
-                "Controlled (value + onValueChange) or uncontrolled (defaultValue).",
-                "Compose the parts: Select wraps a SelectTrigger (with SelectValue) and a SelectContent of SelectItems.",
-                "size lives on SelectTrigger, not Select; height is padding-driven (no fixed height).",
-                "No built-in label — pair a <Label htmlFor> with the trigger's id.",
-                "Built on Radix Select — it handles focus, typeahead, positioning, and ARIA.",
-                'Style hooks: data-slot="select-trigger" and data-size on the trigger.',
-              ]}
-            />
             <Variants variants={VARIANTS} />
             <PropsTable
               groups={[
@@ -458,7 +455,7 @@ export default function SelectDocs() {
                   rows: [
                     { name: "variant?", type: '"default" | "ghost"', default: '"default"', desc: "Bordered surface control, or borderless (text + chevron) for inline triggers." },
                     { name: "size?", type: '"default" | "sm"', default: '"default"', desc: "Trigger size (padding-driven height)." },
-                    { name: "id?", type: "string", desc: "Pair with a <Label htmlFor> for the field." },
+                    { name: "id?", type: "string", desc: "Select has no built-in label prop — to label the field, give the trigger an id and pair it with a sibling <Label htmlFor={id}>." },
                   ],
                 },
                 {
@@ -507,6 +504,7 @@ export default function SelectDocs() {
             />
             <Changelog
               entries={[
+                { version: "1.2", changes: ["Added a hover state to the default trigger — border darkens to border-hover and the placeholder lifts to text-secondary.", "The open menu (data-state=open) now holds the hover styling so the trigger stays active while the list is shown.", "Suppressed the trigger's focus ring after a pointer selection (kept for keyboard)."] },
                 { version: "1.1", changes: ['Added the ghost trigger variant (borderless, for inline / toolbar triggers).'] },
                 { version: "1.0", changes: ["Initial release — Radix-based single-select with grouped options, labels, and a padding-driven size."] },
               ]}

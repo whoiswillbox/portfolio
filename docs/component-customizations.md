@@ -75,6 +75,50 @@ passed `sideOffset` through to the radix Content, and removed the popper-mode
 single trigger-height row). Callers can still pass `position="item-aligned"` to
 opt back in.
 
+### `native-select.tsx` — REMOVED from Cardboard
+**Date:** 2026-07-14
+**Why:** Standardizing on a single, fully-styled Select (the Radix `select.tsx`)
+that looks consistent across platforms — Native Select intentionally used native
+`<select>` chrome / the OS picker, which is the opposite of the desired look.
+**What:** Deleted `src/components/cardboard/native-select.tsx`, the
+`src/components/ui/native-select.tsx` shim, the `export * from "./native-select"`
+line in `cardboard/index.ts`, and the doc page / gallery card / sidebar entry.
+The docs' Playground `select` control (in `_component-page.tsx`) was rewired from
+`NativeSelect` to the Radix `Select` (value / onValueChange), removing the last
+consumer. No app code used it.
+
+### `select.tsx` — add a hover / open state to the default trigger
+**Date:** 2026-07-14
+**Why:** The default (bordered) `SelectTrigger` had no hover affordance — only
+focus. The doc's States section already illustrated a Hover state that the
+component didn't have, so the doc was untruthful; adding the real hover reconciles
+them and gives the control feedback. Also, an open menu should keep the trigger
+looking active rather than reverting to rest.
+**What:** On the `default` variant: (1) `hover:border-border-hover` — border
+darkens from `--color-border` (neutral-200/700) to `--color-border-hover`
+(neutral-400/500) on hover; (2) `data-placeholder:hover:text-secondary` — the
+placeholder lifts tertiary → secondary on hover; (3) the same two applied on
+`data-[state=open]` (`data-[state=open]:border-border-hover` +
+`data-placeholder:data-[state=open]:text-secondary`) so the trigger holds the
+hover look while the list is open. Ghost variant unchanged (already had text-color
+hover/open states). Affects every default Select (both products).
+
+### `select.tsx` — suppress the trigger focus ring after a pointer selection
+**Date:** 2026-07-14
+**Why:** After picking an item with the mouse, the trigger showed a
+`focus-visible` ring. On close Radix returns focus to the trigger; the browser
+heuristically flags that programmatic refocus as `:focus-visible`, so a pure
+mouse interaction left a keyboard-style ring (most visible on the ghost product
+switcher). Affects every Select (both products).
+**What:** In `SelectContent`, track whether the close was pointer-initiated (a
+`pointerRef` flipped on the content's `onPointerDown`) and, in `onCloseAutoFocus`,
+when it was: `e.preventDefault()` (stop Radix returning focus to the trigger)
+**and** blur the trigger on the next frame if it still holds focus —
+`preventDefault` alone left the browser resolving `:focus-visible` on the
+trigger, so the ring lingered until the next click. Keyboard-initiated closes
+fall through untouched (ring stays, correct for keyboard users). Both handlers
+chain any caller-passed `onPointerDown` / `onCloseAutoFocus`.
+
 ### `separator.tsx` — use the `border-divider` token
 **Date:** 2026-07-13
 **What:** Changed the Separator fill from `bg-border` to `bg-border-divider`

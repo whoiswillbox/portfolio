@@ -58,11 +58,15 @@ function SelectTrigger({
         // --space-200 (8px), sm --space-150 (6px). px --space-300 (12px).
         // See docs/component-customizations.md.
         "flex w-fit items-center justify-between gap-(--space-200) rounded-lg px-(--space-300) text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-critical aria-invalid:ring-3 aria-invalid:ring-critical/20 data-placeholder:text-tertiary data-[size=default]:py-(--space-200) data-[size=sm]:py-(--space-150) data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-(--space-150) [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        // variant: default = bordered surface; ghost = borderless, no fill —
-        // states are text-color only: hover → text-secondary, active / menu-open
-        // → text-foreground (Radix sets data-state=open on the trigger).
+        // variant: default = bordered surface. Border darkens to border-hover and
+        // the placeholder lifts tertiary → secondary on hover; the open menu
+        // (data-state=open, set by Radix on the trigger) holds that same hover
+        // styling so the trigger stays "active" while the list is shown;
+        // border-focus on keyboard focus. Ghost = borderless, no fill — states are
+        // text-color only: hover → text-secondary, active / menu-open →
+        // text-foreground.
         variant === "default"
-          ? "border border-border bg-surface focus-visible:border-border-focus"
+          ? "border border-border bg-surface hover:border-border-hover data-[state=open]:border-border-hover data-placeholder:hover:text-secondary data-placeholder:data-[state=open]:text-secondary focus-visible:border-border-focus"
           // ghost: no fill, text-color states only.
           //  · selected value: foreground → dims to secondary on hover;
           //    foreground while active / open.
@@ -91,8 +95,18 @@ function SelectContent({
   position = "popper",
   align = "start",
   sideOffset = 4,
+  onCloseAutoFocus,
+  onPointerDown,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  // CUSTOMIZED: suppress the trigger's focus-visible ring after a *pointer*
+  // selection. On close Radix returns focus to the trigger; the browser flags
+  // that programmatic refocus as :focus-visible, so a mouse click leaves a ring.
+  // We track whether the close was pointer-driven and, if so, preventDefault on
+  // the auto-focus (Radix keeps the trigger focused for a11y, just without the
+  // visible ring). Keyboard closes fall through untouched (ring stays — correct
+  // for keyboard users). See docs/component-customizations.md.
+  const pointerRef = React.useRef(false)
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -102,6 +116,26 @@ function SelectContent({
         position={position}
         align={align}
         sideOffset={sideOffset}
+        onPointerDown={(e) => {
+          pointerRef.current = true
+          onPointerDown?.(e)
+        }}
+        onCloseAutoFocus={(e) => {
+          if (pointerRef.current) {
+            // Prevent Radix from returning focus to the trigger, then actively
+            // blur it next frame — preventDefault alone still leaves the browser
+            // resolving :focus-visible on the trigger, so the ring lingers.
+            e.preventDefault()
+            requestAnimationFrame(() => {
+              const el = document.activeElement
+              if (el instanceof HTMLElement && el.dataset.slot === "select-trigger") {
+                el.blur()
+              }
+            })
+          }
+          pointerRef.current = false
+          onCloseAutoFocus?.(e)
+        }}
         {...props}
       >
         <SelectScrollUpButton />
