@@ -95,8 +95,19 @@ export default function LandingPage() {
   // as you scroll (progress 0→1), revealing the live Box AI beneath. There is NO
   // navigation to /who and no remount — so there's no reflow/jump. /who still
   // exists as the direct-access Box home (conversations, switcher, logo).
-  const [progress, setProgress] = useState(0);
-  const progressRef = useRef(0);
+  // When arriving via /who's scroll-back, start at full progress (Box AI already
+  // revealed, splash out of the way) and consume the flag — so the incoming
+  // upward scroll SCRUBS the splash back in smoothly instead of the splash
+  // snapping to fully-shown on mount (the abrupt first-time transition).
+  const [progress, setProgress] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    if (sessionStorage.getItem("return-to-landing") === "1") {
+      sessionStorage.removeItem("return-to-landing");
+      return 1;
+    }
+    return 0;
+  });
+  const progressRef = useRef(progress);
   const reducedMotion = useRef(false);
   const revealed = progress >= 1;
 
