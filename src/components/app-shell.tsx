@@ -42,7 +42,8 @@ export function AppShell({
           ABOVE the SidebarProvider so the provider keeps its original row
           layout / height behavior unchanged. Hidden on the landing splash. */}
       {!isLanding && (
-        <NavBar className="max-sm:hidden">
+        // TRIAL (try/nav-bar-shell): drop the bottom stroke on the Box nav bar.
+        <NavBar className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"}`}>
           <NavBarLogo href={home.href} aria-label={home.name}>
             <BoxLogo className="size-6" />
           </NavBarLogo>
