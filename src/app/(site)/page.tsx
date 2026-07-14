@@ -2,9 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import { BoxLogo } from "@/components/box-logo";
 import { ContentCard } from "@/components/content-card";
+import { ChatInput } from "@/components/chat-input";
+import { Alert, AlertDescription, AlertAction } from "@/components/ui/alert";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
@@ -313,18 +316,33 @@ export default function LandingPage() {
                   {/* Privacy notice — a SEPARATE banner above the input (mirrors
                       the real Box AI empty state; adds height so the block matches
                       and the cube lands at the same lower position). */}
-                  <div className="mt-3 flex w-full items-start gap-2 px-4 text-left text-body-sm text-info">
-                    <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-info text-[10px] text-white">i</span>
-                    <span className="text-info/90">
-                      Conversations are saved to help improve Box&apos;s answers over time. Please don&apos;t share anything sensitive.
-                    </span>
-                  </div>
-                  {/* Input box */}
-                  <div className="w-full rounded-2xl border border-border bg-surface p-4 text-left shadow-sm">
-                    <span className="text-body-sm text-muted-foreground">Ask Box…</span>
-                    <div className="mt-6 flex justify-end">
-                      <span className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground">›</span>
-                    </div>
+                  {/* The REAL ChatInput (disabled), with the same docked privacy
+                      notice as Box AI — so the replica input + disclaimer + send
+                      button match the real Box AI empty state exactly (tinted
+                      banner, filled send button), not a hand-drawn approximation. */}
+                  <div className="mt-3 w-full text-left">
+                    <ChatInput
+                      value=""
+                      onValueChange={() => {}}
+                      onSend={() => {}}
+                      placeholder="Ask Box…"
+                      ariaLabel="Ask Box a question about Will"
+                      disabled
+                      attachedSection={
+                        <Alert className="border-0 bg-transparent p-0 text-left text-info">
+                          <InformationCircleIcon className="size-4" />
+                          <AlertDescription className="text-info/90">
+                            Conversations are saved to help improve Box&apos;s answers over time.
+                            Please don&apos;t share anything sensitive.
+                          </AlertDescription>
+                          <AlertAction>
+                            <span className="rounded p-0.5 text-info">
+                              <XMarkIcon className="size-4" />
+                            </span>
+                          </AlertAction>
+                        </Alert>
+                      }
+                    />
                   </div>
                   {/* Chips */}
                   <div className="mt-1 flex flex-wrap justify-center gap-2">
