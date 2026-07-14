@@ -227,44 +227,47 @@ export default function LandingPage() {
 
           <FallingBoxes progress={progress} />
 
-          {/* Hero box — the one deliberate box. It scrubs from high/small/faint
-              (progress 0) down into the center, growing and solidifying, landing
-              as the Box logo (progress 1) that the product page carries. This is
-              the "the box becomes the product" moment as you scroll into Box. */}
-          {/* Anchored at top-[21%] — where the Box AI empty-state header cube
-              sits — so at full scrub the box lands in the SAME spot the product's
-              logo occupies, making the hand-off to /who continuous. */}
-          <div
-            className="pointer-events-none absolute left-1/2 top-[21%] z-20"
-            style={{
-              // Ease the scrub for a softer settle.
-              transform: (() => {
-                const p = progress;
-                const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
-                const y = -180 + ease * 180; // -180px (high) → 0 (landing spot)
-                const x = "-50%";
-                const scale = 0.5 + ease * 0.5; // 0.5 → 1 (lands at ~size-12)
-                const rot = (1 - ease) * -35; // -35deg → 0
-                return `translate(${x}, calc(-50% + ${y}px)) scale(${scale}) rotate(${rot}deg)`;
-              })(),
-              opacity: 0.15 + progress * 0.85, // faint → solid
-              transition: "transform 0.1s linear, opacity 0.1s linear",
-            }}
-          >
-            <BoxLogo className="size-12 text-foreground" />
-          </div>
+          {/* Hero block — MIRRORS the Box AI empty-state layout (mx-auto max-w-2xl,
+              vertically centered, cube at the top) so the hero box lands in the
+              exact same position the product's header cube occupies. This makes
+              the hand-off to /who continuous regardless of viewport. */}
+          <div className="pointer-events-none absolute inset-0 flex flex-col justify-center">
+            <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-3 p-6">
+              {/* The hero box — scrubs from high/small/faint into the cube slot at
+                  the top of this block (progress 1 = the Box AI logo, size-12). */}
+              <div
+                className="z-20"
+                style={{
+                  transform: (() => {
+                    const p = progress;
+                    const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
+                    const y = -180 + ease * 180; // -180px (high) → 0 (in place)
+                    const scale = 0.5 + ease * 0.5; // 0.5 → 1 (lands at size-12)
+                    const rot = (1 - ease) * -35; // -35deg → 0
+                    return `translateY(${y}px) scale(${scale}) rotate(${rot}deg)`;
+                  })(),
+                  opacity: 0.15 + progress * 0.85, // faint → solid
+                  transition: "transform 0.1s linear, opacity 0.1s linear",
+                }}
+              >
+                <BoxLogo className="size-12 text-foreground" />
+              </div>
 
-          <div
-            className="relative z-10 flex w-full max-w-4xl flex-col gap-8"
-            style={{
-              transform: `translateY(${progress * -140}px)`,
-              opacity: 1 - progress,
-              transition: "transform 0.1s linear, opacity 0.1s linear",
-            }}
-          >
-            <h1 className="font-display text-display text-secondary">
-              William Box is a product designer that pulls, branches, and merges.
-            </h1>
+              {/* Headline sits below the cube (like the Box AI heading) and
+                  parallax-fades away as you scrub. */}
+              <div
+                className="mt-4 text-center"
+                style={{
+                  transform: `translateY(${progress * -60}px)`,
+                  opacity: 1 - progress,
+                  transition: "transform 0.1s linear, opacity 0.1s linear",
+                }}
+              >
+                <h1 className="font-display text-display text-secondary">
+                  William Box is a product designer that pulls, branches, and merges.
+                </h1>
+              </div>
+            </div>
           </div>
 
           {/* Scroll-to-enter affordance (replaces the buttons). Fades out as the
