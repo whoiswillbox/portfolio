@@ -80,7 +80,18 @@ export function AppShell({
             null
           )}
         </Suspense>
-        <SidebarInset className={`min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar ${!inCardboard ? "sm:mt-0" : ""}`}>
+        <SidebarInset
+          className={`min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar ${!inCardboard && !isLanding ? "sm:mt-0" : ""}`}
+          // Landing: keep the top margin on the splash (looks like a floating
+          // card), then collapse it to 0 as you scroll into the Box product so
+          // the card sits flush under the revealed nav bar. Driven by
+          // --enter-progress (0→1), same signal as the nav reveal.
+          style={
+            isLanding
+              ? { marginTop: "calc(0.5rem * (1 - var(--enter-progress, 0)))" }
+              : undefined
+          }
+        >
           <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
             <BoxSeedProvider>
               <Suspense fallback={null}>
