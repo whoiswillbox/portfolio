@@ -104,6 +104,9 @@
   --color-border-subtle: var(--p-border-secondary);
   --color-border-strong: var(--p-border-tertiary);
   --color-border-focus: var(--p-border-focus);
+  /* Divider — the hairline used by Separator / dividers between rows & sections.
+     Lighter than --color-border; all dividers inherit this. */
+  --color-border-divider: var(--p-border-divider);
 }
 
 /* --- Light theme ------------------------------------------------------ */
@@ -192,13 +195,16 @@
   --p-border-secondary: var(--neutral-100);
   --p-border-tertiary: var(--neutral-300);
   --p-border-focus: var(--brand-500);
+  /* Divider — a lighter hairline for separating elements (thinner presence than
+     a full element border). */
+  --p-border-divider: var(--neutral-100);
 }
 
 /* --- Dark theme ------------------------------------------------------- */
 .dark {
   /* Aliased to Cardboard tokens (--p-*), matching the previous dark values.
-     --border/--input keep the translucent-white treatment (the Cardboard
-     --p-border dark ramp is opaque neutral, used only for the docs swatches). */
+     --border/--input now resolve through the Cardboard --p-border ramp so real
+     dividers match the token shown in the docs (single source of truth). */
   --background: var(--p-bg);
   --foreground: var(--p-text);
   --card: var(--p-bg-surface);
@@ -214,8 +220,8 @@
   --accent: var(--p-bg-surface-secondary);
   --accent-foreground: var(--p-text);
   --destructive: var(--red-400);
-  --border: var(--white-a10);
-  --input: var(--white-a15);
+  --border: var(--p-border);
+  --input: var(--p-border);
   --ring: var(--neutral-500);
   --chart-1: var(--neutral-300);
   --chart-2: var(--neutral-500);
@@ -278,4 +284,6 @@
   --p-border-secondary: var(--neutral-800);
   --p-border-tertiary: var(--neutral-600);
   --p-border-focus: var(--brand-400);
+  /* Divider — a lighter hairline (see light note). */
+  --p-border-divider: var(--neutral-800);
 }

@@ -12,11 +12,14 @@ import { SegmentedControl, SegmentedControlItem } from "@/components/cardboard/s
 
 /* Build a map of custom-property → its RAW declared value by scanning every
    stylesheet rule (computed style flattens var() chains, so we must read the
-   source declarations). Dark-mode overrides (later rules / .dark selectors) win
-   because we assign in document order and re-read the currently-active value
-   through a probe below. */
+   source declarations). THEME-AWARE: a token declared in both :root (light) and
+   `.dark` must resolve to the ACTIVE theme's value. Since later rules overwrite
+   earlier ones in the map, we skip `.dark`-scoped rules when light is active and
+   skip light-only (:root) overrides of dark tokens when dark is active — i.e.
+   only apply a rule if its selector matches the current theme. */
 function collectVarDeclarations(): Map<string, string> {
   const map = new Map<string, string>();
+  const isDark = document.documentElement.classList.contains("dark");
   for (const sheet of Array.from(document.styleSheets)) {
     let rules: CSSRuleList;
     try {
@@ -27,6 +30,11 @@ function collectVarDeclarations(): Map<string, string> {
     const walk = (list: CSSRuleList) => {
       for (const rule of Array.from(list)) {
         if (rule instanceof CSSStyleRule) {
+          // Only apply rules whose selector matches the active theme. A `.dark`
+          // scoped rule applies only in dark mode; everything else (:root, etc.)
+          // is base/light and is overridden by .dark when dark is active.
+          const isDarkRule = /(^|[\s,>+~])\.dark\b/.test(rule.selectorText);
+          if (isDarkRule && !isDark) continue; // skip dark rules in light mode
           const style = rule.style;
           for (let i = 0; i < style.length; i++) {
             const prop = style[i];
@@ -179,6 +187,7 @@ const TEXTS: { token: string; v: string; description: string }[] = [
 
 const BORDERS: { token: string; v: string; description: string }[] = [
   { token: "border", v: "--p-border", description: "Default border for separating elements." },
+  { token: "border-divider", v: "--p-border-divider", description: "Lighter hairline for dividers between rows and sections (Separator)." },
   { token: "border-hover", v: "--p-border-hover", description: "Hover state — a stronger, darker border." },
   { token: "border-disabled", v: "--p-border-disabled", description: "Disabled state border." },
   { token: "border-subtle", v: "--p-border-secondary", description: "Subtle, low-contrast divider." },
