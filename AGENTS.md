@@ -15,3 +15,9 @@ customized. **The customized version is canonical — it IS the component.**
 - Never run `shadcn add <name> --overwrite` or re-init shadcn on a component
   listed there without preserving/re-applying its customizations.
 - Adding brand-new components (not yet in the repo) is safe.
+
+# Cardboard design system
+
+Before adding or documenting a Cardboard component, or touching design tokens,
+read `docs/cardboard.md` — the contributor guide (token architecture, how to add
++ document a component, doc-page conventions, the "don't touch Box" rule).
