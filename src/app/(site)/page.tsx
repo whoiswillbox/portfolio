@@ -277,7 +277,7 @@ function LandingInner() {
       {/* Live Box AI — in normal flow, same layout as /who. Fades in as the
           splash scrubs away; interactive only once fully revealed. */}
       <div
-        className="who-shell landing-box h-full"
+        className={`who-shell landing-box h-full ${revealed ? "landing-revealed" : ""}`}
         style={{
           opacity: Math.max(0, (progress - 0.4) / 0.6),
           transition: "opacity 0.12s linear",
@@ -329,10 +329,14 @@ function LandingInner() {
                   const rot = (1 - ease) * -35;
                   return `translate(${x}px, ${y}px) scale(${scale}) rotate(${rot}deg)`;
                 })(),
-                // Fade in across the WHOLE scrub, reaching full opacity only
-                // once the cube lands (progress = 1). Hidden once Box AI is no
-                // longer empty (its cube slot is gone).
-                opacity: boxIsEmpty ? progress : 0,
+                // Fade in across the WHOLE scrub, reaching full opacity as the
+                // cube lands — then, once fully revealed, HAND OFF to Box AI's
+                // real empty-state cube (which is correctly positioned by its own
+                // layout) and hide this one. This avoids depending on a runtime
+                // measurement at rest (direct ?box-home entry never scrubs, so
+                // the measured target may be stale/zero → cube sat too close to
+                // the h1). Also hidden when Box AI isn't empty (slot is gone).
+                opacity: revealed || !boxIsEmpty ? 0 : progress,
                 transition: "transform 0.12s linear, opacity 0.12s linear",
               }}
             >
