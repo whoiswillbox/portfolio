@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useLayoutEffect, useRef, Suspense, lazy } from "react";
-import { Button } from "@/components/ui/button";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ interface Box {
   rotationSpeed: number;
 }
 
-function FallingBoxes() {
+function FallingBoxes({ progress }: { progress: number }) {
   const [boxes, setBoxes] = useState<Box[]>([]);
   const nextId = useRef(0);
 
@@ -40,7 +40,7 @@ function FallingBoxes() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       {boxes.map(box => (
-        <FallingBox key={box.id} box={box} />
+        <FallingBox key={box.id} box={box} progress={progress} />
       ))}
     </div>
   );
@@ -58,13 +58,18 @@ function spawnBox(id: number, scattered: boolean): Box {
   };
 }
 
-function FallingBox({ box }: { box: Box }) {
+function FallingBox({ box, progress }: { box: Box; progress: number }) {
+  // As the splash scrubs away, boxes scatter: accelerate downward + spin faster
+  // + fade. Driven by scroll `progress` (0 = rest, 1 = fully scattered).
   return (
     <div
       className="absolute top-0"
       style={{
         left: `${box.x}%`,
         animation: `fall ${box.duration}s ${box.delay}s linear infinite`,
+        transform: `translateY(${progress * 120}vh) scale(${1 - progress * 0.4})`,
+        opacity: 1 - progress,
+        transition: "transform 0.1s linear, opacity 0.1s linear",
       }}
     >
       <svg
@@ -93,17 +98,18 @@ export default function LandingPage() {
   const { setOpen } = useSidebar();
   const [loading, setLoading] = useState(false);
   const [animData, setAnimData] = useState<object | null>(null);
-  // When arriving from the /unlock gate, fade in WITHOUT the slide (a plain
-  // crossfade). The animate classes render identically on server + client (no
-  // hydration mismatch); if we arrived from unlock, zero out the slide DISTANCE
-  // before paint (keeping the fade) by setting tw-animate's translate var to 0.
+  // Scroll-scrub progress: 0 = splash at rest, 1 = fully scrubbed away (→ enter).
+  const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);
+  const enteredRef = useRef(false);
+  const reducedMotion = useRef(false);
+
   const cardRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     if (sessionStorage.getItem("from-unlock") === "1") {
       sessionStorage.removeItem("from-unlock");
       const el = cardRef.current?.querySelector<HTMLElement>("[data-scroll-container]");
-      // Kill the slide offset but keep animate-in fade-in → fade only, no slide.
       el?.style.setProperty("--tw-enter-translate-y", "0");
     }
   }, []);
@@ -114,9 +120,69 @@ export default function LandingPage() {
   }, []);
 
   const enter = (path: string) => {
+    if (enteredRef.current) return;
+    enteredRef.current = true;
     setLoading(true);
     setTimeout(() => { sessionStorage.setItem("entered", "1"); router.push(path); }, 800);
   };
+
+  // Scroll-scrub: accumulate wheel / touch delta into a 0→1 progress that drives
+  // the splash exit animation. At 1, trigger the route into Box. A downward
+  // scroll gesture is the entry; keyboard / click affordance covers a11y and
+  // reduced-motion.
+  useEffect(() => {
+    reducedMotion.current =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Total wheel delta (px) needed to fully scrub the splash away.
+    const SCRUB_DISTANCE = 700;
+
+    const bump = (deltaY: number) => {
+      if (enteredRef.current) return;
+      // Reduced motion: any downward intent enters immediately (no scrub).
+      if (reducedMotion.current) {
+        if (deltaY > 0) enter("/who");
+        return;
+      }
+      const next = Math.min(1, Math.max(0, progressRef.current + deltaY / SCRUB_DISTANCE));
+      progressRef.current = next;
+      setProgress(next);
+      if (next >= 1) enter("/who");
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      // Only intercept downward scrolls while scrubbing; let upward reset it.
+      if (e.deltaY === 0) return;
+      bump(e.deltaY);
+    };
+
+    let touchY = 0;
+    const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; };
+    const onTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0].clientY;
+      bump(touchY - y); // dragging up = positive delta = scrub forward
+      touchY = y;
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        enter("/who");
+      }
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -131,32 +197,58 @@ export default function LandingPage() {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
+        @keyframes nudge {
+          0%, 100% { transform: translateY(0); opacity: 0.5; }
+          50% { transform: translateY(6px); opacity: 1; }
+        }
       `}</style>
       <ContentCard
         ref={cardRef}
         className={cn(
           "relative h-full max-sm:min-h-dvh overflow-hidden flex flex-col items-center justify-center gap-8 px-12",
-          // Rendered the same on server + client (hydration-safe). The slide is
-          // stripped before paint via the layout effect when arriving from /unlock.
           "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
         )}
       >
-        {/* Landing content — fades out when loading */}
-        <div className={cn("absolute inset-0 flex flex-col items-center justify-center gap-8 px-12 transition-opacity duration-500", loading ? "opacity-0 pointer-events-none" : "opacity-100")}>
-          <FallingBoxes />
-          <div className="relative z-10 flex w-full max-w-4xl flex-col gap-8">
+        {/* Landing content — parallax-lifts and fades as the splash scrubs away,
+            then fully fades when the enter (loading) sequence fires. */}
+        <div
+          className={cn(
+            "absolute inset-0 flex flex-col items-center justify-center gap-8 px-12 transition-opacity duration-500",
+            loading ? "opacity-0 pointer-events-none" : "opacity-100"
+          )}
+        >
+          <FallingBoxes progress={progress} />
+          <div
+            className="relative z-10 flex w-full max-w-4xl flex-col gap-8"
+            style={{
+              transform: `translateY(${progress * -140}px)`,
+              opacity: 1 - progress,
+              transition: "transform 0.1s linear, opacity 0.1s linear",
+            }}
+          >
             <h1 className="font-display text-display text-secondary">
               William Box is a product designer that pulls, branches, and merges.
             </h1>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button size="lg" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
-                I&apos;m a recruiter / hiring manager
-              </Button>
-              <Button size="lg" variant="outline" className="flex-1 py-6 text-base" onClick={() => enter("/who")}>
-                I&apos;m a friend
-              </Button>
-            </div>
           </div>
+
+          {/* Scroll-to-enter affordance (replaces the buttons). Fades out as the
+              scrub progresses. Clickable / keyboard-focusable for a11y. */}
+          <button
+            type="button"
+            onClick={() => enter("/who")}
+            aria-label="Enter — scroll or click to view William's work"
+            className="group absolute bottom-10 z-10 flex flex-col items-center gap-2 rounded-lg px-4 py-2 text-secondary outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-border-focus"
+            style={{ opacity: 1 - progress }}
+          >
+            <span className="text-body-sm text-muted-foreground transition-colors group-hover:text-foreground">
+              Scroll to enter
+            </span>
+            <ChevronDownIcon
+              className="size-5 text-muted-foreground transition-colors group-hover:text-foreground"
+              style={{ animation: "nudge 1.8s ease-in-out infinite" }}
+              aria-hidden="true"
+            />
+          </button>
         </div>
 
         {/* Lottie loading state — fades in when loading */}
