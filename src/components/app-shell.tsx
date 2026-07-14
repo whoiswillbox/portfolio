@@ -41,7 +41,7 @@ export function AppShell({
           ABOVE the SidebarProvider so the provider keeps its original row
           layout / height behavior unchanged. Hidden on the landing splash. */}
       {!isLanding && (
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border/60 bg-background px-4 max-sm:hidden">
+        <header className="flex h-14 shrink-0 items-center gap-0 border-b border-border/60 bg-background px-4 max-sm:hidden">
           <Link
             href={home.href}
             aria-label={home.name}
