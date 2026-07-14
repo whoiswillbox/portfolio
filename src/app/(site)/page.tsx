@@ -115,6 +115,14 @@ export default function LandingPage() {
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Publish scroll progress to a document-level CSS var so the app-shell nav bar
+  // (which doesn't share this page's state) can fade in with the scrub. Cleared
+  // on unmount so other routes aren't affected.
+  useEffect(() => {
+    document.documentElement.style.setProperty("--enter-progress", String(progress));
+    return () => { document.documentElement.style.removeProperty("--enter-progress"); };
+  }, [progress]);
+
   // The hero box has already scrubbed into the Box-logo position/size by the
   // time we enter, so route straight to Box AI — no loading interstitial; the
   // landed cube reads as the Box AI header logo.

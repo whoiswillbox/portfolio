@@ -30,29 +30,34 @@ export function AppShell({
   return (
     // --topbar-h is consumed by ContentWorkspace/BoxAI, which need an explicit
     // pixel height (100dvh minus the top bar) for their h-full to resolve.
-    // 0 on mobile (no top bar) and on the landing page (top bar hidden);
-    // 3.5rem on desktop everywhere else where the header shows.
+    // 0 on mobile (no top bar); 3.5rem on desktop wherever the header shows.
+    // TRIAL: the Box landing now renders the nav bar in-flow (faded via scroll),
+    // so it reserves the same 3.5rem as /who — no positional jump at commit.
     <div
-      className={`flex h-svh flex-col overflow-hidden [--topbar-h:0px] ${
-        isLanding ? "" : "sm:[--topbar-h:3.5rem]"
-      }`}
+      className="flex h-svh flex-col overflow-hidden [--topbar-h:0px] sm:[--topbar-h:3.5rem]"
     >
       {/* Full-width top bar (Tailwind-docs style): the Box logo home link + the
           product switcher pill. Desktop only — mobile uses MobileNav. Sits
           ABOVE the SidebarProvider so the provider keeps its original row
           layout / height behavior unchanged. Hidden on the landing splash. */}
-      {!isLanding && (
-        // TRIAL (try/nav-bar-shell): drop the bottom stroke on the Box nav bar.
-        <NavBar className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"}`}>
-          <NavBarLogo href={home.href} aria-label={home.name}>
-            <BoxLogo className="size-6" />
-          </NavBarLogo>
-          <ProductSwitcher />
-          {/* TRIAL (try/nav-bar-shell): Box nav lives in the top bar instead of
-              the left sidebar. Cardboard keeps its own sidebar. */}
-          {!inCardboard && <BoxNavItems />}
-        </NavBar>
-      )}
+      {/* TRIAL (try/nav-bar-shell): the nav bar renders on the landing page too,
+          but fades in with the scroll scrub (via --enter-progress the landing
+          page publishes) so it's already present at commit → no pop into /who.
+          Off the landing route the var is absent, so opacity falls back to 1.
+          It stays IN FLOW on landing too (reserving the same 3.5rem topbar height
+          as /who) so there's no positional jump at commit. */}
+      <NavBar
+        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"}`}
+        style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
+      >
+        <NavBarLogo href={home.href} aria-label={home.name}>
+          <BoxLogo className="size-6" />
+        </NavBarLogo>
+        <ProductSwitcher />
+        {/* Box nav lives in the top bar instead of the left sidebar.
+            Cardboard keeps its own sidebar. */}
+        {!inCardboard && <BoxNavItems />}
+      </NavBar>
 
       <SidebarProvider
         defaultOpen={false}
