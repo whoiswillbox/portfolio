@@ -95,11 +95,23 @@ function FallingBox({ box, progress }: { box: Box; progress: number }) {
 export default function LandingPage() {
   const router = useRouter();
   const { setOpen } = useSidebar();
+  // Returning from /who via scroll-up is a CLIENT navigation (no SSR), so a lazy
+  // initializer can read the flag synchronously and start at full progress (Box
+  // AI shown) on the very first paint — no splash flash / load jump before the
+  // effect would have set it. Consume the flag here so it's one-shot.
+  const returnedRef = useRef(false);
   // Scroll-scrub progress: 0 = splash at rest, 1 = fully scrubbed away (→ enter).
-  const [progress, setProgress] = useState(0);
-  const progressRef = useRef(0);
+  const [progress, setProgress] = useState(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("return-to-landing") === "1") {
+      sessionStorage.removeItem("return-to-landing");
+      returnedRef.current = true;
+      return 1;
+    }
+    return 0;
+  });
+  const progressRef = useRef(returnedRef.current ? 1 : 0);
   // Raw (unclamped) scrub, can exceed 1 into the commit buffer.
-  const rawRef = useRef(0);
+  const rawRef = useRef(returnedRef.current ? 1 : 0);
   const enteredRef = useRef(false);
   const reducedMotion = useRef(false);
 
@@ -110,14 +122,6 @@ export default function LandingPage() {
       sessionStorage.removeItem("from-unlock");
       const el = cardRef.current?.querySelector<HTMLElement>("[data-scroll-container]");
       el?.style.setProperty("--tw-enter-translate-y", "0");
-    }
-    // Returning from /who via scroll-up: start fully scrubbed (Box AI shown) so
-    // scrolling up reverses smoothly back to the splash instead of snapping.
-    if (sessionStorage.getItem("return-to-landing") === "1") {
-      sessionStorage.removeItem("return-to-landing");
-      rawRef.current = 1;
-      progressRef.current = 1;
-      setProgress(1);
     }
   }, []);
 
