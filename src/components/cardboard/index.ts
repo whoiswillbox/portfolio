@@ -36,6 +36,7 @@ export * from "./item";
 export * from "./kbd";
 export * from "./label";
 export * from "./menubar";
+export * from "./nav-bar";
 export * from "./native-select";
 export * from "./navigation-menu";
 export * from "./pagination";

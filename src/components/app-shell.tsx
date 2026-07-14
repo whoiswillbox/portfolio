@@ -1,8 +1,8 @@
 "use client"
 
 import { Suspense } from "react"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { NavBar, NavBarLogo } from "@/components/cardboard/nav-bar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { CardboardSidebar } from "@/components/cardboard-sidebar"
@@ -41,16 +41,12 @@ export function AppShell({
           ABOVE the SidebarProvider so the provider keeps its original row
           layout / height behavior unchanged. Hidden on the landing splash. */}
       {!isLanding && (
-        <header className="flex h-14 shrink-0 items-center gap-0 border-b border-border/60 bg-background px-4 max-sm:hidden">
-          <Link
-            href={home.href}
-            aria-label={home.name}
-            className="flex items-center rounded-md text-foreground outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
-          >
+        <NavBar className="max-sm:hidden">
+          <NavBarLogo href={home.href} aria-label={home.name}>
             <BoxLogo className="size-6" />
-          </Link>
+          </NavBarLogo>
           <ProductSwitcher />
-        </header>
+        </NavBar>
       )}
 
       <SidebarProvider
