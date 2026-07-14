@@ -118,6 +118,9 @@ export default function LandingPage() {
       const el = document.querySelector<HTMLElement>(".box-scroll, [data-scroll-container]");
       return !el || el.scrollTop <= 0;
     };
+    // Box AI is "empty" (safe to scrub back to the splash) only when no
+    // conversation or project is open — it marks its root [data-box-empty].
+    const boxEmpty = () => !!document.querySelector("[data-box-empty]");
 
     const bump = (deltaY: number) => {
       if (reducedMotion.current) {
@@ -128,7 +131,9 @@ export default function LandingPage() {
       // Down while not fully revealed → scrub forward. Up while revealed only
       // scrubs back if Box AI is already at its top (otherwise let it scroll).
       if (deltaY > 0 && progressRef.current >= 1) return; // in Box AI, let it scroll
-      if (deltaY < 0 && progressRef.current >= 1 && !boxAtTop()) return;
+      // Once revealed, only scrub back if Box AI is empty AND at its top —
+      // an open conversation/project keeps you in Box AI (scroll up reads history).
+      if (deltaY < 0 && progressRef.current >= 1 && (!boxEmpty() || !boxAtTop())) return;
 
       const next = Math.min(1, Math.max(0, progressRef.current + deltaY / SCRUB_DISTANCE));
       progressRef.current = next;

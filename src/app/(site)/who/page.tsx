@@ -23,8 +23,12 @@ export default function Who() {
       const el = shellRef.current?.querySelector<HTMLElement>("[data-scroll-container], .box-scroll");
       return !el || el.scrollTop <= 0;
     };
+    // Box AI marks its root [data-box-empty] only when there's no active
+    // conversation AND no open case study. Any project/thread open → no
+    // scroll-back to the landing splash.
+    const isEmpty = () => !!shellRef.current?.querySelector("[data-box-empty]");
     const goBack = () => {
-      if (returning) return;
+      if (returning || !isEmpty()) return;
       returning = true;
       // Tell the landing to start at full progress (Box AI shown) so scrolling
       // up reverses smoothly back to the splash instead of snapping.

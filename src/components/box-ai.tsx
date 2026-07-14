@@ -986,7 +986,10 @@ export function BoxAI({
   );
 
   const chatCard = (
-    <ContentCard className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0 max-sm:[@media(display-mode:standalone)]:pb-0">
+    <ContentCard
+      data-box-empty={!embedded && !openCaseStudy && !activeId ? "" : undefined}
+      className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0 max-sm:[@media(display-mode:standalone)]:pb-0"
+    >
       {!embedded && (showTrigger || openCaseStudy || activeId) && (
         <div className="flex items-center gap-1 p-2">
           {showTrigger && <SidebarTrigger className="max-sm:hidden" />}
@@ -1241,13 +1244,14 @@ export function BoxAI({
         </div>
       )}
       {/* Case study bottom sheet — mobile only */}
-      <Sheet open={!!openCaseStudy} onOpenChange={(o) => { if (!o) setOpenCaseStudy(null); }}>
+      <Sheet open={!!openCaseStudy && !isDesktop} onOpenChange={(o) => { if (!o) setOpenCaseStudy(null); }}>
         <SheetContent
           side="bottom"
           showCloseButton={false}
           className="sm:hidden h-[85dvh] rounded-t-2xl px-0 pb-0 overflow-hidden"
           style={{ backgroundColor: "var(--color-background)" }}
         >
+          <SheetTitle className="sr-only">{openCaseStudy?.title ?? "Case study"}</SheetTitle>
           <div className="mx-auto mb-3 mt-2 h-1 w-10 rounded-full bg-border" />
           <div className="h-full overflow-y-auto pb-24">
             {openCaseStudy && <CaseStudyPanel study={openCaseStudy} />}
