@@ -151,11 +151,15 @@ export default function LandingPage() {
         if (deltaY > 0) enter("/who");
         return;
       }
-      // Raw scrub can go past 1 (overscroll) so a settle at fully-scrubbed
-      // doesn't instantly commit — you can freely scroll back up. Entering Box
-      // requires deliberately continuing to scroll DOWN past the end
-      // (OVERSCROLL_COMMIT beyond full). Visible progress is clamped to [0,1].
-      const raw = Math.max(0, rawRef.current + deltaY / SCRUB_DISTANCE);
+      // Raw scrub is clamped to [0, 1 + OVERSCROLL_COMMIT] so there's no large
+      // invisible overshoot to unwind — scrolling up immediately reverses the
+      // visible splash. A settle at fully-scrubbed (shown = 1) doesn't commit;
+      // entering Box requires continuing to scroll DOWN into the overscroll
+      // buffer past the end. Visible progress is clamped to [0, 1].
+      const raw = Math.min(
+        1 + OVERSCROLL_COMMIT,
+        Math.max(0, rawRef.current + deltaY / SCRUB_DISTANCE)
+      );
       rawRef.current = raw;
       const shown = Math.min(1, raw);
       progressRef.current = shown;
