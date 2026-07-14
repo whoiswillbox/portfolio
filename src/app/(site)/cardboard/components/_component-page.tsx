@@ -14,8 +14,11 @@ import {
 import { ContentCard } from "@/components/content-card";
 import {
   Kbd,
-  NativeSelect,
-  NativeSelectOption,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
   Switch,
   Input,
 } from "@cardboard";
@@ -311,7 +314,7 @@ function PreviewSurface({ children }: { children: React.ReactNode }) {
     <div
       style={checkerStyle(dark)}
       className={cn(
-        "relative flex min-h-64 flex-wrap items-center justify-center gap-3 rounded-xl border border-border bg-background p-6",
+        "relative flex min-h-64 flex-wrap items-center justify-center gap-3 border border-border bg-background p-6",
         dark && "dark"
       )}
     >
@@ -331,14 +334,19 @@ function PreviewSurface({ children }: { children: React.ReactNode }) {
 
 /* ─── Playground ─────────────────────────────────────────────────────────── */
 
-// A single configurable control. `select` renders a NativeSelect over `options`;
+// A single configurable control. `select` renders a Select over `options`;
 // `boolean` renders a Switch; `text` renders an Input. `default` seeds the state.
-export type Control =
-  | { prop: string; label?: string; type: "select"; options: (string | number)[]; default: string | number }
-  | { prop: string; label?: string; type: "boolean"; default: boolean }
-  | { prop: string; label?: string; type: "text"; default: string };
-
 export type ControlValues = Record<string, string | number | boolean>;
+
+// `visibleIf` hides a control unless the predicate passes against the current
+// values — for dependent controls (e.g. only show "label text" when a "label"
+// toggle is on). Hidden controls keep their value; they just aren't rendered.
+type ControlBase = { prop: string; label?: string; visibleIf?: (values: ControlValues) => boolean };
+
+export type Control =
+  | (ControlBase & { type: "select"; options: (string | number)[]; default: string | number })
+  | (ControlBase & { type: "boolean"; default: boolean })
+  | (ControlBase & { type: "text"; default: string });
 
 // Interactive playground — a live preview on top, then a controls panel that
 // live-updates it. `render(values)` receives the current control values keyed by
@@ -359,8 +367,10 @@ export function Playground({
   return (
     <section className="mb-12 flex flex-col gap-4">
       <PreviewSurface>{render(values)}</PreviewSurface>
-      <div className="flex flex-col divide-y divide-border rounded-xl border border-border">
-        {controls.map((c) => (
+      <div className="flex flex-col divide-y divide-border border border-border">
+        {controls
+          .filter((c) => !c.visibleIf || c.visibleIf(values))
+          .map((c) => (
           <div key={c.prop} className="flex items-center justify-between gap-4 px-4 py-3">
             <div className="flex flex-col">
               <span className="text-body-sm font-medium text-foreground" style={{ fontFamily: MONO }}>
@@ -368,22 +378,25 @@ export function Playground({
               </span>
             </div>
             {c.type === "select" && (
-              <NativeSelect
-                size="sm"
+              <Select
                 value={String(values[c.prop])}
-                onChange={(e) => {
+                onValueChange={(raw) => {
                   // Preserve number-typed options.
-                  const raw = e.target.value;
                   const asNum = c.options.find((o) => String(o) === raw);
                   set(c.prop, typeof asNum === "number" ? asNum : raw);
                 }}
               >
-                {c.options.map((o) => (
-                  <NativeSelectOption key={String(o)} value={String(o)}>
-                    {String(o)}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+                <SelectTrigger size="sm" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {c.options.map((o) => (
+                    <SelectItem key={String(o)} value={String(o)}>
+                      {String(o)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
             {c.type === "boolean" && (
               <Switch
@@ -549,7 +562,7 @@ function CodeBlock({ tabs }: { tabs: CodeTab[] }) {
     });
   };
   return (
-    <div className={cn("overflow-hidden rounded-xl border border-border bg-surface", SYNTAX_VARS)}>
+    <div className={cn("overflow-hidden border border-border bg-surface", SYNTAX_VARS)}>
       {/* Header bar: language tabs + copy */}
       <div className="flex items-center justify-between border-b border-border pr-2">
         <div className="flex">
@@ -744,12 +757,54 @@ export function PropsTable({
   );
 }
 
+export type SlotRow = {
+  /** The slot name — a subcomponent (NavBarLogo) or `children`. */
+  name: string;
+  /** The accepted content's type, e.g. "ReactNode", "NavBarNavItem[]". */
+  type: string;
+  desc: string;
+  /** Optional — mark a slot as not required. */
+  optional?: boolean;
+};
+
+// The Slots section (Shopify dev-docs style). For compositional components — the
+// insertion points you compose *inside* the component (subcomponents, children).
+// Distinct from Anatomy (a visual, numbered part diagram on Design): Slots is the
+// code-facing contract on Develop, next to Props. Same flat row markup as
+// PropInterface: `name • type`, description below.
+export function Slots({ intro, slots }: { intro?: string; slots: SlotRow[] }) {
+  return (
+    <section className={cn("mb-12 flex flex-col gap-4", SYNTAX_VARS)}>
+      <h2 className="text-h3">Slots</h2>
+      {intro && <p className="text-body-sm text-muted-foreground">{intro}</p>}
+      <div className="divide-y divide-border border-t border-border">
+        {slots.map((s) => (
+          <div key={s.name} className="flex flex-col gap-1 py-3">
+            <div
+              className="flex flex-wrap items-baseline gap-x-2 text-body-xs"
+              style={{ fontFamily: MONO }}
+            >
+              <span className="text-body-sm font-medium text-[var(--sx-attr)]">
+                {s.name}
+                {s.optional && <span className="text-tertiary">?</span>}
+              </span>
+              <span className="text-tertiary">•</span>
+              <span>{highlightCode(s.type, "tsx")}</span>
+            </div>
+            <p className="text-body-sm text-muted-foreground">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 // A specs table: the anatomy of a component — part → the token(s) that style it.
 // For custom pattern components, this makes the doc a build-from template, not
 // just a picture (icon size, title size, body size, spacing, colors…).
 export function Specs({ rows }: { rows: { part: string; spec: string }[] }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-surface">
+    <div className="overflow-hidden border border-border bg-surface">
       <table className="w-full min-w-[24rem] text-left text-body-sm">
         <thead>
           <tr className="border-b border-border font-mono text-body-xs text-muted-foreground">
@@ -787,12 +842,21 @@ export function States({ title = "States", states }: { title?: string; states: S
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">{title}</h2>
 
-      {/* Visual row — each state forced, labeled */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      {/* Visual row — each state forced, labeled. The large-screen column count
+          matches the number of states (capped at 5) so the cards fill the row
+          instead of leaving an empty column when a component has < 5 states. */}
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-3 sm:grid-cols-3",
+          { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4", 5: "lg:grid-cols-5" }[
+            Math.min(states.length, 5)
+          ] ?? "lg:grid-cols-5"
+        )}
+      >
         {states.map((s) => (
           <div
             key={s.name}
-            className="flex flex-col items-center gap-3 rounded-xl border border-border bg-background p-5"
+            className="flex flex-col items-center gap-3 border border-border bg-background p-5"
           >
             <div className="flex flex-1 items-center justify-center">{s.node}</div>
             <span className="text-body-xs font-medium text-tertiary">{s.name}</span>
@@ -801,7 +865,7 @@ export function States({ title = "States", states }: { title?: string; states: S
       </div>
 
       {/* Spec table — State → tokens */}
-      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+      <div className="overflow-hidden border border-border bg-surface">
         <table className="w-full min-w-[24rem] text-left text-body-sm">
           <thead>
             <tr className="border-b border-border text-body-xs text-muted-foreground">
@@ -836,7 +900,7 @@ export function Guidelines({ use, avoid }: { use: string[]; avoid: string[] }) {
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">Usage</h2>
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2 rounded-xl border border-border p-4">
+        <div className="flex flex-col gap-2 border border-border p-4">
           <div className="flex items-center gap-1.5 text-body-sm font-medium text-success">
             <CheckCircleIcon className="size-4" /> Use when
           </div>
@@ -848,7 +912,7 @@ export function Guidelines({ use, avoid }: { use: string[]; avoid: string[] }) {
             ))}
           </ul>
         </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border p-4">
+        <div className="flex flex-col gap-2 border border-border p-4">
           <div className="flex items-center gap-1.5 text-body-sm font-medium text-critical">
             <XCircleIcon className="size-4" /> Avoid when
           </div>
@@ -870,7 +934,7 @@ export type DoDontItem = { caption: string; example: React.ReactNode };
 // Side-by-side Do / Don't examples with a live sample in each.
 export function DoDont({ dos, donts }: { dos: DoDontItem[]; donts: DoDontItem[] }) {
   const Card = ({ ok, item }: { ok: boolean; item: DoDontItem }) => (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-border">
+    <div className="flex flex-col overflow-hidden border border-border">
       <div className="flex min-h-32 items-center justify-center bg-background p-6">
         {item.example}
       </div>
@@ -952,7 +1016,7 @@ export function Accessibility({
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">Accessibility</h2>
       <h3 className="text-body-sm font-medium text-foreground">Keyboard</h3>
-      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+      <div className="overflow-hidden border border-border bg-surface">
         <table className="w-full min-w-[24rem] text-left text-body-sm">
           <thead>
             <tr className="border-b border-border text-body-xs text-muted-foreground">
@@ -982,7 +1046,7 @@ export function Accessibility({
       {aria && aria.length > 0 && (
         <>
           <h3 className="mt-2 text-body-sm font-medium text-foreground">ARIA</h3>
-          <div className={cn("overflow-hidden rounded-xl border border-border bg-surface", SYNTAX_VARS)}>
+          <div className={cn("overflow-hidden border border-border bg-surface", SYNTAX_VARS)}>
             <table className="w-full min-w-[28rem] text-left text-body-sm">
               <thead>
                 <tr className="border-b border-border text-body-xs text-muted-foreground">
@@ -1046,7 +1110,7 @@ export function WcagChecklist({ rows }: { rows: WcagRow[] }) {
           How the component meets WCAG 2.2 AA / ADA design criteria.
         </p>
       </div>
-      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+      <div className="overflow-hidden border border-border bg-surface">
         <table className="w-full min-w-[32rem] text-left text-body-sm">
           <thead>
             <tr className="border-b border-border text-body-xs text-muted-foreground">
@@ -1100,7 +1164,7 @@ export function Anatomy({
   return (
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">Anatomy</h2>
-      <div className="flex min-h-40 items-center justify-center rounded-xl border border-border bg-background p-8">
+      <div className="flex min-h-40 items-center justify-center border border-border bg-background p-8">
         {children}
       </div>
       <ol className="flex flex-col gap-2">
@@ -1157,7 +1221,7 @@ export function Responsive({
         ))}
       </ul>
       {children && (
-        <div className="rounded-xl border border-border bg-background p-6">{children}</div>
+        <div className="border border-border bg-background p-6">{children}</div>
       )}
     </section>
   );
