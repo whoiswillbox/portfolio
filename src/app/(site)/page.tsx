@@ -3,8 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { BoxLogo } from "@/components/box-logo";
 import { ContentCard } from "@/components/content-card";
+import { ChatInput } from "@/components/chat-input";
+import { Alert, AlertDescription, AlertAction } from "@/components/ui/alert";
+import { BoxEmptyState } from "@/components/box-empty-state";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
@@ -145,6 +150,39 @@ export default function LandingPage() {
     router.push(path);
   };
 
+  // Static composer for the landing replica — the REAL ChatInput (disabled) with
+  // the same docked privacy notice as Box AI, so the replica is byte-identical to
+  // the real empty state. Non-interactive; real chat happens after commit.
+  const staticSearchForm = (
+    <ChatInput
+      value=""
+      onValueChange={() => {}}
+      onSend={() => {}}
+      placeholder="Ask Box…"
+      ariaLabel="Ask Box a question about Will"
+      disabled
+      attachedSection={
+        <Alert className="border-0 bg-transparent p-0 text-left text-info">
+          <InformationCircleIcon className="size-4" />
+          <AlertDescription className="text-info/90">
+            Conversations are saved to help improve Box&apos;s answers over time.
+            Please don&apos;t share anything sensitive.
+          </AlertDescription>
+          <AlertAction>
+            <span className="rounded p-0.5 text-info">
+              <XMarkIcon className="size-4" />
+            </span>
+          </AlertAction>
+        </Alert>
+      }
+    />
+  );
+  const staticChips = [
+    { label: "🌊 Do you surf?", prompt: "" },
+    { label: "🚀 How'd you get into product design?", prompt: "" },
+    { label: "💡 What are you proudest of?", prompt: "" },
+  ];
+
   // Scroll-scrub: accumulate wheel / touch delta into a 0→1 progress that drives
   // the splash exit animation. At 1, trigger the route into Box. A downward
   // scroll gesture is the entry; keyboard / click affordance covers a11y and
@@ -247,19 +285,54 @@ export default function LandingPage() {
 
           <FallingBoxes progress={progress} />
 
-          {/* Hero block — MIRRORS the Box AI empty-state layout (mx-auto max-w-2xl,
-              vertically centered, cube at the top) so the hero box lands in the
-              exact same position the product's header cube occupies. This makes
-              the hand-off to /who continuous regardless of viewport. */}
-          {/* translate-y nudge: the Box AI block is taller (heading + input +
-              chips below the cube), so its vertically-centered cube sits a bit
-              lower than ours — push the landing block down to match. */}
-          <div className="pointer-events-none absolute inset-0 flex flex-col justify-center translate-y-12">
+          {/* Two overlaid layers share the exact same Box AI empty-state layout
+              (via BoxEmptyState) so the cube slot lines up identically:
+                · SPLASH layer — cube placeholder + splash headline; fades OUT.
+                · BOX AI layer — the real BoxEmptyState (hideCube); fades IN,
+                  byte-identical to /who so there's no commit seam.
+              The animated hero cube overlays the shared cube slot as the pivot. */}
+
+          {/* Splash layer — fades out over the first part of the scroll. */}
+          <div
+            className="pointer-events-none absolute inset-0 flex flex-col justify-center translate-y-12"
+            style={{
+              opacity: Math.max(0, 1 - progress / 0.45),
+              transition: "opacity 0.1s linear",
+            }}
+          >
             <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-3 p-6">
-              {/* The hero box — scrubs from high/small/faint into the cube slot at
-                  the top of this block (progress 1 = the Box AI logo, size-12). */}
+              {/* invisible cube placeholder — reserves the cube slot's height */}
+              <div className="mb-4 size-12 shrink-0" />
+              <h1
+                className="font-display text-display text-secondary text-center"
+                style={{ transform: `translateY(${progress * -60}px)` }}
+              >
+                William Box is a product designer that pulls, branches, and merges.
+              </h1>
+            </div>
+          </div>
+
+          {/* Box AI layer — the REAL empty state (shared component), fades in. */}
+          <div
+            className="pointer-events-none absolute inset-0 flex flex-col justify-center translate-y-12"
+            style={{
+              opacity: Math.max(0, (progress - 0.55) / 0.45),
+              transition: "opacity 0.1s linear",
+            }}
+          >
+            <BoxEmptyState
+              hideCube
+              heading="Ask me what drives my craft"
+              searchForm={staticSearchForm}
+              chips={staticChips}
+            />
+          </div>
+
+          {/* Animated hero cube — overlays the shared cube slot, scrubbing from
+              high/small/faint into place (progress 1 = the Box AI logo). */}
+          <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-center translate-y-12">
+            <div className="mx-auto flex w-full max-w-2xl flex-col items-center p-6">
               <div
-                className="z-20"
                 style={{
                   transform: (() => {
                     const p = progress;
@@ -269,72 +342,11 @@ export default function LandingPage() {
                     const rot = (1 - ease) * -35; // -35deg → 0
                     return `translateY(${y}px) scale(${scale}) rotate(${rot}deg)`;
                   })(),
-                  opacity: 0.15 + progress * 0.85, // faint → solid
+                  opacity: 0.15 + progress * 0.85,
                   transition: "transform 0.1s linear, opacity 0.1s linear",
                 }}
               >
                 <BoxLogo className="size-12 text-foreground" />
-              </div>
-
-              {/* Below the cube, two layers share the same slot: the SPLASH
-                  headline fades OUT and the Box AI empty-state (heading + input +
-                  chips) fades IN. The two fades are STAGGERED so they don't
-                  overlap: the splash is gone by ~45% scroll, and Box AI only
-                  starts fading in at ~55% — leaving a clean middle beat where the
-                  cube sits mostly alone. The cube is the fixed pivot. */}
-              <div className="relative mt-4 w-full">
-                {/* Splash headline — fades out over the FIRST part of the scroll
-                    (opacity 1 → 0 across progress 0 → 0.45). */}
-                <div
-                  className="text-center"
-                  style={{
-                    transform: `translateY(${progress * -60}px)`,
-                    opacity: Math.max(0, 1 - progress / 0.45),
-                    transition: "transform 0.1s linear, opacity 0.1s linear",
-                  }}
-                >
-                  <h1 className="font-display text-display text-secondary">
-                    William Box is a product designer that pulls, branches, and merges.
-                  </h1>
-                </div>
-
-                {/* Box AI empty-state (static replica) — fades IN over the LAST
-                    part of the scroll (opacity 0 → 1 across progress 0.55 → 1),
-                    after the splash has cleared. Non-interactive; real interaction
-                    happens after committing into /who. */}
-                <div
-                  className="absolute inset-x-0 top-0 flex flex-col items-center gap-3"
-                  style={{
-                    opacity: Math.max(0, (progress - 0.55) / 0.45),
-                    transition: "opacity 0.1s linear",
-                  }}
-                >
-                  <h1 className="text-h1">Ask me what drives my craft</h1>
-                  {/* Privacy notice — a SEPARATE banner above the input (mirrors
-                      the real Box AI empty state; adds height so the block matches
-                      and the cube lands at the same lower position). */}
-                  <div className="mt-3 flex w-full items-start gap-2 px-4 text-left text-body-sm text-info">
-                    <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-info text-[10px] text-white">i</span>
-                    <span className="text-info/90">
-                      Conversations are saved to help improve Box&apos;s answers over time. Please don&apos;t share anything sensitive.
-                    </span>
-                  </div>
-                  {/* Input box */}
-                  <div className="w-full rounded-2xl border border-border bg-surface p-4 text-left shadow-sm">
-                    <span className="text-body-sm text-muted-foreground">Ask Box…</span>
-                    <div className="mt-6 flex justify-end">
-                      <span className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground">›</span>
-                    </div>
-                  </div>
-                  {/* Chips */}
-                  <div className="mt-1 flex flex-wrap justify-center gap-2">
-                    {["🌊 Do you surf?", "🚀 How'd you get into product design?", "💡 What are you proudest of?"].map((c) => (
-                      <span key={c} className="rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground">
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           </div>

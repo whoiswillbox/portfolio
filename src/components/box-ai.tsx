@@ -39,6 +39,7 @@ import { ContactCard } from "@/components/contact-card";
 import { showContactCard, stripContactMarker } from "@/lib/contact";
 import { caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
 import { ContentCard } from "@/components/content-card";
+import { BoxEmptyState } from "@/components/box-empty-state";
 import { CaseStudyPanel } from "@/components/case-study-panel";
 import {
   ResizablePanelGroup,
@@ -1092,38 +1093,16 @@ export function BoxAI({
         )}
       >
         {!active ? (
-          <div className="box-empty-hero mx-auto flex w-full max-w-2xl flex-col gap-3 p-6 text-center">
-            {/* Hidden admin entry: 5 quick taps opens /admin/login (the PWA has
-                no address bar). Plain decorative cube otherwise. */}
-            <button
-              type="button"
-              onClick={handleLogoTap}
-              aria-hidden="true"
-              tabIndex={-1}
-              className="box-cube mb-4 self-center cursor-default"
-            >
-              <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-12 text-foreground">
-                <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-                <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-                <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-              </svg>
-            </button>
-            <h1 className="box-heading text-h1">{heading}</h1>
-            {/* On desktop: input + chips inline. On mobile: hidden here, shown pinned below */}
-            <div className="mt-3 sm:block hidden">{searchForm}</div>
-            <div className="sm:flex hidden flex-wrap justify-center gap-2">
-              {chips.map((chip) => (
-                <button
-                  key={chip.prompt}
-                  onClick={() => send(chip.prompt)}
-                  disabled={atLimit}
-                  className="rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground transition-colors hover:bg-muted disabled:opacity-50"
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          // Shared empty-state hero (also used by the landing scroll-in replica).
+          // handleLogoTap is the hidden 5-tap admin entry.
+          <BoxEmptyState
+            heading={heading}
+            searchForm={searchForm}
+            chips={chips}
+            onChip={(prompt) => send(prompt)}
+            onCubeTap={handleLogoTap}
+            disabled={atLimit}
+          />
         ) : (
           <div className="mx-auto flex w-full max-w-xl flex-col gap-8 px-6 pb-6 pt-28">
             {messages.map((m, idx) =>
