@@ -231,14 +231,17 @@ export default function LandingPage() {
               (progress 0) down into the center, growing and solidifying, landing
               as the Box logo (progress 1) that the product page carries. This is
               the "the box becomes the product" moment as you scroll into Box. */}
+          {/* Anchored at top-[21%] — where the Box AI empty-state header cube
+              sits — so at full scrub the box lands in the SAME spot the product's
+              logo occupies, making the hand-off to /who continuous. */}
           <div
-            className="pointer-events-none absolute left-1/2 top-1/2 z-20"
+            className="pointer-events-none absolute left-1/2 top-[21%] z-20"
             style={{
               // Ease the scrub for a softer settle.
               transform: (() => {
                 const p = progress;
                 const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
-                const y = -220 + ease * 220; // -220px (high) → 0 (center)
+                const y = -180 + ease * 180; // -180px (high) → 0 (landing spot)
                 const x = "-50%";
                 const scale = 0.5 + ease * 0.5; // 0.5 → 1 (lands at ~size-12)
                 const rot = (1 - ease) * -35; // -35deg → 0
