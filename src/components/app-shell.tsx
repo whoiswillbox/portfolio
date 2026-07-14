@@ -69,7 +69,7 @@ export function AppShell({
             null
           )}
         </Suspense>
-        <SidebarInset className="min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar">
+        <SidebarInset className={`min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar ${inCardboard ? "" : "sm:mt-0"}`}>
           <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
             <BoxSeedProvider>
               <Suspense fallback={null}>
