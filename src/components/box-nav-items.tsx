@@ -40,9 +40,6 @@ export function BoxNavItems() {
 
   return (
     <NavBarNav>
-      <NavBarNavItem href="/who" active={pathname === "/who"}>
-        Box
-      </NavBarNavItem>
       <NavBarNavItem disclosure active={groupActive(experience)} items={withActive(experience)}>
         Experience
       </NavBarNavItem>
