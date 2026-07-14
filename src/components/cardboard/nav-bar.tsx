@@ -1,7 +1,14 @@
 import * as React from "react"
 import Link from "next/link"
+import { ChevronDownIcon } from "@heroicons/react/24/outline"
 
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/cardboard/dropdown-menu"
 
 /* Cardboard NavBar — owned (new, not forked). The top application bar: a thin,
    fixed strip that holds the product logo (a home link), a product switcher,
@@ -75,25 +82,88 @@ function NavBarNav({ className, ...props }: React.ComponentProps<"nav">) {
   )
 }
 
-/* A single top-level nav link. `active` marks the current section (fuller
-   weight + foreground); the rest are tertiary with a hover lift. */
+// Shared className for a nav item's rest / active / focus states — used by both
+// the link and the disclosure-trigger forms so they look identical.
+const navItemClass = (active: boolean, className?: string) =>
+  cn(
+    "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-body-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-border-focus",
+    active ? "font-medium text-foreground" : "text-tertiary hover:text-secondary",
+    className
+  )
+
+/* A child row shown in a disclosure item's dropdown menu. */
+type NavBarNavMenuItem = {
+  label: string
+  href: string
+  /** Marks the current child (medium weight + foreground). */
+  active?: boolean
+}
+
+/* A single top-level nav item. Two forms:
+
+   · Link (default) — `active` marks the current section.
+   · Disclosure — pass `disclosure` + `items` to make it a menu trigger that
+     opens a DropdownMenu of child links (mirrors the Box sidebar's expandable
+     items, but as a dropdown since the nav bar is horizontal). It renders a
+     <button> with a rotating chevron instead of a <Link>. */
 function NavBarNavItem({
   active = false,
   className,
+  disclosure = false,
+  items,
+  href,
+  children,
   ...props
-}: React.ComponentProps<typeof Link> & { active?: boolean }) {
+}: Omit<React.ComponentProps<typeof Link>, "href"> & {
+  /** The item's route. Optional — a disclosure item is a menu trigger, not a link. */
+  href?: React.ComponentProps<typeof Link>["href"]
+  active?: boolean
+  /** Render as a menu trigger that discloses `items` in a dropdown. */
+  disclosure?: boolean
+  /** Child links shown in the disclosure dropdown. */
+  items?: NavBarNavMenuItem[]
+}) {
+  if (disclosure) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          data-slot="nav-bar-nav-item"
+          data-active={active || undefined}
+          className={cn(navItemClass(active), "group/disclosure", className)}
+        >
+          {children}
+          <ChevronDownIcon
+            className="size-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]/disclosure:rotate-180"
+            aria-hidden="true"
+          />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="min-w-44">
+          {items?.map((item) => (
+            <DropdownMenuItem key={item.href} asChild>
+              <Link href={item.href} data-active={item.active || undefined}>
+                <span className={item.active ? "font-medium text-foreground" : undefined}>
+                  {item.label}
+                </span>
+              </Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+
   return (
     <Link
+      href={href ?? "#"}
       data-slot="nav-bar-nav-item"
       data-active={active || undefined}
-      className={cn(
-        "rounded-md px-2.5 py-1.5 text-body-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-border-focus",
-        active ? "font-medium text-foreground" : "text-tertiary hover:text-secondary",
-        className
-      )}
+      className={navItemClass(active, className)}
       {...props}
-    />
+    >
+      {children}
+    </Link>
   )
 }
 
 export { NavBar, NavBarLogo, NavBarNav, NavBarNavItem }
+export type { NavBarNavMenuItem }

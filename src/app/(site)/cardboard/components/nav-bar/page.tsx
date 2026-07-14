@@ -74,7 +74,16 @@ function NavItems() {
   return (
     <NavBarNav>
       <NavBarNavItem href="#" active>Docs</NavBarNavItem>
-      <NavBarNavItem href="#">Components</NavBarNavItem>
+      <NavBarNavItem
+        disclosure
+        items={[
+          { label: "Overview", href: "#", active: true },
+          { label: "Foundations", href: "#" },
+          { label: "Components", href: "#" },
+        ]}
+      >
+        Components
+      </NavBarNavItem>
       <NavBarNavItem href="#">Changelog</NavBarNavItem>
     </NavBarNav>
   );
@@ -87,7 +96,7 @@ export default function NavBarDocs() {
     <ComponentPage
       title="Nav Bar"
       status="stable"
-      version="1.0"
+      version="1.1"
       description="The top application bar: a logo that links home, plus a product switcher for moving between products. A thin, fixed strip above the sidebar (desktop only — mobile uses the mobile nav)."
     >
       <AudienceTabs
@@ -269,7 +278,9 @@ function AppNavBar() {
                   interfaceName: "NavBarNavItem",
                   rows: [
                     { name: "active?", type: "boolean", default: "false", desc: "Marks the current section (foreground + medium weight)." },
-                    { name: "href", type: "string", desc: "The item's route (extends next/link)." },
+                    { name: "href", type: "string", desc: "The item's route (extends next/link). Not needed when disclosure is set." },
+                    { name: "disclosure?", type: "boolean", default: "false", desc: "Render as a menu trigger (a <button> with a rotating chevron) that opens a dropdown of items instead of a link. Mirrors the Box sidebar's expandable items." },
+                    { name: "items?", type: "NavBarNavMenuItem[]", desc: "The child links shown in the disclosure dropdown. Each is { label, href, active? }." },
                   ],
                 },
               ]}
@@ -315,6 +326,7 @@ function AppNavBar() {
             />
             <Changelog
               entries={[
+                { version: "1.1", changes: ["Added the disclosure prop to NavBarNavItem — a menu-trigger item that opens a dropdown of child items (via items), mirroring the Box sidebar's expandable items."] },
                 { version: "1.0", changes: ["Initial release — NavBar with NavBarLogo, product switcher, and NavBarNav items."] },
               ]}
             />
