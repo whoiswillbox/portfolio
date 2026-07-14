@@ -1358,7 +1358,7 @@ export function BoxAI({
   return (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="gap-2"
+      className="gap-2 bg-background"
       style={{ overflow: "visible" }}
     >
       <ResizablePanel
