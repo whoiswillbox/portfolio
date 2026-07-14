@@ -16,7 +16,7 @@ export function ContentCard({
       ref={ref}
       className={cn(
         "min-h-0 h-full overflow-hidden",
-        !flush && "sm:bg-sidebar sm:rounded-xl sm:shadow-lg sm:ring-1 sm:ring-sidebar-border"
+        !flush && "sm:bg-sidebar sm:shadow-lg sm:ring-1 sm:ring-border-divider"
       )}
       {...props}
     >
