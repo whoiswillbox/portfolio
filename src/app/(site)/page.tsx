@@ -121,6 +121,10 @@ function LandingInner() {
   // center and steer the settled cube there (relative to true screen center,
   // where the splash cube's own container centers it).
   const [cubeTarget, setCubeTarget] = useState({ x: 0, y: 0 });
+  // False until the slot has been measured at least once. Until then the cube is
+  // held invisible so it never flashes at the unmeasured {0,0} (screen center)
+  // on a direct ?box-home entry before the first measurement lands.
+  const [cubeMeasured, setCubeMeasured] = useState(false);
   useEffect(() => {
     let raf = 0;
     const measure = () => {
@@ -135,6 +139,7 @@ function LandingInner() {
             const y = r.top + r.height / 2 - window.innerHeight / 2;
             return prev.x === x && prev.y === y ? prev : { x, y };
           });
+          setCubeMeasured(true);
         }
       }
       raf = requestAnimationFrame(measure);
@@ -319,8 +324,17 @@ function LandingInner() {
                 // and STAYS at full opacity once landed. Box AI's own cube is
                 // always hidden on landing, so this cube alone represents it —
                 // no handoff, no position jump. Settles onto the measured slot.
-                opacity: progress,
-                transition: "transform 0.12s linear, opacity 0.12s linear",
+                // Held at 0 until the first measurement so it never flashes at
+                // the unmeasured center on a direct (non-scrub) entry.
+                opacity: cubeMeasured ? progress : 0,
+                // Only transition the TRANSFORM while actively scrubbing. At rest
+                // (progress 0 or 1) a late cubeTarget correction — e.g. on a
+                // direct ?box-home entry where measurement lands a frame after
+                // mount — must SNAP into place, not fly up with a transition.
+                transition:
+                  progress > 0 && progress < 1
+                    ? "transform 0.12s linear, opacity 0.12s linear"
+                    : "opacity 0.12s linear",
               }}
             >
               {/* Identical to the Box AI empty-state cube so the handoff is
