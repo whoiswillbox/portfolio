@@ -30,11 +30,12 @@ export function AppShell({
   return (
     // --topbar-h is consumed by ContentWorkspace/BoxAI, which need an explicit
     // pixel height (100dvh minus the top bar) for their h-full to resolve.
-    // 0 on mobile (no top bar); 3.5rem on desktop wherever the header shows.
-    // TRIAL: the Box landing now renders the nav bar in-flow (faded via scroll),
-    // so it reserves the same 3.5rem as /who — no positional jump at commit.
+    // 0 on mobile (no top bar) and on the landing splash (full-bleed, nav bar
+    // overlays); 3.5rem on desktop everywhere else where the header shows.
     <div
-      className="flex h-svh flex-col overflow-hidden [--topbar-h:0px] sm:[--topbar-h:3.5rem]"
+      className={`flex h-svh flex-col overflow-hidden [--topbar-h:0px] ${
+        isLanding ? "" : "sm:[--topbar-h:3.5rem]"
+      }`}
     >
       {/* Full-width top bar (Tailwind-docs style): the Box logo home link + the
           product switcher pill. Desktop only — mobile uses MobileNav. Sits
@@ -44,10 +45,10 @@ export function AppShell({
           but fades in with the scroll scrub (via --enter-progress the landing
           page publishes) so it's already present at commit → no pop into /who.
           Off the landing route the var is absent, so opacity falls back to 1.
-          It stays IN FLOW on landing too (reserving the same 3.5rem topbar height
-          as /who) so there's no positional jump at commit. */}
+          On landing it OVERLAYS absolutely (full-bleed splash keeps --topbar-h:0,
+          no reserved white gap); it just fades in over the splash. */}
       <NavBar
-        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"}`}
+        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"} ${isLanding ? "absolute inset-x-0 top-0 z-30" : ""}`}
         style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
       >
         <NavBarLogo href={home.href} aria-label={home.name}>
