@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { BoxLogo } from "@/components/box-logo";
 import { BoxAI } from "@/components/box-ai";
 import { useSidebar } from "@/components/ui/sidebar";
 
@@ -118,6 +116,50 @@ function LandingInner() {
   const reducedMotion = useRef(false);
   const revealed = progress >= 1;
 
+  // The splash cube must SETTLE exactly onto Box AI's (hidden) empty-state cube
+  // slot so it reads as one continuous cube. Measure that slot's viewport
+  // center and steer the settled cube there (relative to true screen center,
+  // where the splash cube's own container centers it).
+  const [cubeTarget, setCubeTarget] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    let raf = 0;
+    const measure = () => {
+      const slot = document.querySelector<HTMLElement>(".landing-box .box-cube");
+      if (slot) {
+        const r = slot.getBoundingClientRect();
+        // Only trust a real, laid-out slot (Box AI's empty state renders async;
+        // a 0-size box means it isn't ready yet).
+        if (r.width > 0 && r.height > 0) {
+          setCubeTarget((prev) => {
+            const x = r.left + r.width / 2 - window.innerWidth / 2;
+            const y = r.top + r.height / 2 - window.innerHeight / 2;
+            return prev.x === x && prev.y === y ? prev : { x, y };
+          });
+        }
+      }
+      raf = requestAnimationFrame(measure);
+    };
+    // Track the slot while the splash is up: Box AI's empty state mounts async
+    // and its column height (and thus the cube's Y) shifts as content/opacity
+    // settle, so a rAF loop keeps the splash cube pinned to the real slot. Stop
+    // once fully revealed — the cube is hidden then and the slot won't move.
+    if (!revealed) raf = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(raf);
+  }, [revealed]);
+
+  // The splash cube stands in for Box AI's empty-state cube. Once a conversation
+  // or case study opens, that empty state (and its cube slot) is gone — so hide
+  // the splash cube too, else it floats over the conversation. Watch the
+  // [data-box-empty] marker Box AI sets on its root.
+  const [boxIsEmpty, setBoxIsEmpty] = useState(true);
+  useEffect(() => {
+    const check = () => setBoxIsEmpty(!!document.querySelector("[data-box-empty]"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.body, { subtree: true, attributes: true, childList: true });
+    return () => observer.disconnect();
+  }, []);
+
   // React to the box-home / c param: force full progress (splash cleared) and
   // strip the transient ?box-home marker from the URL (keep ?c=).
   useEffect(() => {
@@ -223,16 +265,17 @@ function LandingInner() {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes nudge {
-          0%, 100% { transform: translateY(0); opacity: 0.5; }
-          50% { transform: translateY(6px); opacity: 1; }
-        }
       `}</style>
 
+      {/* Everything lives inside ONE content card (same chrome as every other
+          page's ContentCard), inset by the SidebarInset m-2. The Box AI and the
+          splash overlay are both contained within it — the splash no longer
+          covers the full viewport / nav bar, it sits in the card. */}
+      <div className="relative h-full overflow-hidden sm:bg-sidebar sm:shadow-lg sm:ring-1 sm:ring-border-divider">
       {/* Live Box AI — in normal flow, same layout as /who. Fades in as the
           splash scrubs away; interactive only once fully revealed. */}
       <div
-        className="who-shell h-full"
+        className="who-shell landing-box h-full"
         style={{
           opacity: Math.max(0, (progress - 0.4) / 0.6),
           transition: "opacity 0.12s linear",
@@ -242,40 +285,70 @@ function LandingInner() {
         <BoxAI />
       </div>
 
-      {/* Splash overlay — FIXED full-viewport (above the nav bar) so it reads as
-          a full-bleed splash; scrubs away as progress rises to reveal Box AI +
-          nav bar beneath. Ignores pointer events once revealed. */}
+      {/* Splash overlay — ABSOLUTE within the card (not fixed), so it reads as a
+          card-contained splash; scrubs away as progress rises to reveal Box AI
+          beneath. Ignores pointer events once revealed.
+          Two independent layers so the cube can OUTLIVE the background: the
+          background (bg + falling boxes) fades over 0.6→0.85, but the hero cube
+          on the layer above stays crisp until its own fade (0.85→1). */}
       <div
-        className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-background px-12"
-        style={{
-          opacity: Math.max(0, 1 - progress / 0.6),
-          transition: "opacity 0.12s linear",
-          pointerEvents: revealed ? "none" : "auto",
-        }}
+        className="absolute inset-0 z-40 px-12"
+        style={{ pointerEvents: revealed ? "none" : "auto" }}
       >
-          <FallingBoxes progress={progress} />
+          {/* Background layer — matches the card surface + falling boxes;
+              clears over 0.6→0.85. */}
+          <div
+            className="absolute inset-0 bg-background sm:bg-sidebar"
+            style={{
+              opacity: Math.max(0, 1 - Math.max(0, progress - 0.6) / 0.25),
+              transition: "opacity 0.12s linear",
+            }}
+          >
+            <FallingBoxes progress={progress} />
+          </div>
 
-          {/* Hero cube — the pivot; scrubs from high/small/faint toward the Box AI
-              logo position as the splash clears. */}
-          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-6">
+          {/* Hero cube — on its OWN full-screen centered layer so its natural
+              origin is EXACTLY screen center. cubeTarget is measured relative to
+              screen center, so translate(cubeTarget) lands it precisely on Box
+              AI's (hidden) empty-state cube slot — reading as one continuous
+              cube. (Keeping the heading on a separate layer below avoids the
+              flex-column offset that was pushing the cube up off the slot.) */}
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
             <div
               style={{
                 transform: (() => {
                   const p = progress;
                   const ease = 1 - Math.pow(1 - p, 3);
-                  const y = -80 + ease * 80;
+                  // Start high/small/tilted; settle onto the empty-state cube
+                  // slot (cubeTarget) at full progress.
+                  const x = ease * cubeTarget.x;
+                  const y = -80 + ease * (80 + cubeTarget.y);
                   const scale = 0.6 + ease * 0.4;
                   const rot = (1 - ease) * -35;
-                  return `translateY(${y}px) scale(${scale}) rotate(${rot}deg)`;
+                  return `translate(${x}px, ${y}px) scale(${scale}) rotate(${rot}deg)`;
                 })(),
-                opacity: 0.2 + Math.min(1, progress) * 0.8,
+                // Fade in across the WHOLE scrub, reaching full opacity only
+                // once the cube lands (progress = 1). Hidden once Box AI is no
+                // longer empty (its cube slot is gone).
+                opacity: boxIsEmpty ? progress : 0,
                 transition: "transform 0.12s linear, opacity 0.12s linear",
               }}
             >
-              <BoxLogo className="size-14 text-foreground" />
+              {/* Identical to the Box AI empty-state cube so the handoff is
+                  seamless — same size, same paths. */}
+              <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-12 text-foreground">
+                <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+                <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+                <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+              </svg>
             </div>
+          </div>
+
+          {/* Splash heading — its own centered layer, sitting below the cube.
+              Fades out early in the scrub. */}
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-12">
             <h1
-              className="max-w-4xl text-center font-display text-display text-secondary"
+              className="mt-40 max-w-4xl text-center font-display text-display text-secondary"
               style={{
                 transform: `translateY(${progress * -40}px)`,
                 opacity: Math.max(0, 1 - progress / 0.4),
@@ -285,24 +358,8 @@ function LandingInner() {
             </h1>
           </div>
 
-          {/* Scroll-to-enter affordance. */}
-          <button
-            type="button"
-            onClick={() => { progressRef.current = 1; setProgress(1); }}
-            aria-label="Enter — scroll or click to view William's work"
-            className="group absolute bottom-10 z-10 flex flex-col items-center gap-2 rounded-lg px-4 py-2 text-secondary outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-border-focus"
-            style={{ opacity: 1 - progress }}
-          >
-            <span className="text-body-sm text-muted-foreground transition-colors group-hover:text-foreground">
-              Scroll to enter
-            </span>
-            <ChevronDownIcon
-              className="size-5 text-muted-foreground transition-colors group-hover:text-foreground"
-              style={{ animation: "nudge 1.8s ease-in-out infinite" }}
-              aria-hidden="true"
-            />
-          </button>
         </div>
+      </div>
     </>
   );
 }

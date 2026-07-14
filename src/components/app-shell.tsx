@@ -21,10 +21,10 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const inCardboard = pathname.startsWith("/cardboard")
-  // TRIAL (try/nav-bar-shell, one-page model): "/" now hosts the live Box AI with
-  // a splash OVERLAY on top (fixed, full-viewport) — so "/" uses the SAME layout
-  // as /who (topbar reserved, Box AI centered). The nav bar just fades its opacity
-  // via --enter-progress while the splash is up. No special full-bleed casing.
+  // TRIAL (try/nav-bar-shell, one-page model): "/" hosts the live Box AI inside a
+  // content card with the splash overlaying it (contained in the card, not
+  // full-viewport). The landing page has NO nav bar — the card fills to the top
+  // (--topbar-h:0), and the nav bar is hidden here.
   const isLanding = pathname === "/"
   // Box home is "/" — it already hosts the live (warm) Box AI in the one-page
   // model, so keeping the home there avoids remounting the heavy Box AI on every
@@ -41,20 +41,19 @@ export function AppShell({
     // 0 on mobile (no top bar) and on the landing splash (full-bleed, nav bar
     // overlays); 3.5rem on desktop everywhere else where the header shows.
     <div
-      className="flex h-svh flex-col overflow-hidden [--topbar-h:0px] sm:[--topbar-h:3.5rem]"
+      className={`relative flex h-svh flex-col overflow-hidden [--topbar-h:0px] ${isLanding ? "sm:[--topbar-h:calc(3.5rem*var(--enter-progress,0))]" : "sm:[--topbar-h:3.5rem]"}`}
     >
       {/* Full-width top bar (Tailwind-docs style): the Box logo home link + the
           product switcher pill. Desktop only — mobile uses MobileNav. Sits
           ABOVE the SidebarProvider so the provider keeps its original row
-          layout / height behavior unchanged. Hidden on the landing splash. */}
-      {/* TRIAL (try/nav-bar-shell): the nav bar renders on the landing page too,
-          but fades in with the scroll scrub (via --enter-progress the landing
-          page publishes) so it's already present at commit → no pop into /who.
-          Off the landing route the var is absent, so opacity falls back to 1.
-          On landing it OVERLAYS absolutely (full-bleed splash keeps --topbar-h:0,
-          no reserved white gap); it just fades in over the splash. */}
+          layout / height behavior unchanged.
+
+          On the landing page the nav bar is present from the start but hidden
+          BEHIND the content card (which fills the viewport at rest). As you
+          scroll landing → Box AI, --enter-progress rises 0→1, growing --topbar-h
+          from 0→3.5rem, which slides the card down to EXPOSE the nav bar. */}
       <NavBar
-        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"}`}
+        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"} ${isLanding ? "absolute inset-x-0 top-0 z-20" : ""}`}
         style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
       >
         <NavBarLogo href={home.href} aria-label={home.name}>
@@ -68,7 +67,7 @@ export function AppShell({
 
       <SidebarProvider
         defaultOpen={false}
-        className="!min-h-0 flex-1 bg-background max-sm:bg-sidebar"
+        className={`!min-h-0 flex-1 max-sm:bg-sidebar ${isLanding ? "z-10 bg-transparent pt-[var(--topbar-h)]" : "bg-background"}`}
       >
         <Suspense fallback={null}>
           {inCardboard ? (
@@ -81,7 +80,7 @@ export function AppShell({
             null
           )}
         </Suspense>
-        <SidebarInset className={`min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar ${!inCardboard && !isLanding ? "sm:mt-0" : ""}`}>
+        <SidebarInset className={`min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar ${!inCardboard ? "sm:mt-0" : ""}`}>
           <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
             <BoxSeedProvider>
               <Suspense fallback={null}>

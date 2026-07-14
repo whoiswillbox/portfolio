@@ -90,3 +90,18 @@ body.input-focused .mobile-nav {
     pointer-events: none;
   }
 }
+
+/* One-page landing (try/nav-bar-shell): the landing splash renders the sole
+   cube (it scrubs into place and settles onto this slot). Box AI's own
+   empty-state cube would be a SECOND cube in the same spot, so hide it here —
+   the landing cube stands in for it. Unlayered + !important so it beats the
+   button's utility classes. (Box AI keeps its cube everywhere else, e.g. the
+   embedded launcher.) visibility:hidden (not display:none) keeps the slot's
+   box so the splash cube can measure/align to it and the heading doesn't jump. */
+.landing-box .box-cube {
+  visibility: hidden !important;
+  /* Extra breathing room below the (hidden) cube slot so the heading sits
+     lower — the splash cube settles onto this slot, so a bigger gap here means
+     more space between the landing cube and the h1. */
+  margin-bottom: 2.5rem !important;
+}
