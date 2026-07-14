@@ -75,6 +75,33 @@ passed `sideOffset` through to the radix Content, and removed the popper-mode
 single trigger-height row). Callers can still pass `position="item-aligned"` to
 opt back in.
 
+### `separator.tsx` — use the `border-divider` token
+**Date:** 2026-07-13
+**What:** Changed the Separator fill from `bg-border` to `bg-border-divider`
+(the new lighter divider hairline: light `--neutral-100`, dark `--neutral-800`),
+so all dividers inherit a lighter tone than element borders. Element borders
+still use `--color-border` (light neutral-200 / dark neutral-700).
+
+### `select.tsx` — widen trigger value↔chevron gap
+**Date:** 2026-07-13
+**What:** Bumped the `SelectTrigger` label-to-chevron gap from `--space-150`
+(6px) to `--space-200` (8px). Affects all triggers (default + ghost).
+
+### `select.tsx` — add `variant` prop to `SelectTrigger` (`default` | `ghost`)
+**Date:** 2026-07-13
+**Why:** Needed a borderless, inline trigger (text + chevron, no box chrome) for
+toolbar / product-switcher style selects — previously done with ad-hoc className
+overrides. Made it a first-class, documented variant.
+**What:** Added `variant?: "default" | "ghost"` to `SelectTrigger` and a
+`data-variant` hook. Split the base classes: moved `border border-border
+bg-surface` + `focus-visible:border-border-focus` into the `default` branch;
+`ghost` is borderless with no fill — text-color states only. Selected value:
+`text-foreground` → dims to `text-secondary` on hover, `text-foreground` while
+active / `data-[state=open]`. Placeholder: `text-tertiary` (shared base) → lifts
+to `text-secondary` on hover, `text-foreground` while active / open (compound
+`data-placeholder:` rules beat the base placeholder color). Keeps the focus
+ring. Default behavior unchanged.
+
 ### `sheet.tsx`, `sidebar.tsx` — FORKED into Cardboard
 **Date:** 2026-07-10
 **Why:** Cardboard fork batch 19 — the final pass. Both were **already customized**

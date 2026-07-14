@@ -49,6 +49,22 @@ function BasicSelect({ size, disabled }: { size?: "default" | "sm"; disabled?: b
   );
 }
 
+function GhostSelect() {
+  const [v, setV] = React.useState<string | undefined>(undefined);
+  return (
+    <Select value={v} onValueChange={setV}>
+      <SelectTrigger variant="ghost" className="w-44">
+        <SelectValue placeholder="Pick a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="apple">Apple</SelectItem>
+        <SelectItem value="orange">Orange</SelectItem>
+        <SelectItem value="pear">Pear</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
+
 function GroupedSelect() {
   const [v, setV] = React.useState<string | undefined>(undefined);
   return (
@@ -196,6 +212,21 @@ function Example() {
 </Select>`,
   },
   {
+    label: "No border",
+    caption: "The ghost variant — borderless (text + chevron) for inline / toolbar triggers.",
+    preview: <GhostSelect />,
+    code: `// variant="ghost" drops the border/background for an inline trigger.
+<Select value={value} onValueChange={setValue}>
+  <SelectTrigger variant="ghost" className="w-44">
+    <SelectValue placeholder="Pick a fruit" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="apple">Apple</SelectItem>
+    <SelectItem value="orange">Orange</SelectItem>
+  </SelectContent>
+</Select>`,
+  },
+  {
     label: "Small",
     caption: "Compact size for dense toolbars and inline controls.",
     preview: <BasicSelect size="sm" />,
@@ -223,22 +254,24 @@ function Example() {
 /* ── Playground ──────────────────────────────────────────────────────────── */
 
 function PlaygroundDemo({
+  variant,
   size,
   disabled,
   placeholder,
   label,
 }: {
+  variant: "default" | "ghost";
   size: "default" | "sm";
   disabled: boolean;
   placeholder: string;
   label: string;
 }) {
   const [v, setV] = React.useState<string | undefined>(undefined);
-  const control = (
+  return (
     <div className="flex flex-col gap-1.5">
       {label && <Label htmlFor="pg-select">{label}</Label>}
       <Select value={v} onValueChange={setV} disabled={disabled}>
-        <SelectTrigger id="pg-select" size={size} className="w-56">
+        <SelectTrigger id="pg-select" size={size} variant={variant} className="w-56">
           <SelectValue placeholder={placeholder || "Select…"} />
         </SelectTrigger>
         <SelectContent>
@@ -249,7 +282,6 @@ function PlaygroundDemo({
       </Select>
     </div>
   );
-  return control;
 }
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
@@ -266,6 +298,7 @@ export default function SelectDocs() {
         playground={
           <Playground
             controls={[
+              { prop: "variant", label: "variant", type: "select", options: ["default", "ghost"], default: "default" },
               { prop: "label", label: "label", type: "text", default: "Fruit" },
               { prop: "placeholder", label: "placeholder", type: "text", default: "Pick a fruit" },
               { prop: "size", label: "size", type: "select", options: ["default", "sm"], default: "default" },
@@ -273,6 +306,7 @@ export default function SelectDocs() {
             ]}
             render={(v) => (
               <PlaygroundDemo
+                variant={v.variant as "default" | "ghost"}
                 label={String(v.label)}
                 placeholder={String(v.placeholder)}
                 size={v.size as "default" | "sm"}
@@ -385,7 +419,6 @@ export default function SelectDocs() {
             <Related
               items={[
                 { href: "/cardboard/components/combobox", when: "For long or searchable lists." },
-                { href: "/cardboard/components/radio-group", when: "For a few always-visible options." },
                 { href: "/cardboard/components/segmented-control", when: "For 2–5 mutually exclusive views." },
               ]}
             />
@@ -415,7 +448,7 @@ export default function SelectDocs() {
                 'Style hooks: data-slot="select-trigger" and data-size on the trigger.',
               ]}
             />
-            <Variants variants={VARIANTS} preview={false} />
+            <Variants variants={VARIANTS} />
             <PropsTable
               groups={[
                 {
@@ -430,6 +463,7 @@ export default function SelectDocs() {
                 {
                   interfaceName: "SelectTriggerProps",
                   rows: [
+                    { name: "variant?", type: '"default" | "ghost"', default: '"default"', desc: "Bordered surface control, or borderless (text + chevron) for inline triggers." },
                     { name: "size?", type: '"default" | "sm"', default: '"default"', desc: "Trigger size (padding-driven height)." },
                     { name: "id?", type: "string", desc: "Pair with a <Label htmlFor> for the field." },
                   ],
@@ -480,6 +514,7 @@ export default function SelectDocs() {
             />
             <Changelog
               entries={[
+                { version: "1.1", changes: ['Added the ghost trigger variant (borderless, for inline / toolbar triggers).'] },
                 { version: "1.0", changes: ["Initial release — Radix-based single-select with grouped options, labels, and a padding-driven size."] },
               ]}
             />

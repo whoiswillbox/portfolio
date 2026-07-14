@@ -37,22 +37,38 @@ function SelectValue({
 function SelectTrigger({
   className,
   size = "default",
+  variant = "default",
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default"
+  /** "default" = bordered surface control; "ghost" = borderless (text +
+      chevron only, subtle hover) for inline / toolbar triggers. */
+  variant?: "default" | "ghost"
 }) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       data-size={size}
+      data-variant={variant}
       className={cn(
         // Padding-driven size: no fixed height — padding (on the --space-* scale)
         // plus the text line-height determines the trigger's height, so changing
         // the padding resizes the control. Size variants differ by py: default
         // --space-200 (8px), sm --space-150 (6px). px --space-300 (12px).
         // See docs/component-customizations.md.
-        "flex w-fit items-center justify-between gap-(--space-150) rounded-lg border border-border bg-surface px-(--space-300) text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-border-focus focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-critical aria-invalid:ring-3 aria-invalid:ring-critical/20 data-placeholder:text-tertiary data-[size=default]:py-(--space-200) data-[size=sm]:py-(--space-150) data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-(--space-150) [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex w-fit items-center justify-between gap-(--space-200) rounded-lg px-(--space-300) text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-3 focus-visible:ring-border-focus/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-critical aria-invalid:ring-3 aria-invalid:ring-critical/20 data-placeholder:text-tertiary data-[size=default]:py-(--space-200) data-[size=sm]:py-(--space-150) data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-(--space-150) [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // variant: default = bordered surface; ghost = borderless, no fill —
+        // states are text-color only: hover → text-secondary, active / menu-open
+        // → text-foreground (Radix sets data-state=open on the trigger).
+        variant === "default"
+          ? "border border-border bg-surface focus-visible:border-border-focus"
+          // ghost: no fill, text-color states only.
+          //  · selected value: foreground → dims to secondary on hover;
+          //    foreground while active / open.
+          //  · placeholder: tertiary → lifts to secondary on hover; foreground
+          //    while active / open (compound rules beat the base placeholder color).
+          : "border border-transparent bg-transparent text-foreground hover:text-secondary active:text-foreground data-[state=open]:text-foreground data-placeholder:hover:text-secondary data-placeholder:active:text-foreground data-placeholder:data-[state=open]:text-foreground",
         className
       )}
       {...props}

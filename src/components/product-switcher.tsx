@@ -52,12 +52,8 @@ export function ProductSwitcher() {
         if (next && next.id !== active.id) router.push(next.href)
       }}
     >
-      <SelectTrigger
-        size="sm"
-        aria-label="Switch product"
-        className="gap-1 rounded-md border-0 bg-transparent px-1.5 font-medium text-foreground ring-0 hover:bg-surface-secondary focus-visible:ring-2 focus-visible:ring-border-focus"
-      >
-        {/* Just the product name + chevron, no box chrome. */}
+      <SelectTrigger size="sm" variant="ghost" aria-label="Switch product">
+        {/* Just the product name + chevron — the pure ghost variant. */}
         <span>{active.name}</span>
       </SelectTrigger>
       <SelectContent className="w-56">
