@@ -77,6 +77,9 @@ export const components: {
   href: string;
   description: string;
   preview: React.ReactNode;
+  /** Utilities (helpers/wrappers/assets) — kept in the registry for Related
+      lookups + doc pages, but filtered out of the Components gallery grid. */
+  utility?: boolean;
 }[] = [
   {
     label: "Button",
@@ -255,6 +258,7 @@ export const components: {
   {
     label: "Kbd",
     href: "/cardboard/components/kbd",
+    utility: true,
     description: "Keyboard keys and shortcuts.",
     preview: (
       <div className="flex items-center gap-1 text-body-sm">
@@ -589,6 +593,7 @@ export const components: {
   {
     label: "Copy Token",
     href: "/cardboard/components/copy-token",
+    utility: true,
     description: "Click-to-copy token name.",
     preview: (
       <code className="rounded-md bg-surface-secondary px-2 py-1 font-mono text-body-xs text-foreground ring-1 ring-border">
@@ -599,12 +604,14 @@ export const components: {
   {
     label: "Logo",
     href: "/cardboard/components/logo",
+    utility: true,
     description: "The Box cube mark.",
     preview: <BoxLogo className="size-10 text-foreground" />,
   },
   {
     label: "Mobile Only",
     href: "/cardboard/components/mobile-only",
+    utility: true,
     description: "Mobile-only render wrapper.",
     preview: (
       <div className="flex h-24 w-14 flex-col rounded-[1rem] border-2 border-border bg-background p-1">

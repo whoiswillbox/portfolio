@@ -80,7 +80,6 @@ const components: Entry[] = [
       leaf("Content Card", "content-card"),
     ],
   },
-  leaf("Copy Token", "copy-token"),
   {
     title: "Dialog",
     children: [
@@ -102,8 +101,6 @@ const components: Entry[] = [
     ],
   },
   leaf("Item", "item"),
-  leaf("Kbd", "kbd"),
-  leaf("Logo", "logo"),
   {
     title: "Menu",
     children: [
@@ -114,7 +111,6 @@ const components: Entry[] = [
       leaf("Navigation Menu", "navigation-menu"),
     ],
   },
-  leaf("Mobile Only", "mobile-only"),
   leaf("Nav Bar", "nav-bar", "stable"),
   leaf("Popover", "popover"),
   leaf("Progress", "progress"),
@@ -138,6 +134,15 @@ const components: Entry[] = [
   leaf("Tooltip", "tooltip"),
 ].sort((a, b) => a.title.localeCompare(b.title))
 
+// Utilities — helpers, wrappers, and assets that aren't interactive UI
+// components (render wrappers, brand marks, doc tooling, glyph primitives).
+const utilities: Leaf[] = [
+  leaf("Copy Token", "copy-token"),
+  leaf("Kbd", "kbd"),
+  leaf("Logo", "logo"),
+  leaf("Mobile Only", "mobile-only"),
+].sort((a, b) => a.title.localeCompare(b.title))
+
 export function CardboardSidebar() {
   const pathname = usePathname()
   const base = "/cardboard/components"
@@ -146,7 +151,7 @@ export function CardboardSidebar() {
   return (
     <Sidebar
       variant="floating"
-      className="max-sm:hidden !p-0 sm:!inset-y-auto sm:!top-14 sm:!bottom-0 sm:!h-auto [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-inner]]:!rounded-none [&_[data-slot=sidebar-inner]]:border-r [&_[data-slot=sidebar-inner]]:border-border [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
+      className="max-sm:hidden !p-0 sm:!inset-y-auto sm:!top-14 sm:!bottom-0 sm:!h-auto [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-inner]]:!rounded-none [&_[data-slot=sidebar-inner]]:border-r [&_[data-slot=sidebar-inner]]:border-border-divider [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
     >
       <SidebarHeader>
         <div className="flex items-center justify-end">
@@ -249,6 +254,30 @@ export function CardboardSidebar() {
                       </CollapsibleContent>
                     </SidebarMenuItem>
                   </Collapsible>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* UTILITIES — helpers / wrappers / assets, flat A–Z list. */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono tracking-wide">
+            Utilities
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {utilities.map((u) => {
+                const href = hrefFor(u.slug)
+                return (
+                  <SidebarMenuItem key={u.slug}>
+                    <SidebarMenuButton asChild isActive={pathname === href}>
+                      <Link href={href}>
+                        <span>{u.title}</span>
+                        {u.status && <StatusDot status={u.status} />}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 )
               })}
             </SidebarMenu>

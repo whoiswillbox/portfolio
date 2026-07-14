@@ -17,7 +17,6 @@ import {
   WcagChecklist,
   Anatomy,
   ContentGuidelines,
-  Related,
   ApiNotes,
   Changelog,
 } from "../_component-page";
@@ -436,12 +435,6 @@ export default function SegmentedControlDocs() {
                 },
               ]}
             />
-            <Related
-              items={[
-                { href: "/cardboard/components/select", when: "For more than ~5 options." },
-                { href: "/cardboard/components/tabs", when: "For switching larger content panels." },
-              ]}
-            />
           </>
         }
         dev={
@@ -460,7 +453,7 @@ export default function SegmentedControlDocs() {
             <PropsTable
               groups={[
                 {
-                  interfaceName: "SegmentedControlProps",
+                  interfaceName: "SegmentedControl",
                   rows: [
                     { name: "value", type: "string", desc: "The selected item's value (controlled)." },
                     { name: "onValueChange", type: "(value: string) => void", desc: "Fires when the selection changes." },
@@ -469,7 +462,7 @@ export default function SegmentedControlDocs() {
                   ],
                 },
                 {
-                  interfaceName: "SegmentedControlItemProps",
+                  interfaceName: "SegmentedControlItem",
                   rows: [
                     { name: "value", type: "string", desc: "Unique value identifying the segment." },
                     { name: "icon?", type: "ReactNode", desc: "Optional leading icon, rendered before the label." },

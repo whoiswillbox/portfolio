@@ -26,7 +26,6 @@ import {
   WcagChecklist,
   Anatomy,
   ContentGuidelines,
-  Related,
   ApiNotes,
   Changelog,
 } from "../_component-page";
@@ -416,12 +415,6 @@ export default function SelectDocs() {
                 },
               ]}
             />
-            <Related
-              items={[
-                { href: "/cardboard/components/combobox", when: "For long or searchable lists." },
-                { href: "/cardboard/components/segmented-control", when: "For 2–5 mutually exclusive views." },
-              ]}
-            />
           </>
         }
         dev={
@@ -452,7 +445,7 @@ export default function SelectDocs() {
             <PropsTable
               groups={[
                 {
-                  interfaceName: "SelectProps",
+                  interfaceName: "Select",
                   rows: [
                     { name: "value?", type: "string", desc: "The selected value (controlled)." },
                     { name: "defaultValue?", type: "string", desc: "Initial value (uncontrolled)." },
@@ -461,7 +454,7 @@ export default function SelectDocs() {
                   ],
                 },
                 {
-                  interfaceName: "SelectTriggerProps",
+                  interfaceName: "SelectTrigger",
                   rows: [
                     { name: "variant?", type: '"default" | "ghost"', default: '"default"', desc: "Bordered surface control, or borderless (text + chevron) for inline triggers." },
                     { name: "size?", type: '"default" | "sm"', default: '"default"', desc: "Trigger size (padding-driven height)." },
@@ -469,13 +462,13 @@ export default function SelectDocs() {
                   ],
                 },
                 {
-                  interfaceName: "SelectValueProps",
+                  interfaceName: "SelectValue",
                   rows: [
                     { name: "placeholder?", type: "string", desc: "Shown when nothing is selected." },
                   ],
                 },
                 {
-                  interfaceName: "SelectItemProps",
+                  interfaceName: "SelectItem",
                   rows: [
                     { name: "value", type: "string", desc: "Unique value returned on select." },
                     { name: "disabled?", type: "boolean", default: "false", desc: "Disable an individual option." },

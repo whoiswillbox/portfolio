@@ -20,6 +20,7 @@ export default function Components() {
 
         <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {[...components]
+            .filter((c) => !c.utility)
             .sort((a, b) => a.label.localeCompare(b.label))
             .map((c) => (
               <ComponentCard key={c.href} {...c} />

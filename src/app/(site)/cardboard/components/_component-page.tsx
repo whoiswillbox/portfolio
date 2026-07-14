@@ -664,46 +664,45 @@ export type PropRow = {
 };
 export type PropGroup = { interfaceName?: string; rows: PropRow[] };
 
-// One `interface` card: an optional header + a stacked, syntax-colored row list.
+// A group of props (Shopify dev-docs style): an optional plain subcomponent
+// name, then flat prop rows — each is `name • type  Default: x` inline, with the
+// description below. No `interface` keyword, no boxed card.
 function PropInterface({ interfaceName, rows }: PropGroup) {
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border border-border bg-surface",
-        SYNTAX_VARS
-      )}
-    >
+    <div className={cn("flex flex-col", SYNTAX_VARS)}>
       {interfaceName && (
-        <div
-          className="border-b border-border px-4 py-2.5 text-body-xs"
+        <h3
+          className="mb-1 text-body-sm font-medium text-foreground"
           style={{ fontFamily: MONO }}
         >
-          <span className="text-[var(--sx-keyword)]">interface</span>{" "}
-          <span className="text-[var(--sx-tag)]">{interfaceName}</span>
-        </div>
+          {interfaceName}
+        </h3>
       )}
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border border-t border-border">
         {rows.map((r) => {
           const optional = r.name.endsWith("?");
           const base = optional ? r.name.slice(0, -1) : r.name;
           return (
-            <div key={r.name} className="flex flex-col gap-1 px-4 py-3">
-              <div className="text-body-sm" style={{ fontFamily: MONO }}>
-                <span className="font-medium text-foreground">{base}</span>
-                {optional && <span className="text-[var(--sx-attr)]">?</span>}
-                <span className="text-muted-foreground">: </span>
-                {highlightCode(r.type, "tsx")}
+            <div key={r.name} className="flex flex-col gap-1 py-3">
+              {/* name • type  Default: x */}
+              <div
+                className="flex flex-wrap items-baseline gap-x-2 text-body-xs"
+                style={{ fontFamily: MONO }}
+              >
+                <span className="text-body-sm font-medium text-[var(--sx-attr)]">
+                  {base}
+                  {optional && <span className="text-tertiary">?</span>}
+                </span>
+                <span className="text-tertiary">•</span>
+                <span>{highlightCode(r.type, "tsx")}</span>
+                {r.default !== undefined && (
+                  <span className="text-tertiary">
+                    Default:{" "}
+                    <span className="text-[var(--sx-string)]">{r.default}</span>
+                  </span>
+                )}
               </div>
               <p className="text-body-sm text-muted-foreground">{r.desc}</p>
-              {r.default !== undefined && (
-                <p className="text-body-xs text-tertiary">
-                  Defaults to{" "}
-                  <span style={{ fontFamily: MONO }} className="text-[var(--sx-string)]">
-                    {r.default}
-                  </span>
-                  .
-                </p>
-              )}
               {r.deprecated && (
                 <p className="mt-0.5 flex items-center gap-1.5 text-body-xs text-muted-foreground">
                   <span className="rounded-md bg-surface-caution px-1.5 py-0.5 font-medium text-icon-caution">
@@ -720,23 +719,23 @@ function PropInterface({ interfaceName, rows }: PropGroup) {
   );
 }
 
-// The Props section. Pass `rows` (+ optional `interfaceName`) for a single
-// interface, or `groups` to stack several interface cards under one "Props"
-// heading (e.g. a component and its item subcomponent).
+// The Props section. Pass `rows` (+ optional `interfaceName` = a plain
+// subcomponent name) for a single group, or `groups` to stack several under one
+// "Props" heading (e.g. a component and its item subcomponent).
 export function PropsTable({
   rows,
   interfaceName,
   groups,
 }: {
   rows?: PropRow[];
-  /** Header shown as `interface <name>` (e.g. "SegmentedControlProps"). */
+  /** Plain subcomponent name shown above its props (e.g. "NavBarNavItem"). */
   interfaceName?: string;
-  /** Multiple interface cards under one heading. Takes precedence over `rows`. */
+  /** Multiple prop groups under one heading. Takes precedence over `rows`. */
   groups?: PropGroup[];
 }) {
   const list: PropGroup[] = groups ?? (rows ? [{ interfaceName, rows }] : []);
   return (
-    <section className="mb-12 flex flex-col gap-4">
+    <section className="mb-12 flex flex-col gap-6">
       <h2 className="text-h3">Props</h2>
       {list.map((g, i) => (
         <PropInterface key={g.interfaceName ?? i} {...g} />
@@ -750,19 +749,19 @@ export function PropsTable({
 // just a picture (icon size, title size, body size, spacing, colors…).
 export function Specs({ rows }: { rows: { part: string; spec: string }[] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
+    <div className="overflow-hidden rounded-xl border border-border bg-surface">
       <table className="w-full min-w-[24rem] text-left text-body-sm">
         <thead>
-          <tr className="border-b border-border bg-muted/50 font-mono text-body-xs text-muted-foreground">
-            <th className="px-4 py-2 font-normal">Part</th>
-            <th className="px-4 py-2 font-normal">Spec</th>
+          <tr className="border-b border-border font-mono text-body-xs text-muted-foreground">
+            <th className="px-4 py-2.5 font-normal">Part</th>
+            <th className="px-4 py-2.5 font-normal">Spec</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
           {rows.map((r) => (
             <tr key={r.part}>
-              <td className="px-4 py-2 text-foreground">{r.part}</td>
-              <td className="px-4 py-2 font-mono text-body-xs text-muted-foreground">{r.spec}</td>
+              <td className="px-4 py-3 text-foreground">{r.part}</td>
+              <td className="px-4 py-3 font-mono text-body-xs text-muted-foreground">{r.spec}</td>
             </tr>
           ))}
         </tbody>
@@ -802,20 +801,20 @@ export function States({ title = "States", states }: { title?: string; states: S
       </div>
 
       {/* Spec table — State → tokens */}
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
         <table className="w-full min-w-[24rem] text-left text-body-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
-              <th className="px-4 py-2 font-normal">State</th>
-              <th className="px-4 py-2 font-normal">Tokens</th>
+            <tr className="border-b border-border text-body-xs text-muted-foreground">
+              <th className="px-4 py-2.5 font-normal">State</th>
+              <th className="px-4 py-2.5 font-normal">Tokens</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {states.map((s) => (
               <tr key={s.name}>
-                <td className="px-4 py-2 text-foreground">{s.name}</td>
+                <td className="px-4 py-3 text-foreground">{s.name}</td>
                 <td
-                  className="px-4 py-2 text-body-xs text-muted-foreground"
+                  className="px-4 py-3 text-body-xs text-muted-foreground"
                   style={{ fontFamily: MONO }}
                 >
                   {s.tokens}
@@ -953,18 +952,18 @@ export function Accessibility({
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">Accessibility</h2>
       <h3 className="text-body-sm font-medium text-foreground">Keyboard</h3>
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
         <table className="w-full min-w-[24rem] text-left text-body-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
-              <th className="px-4 py-2 font-normal">Key</th>
-              <th className="px-4 py-2 font-normal">Action</th>
+            <tr className="border-b border-border text-body-xs text-muted-foreground">
+              <th className="px-4 py-2.5 font-normal">Key</th>
+              <th className="px-4 py-2.5 font-normal">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {keyboard.map((k) => (
               <tr key={k.keys.join("/")}>
-                <td className="px-4 py-2">
+                <td className="px-4 py-3">
                   <span className="inline-flex items-center gap-1.5">
                     {k.keys.map((key, i) => (
                       <React.Fragment key={key}>
@@ -974,7 +973,7 @@ export function Accessibility({
                     ))}
                   </span>
                 </td>
-                <td className="px-4 py-2 text-muted-foreground">{k.does}</td>
+                <td className="px-4 py-3 text-muted-foreground">{k.does}</td>
               </tr>
             ))}
           </tbody>
@@ -983,23 +982,23 @@ export function Accessibility({
       {aria && aria.length > 0 && (
         <>
           <h3 className="mt-2 text-body-sm font-medium text-foreground">ARIA</h3>
-          <div className={cn("overflow-x-auto rounded-lg border border-border", SYNTAX_VARS)}>
+          <div className={cn("overflow-hidden rounded-xl border border-border bg-surface", SYNTAX_VARS)}>
             <table className="w-full min-w-[28rem] text-left text-body-sm">
               <thead>
-                <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
-                  <th className="px-4 py-2 font-normal">Attribute</th>
-                  <th className="px-4 py-2 font-normal">Applied to</th>
-                  <th className="px-4 py-2 font-normal">Purpose</th>
+                <tr className="border-b border-border text-body-xs text-muted-foreground">
+                  <th className="px-4 py-2.5 font-normal">Attribute</th>
+                  <th className="px-4 py-2.5 font-normal">Applied to</th>
+                  <th className="px-4 py-2.5 font-normal">Purpose</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {aria.map((a) => (
                   <tr key={a.attr}>
-                    <td className="px-4 py-2 text-body-xs" style={{ fontFamily: MONO }}>
+                    <td className="px-4 py-3 text-body-xs" style={{ fontFamily: MONO }}>
                       {highlightCode(a.attr, "tsx")}
                     </td>
-                    <td className="px-4 py-2 text-muted-foreground">{a.on}</td>
-                    <td className="px-4 py-2 text-muted-foreground">{a.purpose}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{a.on}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{a.purpose}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1047,20 +1046,20 @@ export function WcagChecklist({ rows }: { rows: WcagRow[] }) {
           How the component meets WCAG 2.2 AA / ADA design criteria.
         </p>
       </div>
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
         <table className="w-full min-w-[32rem] text-left text-body-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50 text-body-xs text-muted-foreground">
-              <th className="px-4 py-2 font-normal">Criterion</th>
-              <th className="px-4 py-2 font-normal">Status</th>
-              <th className="px-4 py-2 font-normal">Detail</th>
+            <tr className="border-b border-border text-body-xs text-muted-foreground">
+              <th className="px-4 py-2.5 font-normal">Criterion</th>
+              <th className="px-4 py-2.5 font-normal">Status</th>
+              <th className="px-4 py-2.5 font-normal">Detail</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {rows.map((r) => (
               <tr key={r.criterion}>
-                <td className="px-4 py-2 text-foreground">{r.criterion}</td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-3 text-foreground">{r.criterion}</td>
+                <td className="px-4 py-3">
                   <span
                     className={cn(
                       "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-body-xs font-medium",
@@ -1075,7 +1074,7 @@ export function WcagChecklist({ rows }: { rows: WcagRow[] }) {
                     {r.label}
                   </span>
                 </td>
-                <td className="px-4 py-2 text-muted-foreground">{r.detail}</td>
+                <td className="px-4 py-3 text-muted-foreground">{r.detail}</td>
               </tr>
             ))}
           </tbody>
