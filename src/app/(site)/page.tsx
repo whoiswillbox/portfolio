@@ -258,15 +258,18 @@ export default function LandingPage() {
 
               {/* Below the cube, two layers share the same slot: the SPLASH
                   headline fades OUT and the Box AI empty-state (heading + input +
-                  chips) fades IN — both driven by scroll `progress`, mirroring the
-                  fade-out. The cube is the fixed pivot between the two states. */}
+                  chips) fades IN. The two fades are STAGGERED so they don't
+                  overlap: the splash is gone by ~45% scroll, and Box AI only
+                  starts fading in at ~55% — leaving a clean middle beat where the
+                  cube sits mostly alone. The cube is the fixed pivot. */}
               <div className="relative mt-4 w-full">
-                {/* Splash headline — fades out as you scroll. */}
+                {/* Splash headline — fades out over the FIRST part of the scroll
+                    (opacity 1 → 0 across progress 0 → 0.45). */}
                 <div
                   className="text-center"
                   style={{
                     transform: `translateY(${progress * -60}px)`,
-                    opacity: 1 - progress,
+                    opacity: Math.max(0, 1 - progress / 0.45),
                     transition: "transform 0.1s linear, opacity 0.1s linear",
                   }}
                 >
@@ -275,13 +278,14 @@ export default function LandingPage() {
                   </h1>
                 </div>
 
-                {/* Box AI empty-state (static replica) — fades IN as you scroll,
-                    overlaid on the same slot. Non-interactive; real interaction
+                {/* Box AI empty-state (static replica) — fades IN over the LAST
+                    part of the scroll (opacity 0 → 1 across progress 0.55 → 1),
+                    after the splash has cleared. Non-interactive; real interaction
                     happens after committing into /who. */}
                 <div
                   className="absolute inset-x-0 top-0 flex flex-col items-center gap-3"
                   style={{
-                    opacity: progress,
+                    opacity: Math.max(0, (progress - 0.55) / 0.45),
                     transition: "opacity 0.1s linear",
                   }}
                 >
