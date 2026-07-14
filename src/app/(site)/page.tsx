@@ -1,14 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useLayoutEffect, useRef, Suspense, lazy } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { BoxLogo } from "@/components/box-logo";
 import { ContentCard } from "@/components/content-card";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-
-const Lottie = lazy(() => import("lottie-react"));
 
 interface Box {
   id: number;
@@ -97,8 +95,6 @@ function FallingBox({ box, progress }: { box: Box; progress: number }) {
 export default function LandingPage() {
   const router = useRouter();
   const { setOpen } = useSidebar();
-  const [loading, setLoading] = useState(false);
-  const [animData, setAnimData] = useState<object | null>(null);
   // Scroll-scrub progress: 0 = splash at rest, 1 = fully scrubbed away (→ enter).
   const [progress, setProgress] = useState(0);
   const progressRef = useRef(0);
@@ -118,15 +114,15 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    fetch("/animations/box.json").then(r => r.json()).then(setAnimData).catch(() => null);
-  }, []);
 
+  // The hero box has already scrubbed into the Box-logo position/size by the
+  // time we enter, so route straight to Box AI — no loading interstitial; the
+  // landed cube reads as the Box AI header logo.
   const enter = (path: string) => {
     if (enteredRef.current) return;
     enteredRef.current = true;
-    setLoading(true);
-    setTimeout(() => { sessionStorage.setItem("entered", "1"); router.push(path); }, 800);
+    sessionStorage.setItem("entered", "1");
+    router.push(path);
   };
 
   // Scroll-scrub: accumulate wheel / touch delta into a 0→1 progress that drives
@@ -226,14 +222,9 @@ export default function LandingPage() {
           "animate-in fade-in slide-in-from-bottom-4 duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
         )}
       >
-        {/* Landing content — parallax-lifts and fades as the splash scrubs away,
-            then fully fades when the enter (loading) sequence fires. */}
-        <div
-          className={cn(
-            "absolute inset-0 flex flex-col items-center justify-center gap-8 px-12 transition-opacity duration-500",
-            loading ? "opacity-0 pointer-events-none" : "opacity-100"
-          )}
-        >
+        {/* Landing content — parallax-lifts and fades as the splash scrubs away. */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 px-12">
+
           <FallingBoxes progress={progress} />
 
           {/* Hero box — the one deliberate box. It scrubs from high/small/faint
@@ -249,7 +240,7 @@ export default function LandingPage() {
                 const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
                 const y = -220 + ease * 220; // -220px (high) → 0 (center)
                 const x = "-50%";
-                const scale = 0.5 + ease * 1.9; // 0.5 → 2.4 (logo size)
+                const scale = 0.5 + ease * 0.5; // 0.5 → 1 (lands at ~size-12)
                 const rot = (1 - ease) * -35; // -35deg → 0
                 return `translate(${x}, calc(-50% + ${y}px)) scale(${scale}) rotate(${rot}deg)`;
               })(),
@@ -257,7 +248,7 @@ export default function LandingPage() {
               transition: "transform 0.1s linear, opacity 0.1s linear",
             }}
           >
-            <BoxLogo className="size-16 text-foreground" />
+            <BoxLogo className="size-12 text-foreground" />
           </div>
 
           <div
@@ -291,13 +282,6 @@ export default function LandingPage() {
               aria-hidden="true"
             />
           </button>
-        </div>
-
-        {/* Lottie loading state — fades in when loading */}
-        <div className={cn("absolute inset-0 flex items-center justify-center transition-opacity duration-500", loading ? "opacity-100" : "opacity-0 pointer-events-none")}>
-          <Suspense fallback={null}>
-            {animData && <Lottie animationData={animData} loop style={{ width: 120, height: 120, filter: "grayscale(1) opacity(0.5)" }} />}
-          </Suspense>
         </div>
       </ContentCard>
     </>
