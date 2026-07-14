@@ -6,6 +6,7 @@ import { NavBar, NavBarLogo } from "@/components/cardboard/nav-bar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { CardboardSidebar } from "@/components/cardboard-sidebar"
+import { BoxNavItems } from "@/components/box-nav-items"
 import { ProductSwitcher } from "@/components/product-switcher"
 import { BoxLogo } from "@/components/box-logo"
 import { ContentWorkspace } from "@/components/content-workspace"
@@ -46,6 +47,9 @@ export function AppShell({
             <BoxLogo className="size-6" />
           </NavBarLogo>
           <ProductSwitcher />
+          {/* TRIAL (try/nav-bar-shell): Box nav lives in the top bar instead of
+              the left sidebar. Cardboard keeps its own sidebar. */}
+          {!inCardboard && <BoxNavItems />}
         </NavBar>
       )}
 
@@ -57,7 +61,11 @@ export function AppShell({
           {inCardboard ? (
             <CardboardSidebar />
           ) : (
-            <AppSidebar showLock={showLock} />
+            // TRIAL (try/nav-bar-shell): the Box desktop sidebar is replaced by
+            // the top-nav (BoxNavItems above), so AppSidebar is not rendered for
+            // Box. (AppSidebar was desktop-only — `max-sm:hidden` — so mobile is
+            // unaffected; MobileNav handles mobile Box navigation separately.)
+            null
           )}
         </Suspense>
         <SidebarInset className="min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar">
