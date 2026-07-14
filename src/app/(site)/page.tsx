@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { BoxLogo } from "@/components/box-logo";
 import { BoxAI } from "@/components/box-ai";
@@ -88,41 +89,47 @@ function FallingBox({ box, progress }: { box: Box; progress: number }) {
 }
 
 export default function LandingPage() {
+  return (
+    <Suspense fallback={null}>
+      <LandingInner />
+    </Suspense>
+  );
+}
+
+function LandingInner() {
   const { setOpen } = useSidebar();
+  const searchParams = useSearchParams();
 
   // ONE-PAGE MODEL (try/nav-bar-shell): the real <BoxAI/> is mounted right here,
   // in its final layout, from the start. The splash OVERLAYS it and scrubs away
   // as you scroll (progress 0→1), revealing the live Box AI beneath. There is NO
-  // navigation to /who and no remount — so there's no reflow/jump. /who still
-  // exists as the direct-access Box home (conversations, switcher, logo).
-  // Start at full progress (Box AI revealed, splash cleared) when either:
-  //  - navigating to the Box HOME via the nav logo / switcher (?box-home=1) — the
-  //    logo must land on the live Box AI, NOT re-show the landing splash, or
-  //  - deep-linking into a conversation (?c=<id>) — the splash must not cover it, or
-  //  - arriving via /who's scroll-back (return-to-landing flag), so the incoming
-  //    upward scroll scrubs the splash back in smoothly (no snap).
-  const [progress, setProgress] = useState(() => {
-    if (typeof window === "undefined") return 0;
-    const q = new URLSearchParams(window.location.search);
-    if (q.has("box-home") || q.has("c")) return 1;
-    if (sessionStorage.getItem("return-to-landing") === "1") {
-      sessionStorage.removeItem("return-to-landing");
-      return 1;
-    }
-    return 0;
-  });
-  const progressRef = useRef(progress);
+  // navigation to /who and no remount — so there's no reflow/jump.
+  //
+  // Skip the splash entirely (start revealed) when navigating to the Box HOME:
+  //  - via the nav logo / switcher / New chat (?box-home=1) — the logo must land
+  //    on the live Box AI, NOT re-show the splash, or
+  //  - deep-linking into a conversation (?c=<id>) — the splash must not cover it.
+  // useSearchParams (not a mount-only read) so this also fires when the param
+  // changes on the SAME route (clicking the logo while already on "/").
+  const skipSplash = searchParams.has("box-home") || searchParams.has("c");
 
-  // Clean the ?box-home=1 marker out of the URL after using it (keep ?c=).
+  const [progress, setProgress] = useState(skipSplash ? 1 : 0);
+  const progressRef = useRef(progress);
+  const reducedMotion = useRef(false);
+  const revealed = progress >= 1;
+
+  // React to the box-home / c param: force full progress (splash cleared) and
+  // strip the transient ?box-home marker from the URL (keep ?c=).
   useEffect(() => {
-    const url = new URL(window.location.href);
-    if (url.searchParams.has("box-home")) {
+    if (!skipSplash) return;
+    progressRef.current = 1;
+    setProgress(1);
+    if (searchParams.has("box-home")) {
+      const url = new URL(window.location.href);
       url.searchParams.delete("box-home");
       window.history.replaceState(null, "", url.pathname + url.search);
     }
-  }, []);
-  const reducedMotion = useRef(false);
-  const revealed = progress >= 1;
+  }, [skipSplash, searchParams]);
 
   useEffect(() => { setOpen(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
