@@ -327,13 +327,16 @@ function LandingInner() {
                 // Held at 0 until the first measurement so it never flashes at
                 // the unmeasured center on a direct (non-scrub) entry.
                 opacity: cubeMeasured ? progress : 0,
-                // Only transition the TRANSFORM while actively scrubbing. At rest
-                // (progress 0 or 1) a late cubeTarget correction — e.g. on a
-                // direct ?box-home entry where measurement lands a frame after
-                // mount — must SNAP into place, not fly up with a transition.
+                // While actively scrubbing, NEITHER transform nor opacity gets a
+                // CSS transition — both are driven per-frame by progress, so a
+                // transition just makes them trail the scroll (laggy fade / fly).
+                // At rest (progress 0 or 1) keep a short opacity transition so
+                // the first-measurement fade-in and click/keyboard jumps ease,
+                // while a late cubeTarget correction still snaps (no transform
+                // transition), so a direct ?box-home entry doesn't fly up.
                 transition:
                   progress > 0 && progress < 1
-                    ? "transform 0.12s linear, opacity 0.12s linear"
+                    ? "none"
                     : "opacity 0.12s linear",
               }}
             >
