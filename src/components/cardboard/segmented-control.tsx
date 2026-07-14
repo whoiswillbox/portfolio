@@ -5,7 +5,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 /* Cardboard SegmentedControl — owned (new, not forked). A single-select
-   "pill on a track" selector: a muted, ringed track holds equal segments; the
+   "pill on a track" selector: a muted track holds equal segments; the
    active segment lifts onto a raised surface pill. Controlled via value /
    onValueChange. Distinct from ToggleGroup (joined buttons) — this is the
    iOS-style segmented switch used for view toggles (e.g. Primitives/Semantics).
@@ -85,7 +85,7 @@ function SegmentedControl({
         role="tablist"
         onKeyDown={onKeyDown}
         className={cn(
-          "flex items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border",
+          "flex items-center gap-1 rounded-lg bg-muted p-1",
           fullWidth ? "w-full" : "w-fit",
           className
         )}

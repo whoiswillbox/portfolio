@@ -323,7 +323,7 @@ export const components: {
     href: "/cardboard/components/segmented-control",
     description: "Single-select pill-on-track switch.",
     preview: (
-      <div className="inline-flex items-center gap-1 rounded-lg bg-muted p-1 ring-1 ring-border">
+      <div className="inline-flex items-center gap-1 rounded-lg bg-muted p-1">
         <div className="rounded-md px-3 py-1.5 text-body-sm text-tertiary">Item</div>
         <div className="rounded-md bg-background px-3 py-1.5 text-body-sm font-medium text-foreground shadow-sm">Item</div>
       </div>

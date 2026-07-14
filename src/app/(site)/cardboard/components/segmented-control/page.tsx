@@ -17,7 +17,6 @@ import {
   WcagChecklist,
   Anatomy,
   ContentGuidelines,
-  ApiNotes,
   Changelog,
 } from "../_component-page";
 
@@ -134,7 +133,7 @@ function Example() {
     </SegmentedControl>
   );
 }`,
-            styles: `/* The track — a muted, ringed container. */
+            styles: `/* The track — a muted container. */
 .segmented-control {
   display: inline-flex;
   align-items: center;
@@ -142,7 +141,6 @@ function Example() {
   padding: var(--space-100);        /* 4px */
   background: var(--color-muted);
   border-radius: var(--radius-lg);
-  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 /* A segment — the active one lifts onto a raised surface pill. */
@@ -263,7 +261,7 @@ export default function SegmentedControlDocs() {
     <ComponentPage
       title="Segmented Control"
       status="stable"
-      version="1.1"
+      version="1.2"
       description="A single-select pill-on-track switch for toggling between a few mutually exclusive views. Use it for view modes (e.g. Primitives / Semantics); for actions, use Toggle Group."
     >
       <AudienceTabs
@@ -293,8 +291,8 @@ export default function SegmentedControlDocs() {
           <>
             <Anatomy
               parts={[
-                { n: 1, part: "Track — the container that holds the segments.", tokens: "bg-muted · --radius-lg · ring-border" },
-                { n: 2, part: "Segment — a selectable option (inactive).", tokens: "text-tertiary" },
+                { n: 1, part: "Track — the container that holds the segments.", tokens: "bg-muted · --radius-lg · data-slot=segmented-control" },
+                { n: 2, part: "Segment — a selectable option (inactive).", tokens: "text-tertiary · data-state · data-value" },
                 { n: 3, part: "Active pill — the raised, selected segment.", tokens: "bg-background · shadow-sm · text-foreground · font-medium" },
               ]}
             >
@@ -440,23 +438,14 @@ export default function SegmentedControlDocs() {
         dev={
           <>
             <Install code={`import { SegmentedControl, SegmentedControlItem } from "@cardboard";`} />
-            <ApiNotes
-              notes={[
-                "Controlled only — always pass value and onValueChange (there is no defaultValue).",
-                "SegmentedControlItem must be rendered inside a SegmentedControl (it reads context).",
-                "Each item needs a unique value; it's passed back to onValueChange on select.",
-                "Style hooks: the track exposes data-slot=\"segmented-control\"; items expose data-state (active/inactive) and data-value.",
-                "No extra dependencies or providers required.",
-              ]}
-            />
             <Variants variants={VARIANTS} />
             <PropsTable
               groups={[
                 {
                   interfaceName: "SegmentedControl",
                   rows: [
-                    { name: "value", type: "string", desc: "The selected item's value (controlled)." },
-                    { name: "onValueChange", type: "(value: string) => void", desc: "Fires when the selection changes." },
+                    { name: "value", type: "string", desc: "The selected item's value. Controlled only — there is no defaultValue." },
+                    { name: "onValueChange", type: "(value: string) => void", desc: "Fires with the selected value when the selection changes." },
                     { name: "size?", type: '"default" | "sm"', default: '"default"', desc: "Control size." },
                     { name: "fullWidth?", type: "boolean", default: "false", desc: "Stretch to fill the container; segments share the width evenly." },
                   ],
@@ -501,6 +490,7 @@ export default function SegmentedControlDocs() {
             />
             <Changelog
               entries={[
+                { version: "1.2", changes: ["Removed the track's outer stroke — the track is now a plain muted container (bg-muted, no ring)."] },
                 { version: "1.1", changes: ["Added the icon prop for leading icons on segments.", "Added the fullWidth prop for mobile / full-bleed layouts.", "Selected segment now uses medium weight."] },
                 { version: "1.0", changes: ["Initial release — controlled pill-on-track selector with roving-tabindex keyboard nav."] },
               ]}
