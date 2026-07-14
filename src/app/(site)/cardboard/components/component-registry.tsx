@@ -18,7 +18,6 @@ import { Textarea } from "@/components/cardboard/textarea";
 import { Skeleton } from "@/components/cardboard/skeleton";
 import { Progress } from "@/components/cardboard/progress";
 import { Avatar, AvatarFallback } from "@/components/cardboard/avatar";
-import { NativeSelect } from "@/components/cardboard/native-select";
 import { Kbd } from "@/components/cardboard/kbd";
 import { Label } from "@/components/cardboard/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/cardboard/tabs";
@@ -243,17 +242,6 @@ export const components: {
     href: "/cardboard/components/progress",
     description: "Determinate progress bars.",
     preview: <Progress value={62} className="max-w-[13rem]" />,
-  },
-  {
-    label: "Native Select",
-    href: "/cardboard/components/native-select",
-    description: "Styled native dropdowns.",
-    preview: (
-      <NativeSelect className="max-w-[13rem]" defaultValue="a">
-        <option value="a">Lounge wear</option>
-        <option value="b">Accessories</option>
-      </NativeSelect>
-    ),
   },
   {
     label: "Kbd",

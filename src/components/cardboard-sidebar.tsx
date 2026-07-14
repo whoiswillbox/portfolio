@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRightIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
+import { ChevronRightIcon } from "@heroicons/react/24/outline"
 import {
   Collapsible,
   CollapsibleContent,
@@ -11,7 +11,6 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -22,7 +21,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
@@ -121,7 +119,6 @@ const components: Entry[] = [
     children: [
       leaf("Select", "select", "stable"),
       leaf("Combobox", "combobox"),
-      leaf("Native Select", "native-select"),
     ],
   },
   leaf("Separator", "separator"),
@@ -284,24 +281,6 @@ export function CardboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {/* Footer's own p-2 holds the divider off the panel edge. Kill the
-          horizontal padding so the full-bleed separator reaches both edges (the
-          Settings button re-adds its own inset via the menu button padding). */}
-      <SidebarFooter className="px-0">
-        <SidebarSeparator className="mx-0 w-full mb-2 bg-border-divider" />
-        <div className="px-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === "/settings"}>
-              <Link href="/settings">
-                <Cog6ToothIcon />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        </div>
-      </SidebarFooter>
     </Sidebar>
   )
 }
