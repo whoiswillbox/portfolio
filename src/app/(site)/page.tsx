@@ -310,21 +310,20 @@ export default function LandingPage() {
                   }}
                 >
                   <h1 className="text-h1">Ask me what drives my craft</h1>
-                  {/* Input box + docked privacy notice — mirrors the real Box AI
-                      empty state (the notice adds height, so the block matches and
-                      the cube lands at the same lower position). */}
-                  <div className="mt-3 w-full rounded-2xl border border-border bg-surface text-left shadow-sm">
-                    <div className="flex items-start gap-2 p-4 pb-0 text-body-sm text-info">
-                      <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-info text-[10px] text-white">i</span>
-                      <span className="text-info/90">
-                        Conversations are saved to help improve Box&apos;s answers over time. Please don&apos;t share anything sensitive.
-                      </span>
-                    </div>
-                    <div className="p-4">
-                      <span className="text-body-sm text-muted-foreground">Ask Box…</span>
-                      <div className="mt-6 flex justify-end">
-                        <span className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground">›</span>
-                      </div>
+                  {/* Privacy notice — a SEPARATE banner above the input (mirrors
+                      the real Box AI empty state; adds height so the block matches
+                      and the cube lands at the same lower position). */}
+                  <div className="mt-3 flex w-full items-start gap-2 px-4 text-left text-body-sm text-info">
+                    <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-info text-[10px] text-white">i</span>
+                    <span className="text-info/90">
+                      Conversations are saved to help improve Box&apos;s answers over time. Please don&apos;t share anything sensitive.
+                    </span>
+                  </div>
+                  {/* Input box */}
+                  <div className="w-full rounded-2xl border border-border bg-surface p-4 text-left shadow-sm">
+                    <span className="text-body-sm text-muted-foreground">Ask Box…</span>
+                    <div className="mt-6 flex justify-end">
+                      <span className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground">›</span>
                     </div>
                   </div>
                   {/* Chips */}
