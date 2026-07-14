@@ -111,6 +111,14 @@ export default function LandingPage() {
       const el = cardRef.current?.querySelector<HTMLElement>("[data-scroll-container]");
       el?.style.setProperty("--tw-enter-translate-y", "0");
     }
+    // Returning from /who via scroll-up: start fully scrubbed (Box AI shown) so
+    // scrolling up reverses smoothly back to the splash instead of snapping.
+    if (sessionStorage.getItem("return-to-landing") === "1") {
+      sessionStorage.removeItem("return-to-landing");
+      rawRef.current = 1;
+      progressRef.current = 1;
+      setProgress(1);
+    }
   }, []);
 
   useEffect(() => { setOpen(false); router.prefetch("/who"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
