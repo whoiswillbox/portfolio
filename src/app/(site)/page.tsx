@@ -121,27 +121,28 @@ function LandingInner() {
   // center and steer the settled cube there (relative to true screen center,
   // where the splash cube's own container centers it).
   const [cubeTarget, setCubeTarget] = useState({ x: 0, y: 0 });
-  // False until the slot has been measured at least once. Until then the cube is
-  // held invisible so it never flashes at the unmeasured {0,0} (screen center)
-  // on a direct ?box-home entry before the first measurement lands.
-  const [cubeMeasured, setCubeMeasured] = useState(false);
+  // True only while Box AI's empty-state cube slot currently exists AND is laid
+  // out. Gates the splash cube's visibility: false before the first measurement
+  // (so it never flashes at the unmeasured {0,0} center on direct entry) AND
+  // once a conversation/case study opens (the empty state — and its slot — is
+  // gone, so the splash cube must not float over the thread).
+  const [cubeSlotPresent, setCubeSlotPresent] = useState(false);
   useEffect(() => {
     let raf = 0;
     const measure = () => {
       const slot = document.querySelector<HTMLElement>(".landing-box .box-cube");
-      if (slot) {
-        const r = slot.getBoundingClientRect();
-        // Only trust a real, laid-out slot (Box AI's empty state renders async;
-        // a 0-size box means it isn't ready yet).
-        if (r.width > 0 && r.height > 0) {
-          setCubeTarget((prev) => {
-            const x = r.left + r.width / 2 - window.innerWidth / 2;
-            const y = r.top + r.height / 2 - window.innerHeight / 2;
-            return prev.x === x && prev.y === y ? prev : { x, y };
-          });
-          setCubeMeasured(true);
-        }
+      const r = slot?.getBoundingClientRect();
+      // A real, laid-out slot (Box AI's empty state renders async; a 0-size or
+      // absent box means it's not the empty state right now).
+      const present = !!r && r.width > 0 && r.height > 0;
+      if (present) {
+        setCubeTarget((prev) => {
+          const x = r.left + r.width / 2 - window.innerWidth / 2;
+          const y = r.top + r.height / 2 - window.innerHeight / 2;
+          return prev.x === x && prev.y === y ? prev : { x, y };
+        });
       }
+      setCubeSlotPresent(present);
       raf = requestAnimationFrame(measure);
     };
     // The splash cube is the SOLE cube and must always sit exactly on Box AI's
@@ -324,9 +325,10 @@ function LandingInner() {
                 // and STAYS at full opacity once landed. Box AI's own cube is
                 // always hidden on landing, so this cube alone represents it —
                 // no handoff, no position jump. Settles onto the measured slot.
-                // Held at 0 until the first measurement so it never flashes at
-                // the unmeasured center on a direct (non-scrub) entry.
-                opacity: cubeMeasured ? progress : 0,
+                // Hidden until the slot is measured (no center flash on direct
+                // entry) AND whenever the empty-state slot is gone (a
+                // conversation/case study is open — don't float over the thread).
+                opacity: cubeSlotPresent ? progress : 0,
                 // While actively scrubbing, NEITHER transform nor opacity gets a
                 // CSS transition — both are driven per-frame by progress, so a
                 // transition just makes them trail the scroll (laggy fade / fly).
