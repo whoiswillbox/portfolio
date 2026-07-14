@@ -101,6 +101,8 @@ export default function LandingPage() {
   // Scroll-scrub progress: 0 = splash at rest, 1 = fully scrubbed away (→ enter).
   const [progress, setProgress] = useState(0);
   const progressRef = useRef(0);
+  // Raw (unclamped) scrub, can exceed 1 into the commit buffer.
+  const rawRef = useRef(0);
   const enteredRef = useRef(false);
   const reducedMotion = useRef(false);
 
@@ -137,6 +139,10 @@ export default function LandingPage() {
 
     // Total wheel delta (px) needed to fully scrub the splash away.
     const SCRUB_DISTANCE = 700;
+    // Extra scrub (as a fraction of full) required PAST the end to commit into
+    // Box — the buffer that lets a normal scroll settle at fully-scrubbed
+    // without navigating, so you can scroll back up.
+    const OVERSCROLL_COMMIT = 0.35;
 
     const bump = (deltaY: number) => {
       if (enteredRef.current) return;
@@ -145,14 +151,20 @@ export default function LandingPage() {
         if (deltaY > 0) enter("/who");
         return;
       }
-      const next = Math.min(1, Math.max(0, progressRef.current + deltaY / SCRUB_DISTANCE));
-      progressRef.current = next;
-      setProgress(next);
-      if (next >= 1) enter("/who");
+      // Raw scrub can go past 1 (overscroll) so a settle at fully-scrubbed
+      // doesn't instantly commit — you can freely scroll back up. Entering Box
+      // requires deliberately continuing to scroll DOWN past the end
+      // (OVERSCROLL_COMMIT beyond full). Visible progress is clamped to [0,1].
+      const raw = Math.max(0, rawRef.current + deltaY / SCRUB_DISTANCE);
+      rawRef.current = raw;
+      const shown = Math.min(1, raw);
+      progressRef.current = shown;
+      setProgress(shown);
+      if (raw >= 1 + OVERSCROLL_COMMIT) enter("/who");
     };
 
     const onWheel = (e: WheelEvent) => {
-      // Only intercept downward scrolls while scrubbing; let upward reset it.
+      // Downward scrubs forward; upward reverses it (scroll back up to return).
       if (e.deltaY === 0) return;
       bump(e.deltaY);
     };
