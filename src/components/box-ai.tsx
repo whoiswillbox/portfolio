@@ -486,7 +486,12 @@ export function BoxAI({
     count: 0,
   });
   const [aiActive, setAiActive] = React.useState(false);
-  const [showNotice, setShowNotice] = React.useState(false);
+  // Default TRUE so the privacy notice is present on the very first paint (SSR
+  // and client agree → no hydration mismatch). The effect below only ever flips
+  // it to false for a returning visitor who already dismissed it. Starting false
+  // caused the notice to mount a beat after entry, growing the vertically-centered
+  // hero and pushing the cube up — a visible jump right at the landing hand-off.
+  const [showNotice, setShowNotice] = React.useState(true);
   // Case study opened in the right-hand content card (null = single column).
   const [openCaseStudy, setOpenCaseStudy] = React.useState<CaseStudy | null>(null);
   // Skip the case study panel enter animation when switching between conversations
