@@ -256,19 +256,52 @@ export default function LandingPage() {
                 <BoxLogo className="size-12 text-foreground" />
               </div>
 
-              {/* Headline sits below the cube (like the Box AI heading) and
-                  parallax-fades away as you scrub. */}
-              <div
-                className="mt-4 text-center"
-                style={{
-                  transform: `translateY(${progress * -60}px)`,
-                  opacity: 1 - progress,
-                  transition: "transform 0.1s linear, opacity 0.1s linear",
-                }}
-              >
-                <h1 className="font-display text-display text-secondary">
-                  William Box is a product designer that pulls, branches, and merges.
-                </h1>
+              {/* Below the cube, two layers share the same slot: the SPLASH
+                  headline fades OUT and the Box AI empty-state (heading + input +
+                  chips) fades IN — both driven by scroll `progress`, mirroring the
+                  fade-out. The cube is the fixed pivot between the two states. */}
+              <div className="relative mt-4 w-full">
+                {/* Splash headline — fades out as you scroll. */}
+                <div
+                  className="text-center"
+                  style={{
+                    transform: `translateY(${progress * -60}px)`,
+                    opacity: 1 - progress,
+                    transition: "transform 0.1s linear, opacity 0.1s linear",
+                  }}
+                >
+                  <h1 className="font-display text-display text-secondary">
+                    William Box is a product designer that pulls, branches, and merges.
+                  </h1>
+                </div>
+
+                {/* Box AI empty-state (static replica) — fades IN as you scroll,
+                    overlaid on the same slot. Non-interactive; real interaction
+                    happens after committing into /who. */}
+                <div
+                  className="absolute inset-x-0 top-0 flex flex-col items-center gap-3"
+                  style={{
+                    opacity: progress,
+                    transition: "opacity 0.1s linear",
+                  }}
+                >
+                  <h1 className="text-h1">Ask me what drives my craft</h1>
+                  {/* Input box */}
+                  <div className="mt-3 w-full rounded-2xl border border-border bg-surface p-4 text-left shadow-sm">
+                    <span className="text-body-sm text-muted-foreground">Ask Box…</span>
+                    <div className="mt-6 flex justify-end">
+                      <span className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground">›</span>
+                    </div>
+                  </div>
+                  {/* Chips */}
+                  <div className="mt-1 flex flex-wrap justify-center gap-2">
+                    {["🌊 Do you surf?", "🚀 How'd you get into product design?", "💡 What are you proudest of?"].map((c) => (
+                      <span key={c} className="rounded-lg border bg-muted/40 px-3 py-1.5 text-body-xs text-foreground">
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
