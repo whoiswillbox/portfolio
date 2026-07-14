@@ -231,7 +231,10 @@ export default function LandingPage() {
               vertically centered, cube at the top) so the hero box lands in the
               exact same position the product's header cube occupies. This makes
               the hand-off to /who continuous regardless of viewport. */}
-          <div className="pointer-events-none absolute inset-0 flex flex-col justify-center">
+          {/* translate-y nudge: the Box AI block is taller (heading + input +
+              chips below the cube), so its vertically-centered cube sits a bit
+              lower than ours — push the landing block down to match. */}
+          <div className="pointer-events-none absolute inset-0 flex flex-col justify-center translate-y-12">
             <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-3 p-6">
               {/* The hero box — scrubs from high/small/faint into the cube slot at
                   the top of this block (progress 1 = the Box AI logo, size-12). */}
