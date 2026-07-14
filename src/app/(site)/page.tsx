@@ -137,14 +137,13 @@ function LandingInner() {
           });
         }
       }
-      // Keep tracking while the splash is up; stop once fully revealed (cube is
-      // hidden then and the slot won't move). Read the ref so the dep array
-      // stays constant ([]) — no effect re-subscribe on the reveal toggle.
-      if (progressRef.current < 1) raf = requestAnimationFrame(measure);
+      raf = requestAnimationFrame(measure);
     };
-    // Track the slot while the splash is up: Box AI's empty state mounts async
-    // and its column height (and thus the cube's Y) shifts as content/opacity
-    // settle, so a rAF loop keeps the splash cube pinned to the real slot.
+    // The splash cube is the SOLE cube and must always sit exactly on Box AI's
+    // (hidden) empty-state slot — including on a direct ?box-home entry that
+    // never scrubs. So keep measuring every frame (cheap: no-op when unchanged)
+    // rather than stopping when revealed, else direct entry keeps the initial
+    // {0,0} target and the cube mis-places.
     raf = requestAnimationFrame(measure);
     return () => cancelAnimationFrame(raf);
   }, []);
@@ -264,10 +263,7 @@ function LandingInner() {
       {/* Live Box AI — in normal flow, same layout as /who. Fades in as the
           splash scrubs away; interactive only once fully revealed. */}
       <div
-        // Hide Box AI's own cube ONLY mid-scrub (0 < progress < 1), where the
-        // animated splash cube stands in. At rest (splash up = 0, or revealed =
-        // 1) Box AI's real cube shows, positioned by its own layout.
-        className={`who-shell landing-box h-full ${progress > 0 && progress < 1 ? "landing-scrubbing" : ""}`}
+        className="who-shell landing-box h-full"
         style={{
           opacity: Math.max(0, (progress - 0.4) / 0.6),
           transition: "opacity 0.12s linear",
@@ -319,12 +315,11 @@ function LandingInner() {
                   const rot = (1 - ease) * -35;
                   return `translate(${x}px, ${y}px) scale(${scale}) rotate(${rot}deg)`;
                 })(),
-                // Visible ONLY mid-scrub (0 < progress < 1): fades in as it
-                // animates toward the slot. At rest (progress 0 or 1) it's
-                // hidden and Box AI's real cube shows — so a direct ?box-home
-                // entry (never scrubs, no measurement) is always positioned
-                // correctly by Box AI's own layout, not by a stale target.
-                opacity: progress > 0 && progress < 1 ? progress : 0,
+                // The SOLE cube: fades in across the scrub (opacity == progress)
+                // and STAYS at full opacity once landed. Box AI's own cube is
+                // always hidden on landing, so this cube alone represents it —
+                // no handoff, no position jump. Settles onto the measured slot.
+                opacity: progress,
                 transition: "transform 0.12s linear, opacity 0.12s linear",
               }}
             >

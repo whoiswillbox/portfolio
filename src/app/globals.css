@@ -91,20 +91,15 @@ body.input-focused .mobile-nav {
   }
 }
 
-/* One-page landing (try/nav-bar-shell): during the scrub the SPLASH renders the
-   cube (it animates into place). Box AI's own empty-state cube would be a SECOND
-   cube in the same spot, so hide it WHILE SCRUBBING (landing-box without
-   .landing-revealed). Once REVEALED we hand off: the splash cube hides and Box
-   AI's real cube shows (positioned by its own layout — no runtime measurement
-   needed, which is why a direct ?box-home entry no longer mis-places it).
+/* One-page landing (try/nav-bar-shell): the splash's own cube is the SOLE cube —
+   it fades in across the scrub and settles onto this (hidden) empty-state slot,
+   measured live via getBoundingClientRect. Box AI's own empty-state cube is
+   always hidden here so there's never a second cube and never a handoff jump.
    Unlayered + !important beats the button's utility classes. visibility:hidden
    (not display:none) keeps the slot's box so the splash cube can measure it and
-   the heading doesn't jump. */
-.landing-box.landing-scrubbing .box-cube {
-  visibility: hidden !important;
-}
-/* Extra breathing room below the cube slot so the heading sits lower (applies
-   in both states so the gap is identical across the handoff). */
+   the heading doesn't jump. margin-bottom widens the cube→heading gap (the
+   splash cube settles on the slot, so this gap carries to the landed cube). */
 .landing-box .box-cube {
+  visibility: hidden !important;
   margin-bottom: 2.5rem !important;
 }
