@@ -21,10 +21,10 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const inCardboard = pathname.startsWith("/cardboard")
-  // TRIAL (try/nav-bar-shell, one-page model): "/" hosts the live Box AI inside a
-  // content card with the splash overlaying it (contained in the card, not
-  // full-viewport). The landing page has NO nav bar — the card fills to the top
-  // (--topbar-h:0), and the nav bar is hidden here.
+  // One-page model: "/" hosts the live Box AI inside a content card with the
+  // splash overlaying it (contained in the card, not full-viewport). The landing
+  // page has NO nav bar — the card fills to the top (--topbar-h:0), and the nav
+  // bar is hidden here.
   const isLanding = pathname === "/"
   // Box home is "/" — it already hosts the live (warm) Box AI in the one-page
   // model, so keeping the home there avoids remounting the heavy Box AI on every
@@ -61,8 +61,14 @@ export function AppShell({
         </NavBarLogo>
         <ProductSwitcher />
         {/* Box nav lives in the top bar instead of the left sidebar.
-            Cardboard keeps its own sidebar. */}
-        {!inCardboard && <BoxNavItems />}
+            Cardboard keeps its own sidebar. Suspense: BoxNavItems reads
+            useSearchParams (to mark the active conversation), which needs a
+            boundary to avoid a static-render CSR bailout at build. */}
+        {!inCardboard && (
+          <Suspense fallback={null}>
+            <BoxNavItems />
+          </Suspense>
+        )}
       </NavBar>
 
       <SidebarProvider
@@ -73,15 +79,15 @@ export function AppShell({
           {inCardboard ? (
             <CardboardSidebar />
           ) : (
-            // TRIAL (try/nav-bar-shell): the Box desktop sidebar is replaced by
-            // the top-nav (BoxNavItems above), so AppSidebar is not rendered for
-            // Box. (AppSidebar was desktop-only — `max-sm:hidden` — so mobile is
-            // unaffected; MobileNav handles mobile Box navigation separately.)
+            // The Box desktop sidebar is replaced by the top-nav (BoxNavItems
+            // above), so AppSidebar is not rendered for Box. (AppSidebar was
+            // desktop-only — `max-sm:hidden` — so mobile is unaffected; MobileNav
+            // handles mobile Box navigation separately.)
             null
           )}
         </Suspense>
         <SidebarInset
-          className={`min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar ${!inCardboard && !isLanding ? "sm:mt-0" : ""}`}
+          className="min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
           // Landing: keep the top margin on the splash (looks like a floating
           // card), then collapse it to 0 as you scroll into the Box product so
           // the card sits flush under the revealed nav bar. Driven by
