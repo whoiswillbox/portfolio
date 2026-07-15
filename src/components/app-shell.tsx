@@ -105,7 +105,7 @@ export function AppShell({
               )}
             </Suspense>
             <SidebarInset
-              className="min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
+              className="min-h-0 flex-1 m-3 mt-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
             >
               <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
                 <BoxSeedProvider>

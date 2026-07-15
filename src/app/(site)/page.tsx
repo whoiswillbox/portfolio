@@ -287,7 +287,7 @@ function LandingInner() {
       `}</style>
 
       {/* Everything lives inside ONE content card (same chrome as every other
-          page's ContentCard), inset by the SidebarInset m-2. The Box AI and the
+          page's ContentCard), inset by the SidebarInset margin. The Box AI and the
           splash overlay are both contained within it — the splash no longer
           covers the full viewport / nav bar, it sits in the card. */}
       <div className="relative h-full overflow-hidden sm:bg-sidebar sm:shadow-lg sm:ring-1 sm:ring-border-divider">

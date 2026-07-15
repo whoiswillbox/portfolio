@@ -3,6 +3,7 @@
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CubeIcon, XMarkIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { BoxLogo } from "@/components/box-logo";
 import { BoxAI } from "@/components/box-ai";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -93,10 +94,10 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // Measure the outer container height and set it explicitly on the column
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
 
-  {/* Desktop sidebar-expand trigger — shown whenever the sidebar is collapsed,
-      independent of Box AI (so Cardboard pages, where Box AI is disabled, still
-      have a way to reopen the nav). Hidden on the landing splash (/). */}
-  const expandTrigger = pathname !== "/" && !open && showTrigger && (
+  {/* Desktop sidebar-expand trigger — only on Cardboard, which still has a left
+      sidebar. Box uses the top nav (no sidebar), so this trigger is vestigial
+      there and would collide with the corner cube launcher. */}
+  const expandTrigger = pathname.startsWith("/cardboard") && !open && showTrigger && (
     <div className="absolute left-3 top-3 z-30 max-sm:hidden">
       <SidebarTrigger />
     </div>
@@ -104,9 +105,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
 
   const controls = enabled && (
     <div className="contents">
-      {/* Desktop: cube launcher top-left (the sidebar trigger renders
-          separately via expandTrigger, shifted right to sit beside it). */}
-      <div className="absolute left-11 top-3 z-30 flex items-center gap-1 max-sm:hidden">
+      {/* Desktop: cube launcher in the top-left corner of the content card. */}
+      <div className="absolute left-3 top-3 z-30 flex items-center gap-1 max-sm:hidden">
         {!open && launcherEnabled && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -114,9 +114,9 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={() => { setRendered(true); setOpen(true); }}
                 aria-label="Ask Box"
-                className="inline-flex size-7 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
+                className="inline-flex size-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
               >
-                <CubeIcon className="size-5" />
+                <BoxLogo className="size-6" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom">Ask Box</TooltipContent>

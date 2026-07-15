@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { CubeIcon, SwatchIcon } from "@heroicons/react/24/outline"
 import {
   Select,
@@ -41,7 +41,6 @@ const products: Product[] = [
 ]
 
 export function ProductSwitcher({ demo = false }: { demo?: boolean } = {}) {
-  const router = useRouter()
   const pathname = usePathname()
   const routeActive = products.find((p) => p.match(pathname)) ?? products[0]
   // In `demo` mode (docs) the switch is display-only: selection updates the
@@ -55,8 +54,12 @@ export function ProductSwitcher({ demo = false }: { demo?: boolean } = {}) {
       onValueChange={(id) => {
         const next = products.find((p) => p.id === id)
         if (!next || next.id === active.id) return
-        if (demo) setDemoId(next.id)
-        else router.push(next.href)
+        if (demo) { setDemoId(next.id); return }
+        // Cross-product switch (Box ↔ Cardboard) swaps the whole app shell. A
+        // client-side router.push from the Box home was getting reverted (the
+        // landing/Box-AI effects re-assert "/"), so navigate with a full load —
+        // deliberate + rare, and bulletproof against client-side interference.
+        window.location.assign(next.href)
       }}
     >
       <SelectTrigger size="sm" variant="ghost" aria-label="Switch product">

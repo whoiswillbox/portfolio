@@ -75,6 +75,20 @@ function NavBarMenuProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", onKey)
   }, [openKey])
 
+  // Close on click outside the bar + panel (e.g. on the content card). Clicks on
+  // a nav trigger or inside the panel are ignored (they toggle / navigate).
+  React.useEffect(() => {
+    if (!openKey) return
+    const onPointerDown = (e: PointerEvent) => {
+      const t = e.target as Element | null
+      if (t?.closest('[data-slot="nav-bar"], [data-slot="nav-bar-panel"]')) return
+      setOpenKey(null)
+    }
+    // Capture phase so it runs before other handlers stop propagation.
+    document.addEventListener("pointerdown", onPointerDown, true)
+    return () => document.removeEventListener("pointerdown", onPointerDown, true)
+  }, [openKey])
+
   // Scroll-lock while a menu is open — universal (every page), so the content
   // beneath the panel can't scroll out from under it. A non-passive wheel/touch
   // blocker stops native scrolling of the page and any inner scroll container.
