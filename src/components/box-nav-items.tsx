@@ -46,8 +46,13 @@ export function BoxNavItems() {
       : pathname === "/" && convoParam === c.id
     return { label: c.title, href, active }
   })
+  // Only claim the "Conversations" section on the conversations surfaces
+  // themselves — the /conversations page or the home Box AI viewing a
+  // conversation (/?c=). A case-study conversation lives ON its project page,
+  // which belongs to Experience, so it must NOT also light up Conversations
+  // (that page would then activate two nav items at once).
   const conversationsActive =
-    pathname === "/conversations" || conversationItems.some((i) => i.active)
+    pathname === "/conversations" || (pathname === "/" && !!convoParam)
 
   const experience = [
     { label: "BARBRI", href: "/projects/next-gen-bar", badge: { label: "PACKAGING", variant: "warning" as const } },
