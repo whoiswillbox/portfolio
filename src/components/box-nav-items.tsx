@@ -4,8 +4,9 @@
    disclosure dropdowns — the horizontal nav bar that replaced the left sidebar.
    Mirrors app-sidebar.tsx's sections.
 
-   Not yet carried over from the sidebar: the coming-soon "PACKAGING" badge on
-   BARBRI, and per-item icons (top-nav dropdowns don't carry those well). */
+   Not yet carried over from the sidebar: nested Technergetics grouping (the
+   studies are flat under Experience) and per-item icons (top-nav dropdowns
+   don't carry those well). */
 
 import * as React from "react"
 import { usePathname, useSearchParams } from "next/navigation"
@@ -49,7 +50,7 @@ export function BoxNavItems() {
     pathname === "/conversations" || conversationItems.some((i) => i.active)
 
   const experience = [
-    { label: "BARBRI", href: "/projects/next-gen-bar" },
+    { label: "BARBRI", href: "/projects/next-gen-bar", badge: { label: "PACKAGING", variant: "warning" as const } },
     { label: "Jetdash", href: "/technergetics/jetdash" },
     { label: "Upgrade", href: "/technergetics/upgrade" },
     { label: "Reusable Table", href: "/technergetics/reusable-table" },
@@ -64,7 +65,7 @@ export function BoxNavItems() {
     { label: "Music", href: "/extracurriculars/music" },
   ]
 
-  const withActive = (items: { label: string; href: string }[]) =>
+  const withActive = <T extends { href: string }>(items: T[]) =>
     items.map((i) => ({ ...i, active: isActive(i.href) }))
 
   const groupActive = (items: { href: string }[]) =>

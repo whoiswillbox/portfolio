@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/cardboard/dropdown-menu"
+import { Badge } from "@/components/cardboard/badge"
 
 /* Cardboard NavBar — owned (new, not forked). The top application bar: a thin,
    fixed strip that holds the product logo (a home link), a product switcher,
@@ -97,6 +98,8 @@ type NavBarNavMenuItem = {
   href: string
   /** Marks the current child (medium weight + foreground). */
   active?: boolean
+  /** Optional trailing status badge (e.g. a "PACKAGING" coming-soon tag). */
+  badge?: { label: string; variant?: React.ComponentProps<typeof Badge>["variant"] }
 }
 
 /* A single top-level nav item. Two forms:
@@ -144,6 +147,11 @@ function NavBarNavItem({
                 <span className={item.active ? "font-medium text-foreground" : undefined}>
                   {item.label}
                 </span>
+                {item.badge && (
+                  <Badge variant={item.badge.variant ?? "default"} className="ml-auto">
+                    {item.badge.label}
+                  </Badge>
+                )}
               </Link>
             </DropdownMenuItem>
           ))}

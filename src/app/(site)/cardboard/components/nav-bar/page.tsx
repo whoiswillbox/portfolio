@@ -79,7 +79,7 @@ function NavItems() {
         items={[
           { label: "Overview", href: "#", active: true },
           { label: "Foundations", href: "#" },
-          { label: "Components", href: "#" },
+          { label: "Components", href: "#", badge: { label: "NEW", variant: "warning" } },
         ]}
       >
         Components
@@ -96,7 +96,7 @@ export default function NavBarDocs() {
     <ComponentPage
       title="Nav Bar"
       status="stable"
-      version="1.1"
+      version="1.2"
       description="The top application bar: a logo that links home, plus a product switcher for moving between products. A thin, fixed strip above the sidebar (desktop only — mobile uses the mobile nav)."
     >
       <AudienceTabs
@@ -280,7 +280,7 @@ function AppNavBar() {
                     { name: "active?", type: "boolean", default: "false", desc: "Marks the current section (foreground + medium weight)." },
                     { name: "href", type: "string", desc: "The item's route (extends next/link). Not needed when disclosure is set." },
                     { name: "disclosure?", type: "boolean", default: "false", desc: "Render as a menu trigger (a <button> with a rotating chevron) that opens a dropdown of items instead of a link. Mirrors the Box sidebar's expandable items." },
-                    { name: "items?", type: "NavBarNavMenuItem[]", desc: "The child links shown in the disclosure dropdown. Each is { label, href, active? }." },
+                    { name: "items?", type: "NavBarNavMenuItem[]", desc: "The child links shown in the disclosure dropdown. Each is { label, href, active?, badge? } — badge is an optional trailing status tag { label, variant? } (e.g. a coming-soon 'PACKAGING' Badge)." },
                   ],
                 },
               ]}
@@ -326,6 +326,7 @@ function AppNavBar() {
             />
             <Changelog
               entries={[
+                { version: "1.2", changes: ["Disclosure items now accept an optional badge — a trailing status tag (e.g. a coming-soon 'PACKAGING' Badge) on a child row."] },
                 { version: "1.1", changes: ["Added the disclosure prop to NavBarNavItem — a menu-trigger item that opens a dropdown of child items (via items), mirroring the Box sidebar's expandable items."] },
                 { version: "1.0", changes: ["Initial release — NavBar with NavBarLogo, product switcher, and NavBarNav items."] },
               ]}
