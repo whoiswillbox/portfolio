@@ -183,10 +183,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         overflow: "visible",
       }}
     >
-      {/* Box AI column — explicit pixel height so BoxAI's h-full resolves correctly */}
+      {/* Box AI column — fills its (flex-driven) parent so BoxAI's h-full
+          resolves. Height comes from the flex chain, which the nav panel already
+          shrinks by pushing SidebarProvider down — so no viewport calc that would
+          double-count the push and leave a gap. */}
       <div
-        className="relative min-w-0 flex flex-col"
-        style={{ overflow: "visible", height: "calc(100dvh - 1rem - var(--topbar-h, 0px))", maxHeight: "calc(100dvh - 1rem - var(--topbar-h, 0px))" }}
+        className="relative min-w-0 flex flex-col h-full min-h-0"
+        style={{ overflow: "visible" }}
         onTransitionEnd={() => {
           if (exiting) { setExiting(false); setOpen(false); setRendered(false); }
         }}

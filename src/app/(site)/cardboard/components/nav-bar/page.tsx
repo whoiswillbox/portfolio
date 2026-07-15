@@ -8,6 +8,8 @@ import {
   NavBarLogo,
   NavBarNav,
   NavBarNavItem,
+  NavBarPanel,
+  NavBarMenuProvider,
 } from "@cardboard";
 import {
   ComponentPage,
@@ -43,15 +45,19 @@ function NavBar({
 }) {
   return (
     <div className="w-full overflow-hidden">
-      <NavBarRoot>
-        {logo && (
-          <NavBarLogo href="#">
-            <BoxLogo className="size-6" />
-          </NavBarLogo>
-        )}
-        <ProductSwitcher demo />
-        {children}
-      </NavBarRoot>
+      <NavBarMenuProvider>
+        <NavBarRoot>
+          {logo && (
+            <NavBarLogo href="#">
+              <BoxLogo className="size-6" />
+            </NavBarLogo>
+          )}
+          <ProductSwitcher demo />
+          {children}
+        </NavBarRoot>
+        {/* Disclosure items expand this full-width panel below the bar. */}
+        <NavBarPanel />
+      </NavBarMenuProvider>
     </div>
   );
 }
@@ -76,10 +82,16 @@ function NavItems() {
       <NavBarNavItem href="#" active>Docs</NavBarNavItem>
       <NavBarNavItem
         disclosure
+        menuKey="components"
         items={[
-          { label: "Overview", href: "#", active: true },
-          { label: "Foundations", href: "#" },
-          { label: "Components", href: "#", badge: { label: "NEW", variant: "warning" } },
+          { label: "Get started", items: [
+            { label: "Overview", href: "#", active: true },
+            { label: "Foundations", href: "#" },
+          ]},
+          { label: "Library", items: [
+            { label: "Nav Bar", href: "#" },
+            { label: "Badge", href: "#", badge: { label: "NEW", variant: "warning" } },
+          ]},
         ]}
       >
         Components
@@ -96,7 +108,7 @@ export default function NavBarDocs() {
     <ComponentPage
       title="Nav Bar"
       status="stable"
-      version="1.2"
+      version="2.0"
       description="The top application bar: a logo that links home, plus a product switcher for moving between products. A thin, fixed strip above the sidebar (desktop only — mobile uses the mobile nav)."
     >
       <AudienceTabs
@@ -279,8 +291,21 @@ function AppNavBar() {
                   rows: [
                     { name: "active?", type: "boolean", default: "false", desc: "Marks the current section (foreground + medium weight)." },
                     { name: "href", type: "string", desc: "The item's route (extends next/link). Not needed when disclosure is set." },
-                    { name: "disclosure?", type: "boolean", default: "false", desc: "Render as a menu trigger (a <button> with a rotating chevron) that opens a dropdown of items instead of a link. Mirrors the Box sidebar's expandable items." },
-                    { name: "items?", type: "NavBarNavMenuItem[]", desc: "The child links shown in the disclosure dropdown. Each is { label, href, active?, badge? } — badge is an optional trailing status tag { label, variant? } (e.g. a coming-soon 'PACKAGING' Badge)." },
+                    { name: "disclosure?", type: "boolean", default: "false", desc: "Render as a trigger (a <button> with a rotating chevron) that expands NavBarPanel — a full-width strip below the bar that pushes page content down. Requires a NavBarMenuProvider ancestor. At most one disclosure is open at a time." },
+                    { name: "menuKey?", type: "string", desc: "Stable identifier for this disclosure's panel (defaults to the children text). Set it explicitly when children aren't a plain string." },
+                    { name: "items?", type: "NavBarNavMenuItem[] | NavBarNavMenuGroup[]", desc: "The child links shown in the panel — a flat list, or grouped categories ({ label?, items }). Each item is { label, href, active?, badge? }; badge is an optional trailing status tag { label, variant? } (e.g. a 'PACKAGING' Badge)." },
+                  ],
+                },
+                {
+                  interfaceName: "NavBarMenuProvider",
+                  rows: [
+                    { name: "children", type: "ReactNode", desc: "Wrap the NavBar AND the NavBarPanel. Coordinates which disclosure menu is open (at most one) and closes on Escape." },
+                  ],
+                },
+                {
+                  interfaceName: "NavBarPanel",
+                  rows: [
+                    { name: "…div", type: "HTMLDivProps", desc: "The full-width disclosure panel; render as a sibling right after <NavBar>, inside the same provider, so it pushes page content down. Extends <div> (className, etc.)." },
                   ],
                 },
               ]}
@@ -326,6 +351,11 @@ function AppNavBar() {
             />
             <Changelog
               entries={[
+                { version: "2.0", changes: [
+                  "Disclosure menus now expand a full-width NavBarPanel BELOW the bar that pushes page content down, instead of a floating dropdown. Requires wrapping the bar + panel in NavBarMenuProvider; at most one menu is open at a time (Esc / outside click closes).",
+                  "items now accepts grouped categories (NavBarNavMenuGroup[]) as well as a flat list, so a menu can show labelled sections.",
+                  "Added menuKey to NavBarNavItem to identify a disclosure's panel.",
+                ] },
                 { version: "1.2", changes: ["Disclosure items now accept an optional badge — a trailing status tag (e.g. a coming-soon 'PACKAGING' Badge) on a child row."] },
                 { version: "1.1", changes: ["Added the disclosure prop to NavBarNavItem — a menu-trigger item that opens a dropdown of child items (via items), mirroring the Box sidebar's expandable items."] },
                 { version: "1.0", changes: ["Initial release — NavBar with NavBarLogo, product switcher, and NavBarNav items."] },

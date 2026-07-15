@@ -2,7 +2,7 @@
 
 import { Suspense } from "react"
 import { usePathname } from "next/navigation"
-import { NavBar, NavBarLogo } from "@/components/cardboard/nav-bar"
+import { NavBar, NavBarLogo, NavBarPanel, NavBarMenuProvider } from "@/components/cardboard/nav-bar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { CardboardSidebar } from "@/components/cardboard-sidebar"
@@ -52,61 +52,72 @@ export function AppShell({
           BEHIND the content card (which fills the viewport at rest). As you
           scroll landing → Box AI, --enter-progress rises 0→1, growing --topbar-h
           from 0→3.5rem, which slides the card down to EXPOSE the nav bar. */}
-      <NavBar
-        className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"} ${isLanding ? "absolute inset-x-0 top-0 z-20" : ""}`}
-        style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
-      >
-        <NavBarLogo href={home.href} aria-label={home.name}>
-          <BoxLogo className="size-6" />
-        </NavBarLogo>
-        <ProductSwitcher />
-        {/* Box nav lives in the top bar instead of the left sidebar.
-            Cardboard keeps its own sidebar. Suspense: BoxNavItems reads
-            useSearchParams (to mark the active conversation), which needs a
-            boundary to avoid a static-render CSR bailout at build. */}
-        {!inCardboard && (
-          <Suspense fallback={null}>
-            <BoxNavItems />
-          </Suspense>
-        )}
-      </NavBar>
-
-      <SidebarProvider
-        defaultOpen={false}
-        className={`!min-h-0 flex-1 max-sm:bg-sidebar ${isLanding ? "z-10 bg-transparent pt-[var(--topbar-h)]" : "bg-background"}`}
-      >
-        <Suspense fallback={null}>
-          {inCardboard ? (
-            <CardboardSidebar />
-          ) : (
-            // The Box desktop sidebar is replaced by the top-nav (BoxNavItems
-            // above), so AppSidebar is not rendered for Box. (AppSidebar was
-            // desktop-only — `max-sm:hidden` — so mobile is unaffected; MobileNav
-            // handles mobile Box navigation separately.)
-            null
-          )}
-        </Suspense>
-        <SidebarInset
-          className="min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
-          // Landing: keep the top margin on the splash (looks like a floating
-          // card), then collapse it to 0 as you scroll into the Box product so
-          // the card sits flush under the revealed nav bar. Driven by
-          // --enter-progress (0→1), same signal as the nav reveal.
-          style={
-            isLanding
-              ? { marginTop: "calc(0.5rem * (1 - var(--enter-progress, 0)))" }
-              : undefined
-          }
+      {/* NavBarMenuProvider coordinates the disclosure menus: clicking a
+          top-level item expands NavBarPanel (a full-width strip below the bar)
+          which pushes the content card down. The panel is a sibling right after
+          the bar so it can push. On the landing page the bar is absolute
+          (overlays the card during the scroll-reveal), so the pushing panel
+          would be meaningless there — it's rendered only off-landing. */}
+      <NavBarMenuProvider>
+        <NavBar
+          // On landing the nav fades in with the scrub; while it's still faded
+          // out at the splash (root[data-splash]) it must be INERT so its menus
+          // can't be opened before the nav is visible. Restored once revealed.
+          className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"} ${isLanding ? "nav-splash-inert absolute inset-x-0 top-0 z-20" : ""}`}
+          style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
         >
-          <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
-            <BoxSeedProvider>
-              <Suspense fallback={null}>
-                <ContentWorkspace>{children}</ContentWorkspace>
-              </Suspense>
-            </BoxSeedProvider>
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
+          <NavBarLogo href={home.href} aria-label={home.name}>
+            <BoxLogo className="size-6" />
+          </NavBarLogo>
+          <ProductSwitcher />
+          {/* Box nav lives in the top bar instead of the left sidebar.
+              Cardboard keeps its own sidebar. Suspense: BoxNavItems reads
+              useSearchParams (to mark the active conversation), which needs a
+              boundary to avoid a static-render CSR bailout at build. */}
+          {!inCardboard && (
+            <Suspense fallback={null}>
+              <BoxNavItems />
+            </Suspense>
+          )}
+        </NavBar>
+
+        {/* Everything below the (absolute-on-landing) nav lives in one flow
+            column offset by the nav height on landing (pt-[--topbar-h]), so the
+            panel clears the absolute nav without any per-element margin. The
+            panel is the first child so it PUSHES the content card down (keeping
+            its top margin visible) rather than overlaying it. */}
+        <div className={`flex min-h-0 flex-1 flex-col ${isLanding ? "pt-[var(--topbar-h)]" : ""}`}>
+          <NavBarPanel className="max-sm:hidden" />
+
+          <SidebarProvider
+            defaultOpen={false}
+            className={`!min-h-0 flex-1 max-sm:bg-sidebar ${isLanding ? "z-10 bg-transparent" : "bg-background"}`}
+          >
+            <Suspense fallback={null}>
+              {inCardboard ? (
+                <CardboardSidebar />
+              ) : (
+                // The Box desktop sidebar is replaced by the top-nav (BoxNavItems
+                // above), so AppSidebar is not rendered for Box. (AppSidebar was
+                // desktop-only — `max-sm:hidden` — so mobile is unaffected;
+                // MobileNav handles mobile Box navigation separately.)
+                null
+              )}
+            </Suspense>
+            <SidebarInset
+              className="min-h-0 flex-1 m-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
+            >
+              <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
+                <BoxSeedProvider>
+                  <Suspense fallback={null}>
+                    <ContentWorkspace>{children}</ContentWorkspace>
+                  </Suspense>
+                </BoxSeedProvider>
+              </main>
+            </SidebarInset>
+          </SidebarProvider>
+        </div>
+      </NavBarMenuProvider>
     </div>
   )
 }

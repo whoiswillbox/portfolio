@@ -103,3 +103,11 @@ body.input-focused .mobile-nav {
   visibility: hidden !important;
   margin-bottom: 2.5rem !important;
 }
+
+/* At the landing splash the nav bar is faded out (opacity: --enter-progress).
+   Make it INERT there so its disclosure menus can't be opened before the nav is
+   visible (root gets [data-splash] until the scrub reveals it ~60%). Once
+   revealed the attribute is removed and the nav is interactive again. */
+:root[data-splash] .nav-splash-inert {
+  pointer-events: none;
+}

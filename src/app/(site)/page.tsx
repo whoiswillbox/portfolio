@@ -127,6 +127,11 @@ function LandingInner() {
   // once a conversation/case study opens (the empty state — and its slot — is
   // gone, so the splash cube must not float over the thread).
   const [cubeSlotPresent, setCubeSlotPresent] = useState(false);
+  // The cube's centering layer — the cube's transform origin. cubeTarget must be
+  // measured relative to THIS layer's center (not the viewport), because the
+  // layer lives inside the content card, which the nav disclosure panel PUSHES
+  // down. Measuring off the viewport would leave the cube behind by the push.
+  const cubeLayerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let raf = 0;
     const measure = () => {
@@ -136,9 +141,13 @@ function LandingInner() {
       // absent box means it's not the empty state right now).
       const present = !!r && r.width > 0 && r.height > 0;
       if (present) {
+        // Center of the cube's own layer (its untranslated resting point).
+        const layer = cubeLayerRef.current?.getBoundingClientRect();
+        const originX = layer ? layer.left + layer.width / 2 : window.innerWidth / 2;
+        const originY = layer ? layer.top + layer.height / 2 : window.innerHeight / 2;
         setCubeTarget((prev) => {
-          const x = r.left + r.width / 2 - window.innerWidth / 2;
-          const y = r.top + r.height / 2 - window.innerHeight / 2;
+          const x = r.left + r.width / 2 - originX;
+          const y = r.top + r.height / 2 - originY;
           return prev.x === x && prev.y === y ? prev : { x, y };
         });
       }
@@ -188,8 +197,13 @@ function LandingInner() {
     // Box AI is "empty" (safe to scrub back to the splash) only when no
     // conversation or project is open — it marks its root [data-box-empty].
     const boxEmpty = () => !!document.querySelector("[data-box-empty]");
+    // A nav disclosure menu is open (its panel overlays the splash). Scrubbing
+    // the splash while the menu is open fights the menu, so scroll is locked.
+    const navMenuOpen = () =>
+      !!document.querySelector('[data-slot="nav-bar-panel"][data-state="open"]');
 
     const bump = (deltaY: number) => {
+      if (navMenuOpen()) return; // scroll locked while a nav menu is open
       if (reducedMotion.current) {
         setProgress(deltaY > 0 ? 1 : 0);
         progressRef.current = deltaY > 0 ? 1 : 0;
@@ -209,18 +223,20 @@ function LandingInner() {
 
     const onWheel = (e: WheelEvent) => {
       if (e.deltaY === 0) return;
-      bump(e.deltaY);
+      bump(e.deltaY); // bump() no-ops while a nav menu is open; the NavBarMenu
+                      // provider hard-locks native scroll (preventDefault).
     };
 
     let touchY = 0;
     const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; };
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY;
-      bump(touchY - y); // dragging up = positive = scrub forward
-      touchY = y;
+      bump(touchY - y); // dragging up = positive = scrub forward (no-ops while
+      touchY = y;       // a nav menu is open; provider hard-locks native scroll)
     };
 
     const onKey = (e: KeyboardEvent) => {
+      if (navMenuOpen()) return; // scroll locked while a nav menu is open
       if ((e.key === "ArrowDown" || e.key === "PageDown") && progressRef.current < 1) {
         e.preventDefault();
         progressRef.current = 1;
@@ -240,10 +256,19 @@ function LandingInner() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Publish progress so the app-shell nav bar fades in with the scrub.
+  // Publish progress so the app-shell nav bar fades in with the scrub. Also
+  // flag the splash state (nav faded out) so the nav can be made inert there —
+  // its menus must not be openable while it's invisible.
   useEffect(() => {
-    document.documentElement.style.setProperty("--enter-progress", String(progress));
-    return () => { document.documentElement.style.removeProperty("--enter-progress"); };
+    const root = document.documentElement;
+    root.style.setProperty("--enter-progress", String(progress));
+    // Revealed enough to interact with the nav (~mostly faded in).
+    if (progress >= 0.6) root.removeAttribute("data-splash");
+    else root.setAttribute("data-splash", "");
+    return () => {
+      root.style.removeProperty("--enter-progress");
+      root.removeAttribute("data-splash");
+    };
   }, [progress]);
 
   return (
@@ -318,7 +343,7 @@ function LandingInner() {
               AI's (hidden) empty-state cube slot — reading as one continuous
               cube. (Keeping the heading on a separate layer below avoids the
               flex-column offset that was pushing the cube up off the slot.) */}
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <div ref={cubeLayerRef} className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
             <div
               style={{
                 transform: (() => {

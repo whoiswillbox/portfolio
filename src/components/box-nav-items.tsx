@@ -54,15 +54,29 @@ export function BoxNavItems() {
   const conversationsActive =
     pathname === "/conversations" || (pathname === "/" && !!convoParam)
 
-  const experience = [
+  const withActive = <T extends { href: string }>(items: T[]) =>
+    items.map((i) => ({ ...i, active: isActive(i.href) }))
+
+  // Experience, grouped into categories for the disclosure panel (the nesting
+  // that was flat in the old dropdown): BARBRI · Technergetics · More.
+  const barbri = [
     { label: "BARBRI", href: "/projects/next-gen-bar", badge: { label: "PACKAGING", variant: "warning" as const } },
+  ]
+  const technergetics = [
     { label: "Jetdash", href: "/technergetics/jetdash" },
     { label: "Upgrade", href: "/technergetics/upgrade" },
     { label: "Reusable Table", href: "/technergetics/reusable-table" },
     { label: "Design Standards", href: "/technergetics/design-standards" },
     { label: "Lightcert", href: "/technergetics/lightcert" },
-    { label: "Resume", href: "/resume" },
   ]
+  const experienceMore = [{ label: "Resume", href: "/resume" }]
+  const experienceGroups = [
+    { label: "BARBRI", items: withActive(barbri) },
+    { label: "Technergetics", items: withActive(technergetics) },
+    { label: "More", items: withActive(experienceMore) },
+  ]
+  const experienceActive = [...barbri, ...technergetics, ...experienceMore].some((i) => isActive(i.href))
+
   const school = [{ label: "SwipeRight.ai", href: "/school/swiperight-ai" }]
   const extras = [
     { label: "Surfing", href: "/extracurriculars/surfing" },
@@ -70,30 +84,28 @@ export function BoxNavItems() {
     { label: "Music", href: "/extracurriculars/music" },
   ]
 
-  const withActive = <T extends { href: string }>(items: T[]) =>
-    items.map((i) => ({ ...i, active: isActive(i.href) }))
-
   const groupActive = (items: { href: string }[]) =>
     items.some((i) => isActive(i.href))
 
   return (
     <NavBarNav>
-      <NavBarNavItem disclosure active={groupActive(experience)} items={withActive(experience)}>
+      <NavBarNavItem disclosure menuKey="experience" active={experienceActive} items={experienceGroups}>
         Experience
       </NavBarNavItem>
-      <NavBarNavItem disclosure active={groupActive(school)} items={withActive(school)}>
+      <NavBarNavItem disclosure menuKey="school" active={groupActive(school)} items={withActive(school)}>
         School
       </NavBarNavItem>
-      <NavBarNavItem disclosure active={groupActive(extras)} items={withActive(extras)}>
+      <NavBarNavItem disclosure menuKey="extras" active={groupActive(extras)} items={withActive(extras)}>
         Extracurriculars
       </NavBarNavItem>
       {conversationItems.length > 0 && (
         <NavBarNavItem
           disclosure
+          menuKey="conversations"
           active={conversationsActive}
           items={[
-            ...conversationItems,
-            { label: "View all →", href: "/conversations", active: pathname === "/conversations" },
+            { label: "Recent", items: conversationItems },
+            { items: [{ label: "View all →", href: "/conversations", active: pathname === "/conversations" }] },
           ]}
         >
           Conversations
