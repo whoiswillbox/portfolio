@@ -7,7 +7,6 @@ import {
   PencilSquareIcon,
   XMarkIcon,
   CubeIcon,
-  ChevronDownIcon,
   HandThumbUpIcon,
   HandThumbDownIcon,
   FolderIcon,
@@ -18,6 +17,8 @@ import {
   BoltIcon,
   PuzzlePieceIcon,
   AcademicCapIcon,
+  MagnifyingGlassIcon,
+  SparklesIcon,
   Cog6ToothIcon,
   MoonIcon,
   SunIcon,
@@ -40,6 +41,7 @@ import { showContactCard, stripContactMarker } from "@/lib/contact";
 import { caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
 import { ContentCard } from "@/components/content-card";
 import { CaseStudyPanel } from "@/components/case-study-panel";
+import { ThinkingSteps } from "@/components/cardboard/thinking-steps";
 import { hasRealPage } from "@/components/case-study-pages";
 import {
   ResizablePanelGroup,
@@ -155,6 +157,35 @@ const SURF_PHRASES = [
 
 const randomSurf = () => SURF_PHRASES[Math.floor(Math.random() * SURF_PHRASES.length)];
 
+/* Follow-up suggestion pool for the local fallback (no API on localhost). The
+   deployed API returns contextual suggestions; here we pick 3 at random from a
+   varied pool so localhost doesn't show the same static three every time —
+   keeping the local experience close to deployed. */
+const FALLBACK_SUGGESTION_POOL = [
+  "Tell me more about your experience",
+  "What's your favorite project?",
+  "How can I reach you?",
+  "What did you build at Technergetics?",
+  "Walk me through the BARBRI work",
+  "What's the SwipeRight project about?",
+  "What are your design skills?",
+  "Tell me about the Cardboard design system",
+  "What do you do outside of work?",
+  "Where did you go to school?",
+  "What tools do you use?",
+  "Show me your best case study",
+];
+
+/* Fisher–Yates pick of `n` distinct items. */
+function pickRandom<T>(pool: readonly T[], n: number): T[] {
+  const arr = [...pool];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, n);
+}
+
 const Lottie = React.lazy(() => import("lottie-react"));
 
 let _animDataCache: object | null = null;
@@ -211,58 +242,99 @@ function FadeOnScroll({ children }: { children: React.ReactNode }) {
 
 /* Reasoning trace — keyword → steps shown while waiting for first token. */
 type ReasoningStep = { label: string; Icon: React.ElementType };
+// Each group's steps name the SPECIFIC source being consulted, so the trace
+// reads like a grounded retrieval ("Reading the SwipeRight case study") rather
+// than a vague "thinking". Order matters: more specific keyword groups come
+// first so e.g. "swiperight" matches its own group before the generic project
+// group. Every chain ends with a shared "Drafting an answer…" closer (appended
+// in getReasoningSteps) so the last step always reads as composing the reply.
 const REASONING_STEPS: { keywords: string[]; steps: ReasoningStep[] }[] = [
   {
-    keywords: ["project", "built", "shipped", "work", "portfolio", "design", "barbri", "technergetics", "lightcert", "swiperight", "jetdash"],
+    keywords: ["swiperight", "swipe right", "dating", "capstone"],
     steps: [
-      { label: "Checking your projects…", Icon: FolderIcon },
-      { label: "Pulling case study details…", Icon: BoltIcon },
+      { label: "Searching the portfolio…", Icon: MagnifyingGlassIcon },
+      { label: "Reading the SwipeRight case study…", Icon: AcademicCapIcon },
+    ],
+  },
+  {
+    keywords: ["jetdash", "logistics", "manifest", "airmen"],
+    steps: [
+      { label: "Searching the portfolio…", Icon: MagnifyingGlassIcon },
+      { label: "Reading the JetDash case study…", Icon: BoltIcon },
+    ],
+  },
+  {
+    keywords: ["barbri", "next gen", "sqe2", "powerscore", "oneux", "onebarbri", "bar exam"],
+    steps: [
+      { label: "Searching the portfolio…", Icon: MagnifyingGlassIcon },
+      { label: "Reading the BARBRI case studies…", Icon: FolderIcon },
+    ],
+  },
+  {
+    keywords: ["technergetics", "upgrade", "reusable table", "design standards", "military"],
+    steps: [
+      { label: "Searching the portfolio…", Icon: MagnifyingGlassIcon },
+      { label: "Reading the Technergetics case studies…", Icon: BuildingOffice2Icon },
+    ],
+  },
+  {
+    keywords: ["lightcert", "internship", "intern", "save", "share", "onboarding"],
+    steps: [
+      { label: "Searching the portfolio…", Icon: MagnifyingGlassIcon },
+      { label: "Reading the Lightcert internship notes…", Icon: FolderIcon },
+    ],
+  },
+  {
+    keywords: ["experience", "job", "role", "career", "resume", "cv", "hire", "recruiter", "work at"],
+    steps: [
+      { label: "Reviewing work experience…", Icon: BuildingOffice2Icon },
+      { label: "Reading the CV…", Icon: DocumentTextIcon },
+    ],
+  },
+  {
+    keywords: ["design", "skill", "process", "figma", "ux", "ui", "research", "system", "token"],
+    steps: [
+      { label: "Reviewing the design background…", Icon: FolderIcon },
+      { label: "Checking the Cardboard design system…", Icon: CubeIcon },
     ],
   },
   {
     keywords: ["music", "playlist", "song", "listen", "artist", "spotify", "track"],
     steps: [
-      { label: "Reading your music knowledge…", Icon: MusicalNoteIcon },
+      { label: "Reading music notes…", Icon: MusicalNoteIcon },
       { label: "Checking Spotify data…", Icon: MusicalNoteIcon },
     ],
   },
   {
     keywords: ["surf", "surfing", "wave", "board", "ocean", "skate"],
     steps: [
-      { label: "Checking your surfing background…", Icon: LifebuoyIcon },
+      { label: "Reading the surfing background…", Icon: LifebuoyIcon },
     ],
   },
   {
-    keywords: ["experience", "job", "role", "career", "resume", "hire", "recruiter", "work at"],
+    keywords: ["fun", "hobby", "outside", "personal", "life", "game", "gaming", "extracurricular"],
     steps: [
-      { label: "Reviewing your experience…", Icon: BuildingOffice2Icon },
-      { label: "Checking your resume…", Icon: DocumentTextIcon },
+      { label: "Checking personal interests…", Icon: PuzzlePieceIcon },
     ],
   },
   {
-    keywords: ["design", "skill", "process", "figma", "ux", "ui", "research"],
+    keywords: ["project", "built", "shipped", "work", "portfolio", "case study"],
     steps: [
-      { label: "Looking at your design background…", Icon: FolderIcon },
-    ],
-  },
-  {
-    keywords: ["fun", "hobby", "outside", "personal", "life", "game", "gaming"],
-    steps: [
-      { label: "Checking your personal interests…", Icon: PuzzlePieceIcon },
-    ],
-  },
-  {
-    keywords: ["school", "swiperight", "student", "class"],
-    steps: [
-      { label: "Checking your school projects…", Icon: AcademicCapIcon },
+      { label: "Searching the portfolio…", Icon: MagnifyingGlassIcon },
+      { label: "Pulling case study details…", Icon: BoltIcon },
     ],
   },
 ];
 
+const DRAFTING_STEP: ReasoningStep = { label: "Drafting an answer…", Icon: SparklesIcon };
+
 function getReasoningSteps(query: string): ReasoningStep[] {
   const lower = query.toLowerCase();
   const matched = REASONING_STEPS.find((r) => r.keywords.some((k) => lower.includes(k)));
-  return matched?.steps ?? [{ label: "Thinking…", Icon: CubeIcon }];
+  // Fallback (no keyword hit) still reads as a grounded search, not a vague
+  // "thinking". Every chain ends with the shared drafting closer.
+  const base = matched?.steps ?? [{ label: "Searching the portfolio…", Icon: MagnifyingGlassIcon }];
+  return [...base, DRAFTING_STEP];
 }
 
 function uid(): string {
@@ -478,8 +550,11 @@ export function BoxAI({
   const abortRef = React.useRef<AbortController | null>(null);
   const [reasoningSteps, setReasoningSteps] = React.useState<ReasoningStep[]>([]);
   const [visibleSteps, setVisibleSteps] = React.useState<ReasoningStep[]>([]);
+  // Once the reply is ready, every step (incl. the final "Drafting…") flips to a
+  // checkmark and holds a beat BEFORE the output reveals — so the trace reads as
+  // fully complete first.
+  const [allStepsDone, setAllStepsDone] = React.useState(false);
   const [streamingText, setStreamingText] = React.useState("");
-  const [reasoningOpen, setReasoningOpen] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
 
   const [usage, setUsage] = React.useState<{ date: string; count: number }>({
@@ -750,13 +825,20 @@ export function BoxAI({
       if (!text.trim()) throw new Error("empty");
       return { text, entryId: null, fromApi: true, suggestions };
     } catch {
-      // Local fallback: simulate streaming by dripping the response word by word.
+      // Local fallback (no ANTHROPIC_API_KEY on localhost): approximate the
+      // DEPLOYED experience as closely as possible without real spend —
+      //  1) realistic "time to first token" latency (not the old 9s stub),
+      //  2) word-chunk streaming (real Claude streams word-ish, not char-ish),
+      //  3) varied follow-up suggestions (see fallbackSuggestions in send()).
       const fallback = respondTo(trimmed, shown);
-      // Wait so the thinking accordion is visible before streaming starts.
-      await new Promise((r) => setTimeout(r, 9000));
-      for (const char of fallback.text) {
-        await new Promise((r) => setTimeout(r, 12));
-        onToken(char);
+      // Time-to-first-token: ~700ms + jitter, so the thinking trace is briefly
+      // visible (like a real round-trip) without feeling stalled.
+      await new Promise((r) => setTimeout(r, 700 + Math.random() * 400));
+      // Stream in word chunks with small gaps, like a real token stream.
+      const tokens = fallback.text.match(/\S+\s*/g) ?? [fallback.text];
+      for (const token of tokens) {
+        await new Promise((r) => setTimeout(r, 18 + Math.random() * 22));
+        onToken(token);
       }
       return { ...fallback, fromApi: false, suggestions: undefined };
     }
@@ -787,7 +869,7 @@ export function BoxAI({
     setThinkSecs(0);
     setStreamingText("");
     setVisibleSteps([]);
-    setReasoningOpen(false);
+    setAllStepsDone(false);
     setSuggestions([]);
     const steps = getReasoningSteps(trimmed);
     setReasoningSteps(steps);
@@ -824,7 +906,6 @@ export function BoxAI({
       if (firstToken) {
         firstToken = false;
         if (thinkTimerRef.current) { clearInterval(thinkTimerRef.current); thinkTimerRef.current = null; }
-        setReasoningOpen(false);
       }
       setStreamingText((prev) => prev + chunk);
     }, abortRef.current!.signal);
@@ -837,16 +918,23 @@ export function BoxAI({
       await new Promise((r) => setTimeout(r, MIN_THINK_MS - elapsed));
     }
 
-    // Use API suggestions if available, else generate fallbacks from seed/context
+    // Reply is ready: reveal ALL steps and flip every one (incl. the final
+    // "Drafting…") to a checkmark, then hold briefly so the completed trace is
+    // seen BEFORE the answer replaces it.
+    setVisibleSteps(steps);
+    setAllStepsDone(true);
+    await new Promise((r) => setTimeout(r, 500));
+
+    // Use API suggestions if available (deployed). On localhost the fallback
+    // prefers the current case-study seed's prompts (contextual), else picks 3
+    // at random from the varied pool so the suggestions aren't always identical.
     if (reply.suggestions?.length) {
       setSuggestions(reply.suggestions);
     } else {
-      const fallbackSuggestions = seedRef.current?.prompts?.slice(0, 3) ?? [
-        "Tell me more about your experience",
-        "What's your favorite project?",
-        "How can I reach you?",
-      ];
-      setSuggestions(fallbackSuggestions);
+      const seedPrompts = seedRef.current?.prompts;
+      setSuggestions(
+        seedPrompts?.length ? seedPrompts.slice(0, 3) : pickRandom(FALLBACK_SUGGESTION_POOL, 3),
+      );
     }
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
 
@@ -890,6 +978,7 @@ export function BoxAI({
     if (thinkTimerRef.current) { clearInterval(thinkTimerRef.current); thinkTimerRef.current = null; }
     setStreamingText("");
     setVisibleSteps([]);
+    setAllStepsDone(false);
     setSending(false);
 
     // Home page: route to the case study's own page (with the conversation) once
@@ -1167,37 +1256,21 @@ export function BoxAI({
             )}
             {sending && (
               <div className="flex w-full flex-col gap-1">
-                {!streamingText && (
-                  <div className="w-full rounded-lg bg-muted px-3 py-2 flex flex-col font-mono text-body-xs uppercase tracking-wide text-muted-foreground mb-2">
-                    <button
-                      type="button"
-                      onClick={() => setReasoningOpen((o) => !o)}
-                      className="flex items-center gap-2 text-left hover:text-foreground transition-colors"
-                    >
-                      <span className="animate-pulse">{thinking} 🏄‍♂️</span>
-                      {thinkSecs > 0 && <span>{thinkSecs}s</span>}
-                      <ChevronDownIcon className={cn("ml-auto size-3 transition-transform duration-300", reasoningOpen ? "rotate-0" : "-rotate-90")} />
-                    </button>
-                    <div className={cn("grid transition-[grid-template-rows] duration-300 ease-out", reasoningOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
-                      <div className="overflow-hidden">
-                        <div className="flex flex-col pt-2">
-                          {visibleSteps.map((step, i) => (
-                            <div key={i} className="flex gap-2 animate-in fade-in slide-in-from-bottom-1 duration-300">
-                              <div className="flex flex-col items-center">
-                                <step.Icon className="size-3 opacity-60 shrink-0 mt-0.5" />
-                                {i < visibleSteps.length - 1 && (
-                                  <span className="w-px flex-1 bg-current opacity-20 my-0.5" />
-                                )}
-                              </div>
-                              <span className="pb-2">{step.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {streamingText && (
+                {!allStepsDone ? (
+                  <ThinkingSteps
+                    className="mb-2"
+                    heading={<>{thinking} 🏄‍♂️</>}
+                    seconds={thinkSecs}
+                    steps={visibleSteps.map((step, i) => ({
+                      label: step.label,
+                      icon: step.Icon,
+                      // Each step is done once the next appears; the last stays
+                      // active until the reply is ready (allStepsDone).
+                      status: allStepsDone || i < visibleSteps.length - 1 ? "done" : "active",
+                    }))}
+                  />
+                ) : null}
+                {allStepsDone && streamingText && (
                   <p className="font-sans text-body-sm text-foreground">
                     {streamingText.split(" ").map((word, i) => (
                       <span key={i} className="animate-in fade-in duration-300">{i > 0 ? " " : ""}{word}</span>

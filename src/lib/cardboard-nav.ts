@@ -98,6 +98,14 @@ export const components: Entry[] = [
   leaf("Tabs", "tabs"),
   leaf("Textarea", "textarea"),
   leaf("Tooltip", "tooltip"),
+  // Box AI chat surfaces. Starts with Thinking Steps; the other chat components
+  // (bubbles, input, suggestions, …) will land here as they're extracted.
+  {
+    title: "Chat",
+    children: [
+      leaf("Thinking Steps", "thinking-steps", "experimental"),
+    ],
+  },
 ].sort((a, b) => a.title.localeCompare(b.title))
 
 // Utilities — helpers, wrappers, and assets that aren't interactive UI.

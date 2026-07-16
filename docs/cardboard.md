@@ -94,6 +94,16 @@ Then wire it up:
 
 ## Doc page conventions
 
+**Every new component ships the FULL doc template — no exceptions.** Use
+`src/app/(site)/cardboard/components/segmented-control/page.tsx` as the canonical
+reference: `ComponentPage` → `AudienceTabs` with a Playground plus the Design and
+Develop tabs and their sections (Anatomy, Guidelines, Content, Do/Don't, States,
+WcagChecklist · Install, Variants, PropsTable/Slots, Accessibility, Changelog).
+Do NOT ship a thin `ComponentPage` + `Demo`-only page — a component isn't
+"documented" until it follows the template. Only include the sections that
+genuinely apply (a leaf component skips Slots; a static one skips keyboard a11y),
+but start from the full template and remove what doesn't fit, never the reverse.
+
 Every doc page composes helpers from `_component-page.tsx`. The shell is
 `ComponentPage` (title, description, `status`, `version`) wrapping `AudienceTabs`.
 
