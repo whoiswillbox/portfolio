@@ -85,9 +85,6 @@ export function BoxNavItems() {
           Conversations
         </NavBarNavItem>
       )}
-      <NavBarNavItem href="/settings" active={pathname === "/settings"}>
-        Settings
-      </NavBarNavItem>
     </NavBarNav>
   )
 }
