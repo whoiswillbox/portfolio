@@ -850,9 +850,14 @@ export function BoxAI({
     }
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
 
-    // If the reply references a case study, open it in the side panel (desktop) or bottom sheet (mobile).
+    // If the reply references a case study, show it. When embedded (already on a
+    // case-study page) open the in-place side panel. On the home page (non-
+    // embedded) NAVIGATE to the study's own page instead — its ContentWorkspace
+    // renders the split with proper floating panels; the landing card can't host
+    // that split. The conversation is bound below + carried via ?box=, so it
+    // reopens beside the study (same as reopening from the conversations page).
     const cs = findCaseStudy(reply.text);
-    if (cs) setOpenCaseStudy(cs);
+    if (cs && embedded) setOpenCaseStudy(cs);
 
     // Only paid (API) replies count toward the daily limit — unless the dev
     // preview toggle is on, which also counts free local replies.
@@ -886,6 +891,10 @@ export function BoxAI({
     setStreamingText("");
     setVisibleSteps([]);
     setSending(false);
+
+    // Home page: route to the case study's own page (with the conversation) once
+    // the reply is saved, so it opens as the proper floating split there.
+    if (cs && !embedded) router.push(`${cs.href}?box=${convoId}`);
   };
 
   const goHome = () => {
@@ -911,12 +920,19 @@ export function BoxAI({
         (convo ? caseStudyForConversation(convo) : null) ??
         convo?.messages.map((m) => findCaseStudy(m.text)).find(Boolean) ??
         null;
+      // On the home page, a case-study conversation opens on the study's own page
+      // (proper floating split via ContentWorkspace) rather than in-place inside
+      // the landing card. Embedded (already on a study page) opens in-place.
+      if (cs && !embedded) {
+        router.push(`${cs.href}?box=${id}`);
+        return;
+      }
       // If panel is already showing, skip the enter animation on the new study.
       skipCaseStudyAnim.current = openCaseStudy !== null;
       setOpenCaseStudy(cs);
       if (cs) setContextStudy(cs);
     },
-    [conversations, openCaseStudy]
+    [conversations, openCaseStudy, embedded, router]
   );
 
   // When arrived at via the sidebar (/who?c=<id>), open that conversation once
@@ -1358,6 +1374,7 @@ export function BoxAI({
   return (
     <ResizablePanelGroup
       orientation="horizontal"
+      data-box-split=""
       className="gap-2 bg-background"
       style={{ overflow: "visible" }}
     >

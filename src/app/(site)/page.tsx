@@ -289,7 +289,10 @@ function LandingInner() {
       {/* Everything lives inside ONE content card (same chrome as every other
           page's ContentCard), inset by the SidebarInset margin. The Box AI and the
           splash overlay are both contained within it — the splash no longer
-          covers the full viewport / nav bar, it sits in the card. */}
+          covers the full viewport / nav bar, it sits in the card.
+          Opening a case study NAVIGATES to its own page (box-ai routes non-
+          embedded case-study opens to <study>?box=<id>), so the split never
+          renders here — this stays a simple single card. */}
       <div className="relative h-full overflow-hidden sm:bg-sidebar sm:shadow-lg sm:ring-1 sm:ring-border-divider">
       {/* Live Box AI — in normal flow, same layout as /who. Fades in as the
           splash scrubs away; interactive only once fully revealed. */}

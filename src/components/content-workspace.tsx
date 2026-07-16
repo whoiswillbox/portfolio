@@ -220,12 +220,13 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
         )}
       </div>
 
-      {/* Drag handle */}
+      {/* Drag handle — matches the in-place box-ai split's grip (h-6 w-1 rounded
+          bg-border) so both split code paths read identically. */}
       <div
-        className="group flex cursor-col-resize items-center justify-center"
+        className="group flex cursor-col-resize items-center justify-center bg-background"
         onMouseDown={onHandleMouseDown}
       >
-        <div className="h-12 w-1 rounded-full bg-sidebar-border transition-colors group-hover:bg-muted-foreground/40" />
+        <div className="h-6 w-1 shrink-0 rounded-lg bg-border transition-colors group-hover:bg-muted-foreground/40" />
       </div>
 
       {/* Content column */}
