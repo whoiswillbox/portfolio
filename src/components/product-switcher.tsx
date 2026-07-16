@@ -1,20 +1,11 @@
 "use client"
 
-import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { CubeIcon, SwatchIcon } from "@heroicons/react/24/outline"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/cardboard/select"
+import { NavBarNavItem } from "@/components/cardboard/nav-bar"
 
 type Product = {
   id: "box" | "cardboard"
   name: string
-  tagline: string
-  icon: typeof CubeIcon
   /** Landing route entered when the product is selected. */
   href: string
   /** Pathname prefix that marks this product as active. */
@@ -25,16 +16,12 @@ const products: Product[] = [
   {
     id: "box",
     name: "Box",
-    tagline: "Portfolio",
-    icon: CubeIcon,
     href: "/?box-home=1",
     match: (p) => !p.startsWith("/cardboard"),
   },
   {
     id: "cardboard",
     name: "Cardboard",
-    tagline: "Design System",
-    icon: SwatchIcon,
     href: "/cardboard/foundations",
     match: (p) => p.startsWith("/cardboard"),
   },
@@ -42,53 +29,29 @@ const products: Product[] = [
 
 export function ProductSwitcher({ demo = false }: { demo?: boolean } = {}) {
   const pathname = usePathname()
-  const routeActive = products.find((p) => p.match(pathname)) ?? products[0]
-  // In `demo` mode (docs) the switch is display-only: selection updates the
-  // shown value locally but never navigates, so it can't route out of the demo.
-  const [demoId, setDemoId] = useState(routeActive.id)
-  const active = demo ? (products.find((p) => p.id === demoId) ?? products[0]) : routeActive
+  const active = products.find((p) => p.match(pathname)) ?? products[0]
+
+  // The switcher is now a disclosure nav item (same push-down panel behavior as
+  // Experience, etc.) rather than a Select dropdown. Clicking the trigger opens
+  // the full-width panel with the products; picking the other one navigates.
+  // In `demo` mode (docs) there's no NavBarMenuProvider, so render an inert
+  // trigger-shaped label instead.
+  if (demo) {
+    return (
+      <span className="inline-flex items-center rounded-md px-2.5 py-1.5 text-body-sm text-tertiary">
+        {active.name}
+      </span>
+    )
+  }
+
+  // Only show the OTHER product(s) — no point listing the one you're already in.
+  const items = products
+    .filter((p) => p.id !== active.id)
+    .map((p) => ({ label: p.name, href: p.href }))
 
   return (
-    <Select
-      value={active.id}
-      onValueChange={(id) => {
-        const next = products.find((p) => p.id === id)
-        if (!next || next.id === active.id) return
-        if (demo) { setDemoId(next.id); return }
-        // Cross-product switch (Box ↔ Cardboard) swaps the whole app shell. A
-        // client-side router.push from the Box home was getting reverted (the
-        // landing/Box-AI effects re-assert "/"), so navigate with a full load —
-        // deliberate + rare, and bulletproof against client-side interference.
-        window.location.assign(next.href)
-      }}
-    >
-      {/* Styled to match the disclosure nav items (Experience, etc.): body-xs,
-          tertiary→secondary, foreground when open; no chevron. The trailing
-          chevron the SelectTrigger renders is hidden via the last-child rule. */}
-      <SelectTrigger
-        size="sm"
-        variant="ghost"
-        aria-label="Switch product"
-        className="gap-1 rounded-md px-2.5 py-1.5 text-body-sm text-tertiary hover:text-secondary data-[state=open]:text-foreground [&>svg:last-child]:hidden"
-      >
-        <span>{active.name}</span>
-      </SelectTrigger>
-      <SelectContent className="w-56">
-        {products.map((product) => {
-          const Icon = product.icon
-          return (
-            <SelectItem key={product.id} value={product.id} className="py-2 pl-2">
-              <span className="flex size-7 items-center justify-center rounded-md bg-surface-secondary text-foreground">
-                <Icon className="size-4" />
-              </span>
-              <span className="flex flex-col leading-none">
-                <span className="text-body-sm font-medium">{product.name}</span>
-                <span className="text-body-xs text-tertiary">{product.tagline}</span>
-              </span>
-            </SelectItem>
-          )
-        })}
-      </SelectContent>
-    </Select>
+    <NavBarNavItem disclosure menuKey="product-switcher" items={items}>
+      {active.name}
+    </NavBarNavItem>
   )
 }

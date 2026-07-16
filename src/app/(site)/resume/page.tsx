@@ -69,24 +69,19 @@ const SKILLS = [
       "Persona Mapping",
       "Information Architecture",
       "Interaction Design",
-      "Wireframing",
-      "Responsive Design",
-      "Prototyping",
+      "AI Prototyping",
       "Design Systems",
-      "Design Operations",
+      "DesignOps",
+      "Accessibility (WCAG)",
     ],
   },
   {
-    category: "Handoff",
-    items: ["Data Labeling", "Tokenization", "Naming Conventions", "Walkthroughs", "Changelogs", "Annotations", "Q&A"],
-  },
-  {
     category: "Stack",
-    items: ["Figma", "Figjam", "Webflow", "Framer", "Lucid Chart", "VS Code", "Storybook", "YouTrack"],
+    items: ["Figma", "Claude Code", "Azure DevOps", "GitHub", "Storybook", "Jira", "Confluence", "Fullstory"],
   },
   {
     category: "Other",
-    items: ["Agile Methodologies", "Component Libraries"],
+    items: ["Agile Ceremonies", "Agentic Workflows"],
   },
 ];
 
@@ -115,7 +110,7 @@ export default function Resume() {
               {EXPERIENCE.map((job) => (
                 <div key={`${job.company}-${job.role}`} className="flex flex-col gap-2">
                   <div>
-                    <p className="text-body-md font-semibold">
+                    <p className="text-h6">
                       <span>{job.company}</span>
                       <span className="font-normal text-muted-foreground">, {job.role}</span>
                     </p>
@@ -139,7 +134,7 @@ export default function Resume() {
               <h2 className="text-h3 tracking-tight">Education</h2>
               {EDUCATION.map((e) => (
                 <div key={e.institution} className="flex flex-col gap-0.5">
-                  <p className="text-body-md font-semibold">{e.institution}</p>
+                  <p className="text-h6">{e.institution}</p>
                   <p className="font-mono text-body-xs text-muted-foreground">
                     {e.period} | {e.location}
                   </p>
@@ -155,7 +150,7 @@ export default function Resume() {
               <h2 className="text-h3 tracking-tight">Certifications</h2>
               {CERTIFICATIONS.map((c) => (
                 <div key={c.institution} className="flex flex-col gap-0.5">
-                  <p className="text-body-md font-semibold">{c.institution}</p>
+                  <p className="text-h6">{c.institution}</p>
                   <p className="font-mono text-body-xs text-muted-foreground">
                     {c.period} | {c.location}
                   </p>
