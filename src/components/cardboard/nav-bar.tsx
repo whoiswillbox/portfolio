@@ -19,13 +19,12 @@ import { Badge } from "@/components/cardboard/badge"
    Desktop-only in the app shell (hidden under sm; the mobile nav takes over).
 
    NavBar is a layout shell only — it takes free children, it does NOT own the
-   switcher. The product switcher is a real Select (ProductSwitcher), dropped in
-   as a child, because it has genuine listbox semantics: a selected value, a
-   checkmark, a listbox popup. Deliberately NOT folded into NavBarNavItem as a
-   "disclosure" prop (a nav item is a Link that navigates; conflating the two
-   would overload one component with two ARIA roles) and NOT exposed as a fixed
-   `switcher` slot (would bake "has a switcher" into every bar). Keep it
-   compositional. */
+   switcher. The product switcher (ProductSwitcher) is dropped in as a child and
+   is itself a disclosure NavBarNavItem: clicking the current product name opens
+   the full-width panel with the product(s) you can switch to — same push-down
+   behavior as the other disclosure items, so the switch reads as part of the
+   same nav language. It is NOT exposed as a fixed `switcher` slot (that would
+   bake "has a switcher" into every bar). Keep it compositional. */
 
 /* ── Disclosure menu coordination ──────────────────────────────────────────
    A disclosure nav item no longer opens its own popover. Instead it toggles a

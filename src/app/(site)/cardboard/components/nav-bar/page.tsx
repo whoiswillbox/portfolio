@@ -34,8 +34,9 @@ import {
 // Renders the REAL NavBar component (framed for the docs) so the preview is
 // truthful. `logo` toggles the logo slot; children are extra trailing content.
 // The product switcher is the REAL <ProductSwitcher /> — the same component the
-// app shell mounts — so the demo can't drift from production (icons + taglines,
-// active state, behavior all come from the real thing).
+// app shell mounts — so the demo can't drift from production (disclosure
+// behavior, active state all come from the real thing). In `demo` mode it
+// renders an inert trigger-shaped label (no NavBarMenuProvider navigation).
 function NavBar({
   children,
   logo = true,
@@ -131,7 +132,7 @@ export default function NavBarDocs() {
               parts={[
                 { n: 1, part: "Bar — the fixed strip; sits above the SidebarProvider so the provider's row layout / height is unchanged.", tokens: "NavBar · h-14 · border-b border-divider" },
                 { n: 2, part: "Logo — the product mark; links home.", tokens: "NavBarLogo · size-6" },
-                { n: 3, part: "Product switcher — the ProductSwitcher (a ghost Select); each item shows an icon + name + tagline.", tokens: "ProductSwitcher · SelectTrigger variant=ghost" },
+                { n: 3, part: "Product switcher — the ProductSwitcher, a disclosure nav item: clicking the current product name opens the full-width panel with the product(s) you can switch to.", tokens: "ProductSwitcher · NavBarNavItem[disclosure]" },
                 { n: 4, part: "Nav items — optional top-level links, right-aligned; the current one is active.", tokens: "NavBarNav · NavBarNavItem[active]" },
               ]}
             >
@@ -246,8 +247,9 @@ function AppNavBar() {
         <BoxLogo className="size-6" />
       </NavBarLogo>
 
-      {/* Product switcher — the ghost-variant Select, with icon + tagline
-          per product. Self-contained (reads the route for the active one). */}
+      {/* Product switcher — a disclosure nav item; opening it reveals the
+          product(s) to switch to. Self-contained (reads the route for the
+          active one). */}
       <ProductSwitcher />
 
       {/* Optional top-level nav items (right-aligned) */}
@@ -311,7 +313,7 @@ function AppNavBar() {
               ]}
             />
             <Slots
-              intro="The Nav Bar is a layout shell — compose its parts as children. It owns no fixed switcher; drop in a ProductSwitcher (a Select) as a child."
+              intro="The Nav Bar is a layout shell — compose its parts as children. It owns no fixed switcher; drop in a ProductSwitcher (a disclosure nav item) as a child."
               slots={[
                 {
                   name: "NavBarLogo",
@@ -322,7 +324,7 @@ function AppNavBar() {
                   name: "ProductSwitcher",
                   type: "ReactNode",
                   optional: true,
-                  desc: "The product switcher — a ghost-variant Select with an icon, name, and tagline per product. Any inline control can go here; it's just a child, not a fixed slot.",
+                  desc: "The product switcher — a disclosure nav item showing the current product name; opening it reveals the product(s) you can switch to in the full-width panel. Any inline control can go here; it's just a child, not a fixed slot.",
                 },
                 {
                   name: "NavBarNav",
