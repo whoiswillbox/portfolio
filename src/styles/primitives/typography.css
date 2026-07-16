@@ -8,10 +8,9 @@
      (see src/app/fonts.ts); the --font-geist and --font-eb-garamond vars come
      from next/font/google. Fallbacks keep text rendering if a face fails. */
   --font-family-sans: var(--font-sohne, var(--font-geist-sans));
-  /* "mono" role now points at Signifier serif (Geist Mono removed) — used for
-     token names, code labels, and metadata chrome. Note: Signifier is
-     proportional, not monospaced, so tabular alignment no longer applies. */
-  --font-family-mono: var(--font-signifier, var(--font-eb-garamond));
+  /* "mono" role — Roboto Mono (next/font/google), used for token names, code
+     labels, and metadata chrome. A true monospace, so tabular alignment holds. */
+  --font-family-mono: var(--font-roboto-mono, ui-monospace, monospace);
 
   /* Serif reading voice (body + eyebrow) — Signifier. */
   --font-family-serif: var(--font-signifier, var(--font-eb-garamond));
