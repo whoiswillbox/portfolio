@@ -96,14 +96,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   // Measure the outer container height and set it explicitly on the column
   // so BoxAI's h-full resolves to a real pixel value, not scroll height.
 
-  {/* Desktop sidebar-expand trigger — only on Cardboard, which still has a left
-      sidebar. Box uses the top nav (no sidebar), so this trigger is vestigial
-      there and would collide with the corner cube launcher. */}
-  const expandTrigger = pathname.startsWith("/cardboard") && !open && showTrigger && (
-    <div className="absolute left-3 top-3 z-30 max-sm:hidden">
-      <SidebarTrigger />
-    </div>
-  );
 
   const controls = enabled && (
     <div className="contents">
@@ -258,7 +250,6 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             {boxAI}
           </div>
         )}
-        {expandTrigger}
         {controls}
         <div className="h-full min-h-0">
           {children}

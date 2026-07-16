@@ -13,38 +13,23 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarTrigger,
 } from "@/components/ui/sidebar"
-
-const foundations = [
-  { title: "Overview", slug: "" },
-  { title: "Colors", slug: "colors" },
-  { title: "Typography", slug: "typography" },
-  { title: "Spacing", slug: "spacing" },
-  { title: "Radius", slug: "radius" },
-  { title: "Elevation", slug: "elevation" },
-  { title: "Iconography", slug: "iconography" },
-]
-
-// A flat, alphabetical component list. A leaf is a single doc page ([Title,
-// slug]); a group is a collapsible parent whose `children` are related variants
-// (e.g. Button → Button, Button Group, Toggle…). Sorted by top-level title.
-type Status = "stable" | "beta" | "experimental" | "deprecated"
-type Leaf = { title: string; slug: string; status?: Status }
-type Group = { title: string; children: Leaf[] }
-type Entry = Leaf | Group
-
-const isGroup = (e: Entry): e is Group => "children" in e
-
-const leaf = (title: string, slug: string, status?: Status): Leaf => ({ title, slug, status })
+import {
+  cardboardSection,
+  isGroup,
+  foundations,
+  components,
+  utilities,
+  FOUNDATIONS_BASE,
+  COMPONENTS_BASE,
+  type Status,
+} from "@/lib/cardboard-nav"
 
 // A small maturity dot shown after a nav item's title. Tone matches the doc
 // page's StatusBadge (success = stable, caution = beta/experimental, etc.).
@@ -64,222 +49,158 @@ function StatusDot({ status }: { status: Status }) {
   )
 }
 
-const components: Entry[] = [
-  leaf("Accordion", "accordion"),
-  leaf("Alert", "alert"),
-  leaf("Badge", "badge"),
-  leaf("Breadcrumb", "breadcrumb"),
-  leaf("Button", "button"),
-  {
-    title: "Card",
-    children: [
-      leaf("Card", "card"),
-      leaf("Contact Card", "contact-card"),
-      leaf("Content Card", "content-card"),
-    ],
-  },
-  {
-    title: "Dialog",
-    children: [
-      leaf("Dialog", "dialog"),
-      leaf("Alert Dialog", "alert-dialog"),
-      leaf("Drawer", "drawer"),
-      leaf("Sheet", "sheet"),
-    ],
-  },
-  leaf("Empty", "empty"),
-  leaf("Field", "field"),
-  leaf("Image Lightbox", "image-lightbox"),
-  {
-    title: "Input",
-    children: [
-      leaf("Input", "input"),
-      leaf("Input Group", "input-group"),
-      leaf("Input OTP", "input-otp"),
-    ],
-  },
-  leaf("Item", "item"),
-  {
-    title: "Menu",
-    children: [
-      leaf("Command", "command"),
-      leaf("Context Menu", "context-menu"),
-      leaf("Dropdown Menu", "dropdown-menu"),
-      leaf("Menubar", "menubar"),
-      leaf("Navigation Menu", "navigation-menu"),
-    ],
-  },
-  leaf("Nav Bar", "nav-bar", "stable"),
-  leaf("Popover", "popover"),
-  leaf("Progress", "progress"),
-  leaf("Resizable", "resizable"),
-  leaf("Segmented Control", "segmented-control", "stable"),
-  {
-    title: "Select",
-    children: [
-      leaf("Select", "select", "stable"),
-      leaf("Combobox", "combobox"),
-    ],
-  },
-  leaf("Separator", "separator"),
-  leaf("Sidebar", "sidebar"),
-  leaf("Skeleton", "skeleton"),
-  leaf("Switch", "switch"),
-  leaf("Table", "table"),
-  leaf("Tabs", "tabs"),
-  leaf("Textarea", "textarea"),
-  leaf("Tooltip", "tooltip"),
-].sort((a, b) => a.title.localeCompare(b.title))
-
-// Utilities — helpers, wrappers, and assets that aren't interactive UI
-// components (render wrappers, brand marks, doc tooling, glyph primitives).
-const utilities: Leaf[] = [
-  leaf("Copy Token", "copy-token"),
-  leaf("Kbd", "kbd"),
-  leaf("Logo", "logo"),
-  leaf("Mobile Only", "mobile-only"),
-].sort((a, b) => a.title.localeCompare(b.title))
-
 export function CardboardSidebar() {
   const pathname = usePathname()
-  const base = "/cardboard/components"
-  const hrefFor = (slug: string) => `${base}/${slug}`
+  // The top-nav picks the section; the sidebar shows ONLY that section's items,
+  // mirroring the Box product (nav item → filtered navigation). One label group
+  // is rendered at a time.
+  const section = cardboardSection(pathname)
+  const hrefFor = (slug: string) => `${COMPONENTS_BASE}/${slug}`
+
+  // Open/collapse is CONTROLLED by the route via the shell's SidebarProvider
+  // (collapsed on the landing, expanded in a section) — see app-shell. The
+  // sidebar-gap transitions its width, so the content card (flex-1 beside it)
+  // slides over smoothly. Driving it from the pathname on both server + client
+  // avoids the hydration mismatch a post-hydration setOpen() effect caused.
 
   return (
     <Sidebar
       variant="floating"
-      className="max-sm:hidden !p-0 sm:!inset-y-auto sm:!top-14 sm:!bottom-0 sm:!h-auto [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-inner]]:!rounded-none [&_[data-slot=sidebar-inner]]:border-r [&_[data-slot=sidebar-inner]]:border-border-divider [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal"
+      // The sidebar is floating (out of the flex flow), so the disclosure panel
+      // can't push it like it does in-flow content. Offset its top by the panel's
+      // published height (--navpanel-h) so it slides BELOW the expanded panel
+      // when the product switcher (or any disclosure) is open, instead of being
+      // overlapped. Matches the panel's easing. NOTE: top must be an !important
+      // utility, not inline style — the sidebar-container's base `inset-y-0` and
+      // this component's `!bottom-0` are !important classes that would otherwise
+      // beat an inline `top`, leaving top:auto (sidebar anchored to the bottom).
+      className="max-sm:hidden !p-0 sm:!top-[calc(3.5rem+var(--navpanel-h,0px))] sm:!bottom-0 sm:!h-auto sm:transition-[top,left,right,width] sm:duration-300 sm:ease-[cubic-bezier(0.32,0.72,0,1)] [&_[data-slot=sidebar-inner]]:!bg-transparent [&_[data-slot=sidebar-inner]]:!shadow-none [&_[data-slot=sidebar-inner]]:!ring-0 [&_[data-slot=sidebar-inner]]:!rounded-none [&_[data-slot=sidebar-menu-button]_span]:font-sans [&_[data-slot=sidebar-menu-button]_span]:normal-case [&_[data-slot=sidebar-menu-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-sub-button]_span]:font-sans [&_[data-slot=sidebar-menu-sub-button]_span]:normal-case [&_[data-slot=sidebar-menu-sub-button]_span]:tracking-normal [&_[data-slot=sidebar-menu-button]]:transition-colors [&_[data-slot=sidebar-menu-sub-button]]:transition-colors [&_[data-slot=sidebar-menu-button]]:!bg-transparent [&_[data-slot=sidebar-menu-sub-button]]:!bg-transparent [&_[data-slot=sidebar-menu-button]]:!font-normal [&_[data-slot=sidebar-menu-sub-button]]:!font-normal [&_[data-slot=sidebar-menu-button]]:!text-quaternary [&_[data-slot=sidebar-menu-sub-button]]:!text-quaternary [&_[data-slot=sidebar-menu-button]:hover]:!text-secondary [&_[data-slot=sidebar-menu-sub-button]:hover]:!text-secondary [&_[data-slot=sidebar-menu-button][data-active=true]]:!text-foreground [&_[data-slot=sidebar-menu-sub-button][data-active=true]]:!text-foreground"
     >
-      <SidebarHeader>
-        <div className="flex items-center justify-end">
-          <SidebarTrigger className="max-sm:hidden" />
-        </div>
-      </SidebarHeader>
       <SidebarContent>
-        {/* FOUNDATIONS — eyebrow group header, items listed directly. */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono tracking-wide">
-            Foundations
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {foundations.map((f) => {
-                const href = f.slug
-                  ? `/cardboard/foundations/${f.slug}`
-                  : "/cardboard/foundations"
-                return (
-                  <SidebarMenuItem key={href}>
-                    <SidebarMenuButton asChild isActive={pathname === href}>
-                      <Link href={href}>
-                        <span>{f.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* COMPONENTS — eyebrow group header; flat A–Z list, some collapsible. */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono tracking-wide">
-            Components
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {/* Gallery overview link */}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === base}>
-                  <Link href={base}>
-                    <span>Overview</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              {components.map((entry) => {
-                if (!isGroup(entry)) {
-                  const href = hrefFor(entry.slug)
+        {/* FOUNDATIONS */}
+        {section === "foundations" && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {foundations.map((f) => {
+                  const href = f.slug
+                    ? `${FOUNDATIONS_BASE}/${f.slug}`
+                    : FOUNDATIONS_BASE
                   return (
-                    <SidebarMenuItem key={entry.slug}>
+                    <SidebarMenuItem key={href}>
                       <SidebarMenuButton asChild isActive={pathname === href}>
                         <Link href={href}>
-                          <span>{entry.title}</span>
-                          {entry.status && <StatusDot status={entry.status} />}
+                          <span>{f.title}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )
-                }
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
-                const groupActive = entry.children.some(
-                  (c) => pathname === hrefFor(c.slug)
-                )
-                return (
-                  <Collapsible
-                    key={entry.title}
-                    asChild
-                    defaultOpen={groupActive}
-                    className="group/comp"
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={entry.title}>
-                          <span>{entry.title}</span>
-                          <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/comp:rotate-90" />
+        {/* COMPONENTS — flat A–Z list, some collapsible. */}
+        {section === "components" && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {/* Gallery overview link */}
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === COMPONENTS_BASE}>
+                    <Link href={COMPONENTS_BASE}>
+                      <span>Overview</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+
+                {components.map((entry) => {
+                  if (!isGroup(entry)) {
+                    const href = hrefFor(entry.slug)
+                    return (
+                      <SidebarMenuItem key={entry.slug}>
+                        <SidebarMenuButton asChild isActive={pathname === href}>
+                          <Link href={href}>
+                            <span>{entry.title}</span>
+                            {entry.status && <StatusDot status={entry.status} />}
+                          </Link>
                         </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {entry.children.map((c) => {
-                            const href = hrefFor(c.slug)
-                            return (
-                              <SidebarMenuSubItem key={c.slug}>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  isActive={pathname === href}
-                                >
-                                  <Link href={href}>
-                                    <span>{c.title}</span>
-                                    {c.status && <StatusDot status={c.status} />}
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            )
-                          })}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                      </SidebarMenuItem>
+                    )
+                  }
+
+                  const groupActive = entry.children.some(
+                    (c) => pathname === hrefFor(c.slug)
+                  )
+                  return (
+                    <Collapsible
+                      key={entry.title}
+                      asChild
+                      defaultOpen={groupActive}
+                      className="group/comp"
+                    >
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton
+                            tooltip={entry.title}
+                            className="!bg-transparent !font-normal !text-quaternary hover:!text-secondary data-[state=open]:!text-secondary"
+                          >
+                            <span>{entry.title}</span>
+                            <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/comp:rotate-90" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {entry.children.map((c) => {
+                              const href = hrefFor(c.slug)
+                              return (
+                                <SidebarMenuSubItem key={c.slug}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={pathname === href}
+                                  >
+                                    <Link href={href}>
+                                      <span>{c.title}</span>
+                                      {c.status && <StatusDot status={c.status} />}
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              )
+                            })}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* UTILITIES — helpers / wrappers / assets, flat A–Z list. */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono tracking-wide">
-            Utilities
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {utilities.map((u) => {
-                const href = hrefFor(u.slug)
-                return (
-                  <SidebarMenuItem key={u.slug}>
-                    <SidebarMenuButton asChild isActive={pathname === href}>
-                      <Link href={href}>
-                        <span>{u.title}</span>
-                        {u.status && <StatusDot status={u.status} />}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {section === "utilities" && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {utilities.map((u) => {
+                  const href = hrefFor(u.slug)
+                  return (
+                    <SidebarMenuItem key={u.slug}>
+                      <SidebarMenuButton asChild isActive={pathname === href}>
+                        <Link href={href}>
+                          <span>{u.title}</span>
+                          {u.status && <StatusDot status={u.status} />}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   )
