@@ -9,75 +9,57 @@
    don't carry those well). */
 
 import * as React from "react"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { NavBarNav, NavBarNavItem } from "@/components/cardboard/nav-bar"
 import {
   loadConversations,
   subscribeConversations,
   type Conversation,
 } from "@/lib/chat/store"
-import { caseStudyForConversation } from "@/lib/case-studies"
 
 export function BoxNavItems() {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`)
 
-  // Box AI conversations, kept in sync with the chat (same localStorage store
-  // the old sidebar read). Surfaced here as a top-nav disclosure since the
-  // sidebar that used to hold them is gone.
+  // Box AI conversations, kept in sync with the chat (same localStorage store).
+  // The Conversations nav item is a plain link to /conversations, shown only
+  // when at least one conversation exists.
   const [conversations, setConversations] = React.useState<Conversation[]>([])
   React.useEffect(() => {
     const sync = () => setConversations(loadConversations())
     sync()
     return subscribeConversations(sync)
   }, [])
-
-  // Where a conversation reopens: a case-study chat reopens on its project page
-  // with Box AI toggled on; everything else reopens on the home Box AI ("/?c=").
-  const boxParam = searchParams.get("box")
-  const convoParam = searchParams.get("c")
-  const conversationItems = conversations.slice(0, 5).map((c) => {
-    const study = caseStudyForConversation(c)
-    const href = study ? `${study.href}?box=${c.id}` : `/?c=${c.id}`
-    const active = study
-      ? pathname === study.href && boxParam === c.id
-      : pathname === "/" && convoParam === c.id
-    return { label: c.title, href, active }
-  })
-  // Only claim the "Conversations" section on the conversations surfaces
-  // themselves — the /conversations page or the home Box AI viewing a
-  // conversation (/?c=). A case-study conversation lives ON its project page,
-  // which belongs to Experience, so it must NOT also light up Conversations
-  // (that page would then activate two nav items at once).
-  const conversationsActive =
-    pathname === "/conversations" || (pathname === "/" && !!convoParam)
+  const hasConversations = conversations.length > 0
 
   const withActive = <T extends { href: string }>(items: T[]) =>
     items.map((i) => ({ ...i, active: isActive(i.href) }))
 
-  // Experience, grouped into categories for the disclosure panel (the nesting
-  // that was flat in the old dropdown): BARBRI · Technergetics · More.
+  // Experience, grouped into tabs for the disclosure panel:
+  // BARBRI · Technergetics · School · More.
   const barbri = [
-    { label: "BARBRI", href: "/projects/next-gen-bar", badge: { label: "PACKAGING", variant: "warning" as const } },
+    { label: "Next Gen", href: "/projects/next-gen-bar" },
+    { label: "SQE2", href: "/projects/sqe2" },
+    { label: "Powerscore", href: "/projects/powerscore-ai-tutor" },
+    { label: "OneUX", href: "/projects/onebarbri" },
   ]
   const technergetics = [
     { label: "Jetdash", href: "/technergetics/jetdash" },
     { label: "Upgrade", href: "/technergetics/upgrade" },
     { label: "Reusable Table", href: "/technergetics/reusable-table" },
     { label: "Design Standards", href: "/technergetics/design-standards" },
-    { label: "Lightcert", href: "/technergetics/lightcert" },
   ]
-  const experienceMore = [{ label: "Resume", href: "/resume" }]
+  const lightcert = [{ label: "Lightcert", href: "/technergetics/lightcert" }]
+  const school = [{ label: "SwipeRight.ai", href: "/school/swiperight-ai" }]
   const experienceGroups = [
     { label: "BARBRI", items: withActive(barbri) },
     { label: "Technergetics", items: withActive(technergetics) },
-    { label: "More", items: withActive(experienceMore) },
+    { label: "Internship", items: withActive(lightcert) },
+    { label: "School", items: withActive(school) },
   ]
-  const experienceActive = [...barbri, ...technergetics, ...experienceMore].some((i) => isActive(i.href))
+  const experienceActive = [...barbri, ...technergetics, ...lightcert, ...school].some((i) => isActive(i.href))
 
-  const school = [{ label: "SwipeRight.ai", href: "/school/swiperight-ai" }]
   const extras = [
     { label: "Surfing", href: "/extracurriculars/surfing" },
     { label: "Gaming", href: "/extracurriculars/gaming" },
@@ -92,22 +74,14 @@ export function BoxNavItems() {
       <NavBarNavItem disclosure menuKey="experience" active={experienceActive} items={experienceGroups}>
         Experience
       </NavBarNavItem>
-      <NavBarNavItem disclosure menuKey="school" active={groupActive(school)} items={withActive(school)}>
-        School
-      </NavBarNavItem>
       <NavBarNavItem disclosure menuKey="extras" active={groupActive(extras)} items={withActive(extras)}>
         Extracurriculars
       </NavBarNavItem>
-      {conversationItems.length > 0 && (
-        <NavBarNavItem
-          disclosure
-          menuKey="conversations"
-          active={conversationsActive}
-          items={[
-            { label: "Recent", items: conversationItems },
-            { items: [{ label: "View all →", href: "/conversations", active: pathname === "/conversations" }] },
-          ]}
-        >
+      <NavBarNavItem href="/resume" active={isActive("/resume")}>
+        Resume
+      </NavBarNavItem>
+      {hasConversations && (
+        <NavBarNavItem href="/conversations" active={pathname === "/conversations"}>
           Conversations
         </NavBarNavItem>
       )}

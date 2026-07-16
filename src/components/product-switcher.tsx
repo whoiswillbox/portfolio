@@ -62,8 +62,15 @@ export function ProductSwitcher({ demo = false }: { demo?: boolean } = {}) {
         window.location.assign(next.href)
       }}
     >
-      <SelectTrigger size="sm" variant="ghost" aria-label="Switch product">
-        {/* Just the product name + chevron — the pure ghost variant. */}
+      {/* Styled to match the disclosure nav items (Experience, etc.): body-xs,
+          tertiary→secondary, foreground when open; no chevron. The trailing
+          chevron the SelectTrigger renders is hidden via the last-child rule. */}
+      <SelectTrigger
+        size="sm"
+        variant="ghost"
+        aria-label="Switch product"
+        className="gap-1 rounded-md px-2.5 py-1.5 text-body-sm text-tertiary hover:text-secondary data-[state=open]:text-foreground [&>svg:last-child]:hidden"
+      >
         <span>{active.name}</span>
       </SelectTrigger>
       <SelectContent className="w-56">

@@ -2,18 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   XMarkIcon,
   MagnifyingGlassIcon,
   PlusIcon,
   TrashIcon,
   CheckIcon,
-  ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
 import { ContentCard } from "@/components/content-card";
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import {
   Select,
   SelectTrigger,
@@ -52,9 +49,6 @@ function previewOf(c: Conversation): string {
 }
 
 export default function ConversationsPage() {
-  const router = useRouter();
-  const { state, isMobile } = useSidebar();
-  const showTrigger = state === "collapsed" || isMobile;
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [query, setQuery] = React.useState("");
   const [filter, setFilter] = React.useState<Filter>("all");
@@ -109,21 +103,6 @@ export default function ConversationsPage() {
 
   return (
     <ContentCard className="flex h-full flex-col">
-      {/* Top bar — sidebar trigger (when collapsed) + Back, top-left like the
-          chat and case-study pages. */}
-      <div className="flex items-center gap-1 p-2 max-sm:hidden">
-        {showTrigger && <SidebarTrigger />}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.back()}
-          className="font-mono text-body-xs uppercase tracking-wide text-muted-foreground"
-        >
-          <ArrowLeftIcon className="size-4" />
-          Back
-        </Button>
-      </div>
-
       <div className="min-h-0 flex-1 overflow-auto">
         <div className="mx-auto w-full max-w-4xl px-6 pb-10 pt-16 max-sm:[@media(display-mode:standalone)]:pt-24">
           <header className="flex items-start justify-between gap-4">

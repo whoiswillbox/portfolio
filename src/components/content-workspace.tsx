@@ -6,6 +6,7 @@ import { CubeIcon, XMarkIcon, ArrowLeftIcon } from "@heroicons/react/24/outline"
 import { BoxLogo } from "@/components/box-logo";
 import { BoxAI } from "@/components/box-ai";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { useNavBarMenuClose } from "@/components/cardboard/nav-bar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { findCaseStudyByPath } from "@/lib/case-studies";
 import { useBoxSeed } from "@/components/box-seed";
@@ -29,6 +30,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   ];
   const launcherEnabled = enabled && !pathname.startsWith("/admin") && (!inProgressPaths.includes(pathname) || !!boxParam);
   const { state, isMobile } = useSidebar();
+  const closeNavMenu = useNavBarMenuClose();
   const showTrigger = state === "collapsed" || isMobile;
   const dynamicSeed = useBoxSeed();
   const contextSeed = dynamicSeed ?? findCaseStudyByPath(pathname);
@@ -112,14 +114,14 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
             <TooltipTrigger asChild>
               <button
                 type="button"
-                onClick={() => { setRendered(true); setOpen(true); }}
+                onClick={() => { closeNavMenu(); setRendered(true); setOpen(true); }}
                 aria-label="Ask Box"
                 className="inline-flex size-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
               >
                 <BoxLogo className="size-6" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom">Ask Box</TooltipContent>
+            <TooltipContent side="right">Ask Box</TooltipContent>
           </Tooltip>
         )}
       </div>
