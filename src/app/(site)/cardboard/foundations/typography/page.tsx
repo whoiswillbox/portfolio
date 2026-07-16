@@ -80,7 +80,7 @@ const FONTS = [
   { token: "font-heading", name: "Söhne", role: "Headings (h1–h6) and UI.", cls: "font-heading" },
   { token: "font-sans", name: "Söhne", role: "UI and body copy.", cls: "font-sans" },
   { token: "font-serif", name: "Signifier", role: "Long-form reading body and eyebrows.", cls: "font-serif" },
-  { token: "font-mono", name: "Signifier", role: "Token names and metadata labels.", cls: "font-mono" },
+  { token: "font-mono", name: "Roboto Mono", role: "Token names and metadata labels.", cls: "font-mono" },
 ];
 
 // Only the weights we've licensed real cuts for: Söhne Buch (400) + Kräftig
@@ -99,7 +99,7 @@ const PRIM_FAMILIES = [
   { v: "--font-family-heading", value: "Söhne", feeds: "text-h*" },
   { v: "--font-family-sans", value: "Söhne", feeds: "text-body-*" },
   { v: "--font-family-serif", value: "Signifier", feeds: "font-serif" },
-  { v: "--font-family-mono", value: "Signifier", feeds: "font-mono" },
+  { v: "--font-family-mono", value: "Roboto Mono", feeds: "font-mono" },
 ];
 const PRIM_SIZES = [
   { v: "--font-size-7xl", value: "4.5rem", px: "72", feeds: "— (display-lg is fluid)" },

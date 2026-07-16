@@ -418,13 +418,13 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
       <div
         ref={contentRef}
         style={{ paddingLeft: padLeft || undefined }}
-        className="flex flex-col items-start gap-4 px-4 py-3"
+        className="flex flex-col items-start gap-4 px-4 py-3 [&>div]:max-w-full"
       >
         {/* Category tabs — clickable labels that swap the items shown below.
             A group with an `href` is a link-tab: it navigates directly instead
             of revealing items (e.g. a single-destination category like a CV). */}
         {asTabs && (
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1">
             {groups.map((group, gi) => {
               const tabClass = cn(
                 "rounded-md px-3 py-1 text-body-sm transition-colors",
