@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { CardboardSidebar } from "@/components/cardboard-sidebar"
 import { BoxNavItems } from "@/components/box-nav-items"
+import { CardboardNavItems } from "@/components/cardboard-nav-items"
 import { ProductSwitcher } from "@/components/product-switcher"
 import { BoxLogo } from "@/components/box-logo"
 import { ContentWorkspace } from "@/components/content-workspace"
@@ -22,6 +23,12 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const inCardboard = pathname.startsWith("/cardboard")
+  // Cardboard's sidebar is CONTROLLED by the route: collapsed on the Getting
+  // Started landing (/cardboard), expanded in a section. Deriving it from the
+  // pathname (identical on server + client) avoids the hydration mismatch a
+  // post-hydration setOpen() effect caused. Box is uncontrolled (no desktop
+  // sidebar), so it keeps defaultOpen.
+  const cardboardSidebarOpen = inCardboard && pathname !== "/cardboard"
   // One-page model: "/" hosts the live Box AI inside a content card with the
   // splash overlaying it (contained in the card, not full-viewport). The landing
   // page has NO nav bar — the card fills to the top (--topbar-h:0), and the nav
@@ -33,7 +40,7 @@ export function AppShell({
   // the landing splash and show Box AI directly (the logo must NOT re-show the
   // splash); "/" strips the marker after reading it.
   const home = inCardboard
-    ? { name: "Cardboard", href: "/cardboard/foundations" }
+    ? { name: "Cardboard", href: "/cardboard" }
     : { name: "Box", href: "/?box-home=1" }
 
   return (
@@ -64,7 +71,7 @@ export function AppShell({
           // On landing the nav fades in with the scrub; while it's still faded
           // out at the splash (root[data-splash]) it must be INERT so its menus
           // can't be opened before the nav is visible. Restored once revealed.
-          className={`max-sm:hidden ${inCardboard ? "" : "border-b-0"} ${isLanding ? "nav-splash-inert absolute inset-x-0 top-0 z-20" : ""}`}
+          className={`max-sm:hidden border-b-0 ${isLanding ? "nav-splash-inert absolute inset-x-0 top-0 z-20" : ""}`}
           style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
         >
           <NavBarLogo href={home.href} aria-label={home.name}>
@@ -75,7 +82,9 @@ export function AppShell({
               Cardboard keeps its own sidebar. Suspense: BoxNavItems reads
               useSearchParams (to mark the active conversation), which needs a
               boundary to avoid a static-render CSR bailout at build. */}
-          {!inCardboard && (
+          {inCardboard ? (
+            <CardboardNavItems />
+          ) : (
             <Suspense fallback={null}>
               <BoxNavItems />
             </Suspense>
@@ -92,10 +101,21 @@ export function AppShell({
 
           <SidebarProvider
             defaultOpen={false}
+            {...(inCardboard ? { open: cardboardSidebarOpen, onOpenChange: () => {} } : {})}
             className={`!min-h-0 flex-1 max-sm:bg-sidebar ${isLanding ? "z-10 bg-transparent" : "bg-background"}`}
+            // Cardboard uses a narrower sidebar than the base 16rem. Set on the
+            // provider (ancestor of both the in-flow gap and the fixed
+            // container) so both resize together and the content card slides
+            // over by exactly this width. Box has no desktop sidebar, so this is
+            // scoped to Cardboard.
+            style={inCardboard ? ({ "--sidebar-width": "13rem" } as React.CSSProperties) : undefined}
           >
             <Suspense fallback={null}>
               {inCardboard ? (
+                // Always mounted in Cardboard (even on the landing) so it can
+                // ANIMATE its width collapse↔expand — mounting/unmounting can't
+                // transition. It collapses to w-0 on the landing and expands
+                // when you enter a section, sliding the content card over.
                 <CardboardSidebar />
               ) : (
                 // The Box desktop sidebar is replaced by the top-nav (BoxNavItems
@@ -132,11 +152,21 @@ export function AppShell({
             </SidebarInset>
           </SidebarProvider>
 
-          {/* Box product footer — © year + Light/Dark toggle. Box only (not
-              Cardboard). Sits below the content card, aligned to its side
-              margins (px-5). On landing it fades in with the scroll into Box AI
-              (same --enter-progress signal as the nav). */}
-          {!inCardboard && <BoxFooter isLanding={isLanding} />}
+          {/* Footer — © year + Light/Dark toggle. Shown in both products. Sits
+              below the content card, aligned to its side margins (px-5). On the
+              Box landing it fades in with the scroll into Box AI (same
+              --enter-progress signal as the nav). In Cardboard it's inset from
+              the left by the sidebar's width so it aligns under the content card
+              (not under the floating sidebar); the inset collapses to 0 on the
+              Getting Started landing where the sidebar is collapsed. */}
+          <BoxFooter
+            isLanding={isLanding}
+            style={
+              inCardboard
+                ? { paddingLeft: cardboardSidebarOpen ? "var(--sidebar-width, 13rem)" : undefined }
+                : undefined
+            }
+          />
         </div>
       </NavBarMenuProvider>
     </div>

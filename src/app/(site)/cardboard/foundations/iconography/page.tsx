@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import {
-  ArrowLeftIcon,
   LightBulbIcon,
   MagnifyingGlassIcon,
   HomeIcon,
@@ -88,16 +86,8 @@ export default function Iconography() {
   }, [query, iconStyle]);
 
   return (
-    <ContentCard flush className="h-full overflow-auto">
+    <ContentCard className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-4xl px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
-        <Link
-          href="/cardboard/foundations"
-          className="mb-6 inline-flex items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground max-sm:hidden"
-        >
-          <ArrowLeftIcon className="size-4" />
-          Foundations
-        </Link>
-
         <div className="flex flex-col gap-3 mb-12">
           <h1 className="text-h1">Iconography</h1>
           <p className="text-body-lg text-muted-foreground">

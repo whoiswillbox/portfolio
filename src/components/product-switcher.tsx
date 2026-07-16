@@ -22,7 +22,7 @@ const products: Product[] = [
   {
     id: "cardboard",
     name: "Cardboard",
-    href: "/cardboard/foundations",
+    href: "/cardboard",
     match: (p) => p.startsWith("/cardboard"),
   },
 ]

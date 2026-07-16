@@ -392,6 +392,17 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
     return () => { ro.disconnect(); window.removeEventListener("resize", update) }
   }, [openKey, activeTab, shownItems.length])
 
+  // Publish the panel's current open height as --navpanel-h on the root so
+  // fixed/floating siblings that AREN'T in the flex flow (e.g. the Cardboard
+  // sidebar, pinned at top-14) can offset themselves to sit BELOW the expanded
+  // panel instead of being overlapped by it. In-flow content is pushed by the
+  // panel's own height and ignores this var.
+  React.useEffect(() => {
+    const root = document.documentElement
+    root.style.setProperty("--navpanel-h", `${open ? contentH : 0}px`)
+    return () => { root.style.setProperty("--navpanel-h", "0px") }
+  }, [open, contentH])
+
   return (
     <div
       ref={panelRef}

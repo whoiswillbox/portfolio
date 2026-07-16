@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ArrowLeftIcon,
   SunIcon,
   MoonIcon,
   CheckIcon,
@@ -45,20 +44,13 @@ export function ComponentPage({
 }) {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
-    <ContentCard flush className="h-full overflow-auto">
+    <ContentCard className="h-full overflow-auto">
       {/* Content is centered (flex-1 + max-w-3xl within a justify-center row);
           the ToC aside animates its own width/opacity, so as it collapses the
           centered content glides over smoothly with no snap. The aside carries
           its own left gap, which collapses with it. */}
       <div className="mx-auto flex w-full max-w-6xl justify-center px-6 pt-16 max-sm:pt-28 max-sm:[@media(display-mode:standalone)]:pt-36 pb-10">
         <div ref={contentRef} className="w-full min-w-0 flex-1 lg:max-w-3xl">
-          <Link
-            href="/cardboard/components"
-            className="mb-6 inline-flex items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground max-sm:hidden"
-          >
-            <ArrowLeftIcon className="size-4" />
-            Components
-          </Link>
           <div className="flex flex-col gap-3 mb-12">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-h1">{title}</h1>
