@@ -15,6 +15,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/cardboard
 import { Switch } from "@/components/cardboard/switch";
 import { Separator } from "@/components/cardboard/separator";
 import { Textarea } from "@/components/cardboard/textarea";
+import { ThinkingSteps } from "@/components/cardboard/thinking-steps";
+import { SparklesIcon } from "@heroicons/react/24/outline";
 import { Skeleton } from "@/components/cardboard/skeleton";
 import { Progress } from "@/components/cardboard/progress";
 import { Avatar, AvatarFallback } from "@/components/cardboard/avatar";
@@ -222,6 +224,20 @@ export const components: {
     href: "/cardboard/components/textarea",
     description: "Multi-line text fields.",
     preview: <Textarea placeholder="Write a note…" className="max-w-[13rem]" rows={3} />,
+  },
+  {
+    label: "Thinking Steps",
+    href: "/cardboard/components/thinking-steps",
+    description: "Sequential reasoning trace.",
+    preview: (
+      <ThinkingSteps
+        className="max-w-[15rem]"
+        steps={[
+          { label: "Searching…", icon: MagnifyingGlassIcon, status: "done" },
+          { label: "Drafting…", icon: SparklesIcon, status: "active" },
+        ]}
+      />
+    ),
   },
   {
     label: "Skeleton",

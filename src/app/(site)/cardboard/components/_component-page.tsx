@@ -3,8 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  SunIcon,
-  MoonIcon,
   CheckIcon,
   ClipboardIcon,
   CheckCircleIcon,
@@ -284,41 +282,21 @@ export function AudienceTabs({
   );
 }
 
-// The rendered preview surface with a per-card light/dark toggle (scoped `.dark`
-// class) so you can check the component in both themes without flipping the
-// whole site. Shared by Demo and Variants.
-// A subtle checkerboard (transparency grid) behind the preview so component
-// edges and any transparency read clearly. The tint is driven from the `dark`
-// state directly (not the `dark:` variant — our variant is `.dark *`, which
-// wouldn't match the element that carries .dark itself): faint black in light,
-// brighter white in dark, since 2% white is invisible on the dark surface.
-const checkerStyle = (dark: boolean): React.CSSProperties => {
-  const tint = dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
-  return {
-    backgroundImage: `conic-gradient(${tint} 25%, transparent 0 50%, ${tint} 0 75%, transparent 0)`,
-    backgroundSize: "20px 20px",
-  };
+// The rendered preview surface. Theme follows the page (flip it with the global
+// light/dark toggle in the footer). A subtle checkerboard (transparency grid)
+// behind the preview so component edges and any transparency read clearly.
+const checkerStyle: React.CSSProperties = {
+  backgroundImage:
+    "conic-gradient(var(--preview-checker) 25%, transparent 0 50%, var(--preview-checker) 0 75%, transparent 0)",
+  backgroundSize: "20px 20px",
 };
 
 function PreviewSurface({ children }: { children: React.ReactNode }) {
-  const [dark, setDark] = React.useState(false);
   return (
     <div
-      style={checkerStyle(dark)}
-      className={cn(
-        "relative flex min-h-64 flex-wrap items-center justify-center gap-3 border border-border bg-background p-6",
-        dark && "dark"
-      )}
+      style={checkerStyle}
+      className="relative flex min-h-64 flex-wrap items-center justify-center gap-3 border border-border bg-background p-6 [--preview-checker:rgba(0,0,0,0.03)] dark:[--preview-checker:rgba(255,255,255,0.05)]"
     >
-      <button
-        type="button"
-        onClick={() => setDark((d) => !d)}
-        aria-label={dark ? "Preview in light mode" : "Preview in dark mode"}
-        title={dark ? "Light" : "Dark"}
-        className="absolute right-3 top-3 z-10 flex size-7 items-center justify-center rounded-md text-tertiary transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
-      >
-        {dark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
-      </button>
       {children}
     </div>
   );
