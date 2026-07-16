@@ -52,13 +52,16 @@ export function BoxNavItems() {
   ]
   const lightcert = [{ label: "Lightcert", href: "/technergetics/lightcert" }]
   const school = [{ label: "SwipeRight.ai", href: "/school/swiperight-ai" }]
+  const cv = [{ label: "CV", href: "/resume" }]
   const experienceGroups = [
     { label: "BARBRI", items: withActive(barbri) },
     { label: "Technergetics", items: withActive(technergetics) },
     { label: "Internship", items: withActive(lightcert) },
     { label: "School", items: withActive(school) },
+    // CV is a link-tab — clicking it goes straight to /resume, no sub-items.
+    { label: "CV", href: "/resume", items: withActive(cv) },
   ]
-  const experienceActive = [...barbri, ...technergetics, ...lightcert, ...school].some((i) => isActive(i.href))
+  const experienceActive = [...barbri, ...technergetics, ...lightcert, ...school, ...cv].some((i) => isActive(i.href))
 
   const extras = [
     { label: "Surfing", href: "/extracurriculars/surfing" },
@@ -76,9 +79,6 @@ export function BoxNavItems() {
       </NavBarNavItem>
       <NavBarNavItem disclosure menuKey="extras" active={groupActive(extras)} items={withActive(extras)}>
         Extracurriculars
-      </NavBarNavItem>
-      <NavBarNavItem href="/resume" active={isActive("/resume")}>
-        Resume
       </NavBarNavItem>
       {hasConversations && (
         <NavBarNavItem href="/conversations" active={pathname === "/conversations"}>

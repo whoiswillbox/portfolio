@@ -1370,7 +1370,9 @@ export function BoxAI({
       >
         {chatCard}
       </ResizablePanel>
-      <ResizableHandle withHandle className="bg-transparent" />
+      {/* The handle blends into the page background so the gutter reads as empty
+          space between two floating panels — only the grip is visible. */}
+      <ResizableHandle withHandle className="!bg-background border-0" />
       <ResizablePanel
         defaultSize="60%"
         minSize="30%"

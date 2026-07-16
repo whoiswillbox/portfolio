@@ -291,17 +291,6 @@ function LandingInner() {
           splash overlay are both contained within it — the splash no longer
           covers the full viewport / nav bar, it sits in the card. */}
       <div className="relative h-full overflow-hidden sm:bg-sidebar sm:shadow-lg sm:ring-1 sm:ring-border-divider">
-      {/* Top stroke: a 1px hairline pinned to the card's top edge. At rest on the
-          splash it reads as a floating card; it fades out via opacity as the
-          splash scrubs in (progress 0→1) and the nav is revealed, so the flush
-          nav+card read as one surface with no doubled line. Separate element
-          (not the ring's top) so only the TOP fades — sides/bottom stay solid.
-          Desktop only (max-sm has no floating nav). */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-50 hidden h-px bg-border-divider sm:block"
-        style={{ opacity: Math.max(0, 1 - progress) }}
-      />
       {/* Live Box AI — in normal flow, same layout as /who. Fades in as the
           splash scrubs away; interactive only once fully revealed. */}
       <div

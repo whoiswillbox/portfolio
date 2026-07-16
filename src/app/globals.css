@@ -101,7 +101,7 @@ body.input-focused .mobile-nav {
    splash cube settles on the slot, so this gap carries to the landed cube). */
 .landing-box .box-cube {
   visibility: hidden !important;
-  margin-bottom: 2.5rem !important;
+  margin-bottom: 1.5rem !important;
 }
 
 /* At the landing splash the nav bar is faded out (opacity: --enter-progress).

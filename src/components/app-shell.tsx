@@ -105,7 +105,16 @@ export function AppShell({
               )}
             </Suspense>
             <SidebarInset
-              className="min-h-0 flex-1 m-3 mt-2 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
+              className="min-h-0 flex-1 m-5 mt-1.5 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
+              // Landing: the top margin eases from m-5 (1.25rem) on the splash
+              // down to ~m-1 (0.25rem) as you scroll into the Box product, driven
+              // by --enter-progress (0→1) — same signal as the nav reveal. Sides
+              // + bottom stay m-5. Non-landing keeps the static mt-1.5.
+              style={
+                isLanding
+                  ? { marginTop: "calc(1.25rem - 1rem * var(--enter-progress, 0))" }
+                  : undefined
+              }
             >
               <main className="flex flex-1 flex-col min-w-0 min-h-0 h-full">
                 <BoxSeedProvider>

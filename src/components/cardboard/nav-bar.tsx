@@ -212,6 +212,9 @@ type NavBarNavMenuItem = {
 type NavBarNavMenuGroup = {
   label?: string
   items: NavBarNavMenuItem[]
+  /** When set, the category TAB itself is a link that navigates here (instead
+      of revealing `items`) — for a single-destination category like a CV. */
+  href?: string
 }
 
 /* Accept either a flat item list (one implicit category) or explicit groups. */
@@ -367,12 +370,14 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
   const [activeTab, setActiveTab] = React.useState<number | null>(null)
   React.useEffect(() => {
     if (!asTabs) return
-    const activeIdx = groups.findIndex((g) => g.items.some((i) => i.active))
+    // Skip link-tabs (href) — they navigate, they're never the "shown items" tab.
+    const activeIdx = groups.findIndex((g) => !g.href && g.items.some((i) => i.active))
     setActiveTab(activeIdx >= 0 ? activeIdx : null)
   }, [openKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const shownItems = asTabs
-    ? (activeTab != null ? groups[activeTab]?.items ?? [] : [])
+    // A link-tab (group with href) navigates on click and shows no items below.
+    ? (activeTab != null && !groups[activeTab]?.href ? groups[activeTab]?.items ?? [] : [])
     : groups.flatMap((g) => g.items)
 
   React.useLayoutEffect(() => {
@@ -405,25 +410,34 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
         style={{ paddingLeft: padLeft || undefined }}
         className="flex flex-col items-start gap-4 px-4 py-3"
       >
-        {/* Category tabs — clickable labels that swap the items shown below. */}
+        {/* Category tabs — clickable labels that swap the items shown below.
+            A group with an `href` is a link-tab: it navigates directly instead
+            of revealing items (e.g. a single-destination category like a CV). */}
         {asTabs && (
           <div className="flex items-center gap-1">
-            {groups.map((group, gi) => (
-              <button
-                key={group.label ?? gi}
-                type="button"
-                onClick={() => setActiveTab(gi)}
-                data-active={gi === activeTab || undefined}
-                className={cn(
-                  "rounded-md px-3 py-1 text-body-sm transition-colors",
-                  gi === activeTab
-                    ? "text-foreground"
-                    : "text-quaternary hover:text-secondary"
-                )}
-              >
-                {group.label}
-              </button>
-            ))}
+            {groups.map((group, gi) => {
+              const tabClass = cn(
+                "rounded-md px-3 py-1 text-body-sm transition-colors",
+                (group.href ? group.items.some((i) => i.active) : gi === activeTab)
+                  ? "text-foreground"
+                  : "text-quaternary hover:text-secondary"
+              )
+              return group.href ? (
+                <Link key={group.label ?? gi} href={group.href} onClick={close} className={tabClass}>
+                  {group.label}
+                </Link>
+              ) : (
+                <button
+                  key={group.label ?? gi}
+                  type="button"
+                  onClick={() => setActiveTab(gi)}
+                  data-active={gi === activeTab || undefined}
+                  className={tabClass}
+                >
+                  {group.label}
+                </button>
+              )
+            })}
           </div>
         )}
 
