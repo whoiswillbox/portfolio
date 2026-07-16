@@ -3,8 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, ChevronRightIcon, LockClosedIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
-import { Cog6ToothIcon as Cog6ToothSolid } from "@heroicons/react/24/solid"
+import { CubeIcon, FolderIcon, BuildingOffice2Icon, DocumentTextIcon, ChevronRightIcon, LockClosedIcon, XMarkIcon, LifebuoyIcon, PuzzlePieceIcon, MusicalNoteIcon, BoltIcon, AcademicCapIcon } from "@heroicons/react/24/outline"
 import {
   CubeIcon as CubeSolid,
   FolderIcon as FolderSolid,
@@ -25,7 +24,6 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -37,7 +35,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import {
@@ -326,19 +323,6 @@ export function AppSidebar({
           </SidebarGroup>
         )}
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarSeparator className="mx-0 mb-2 bg-border/50" />
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === "/settings"}>
-              <Link href="/settings">
-                {pathname === "/settings" ? <Cog6ToothSolid /> : <Cog6ToothIcon />}
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   )
 }
