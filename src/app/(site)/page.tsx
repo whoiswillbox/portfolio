@@ -265,9 +265,15 @@ function LandingInner() {
     // Revealed enough to interact with the nav (~mostly faded in).
     if (progress >= 0.6) root.removeAttribute("data-splash");
     else root.setAttribute("data-splash", "");
+    // Splash fully at rest (Box AI completely hidden behind it). Box AI keys its
+    // heading re-randomize off THIS — not data-splash (0.6) — so the new heading
+    // is picked while the splash fully covers it, never visibly mid-scroll.
+    if (progress <= 0.01) root.setAttribute("data-splash-rest", "");
+    else root.removeAttribute("data-splash-rest");
     return () => {
       root.style.removeProperty("--enter-progress");
       root.removeAttribute("data-splash");
+      root.removeAttribute("data-splash-rest");
     };
   }, [progress]);
 

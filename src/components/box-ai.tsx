@@ -662,6 +662,24 @@ export function BoxAI({
     setChips(shuffle(CHIPS).slice(0, CHIP_COUNT));
   }, []);
 
+  // On the landing one-page model, Box AI stays mounted (warm) as you scroll
+  // between the splash and Box AI, so the mount-time randomization above only
+  // fires once. Re-randomize the heading whenever the splash comes fully to REST
+  // (root gains data-splash-rest, i.e. progress ~0 — Box AI fully hidden behind
+  // it) so the fresh heading is picked out of view, never visibly mid-scroll,
+  // and each scroll back into Box AI shows a new one.
+  React.useEffect(() => {
+    const root = document.documentElement;
+    let wasRest = root.hasAttribute("data-splash-rest");
+    const obs = new MutationObserver(() => {
+      const isRest = root.hasAttribute("data-splash-rest");
+      if (isRest && !wasRest) setHeading(randomHeading());
+      wasRest = isRest;
+    });
+    obs.observe(root, { attributes: true, attributeFilter: ["data-splash-rest"] });
+    return () => obs.disconnect();
+  }, []);
+
   // Load persisted conversations on mount, and (launcher use) seed a fresh
   // project-framed conversation: a bot opener + that project's follow-up chips.
   // Load + seed live in one guarded effect so StrictMode's double-invoke can't
@@ -1033,6 +1051,15 @@ export function BoxAI({
         (convo ? caseStudyForConversation(convo) : null) ??
         convo?.messages.map((m) => findCaseStudy(m.text)).find(Boolean) ??
         null;
+      // Repopulate follow-up chips for the reopened conversation — otherwise the
+      // last answer has none (suggestions are only set during a live send).
+      // Prefer the bound case study's prompts; else a varied fallback set.
+      const endsWithBot = convo?.messages[convo.messages.length - 1]?.role === "bot";
+      if (endsWithBot) {
+        setSuggestions(cs?.prompts?.slice(0, 3) ?? pickRandom(FALLBACK_SUGGESTION_POOL, 3));
+      } else {
+        setSuggestions([]);
+      }
       // On the home page, a case-study conversation opens on the study's own page
       // (proper floating split via ContentWorkspace) rather than in-place inside
       // the landing card. Embedded (already on a study page) opens in-place.
@@ -1325,7 +1352,14 @@ export function BoxAI({
             {/* Follow-up prompt chips — dynamic suggestions from API, or static case-study prompts */}
             {!sending && messages[messages.length - 1]?.role === "bot" && (
               <div className="flex flex-wrap gap-2">
-                {(suggestions.length > 0 ? suggestions : (openCaseStudy ?? contextStudy)?.prompts ?? []).map((p) => (
+                {(() => {
+                  // Never suggest a question already asked in this conversation.
+                  const asked = new Set(
+                    messages.filter((m) => m.role === "user").map((m) => m.text.trim().toLowerCase()),
+                  );
+                  const pool = suggestions.length > 0 ? suggestions : (openCaseStudy ?? contextStudy)?.prompts ?? [];
+                  return pool.filter((p) => !asked.has(p.trim().toLowerCase()));
+                })().map((p) => (
                   <button
                     key={p}
                     onClick={() => send(p)}
