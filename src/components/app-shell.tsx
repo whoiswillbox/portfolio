@@ -68,11 +68,21 @@ export function AppShell({
           would be meaningless there — it's rendered only off-landing. */}
       <NavBarMenuProvider>
         <NavBar
-          // On landing the nav fades in with the scrub; while it's still faded
+          // On landing the nav fades AND grows in with the scrub (opacity +
+          // height scaled by --enter-progress) so it reveals with the exact same
+          // motion as the footer. It's absolute here (overlays the card), so the
+          // height scrub is purely visual — no layout shift. While still faded
           // out at the splash (root[data-splash]) it must be INERT so its menus
           // can't be opened before the nav is visible. Restored once revealed.
-          className={`max-sm:hidden border-b-0 ${isLanding ? "nav-splash-inert absolute inset-x-0 top-0 z-20" : ""}`}
-          style={isLanding ? { opacity: "var(--enter-progress, 0)" } : undefined}
+          className={`max-sm:hidden border-b-0 ${isLanding ? "nav-splash-inert absolute inset-x-0 top-0 z-20 overflow-hidden" : ""}`}
+          style={
+            isLanding
+              ? {
+                  opacity: "var(--enter-progress, 0)",
+                  height: "calc(3.5rem * var(--enter-progress, 0))",
+                }
+              : undefined
+          }
         >
           <NavBarLogo href={home.href} aria-label={home.name}>
             <BoxLogo className="size-6" />
