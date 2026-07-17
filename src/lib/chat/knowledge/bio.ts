@@ -95,6 +95,19 @@ export const bioEntries: QAEntry[] = [
       "I studied Psychology with a Cognitive Science (Design + Interaction) minor at UC San Diego (2018–2022), after an AA in Communication at Santa Barbara City College. My UCSD coursework covered interaction design, prototyping, usability, and programming in Python and Java. I'm also certified in AI Product Design through ELVTR (Intro to AI Product Design with Robert Redmond, 2024).",
   },
   {
+    // Explicit "show/open my CV" — opens the résumé PAGE (marker). Kept separate
+    // from the general resume Q&A so experience questions stay conversational and
+    // only THIS opens the page (offer, don't force).
+    id: "open-cv",
+    question: "See my full CV",
+    keywords: [
+      "see my cv", "see your cv", "full cv", "see my resume", "see your resume",
+      "full resume", "open cv", "open resume", "show me your cv", "show me your resume",
+      "view cv", "view resume", "cv page", "resume page",
+    ],
+    answer: "Here's my full CV 👇 [[case-study:resume]]",
+  },
+  {
     id: "resume",
     question: "What's on your resume?",
     keywords: [

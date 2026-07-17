@@ -84,7 +84,14 @@ export function AppShell({
               : undefined
           }
         >
-          <NavBarLogo href={home.href} aria-label={home.name}>
+          <NavBarLogo
+            href={home.href}
+            aria-label={home.name}
+            // Clicking the Box logo returns to a fresh Box AI home. Navigation
+            // alone doesn't reset an already-mounted Box AI (you're already on
+            // "/"), so signal it to clear its active conversation too.
+            onClick={() => { if (!inCardboard) window.dispatchEvent(new Event("box:home")); }}
+          >
             <BoxLogo className="size-6" />
           </NavBarLogo>
           <ProductSwitcher />

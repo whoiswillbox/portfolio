@@ -5,9 +5,36 @@
    projects can be added later.
    ========================================================================== */
 
+import { EXPERIENCE, EDUCATION, CERTIFICATIONS, SKILLS } from "@/lib/resume-data";
+
 export type CaseStudyMetric = { value: string; label: string };
 
 export type CaseStudySection = { heading: string; body: string };
+
+// Build the résumé seed's sections from the shared résumé data (single source of
+// truth) so the Box AI card never drifts from the résumé page. BARBRI (current
+// role) isn't in the arrays (privacy/in-progress), so it's prepended by hand.
+const resumeSections: CaseStudySection[] = [
+  {
+    heading: "Experience",
+    body: [
+      "BARBRI — Product Designer (current, remote LA): Leading design for Bar Prep and SQE across two teams, partnering with UK teams on SQE.",
+      ...EXPERIENCE.map((j) => `${j.company} — ${j.role} (${j.period})`),
+    ].join(" | "),
+  },
+  {
+    heading: "Education",
+    body: EDUCATION.map((e) => `${e.institution} — ${e.details.join(", ")} (${e.period})`).join(". "),
+  },
+  {
+    heading: "Certifications",
+    body: CERTIFICATIONS.map((c) => `${c.institution} — ${c.details.join(", ")} (${c.period})`).join(". "),
+  },
+  {
+    heading: "Skills",
+    body: SKILLS.map((g) => `${g.category}: ${g.items.join(", ")}`).join(". "),
+  },
+];
 
 export type CaseStudy = {
   slug: string;
@@ -32,24 +59,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     meta: "Product Designer",
     summary: "You're looking at my resume. Ask me anything — I'm happy to go deeper on my experience, skills, or background.",
     metrics: [],
-    sections: [
-      {
-        heading: "Experience",
-        body: "BARBRI — Product Designer (current, remote LA): Leading design for Bar Prep and SQE across two teams, partnering with UK teams on SQE. | Technergetics — Lead UX Designer (Aug 2023–Aug 2024): Sole designer on mobile logistics team; led end-to-end design for web, mobile, and PWA platforms used by 250,000+ airmen; partnered with ML engineers on recommendation systems; responsible for Rawhide, Merlin, Upgrade, Manifast, JetDash, Hyperkit, JIJOE, DPC, LogTrax. | Technergetics — UX Designer (Aug 2022–Aug 2023): Automated military processes; won 3+ SBIR Phase II contracts; promoted to Lead after one year. | Lightcert — UX/UI Design Intern (Jan–Jun 2022): Revamped mobile design system; designed save/share feature for MVP v.2 reaching 40k+ fandoms.",
-      },
-      {
-        heading: "Education",
-        body: "UC San Diego — Psychology B.A., Cognitive Science (Design + Interaction) Minor (2018–2022). Santa Barbara City College — Communication A.A. (2017–2018).",
-      },
-      {
-        heading: "Certifications",
-        body: "ELVTR — Intro to AI Product Design with Robert Redmond (2023–2024).",
-      },
-      {
-        heading: "Skills",
-        body: "Design: Persona Mapping, Information Architecture, Interaction Design, Wireframing, Responsive Design, Prototyping, Design Systems, Design Operations. Handoff: Data Labeling, Tokenization, Naming Conventions, Walkthroughs, Changelogs, Annotations, Q&A. Stack: Figma, Figjam, Webflow, Framer, Lucid Chart, VS Code, Storybook, YouTrack. Other: Agile Methodologies, Component Libraries.",
-      },
-    ],
+    sections: resumeSections,
     prompts: [
       "What kind of work do you do best?",
       "Tell me about your time at Technergetics.",
