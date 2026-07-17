@@ -59,9 +59,15 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const { setOpen: setSidebarOpen } = useSidebar();
   React.useEffect(() => {
     const entering = sessionStorage.getItem("entered") === "1";
-    setOpen(false);
-    setExiting(false);
-    setRendered(false);
+    // Navigating WITH ?box= means we arrived here from Box AI carrying a
+    // conversation — keep the panel fully open/rendered through the page change
+    // (don't reset open/exiting/rendered, which slammed it shut mid-navigation).
+    // Without ?box= this is a normal page nav → reset the panel closed.
+    if (!boxParam) {
+      setOpen(false);
+      setExiting(false);
+      setRendered(false);
+    }
     setSplitPct(30);
     // Sidebar is collapsed by SSR default (see layout). Open it on the client
     // for any non-landing page (hard refresh + entering flow); the landing keeps
@@ -70,7 +76,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
       requestAnimationFrame(() => setSidebarOpen(true));
     }
     if (entering) sessionStorage.removeItem("entered");
-  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pathname, boxParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const boxAI = React.useMemo(
     () => <BoxAI key={boxParam ?? "default"} embedded seed={contextSeed} />,
@@ -85,7 +91,8 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
   const closeDrawer = () => {
     if (isDesktop) setExiting(true);
     else setOpen(false);
-    if (boxParam) router.replace(pathname);
+    // Keep ?box=<id> in the URL on close so RE-opening the panel restores the
+    // same conversation (you entered THROUGH Box AI) rather than a fresh seed.
   };
   React.useEffect(() => {
     if (open) {

@@ -4,7 +4,6 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
-  PencilSquareIcon,
   XMarkIcon,
   CubeIcon,
   HandThumbUpIcon,
@@ -277,6 +276,7 @@ const FALLBACK_SUGGESTION_POOL = [
   "Where did you go to school?",
   "What tools do you use?",
   "Show me your best case study",
+  "See my full CV",
 ];
 
 /* Fisher–Yates pick of `n` distinct items. */
@@ -796,7 +796,7 @@ export function BoxAI({
       // back in (it's hidden during the transition either way).
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
-        setHeading((cur) => randomHeading(cur)); // exclude current — no repeat
+        setHeading((cur) => randomHeading(cur)); // shuffle-bag: new until exhausted
       }, 120);
     };
     const obs = new MutationObserver(sync);
@@ -827,9 +827,17 @@ export function BoxAI({
     // start with a user message, so this can't delete anything written).
     const isEmptySeed = (c: Conversation) =>
       c.messages.length === 1 && c.messages[0].role === "bot";
+    // Slugs that already have a REAL (replied-to) conversation — an empty seed
+    // for the same topic is redundant next to it, so drop it.
+    const realSlugs = new Set(
+      loadedConvos.filter((c) => !isEmptySeed(c) && c.caseStudySlug).map((c) => c.caseStudySlug),
+    );
     const seenEmptyTitles = new Set<string>();
     loadedConvos = loadedConvos.filter((c) => {
       if (!isEmptySeed(c)) return true;
+      // Drop the empty seed if a real conversation already covers its topic.
+      if (c.caseStudySlug && realSlugs.has(c.caseStudySlug)) return false;
+      // Otherwise keep at most one empty seed per title (collapse dupes).
       if (seenEmptyTitles.has(c.title)) return false;
       seenEmptyTitles.add(c.title);
       return true;
@@ -846,10 +854,15 @@ export function BoxAI({
       setActiveId(carried.id);
       if (study) setContextStudy(study);
     } else if (study) {
-      // Reuse an existing conversation about this project if the visitor already
-      // has one; otherwise seed a single fresh one. Either way there's only ever
-      // one "About <project>".
-      const existing = loadedConvos.find((c) => c.title === `About ${study.title}`);
+      // Reuse an existing conversation about this project/topic if the visitor
+      // already has one — matched by the bound caseStudySlug FIRST (a convo
+      // entered THROUGH Box AI is titled from the question, not "About <topic>",
+      // but is still slug-bound), then by the seeded "About <title>". So
+      // returning to the page restores that conversation instead of seeding a
+      // fresh one (unless it was deleted). Most recent wins.
+      const existing =
+        loadedConvos.find((c) => c.caseStudySlug === study.slug) ??
+        loadedConvos.find((c) => c.title === `About ${study.title}`);
       if (existing) {
         setConversations(loadedConvos);
         setActiveId(existing.id);
@@ -1125,12 +1138,13 @@ export function BoxAI({
     // that split. The conversation is bound below + carried via ?box=, so it
     // reopens beside the study (same as reopening from the conversations page).
     const cs = findCaseStudy(reply.text);
-    // Open the panel in-place when embedded — but NOT if we're already viewing
-    // that same page (would stack a nested panel on top of the current split,
-    // e.g. asking about music while on the Music page). On the home page the
-    // navigate below handles it instead.
-    const alreadyOnPage = !!cs?.href && pathname === cs.href;
-    if (cs && embedded && !alreadyOnPage) setOpenCaseStudy(cs);
+    const onCsPage = !!cs?.href && pathname === cs.href;
+    // Only open the in-place panel when the referenced study IS the page we're
+    // already on (the normal case-study-page flow shows it beside the content).
+    // Referencing a DIFFERENT study while embedded must NOT stack a third panel
+    // on top of the current split — navigate to that study's page instead (see
+    // the navigate branch below). onCsPage=true → its own content already shows,
+    // so nothing to open.
 
     // Only paid (API) replies count toward the daily limit — unless the dev
     // preview toggle is on, which also counts free local replies.
@@ -1143,44 +1157,59 @@ export function BoxAI({
       });
     }
 
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.id === convoId
-          ? {
-              ...c,
-              messages: [...c.messages, botMsg],
-              shown:
-                reply.entryId && !c.shown.includes(reply.entryId)
-                  ? [...c.shown, reply.entryId]
-                  : c.shown,
-              // If this reply introduced a case study, bind it to the conversation
-              // so revisiting from the sidebar routes to the project page.
-              ...(cs && !c.caseStudySlug ? { caseStudySlug: cs.slug } : {}),
-            }
-          : c
-      )
-    );
+    // CONTEXT SWITCH: the active thread is already bound to a DIFFERENT case
+    // study/topic and this reply is about a new one. Branch — move this exchange
+    // (the switching question + its answer) OUT of the current thread and INTO a
+    // NEW conversation bound to the new study, so each thread stays on-topic and
+    // is cleanly separable in the Conversations page.
+    const contextSwitch =
+      !!cs && !!active?.caseStudySlug && cs.slug !== active.caseStudySlug;
+
+    let targetConvoId = convoId;
+    if (contextSwitch && active) {
+      const newId = uid();
+      targetConvoId = newId;
+      setActiveId(newId);
+      setConversations((prev) => [
+        // New thread: this question + answer, bound to the new study.
+        { id: newId, title: titleFrom(trimmed), messages: [userMsg, botMsg], shown: [], caseStudySlug: cs!.slug },
+        // Old thread: drop the switching question we optimistically appended.
+        ...prev.map((c) =>
+          c.id === active.id ? { ...c, messages: c.messages.filter((m) => m.id !== userMsg.id) } : c
+        ),
+      ]);
+    } else {
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === convoId
+            ? {
+                ...c,
+                messages: [...c.messages, botMsg],
+                shown:
+                  reply.entryId && !c.shown.includes(reply.entryId)
+                    ? [...c.shown, reply.entryId]
+                    : c.shown,
+                // If this reply introduced a case study, bind it to the
+                // conversation so revisiting from the sidebar routes to it.
+                ...(cs && !c.caseStudySlug ? { caseStudySlug: cs.slug } : {}),
+              }
+            : c
+        )
+      );
+    }
     if (thinkTimerRef.current) { clearInterval(thinkTimerRef.current); thinkTimerRef.current = null; }
     setStreamingText("");
     setVisibleSteps([]);
     setAllStepsDone(false);
     setSending(false);
 
-    // Home page: route to the case study's own page (with the conversation) once
-    // the reply is saved, so it opens as the proper floating split there. Skip
-    // if we're somehow already on that page (guard against a redundant nav).
-    if (cs && !embedded && !alreadyOnPage) router.push(`${cs.href}?box=${convoId}`);
-  };
-
-  const goHome = () => {
-    setActiveId(null);
-    setInput("");
-    setHeading(randomHeading());
-    setOpenCaseStudy(null); // close the case study panel when leaving the chat
-    setContextStudy(null);
-    // Drop the ?c=<id> param and return to the Box home ("/", the warm one-page
-    // Box AI) without re-showing the landing splash (box-home marker).
-    if (!embedded) router.replace("/?box-home=1");
+    // Show the referenced study without ever stacking a third panel:
+    //  · embedded AND it's THIS page (onCsPage) → nothing to do; the page's own
+    //    content already shows beside the chat.
+    //  · otherwise (home, OR embedded on a DIFFERENT page / context switch) →
+    //    navigate to the study's page carrying the (possibly new) conversation,
+    //    so it opens as the proper floating split and REPLACES the current one.
+    if (cs?.href && !onCsPage) router.push(`${cs.href}?box=${targetConvoId}`);
   };
 
   // Open a conversation and restore its case study panel, so reopening it (from
@@ -1204,20 +1233,35 @@ export function BoxAI({
       } else {
         setSuggestions([]);
       }
-      // On the home page, a case-study conversation opens on the study's own page
-      // (proper floating split via ContentWorkspace) rather than in-place inside
-      // the landing card. Embedded (already on a study page) opens in-place.
-      if (cs && !embedded) {
+      // Open the study's page (carrying the conversation) unless we're already
+      // ON that page — same no-stacking rule as send(): navigate for a different
+      // page (home, or embedded elsewhere) so it opens as the proper floating
+      // split and replaces any current one; only skip when it's this page.
+      const onCsPage = !!cs?.href && pathname === cs.href;
+      if (cs?.href && !onCsPage) {
         router.push(`${cs.href}?box=${id}`);
         return;
       }
-      // If panel is already showing, skip the enter animation on the new study.
-      skipCaseStudyAnim.current = openCaseStudy !== null;
-      setOpenCaseStudy(cs);
       if (cs) setContextStudy(cs);
     },
     [conversations, openCaseStudy, embedded, router]
   );
+
+  // Box logo click (from the nav) → return to a fresh Box AI home. The logo
+  // also navigates to /?box-home=1, but that no-ops when already on "/", so this
+  // clears the active conversation + panel so the empty hero shows again.
+  React.useEffect(() => {
+    if (embedded) return;
+    const reset = () => {
+      setActiveId(null);
+      setInput("");
+      setHeading(randomHeading());
+      setOpenCaseStudy(null);
+      setContextStudy(null);
+    };
+    window.addEventListener("box:home", reset);
+    return () => window.removeEventListener("box:home", reset);
+  }, [embedded]);
 
   // When arrived at via the sidebar (/who?c=<id>), open that conversation once
   // conversations have loaded.
@@ -1288,19 +1332,8 @@ export function BoxAI({
       data-box-empty={!embedded && !openCaseStudy && !activeId ? "" : undefined}
       className="relative flex h-full w-full min-w-0 flex-col max-sm:pt-8 max-sm:pb-0 max-sm:[@media(display-mode:standalone)]:pb-0"
     >
-      {!embedded && (openCaseStudy || activeId) && (
+      {!embedded && openCaseStudy && (
         <div className="flex items-center gap-1 p-2">
-          {activeId && !openCaseStudy && (
-            <button
-              type="button"
-              onClick={goHome}
-              aria-label="New chat"
-              className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <PencilSquareIcon className="size-4" />
-              New chat
-            </button>
-          )}
           {openCaseStudy && (
             <button
               type="button"
