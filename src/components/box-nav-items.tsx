@@ -8,30 +8,13 @@
    studies are flat under Experience) and per-item icons (top-nav dropdowns
    don't carry those well). */
 
-import * as React from "react"
 import { usePathname } from "next/navigation"
 import { NavBarNav, NavBarNavItem } from "@/components/cardboard/nav-bar"
-import {
-  loadConversations,
-  subscribeConversations,
-  type Conversation,
-} from "@/lib/chat/store"
 
 export function BoxNavItems() {
   const pathname = usePathname()
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`)
-
-  // Box AI conversations, kept in sync with the chat (same localStorage store).
-  // The Conversations nav item is a plain link to /conversations, shown only
-  // when at least one conversation exists.
-  const [conversations, setConversations] = React.useState<Conversation[]>([])
-  React.useEffect(() => {
-    const sync = () => setConversations(loadConversations())
-    sync()
-    return subscribeConversations(sync)
-  }, [])
-  const hasConversations = conversations.length > 0
 
   const withActive = <T extends { href: string }>(items: T[]) =>
     items.map((i) => ({ ...i, active: isActive(i.href) }))
@@ -80,11 +63,9 @@ export function BoxNavItems() {
       <NavBarNavItem disclosure menuKey="extras" active={groupActive(extras)} items={withActive(extras)}>
         Extracurriculars
       </NavBarNavItem>
-      {hasConversations && (
-        <NavBarNavItem href="/conversations" active={pathname === "/conversations"}>
-          Conversations
-        </NavBarNavItem>
-      )}
+      <NavBarNavItem href="/conversations" active={pathname === "/conversations"}>
+        Conversations
+      </NavBarNavItem>
     </NavBarNav>
   )
 }
