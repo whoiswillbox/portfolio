@@ -179,7 +179,7 @@ export function ThinkingSteps({
       data-slot="thinking-steps"
       data-collapsed={collapsed || undefined}
       className={cn(
-        "flex w-full flex-col gap-2 rounded-xl border border-border bg-muted/40 p-3 font-mono text-body-xs uppercase tracking-wide text-muted-foreground",
+        "flex w-full flex-col gap-3 font-mono text-body-xs uppercase tracking-wide text-muted-foreground",
         className,
       )}
       {...props}

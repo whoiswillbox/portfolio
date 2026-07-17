@@ -37,7 +37,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { ChatInput } from "@/components/chat-input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { ContactCard } from "@/components/contact-card";
-import { showContactCard, stripContactMarker } from "@/lib/contact";
+import { IMDbCard } from "@/components/imdb-card";
+import { BoxLogo } from "@/components/box-logo";
+import { showContactCard, stripContactMarker, showImdbCard, stripImdbMarker } from "@/lib/contact";
 import { caseStudies, caseStudyForConversation, findCaseStudy, stripCaseStudyMarker, type CaseStudy } from "@/lib/case-studies";
 import { ContentCard } from "@/components/content-card";
 import { CaseStudyPanel } from "@/components/case-study-panel";
@@ -305,11 +307,30 @@ function AnimatedBoxIcon({ className }: { className?: string }) {
     if (_animDataCache) { setAnimData(_animDataCache); return; }
     fetch("/animations/box.json").then(r => r.json()).then(d => { _animDataCache = d; setAnimData(d); }).catch(() => null);
   }, []);
+  // The Lottie asset has HARDCODED colors (dark-grey strokes, white fills) —
+  // it isn't currentColor-based, so it can't adapt to theme on its own.
+  // grayscale+opacity alone reads fine on a light background, but on dark the
+  // same near-white/near-black pixels sit close to the dark background and
+  // wash out to invisible. Invert in dark mode so the lightness flips too
+  // (white fill → near-black, dark stroke → near-white), keeping contrast.
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
 
   if (animData) {
     return (
       <React.Suspense fallback={null}>
-        <div className={className} style={{ display: "flex", alignItems: "center", justifyContent: "center", filter: "grayscale(1) opacity(0.5)", overflow: "hidden" }}>
+        <div
+          className={className}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            filter: isDark ? "grayscale(1) invert(1) opacity(0.5)" : "grayscale(1) opacity(0.5)",
+            overflow: "hidden",
+          }}
+        >
           <Lottie animationData={animData} loop style={{ width: "100%", height: "100%", flexShrink: 0 }} />
         </div>
       </React.Suspense>
@@ -1454,11 +1475,7 @@ export function BoxAI({
               tabIndex={-1}
               className="box-cube mb-4 self-center cursor-default"
             >
-              <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-12 text-foreground">
-                <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-                <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-                <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-              </svg>
+              <BoxLogo className="size-12" />
             </button>
             <h1 className="box-heading text-h1">{heading}</h1>
             {/* On desktop: input + chips inline. On mobile: hidden here, shown pinned below */}
@@ -1480,7 +1497,7 @@ export function BoxAI({
           <div className="mx-auto flex w-full max-w-xl flex-col gap-8 px-6 pb-6 pt-28">
             {messages.map((m, idx) =>
               m.role === "bot" ? (
-                <div key={m.id} className="flex flex-col gap-2">
+                <div key={m.id} className="flex flex-col gap-3">
                   {/* Collapsed "Thought for Xs" trace — persisted on the message,
                       so it survives navigation + reload. Icons re-derived from
                       the labels by keyword. */}
@@ -1520,7 +1537,7 @@ export function BoxAI({
               <div className="flex w-full flex-col gap-1">
                 {!allStepsDone ? (
                   <ThinkingSteps
-                    className="mb-2"
+                    className="mb-3"
                     steps={visibleSteps.map((step, i) => {
                       const done = allStepsDone || i < visibleSteps.length - 1;
                       return {
@@ -1822,9 +1839,10 @@ function BotBubble({
 
       <div className="group flex w-full flex-col gap-1">
         <p className="font-sans text-body-sm text-foreground">
-          {stripCaseStudyMarker(stripContactMarker(text))}
+          {stripCaseStudyMarker(stripContactMarker(stripImdbMarker(text)))}
         </p>
         {showContactCard(text) && <ContactCard />}
+        {showImdbCard(text) && <IMDbCard />}
         <div className="flex items-center gap-0.5 pl-1">
           <button
             type="button"
@@ -1852,11 +1870,7 @@ function BotBubble({
           </button>
         </div>
         {isLast && (
-          <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-8 text-muted-foreground mt-1 animate-in fade-in duration-500" aria-hidden="true">
-            <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-            <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-            <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-          </svg>
+          <BoxLogo className="size-8 mt-1 animate-in fade-in duration-500" />
         )}
       </div>
     </>

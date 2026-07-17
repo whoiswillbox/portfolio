@@ -202,7 +202,7 @@ export default function ThinkingStepsDocs() {
           <>
             <Anatomy
               parts={[
-                { n: 1, part: "Card — the container holding the whole trace.", tokens: "rounded-xl · border-border · bg-muted/40 · data-slot=thinking-steps" },
+                { n: 1, part: "Wrapper — no visible container; the trace sits directly on the page background.", tokens: "flex flex-col gap-3 · data-slot=thinking-steps" },
                 { n: 2, part: "Header — an optional pulsing phrase + elapsed seconds.", tokens: "font-mono · uppercase · text-muted-foreground · animate-pulse" },
                 { n: 3, part: "Step — an icon node threaded by a vertical connector line, with the label to its right (no per-step box).", tokens: "timeline · data-status · label truncate" },
                 { n: 4, part: "Node — the source icon while pending/active (pulsing when active), a checkmark when done.", tokens: "CheckGlyph · animate-pulse · connector w-px bg-current/20" },
