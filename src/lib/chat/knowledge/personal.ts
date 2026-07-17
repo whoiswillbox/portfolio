@@ -2,6 +2,7 @@
    and the stunt-double easter egg. (Deep extracurricular topics like surfing/
    gaming/music have their own pages + Box AI seeds.) */
 import type { QAEntry } from "./types";
+import { IMDB_MARKER } from "@/lib/contact";
 
 export const personalEntries: QAEntry[] = [
   {
@@ -86,10 +87,11 @@ export const personalEntries: QAEntry[] = [
     id: "stunt",
     question: "Stunt work",
     keywords: [
-      "stunt", "stuntman", "stunt double", "acting", "actor", "imdb",
-      "cody fern", "tribes of palos verdes", "movie role", "film role",
+      "stunt", "stuntman", "stunt double", "surf double", "acting", "actor", "imdb",
+      "tribes of palos verdes", "what i like about you", "movie role", "film role",
+      "movie", "tv show", "television show", "film", "worked on a movie",
+      "worked on a show", "acting career", "screen credit", "child actor",
     ],
-    answer:
-      "Ha, you found it — I was a stunt double for Cody Fern on Tribes of Palos Verdes (SAG-AFTRA). It's on IMDb under William Box. 🎬",
+    answer: `Ha, you found it — I was a surf double (Jim) in Tribes of Palos Verdes (2017), and way back as a kid I appeared on What I Like About You (S1E4, "The Teddy Bear"). It's all on my IMDb. ${IMDB_MARKER} 🎬`,
   },
 ];
