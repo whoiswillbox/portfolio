@@ -262,20 +262,35 @@ function LandingInner() {
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty("--enter-progress", String(progress));
-    // Revealed enough to interact with the nav (~mostly faded in).
-    if (progress >= 0.6) root.removeAttribute("data-splash");
-    else root.setAttribute("data-splash", "");
+    // Revealed enough to interact with the nav (~mostly faded in). Only WRITE the
+    // attribute when it actually changes — the effect runs on every progress
+    // frame, and blind set/removeAttribute (esp. via cleanup) made downstream
+    // observers fire spuriously (glitchy heading re-randomize).
+    const wantSplash = progress < 0.6;
+    if (wantSplash !== root.hasAttribute("data-splash")) {
+      if (wantSplash) root.setAttribute("data-splash", "");
+      else root.removeAttribute("data-splash");
+    }
     // Splash fully at rest (Box AI completely hidden behind it). Box AI keys its
     // heading re-randomize off THIS — not data-splash (0.6) — so the new heading
     // is picked while the splash fully covers it, never visibly mid-scroll.
-    if (progress <= 0.01) root.setAttribute("data-splash-rest", "");
-    else root.removeAttribute("data-splash-rest");
+    const wantRest = progress <= 0.01;
+    if (wantRest !== root.hasAttribute("data-splash-rest")) {
+      if (wantRest) root.setAttribute("data-splash-rest", "");
+      else root.removeAttribute("data-splash-rest");
+    }
+  }, [progress]);
+
+  // Clear the splash attributes only on unmount (not on every progress frame —
+  // a per-frame cleanup was toggling them and firing observers repeatedly).
+  useEffect(() => {
+    const root = document.documentElement;
     return () => {
       root.style.removeProperty("--enter-progress");
       root.removeAttribute("data-splash");
       root.removeAttribute("data-splash-rest");
     };
-  }, [progress]);
+  }, []);
 
   return (
     <>
