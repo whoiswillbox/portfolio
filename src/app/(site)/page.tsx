@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { BoxAI } from "@/components/box-ai";
 import { useSidebar } from "@/components/ui/sidebar";
+import { BoxLogo } from "@/components/box-logo";
 
 interface Box {
   id: number;
@@ -200,10 +201,11 @@ function LandingInner() {
     // A nav disclosure menu is open (its panel overlays the splash). Scrubbing
     // the splash while the menu is open fights the menu, so scroll is locked.
     const navMenuOpen = () =>
-      !!document.querySelector('[data-slot="nav-bar-panel"][data-state="open"]');
+      !!document.querySelector('[data-slot="nav-bar-panel"][data-state="open"]') ||
+      !!document.querySelector('[data-slot="footer-panel"][data-state="open"]');
 
     const bump = (deltaY: number) => {
-      if (navMenuOpen()) return; // scroll locked while a nav menu is open
+      if (navMenuOpen()) return; // scroll locked while a nav/footer menu is open
       if (reducedMotion.current) {
         setProgress(deltaY > 0 ? 1 : 0);
         progressRef.current = deltaY > 0 ? 1 : 0;
@@ -223,8 +225,8 @@ function LandingInner() {
 
     const onWheel = (e: WheelEvent) => {
       if (e.deltaY === 0) return;
-      bump(e.deltaY); // bump() no-ops while a nav menu is open; the NavBarMenu
-                      // provider hard-locks native scroll (preventDefault).
+      bump(e.deltaY); // bump() no-ops while a nav/footer menu is open; their
+                      // provider also hard-locks native scroll (preventDefault).
     };
 
     let touchY = 0;
@@ -232,7 +234,7 @@ function LandingInner() {
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY;
       bump(touchY - y); // dragging up = positive = scrub forward (no-ops while
-      touchY = y;       // a nav menu is open; provider hard-locks native scroll)
+      touchY = y;       // a nav/footer menu is open; provider hard-locks native scroll)
     };
 
     const onKey = (e: KeyboardEvent) => {
@@ -393,11 +395,7 @@ function LandingInner() {
             >
               {/* Identical to the Box AI empty-state cube so the handoff is
                   seamless — same size, same paths. */}
-              <svg viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-12 text-foreground">
-                <path d="M2 9 L12 15 L12 25 L2 19 Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-                <path d="M22 9 L12 15 L12 25 L22 19 Z" fill="currentColor" fillOpacity="0.05" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-                <path d="M2 9 L12 3 L22 9 L12 15 Z" fill="currentColor" fillOpacity="0.08" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-              </svg>
+              <BoxLogo className="size-12" />
             </div>
           </div>
 

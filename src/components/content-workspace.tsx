@@ -117,7 +117,7 @@ export function ContentWorkspace({ children }: { children: React.ReactNode }) {
                 aria-label="Ask Box"
                 className="inline-flex size-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted active:scale-95"
               >
-                <BoxLogo className="size-6" />
+                <BoxLogo className="size-7" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="right">Ask Box</TooltipContent>
