@@ -35,11 +35,13 @@ import { Badge } from "@/components/cardboard/badge"
 type NavBarMenuContextValue = {
   openKey: string | null
   /** Toggle a menu open/closed by key (clicking the open one closes it). The
-      trigger element lets the panel left-align its content under the trigger. */
+      trigger element lets the panel align the product-switcher's content under
+      its trigger (every other menu centers instead — see NavBarPanel). */
   toggle: (key: string, trigger?: HTMLElement | null) => void
   close: () => void
-  /** Viewport-x of the open trigger's left edge, so NavBarPanel can align its
-      content to start under the nav item that opened it. */
+  /** Viewport-x of the open trigger's left edge. Only consulted by the
+      product-switcher panel (it stays pinned under its trigger next to the
+      logo); every other disclosure ignores this and centers. */
   openLeft: number | null
   /** Disclosure items register their groups here so the panel can render them
       by key without prop-drilling. Returns the groups for the open key. */
@@ -67,7 +69,6 @@ function NavBarMenuProvider({ children }: { children: React.ReactNode }) {
   const toggle = React.useCallback((key: string, trigger?: HTMLElement | null) => {
     setOpenKey((cur) => {
       if (cur === key) return null
-      // Record the trigger's left edge so the panel aligns its content under it.
       if (trigger) setOpenLeft(trigger.getBoundingClientRect().left)
       return key
     })
@@ -141,7 +142,7 @@ function NavBar({ className, children, ...props }: React.ComponentProps<"header"
     <header
       data-slot="nav-bar"
       className={cn(
-        "flex h-14 shrink-0 items-center gap-0 border-b border-border-divider bg-background px-4",
+        "relative flex h-14 shrink-0 items-center gap-0 border-b border-border-divider bg-background px-4",
         className
       )}
       {...props}
@@ -181,7 +182,10 @@ function NavBarNav({ className, ...props }: React.ComponentProps<"nav">) {
   return (
     <nav
       data-slot="nav-bar-nav"
-      className={cn("ml-auto flex items-center gap-1", className)}
+      className={cn(
+        "ml-auto flex items-center gap-1 sm:absolute sm:left-1/2 sm:ml-0 sm:-translate-x-1/2",
+        className
+      )}
       {...props}
     />
   )
@@ -342,6 +346,7 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
   const { openKey, groupsFor, close, openLeft } = useNavBarMenu()
   const openItems = groupsFor(openKey)
   const open = !!openKey && !!openItems && openItems.length > 0
+  const isSwitcher = openKey === "product-switcher"
   const panelRef = React.useRef<HTMLDivElement>(null)
   const contentRef = React.useRef<HTMLDivElement>(null)
   // The panel's natural content height drives its own animated height (0 →
@@ -349,13 +354,15 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
   // that content down — no CSS var / viewport calc needed.
   const [contentH, setContentH] = React.useState(0)
 
-  // Left-align the content under the nav item that opened the menu: pad the
-  // content by (trigger left − panel left). Recomputed when the menu opens.
+  // The product switcher pins its content under its trigger (left, next to the
+  // logo) rather than centering — pad the content by (trigger left − panel
+  // left). Every other disclosure ignores this and centers instead.
   const [padLeft, setPadLeft] = React.useState(0)
   React.useLayoutEffect(() => {
-    if (!open || openLeft == null || !panelRef.current) { setPadLeft(0); return }
+    if (!open || !isSwitcher || openLeft == null || !panelRef.current) { setPadLeft(0); return }
     setPadLeft(Math.max(0, openLeft - panelRef.current.getBoundingClientRect().left))
-  }, [open, openLeft])
+  }, [open, isSwitcher, openLeft])
+
 
   // Groups render as TABS: a row of clickable category labels, with the selected
   // category's items below. Reset to the first tab (or the one holding the active
@@ -418,13 +425,24 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
       <div
         ref={contentRef}
         style={{ paddingLeft: padLeft || undefined }}
-        className="flex flex-col items-start gap-4 px-4 py-3 [&>div]:max-w-full"
+        className={cn(
+          "flex flex-col gap-4 px-4 pb-3 [&>div]:max-w-full",
+          // The product switcher's panel stays pinned under its trigger (via
+          // padLeft, computed above) — every other disclosure (Experience,
+          // etc.) centers under the now-centered nav row.
+          isSwitcher ? "items-start" : "items-center"
+        )}
       >
         {/* Category tabs — clickable labels that swap the items shown below.
             A group with an `href` is a link-tab: it navigates directly instead
             of revealing items (e.g. a single-destination category like a CV). */}
         {asTabs && (
-          <div className="flex flex-wrap items-center gap-1">
+          <div
+            className={cn(
+              "flex flex-wrap items-center gap-1",
+              isSwitcher ? "justify-start" : "justify-center"
+            )}
+          >
             {groups.map((group, gi) => {
               const tabClass = cn(
                 "rounded-md px-3 py-1 text-body-sm transition-colors",
@@ -451,30 +469,39 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
           </div>
         )}
 
-        {/* Items for the selected tab (or all items for a single-group menu). */}
-        <div className="flex flex-wrap items-center justify-start gap-x-4 gap-y-1">
-          {shownItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={close}
-              data-active={item.active || undefined}
-              className={cn(
-                "inline-flex items-center gap-2 whitespace-nowrap rounded-md px-2 py-1 text-body-sm transition-colors",
-                item.active
-                  ? "text-foreground"
-                  : "text-quaternary hover:text-secondary"
-              )}
-            >
-              {item.label}
-              {item.badge && (
-                <Badge variant={item.badge.variant ?? "default"}>
-                  {item.badge.label}
-                </Badge>
-              )}
-            </Link>
-          ))}
-        </div>
+        {/* Items for the selected tab (or all items for a single-group menu).
+            Only rendered once there's something to show — otherwise its
+            gap-4 above reserves dead space while no tab is selected yet. */}
+        {shownItems.length > 0 && (
+          <div
+            className={cn(
+              "flex flex-wrap items-center gap-x-4 gap-y-1",
+              isSwitcher ? "justify-start" : "justify-center"
+            )}
+          >
+            {shownItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={close}
+                data-active={item.active || undefined}
+                className={cn(
+                  "inline-flex items-center gap-2 whitespace-nowrap rounded-md px-2 py-1 text-body-sm transition-colors",
+                  item.active
+                    ? "text-foreground"
+                    : "text-quaternary hover:text-secondary"
+                )}
+              >
+                {item.label}
+                {item.badge && (
+                  <Badge variant={item.badge.variant ?? "default"}>
+                    {item.badge.label}
+                  </Badge>
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
