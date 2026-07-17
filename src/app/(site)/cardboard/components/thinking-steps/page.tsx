@@ -7,7 +7,7 @@ import {
   BuildingOffice2Icon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import { ThinkingSteps, type ThinkingStep } from "@cardboard";
+import { ThinkingSteps, type ThinkingStep, type ThinkingStepSource } from "@cardboard";
 import {
   ComponentPage,
   AudienceTabs,
@@ -45,13 +45,16 @@ const singleStep: ThinkingStep[] = [
 
 /* ── Variants ────────────────────────────────────────────────────────────── */
 
+// The two canonical variants: THINKING (live — steps visible, one active) and
+// THOUGHT (done — a collapsible/expandable "Thought for Xs" card). The extra
+// examples below (single step, headerless) are shapes of the Thinking variant.
 const VARIANTS = [
   {
-    label: "Running",
-    caption: "The last (active) step pulses; finished steps dim and show a checkmark.",
+    label: "Thinking",
+    caption: "A static snapshot of the live trace: steps threaded on a connector line, the active one breathing (fades in/out), finished ones dimmed with a checkmark.",
     preview: (
       <div className="w-full max-w-md">
-        <ThinkingSteps heading="Riding the break 🏄‍♂️" seconds={3} steps={runningSteps} />
+        <ThinkingSteps steps={runningSteps} />
       </div>
     ),
     code: `import { ThinkingSteps, type ThinkingStep } from "@cardboard";
@@ -63,22 +66,26 @@ const steps: ThinkingStep[] = [
   { label: "Drafting an answer…", icon: SparklesIcon, status: "active" },
 ];
 
-<ThinkingSteps heading="Riding the break 🏄‍♂️" seconds={3} steps={steps} />`,
+// Thinking: pass steps. (An optional heading is also supported.)
+<ThinkingSteps steps={steps} />`,
   },
   {
-    label: "Complete",
-    caption: "Every step done — shown briefly before the answer replaces the trace.",
+    label: "Thought",
+    caption: "Once complete, pass a `summary` to collapse it into an expandable \"Thought for Xs\" card — click to re-reveal the steps. Show above the answer.",
     preview: (
       <div className="w-full max-w-md">
-        <ThinkingSteps heading="Riding the break 🏄‍♂️" seconds={4} steps={completeSteps} />
+        <ThinkingSteps summary="Thought for 4s" steps={completeSteps} />
       </div>
     ),
-    code: `// Same shape as Running, but every step's status is "done".
-<ThinkingSteps heading="Riding the break 🏄‍♂️" seconds={4} steps={steps} />`,
+    code: `// Thought: pass a summary (every step done) to render the collapsed card.
+<ThinkingSteps summary="Thought for 4s" steps={completeSteps} />
+
+// Start expanded with defaultOpen:
+<ThinkingSteps summary="Thought for 4s" steps={completeSteps} defaultOpen />`,
   },
   {
-    label: "Single step, no header",
-    caption: "The header is optional; a one-step trace is valid.",
+    label: "Thinking · single step",
+    caption: "A Thinking trace with one step and no header — the header is optional.",
     preview: (
       <div className="w-full max-w-md">
         <ThinkingSteps steps={singleStep} />
@@ -92,33 +99,70 @@ const steps: ThinkingStep[] = [
 
 /* ── Playground ──────────────────────────────────────────────────────────── */
 
+const PLAYGROUND_SOURCES: ThinkingStepSource[] = [
+  { title: "SwipeRight.ai", subtitle: "School · 2024", href: "/school/swiperight-ai" },
+  { title: "Jet Dash", subtitle: "Technergetics · 2023–24", href: "/technergetics/jetdash" },
+  { title: "Next Gen Bar Prep", subtitle: "BARBRI · 2024–2025", href: "/projects/next-gen-bar" },
+];
+
 function PlaygroundDemo({
-  heading,
+  variant,
   seconds,
   active,
+  sources,
+  autoplay,
 }: {
-  heading: boolean;
+  variant: "thinking" | "thought";
   seconds: number;
   active: number;
+  sources: boolean;
+  autoplay: boolean;
 }) {
-  // A fixed 3-step chain; `active` picks which step is currently running (the
-  // ones before it are done, the ones after are pending).
   const labels = [
-    { label: "Searching the portfolio…", icon: MagnifyingGlassIcon },
+    { label: "Searching the case studies…", icon: MagnifyingGlassIcon },
     { label: "Reading the case study…", icon: DocumentTextIcon },
     { label: "Drafting an answer…", icon: SparklesIcon },
   ];
-  const steps: ThinkingStep[] = labels.map((l, i) => ({
-    ...l,
-    status: i < active ? "done" : i === active ? "active" : "pending",
-  }));
+
+  // Auto-play (Thinking only): reveal steps one at a time on a loop, ignoring the
+  // manual `active` control. Otherwise `active` scrubs the running step by hand.
+  const looping = autoplay && variant === "thinking";
+  const [phase, setPhase] = React.useState(1);
+  React.useEffect(() => {
+    if (!looping) return;
+    const next = phase > labels.length ? 1 : phase + 1;
+    const id = setTimeout(() => setPhase(next), phase > labels.length ? 1600 : 900);
+    return () => clearTimeout(id);
+  }, [looping, phase, labels.length]);
+  React.useEffect(() => { if (!looping) setPhase(1); }, [looping]);
+
+  const activeIdx = looping ? Math.min(phase, labels.length) - 1 : active;
+  const allDone = looping && phase > labels.length;
+
+  const steps: ThinkingStep[] = labels
+    .slice(0, looping ? Math.min(phase, labels.length) : labels.length)
+    .map((l, i, arr) => {
+      const status: ThinkingStep["status"] =
+        variant === "thought" || allDone
+          ? "done"
+          : i < activeIdx
+          ? "done"
+          : i === (looping ? arr.length - 1 : activeIdx)
+          ? "active"
+          : "pending";
+      // Attach sources to the case-study step (once it's done).
+      const withSources =
+        sources && status === "done" && l.label.toLowerCase().includes("case stud");
+      return { ...l, status, sources: withSources ? PLAYGROUND_SOURCES : undefined };
+    });
+
   return (
     <div className="w-full max-w-md">
-      <ThinkingSteps
-        heading={heading ? "Riding the break 🏄‍♂️" : undefined}
-        seconds={seconds}
-        steps={steps}
-      />
+      {variant === "thought" ? (
+        <ThinkingSteps summary={`Thought for ${seconds || 4}s`} steps={steps} />
+      ) : (
+        <ThinkingSteps steps={steps} />
+      )}
     </div>
   );
 }
@@ -130,22 +174,26 @@ export default function ThinkingStepsDocs() {
     <ComponentPage
       title="Thinking Steps"
       status="experimental"
-      version="0.1"
-      description="A reasoning trace: a card of sequential steps, each with a leading icon, a label, and a right-aligned status — a pulsing dot while running, a filled checkmark when done. Presentational and controlled: pass the step statuses; the consumer (e.g. Box AI) drives the timing."
+      version="0.4"
+      description="A reasoning trace card with two variants: Thinking (live — steps visible, the active one pulsing, finished ones checked) and Thought (done — a collapsible 'Thought for Xs' card that re-reveals the steps on click). Presentational and controlled: pass the step statuses; the consumer (e.g. Box AI) drives the timing."
     >
       <AudienceTabs
         playground={
           <Playground
             controls={[
-              { prop: "heading", label: "heading", type: "boolean", default: true },
-              { prop: "seconds", label: "seconds", type: "select", options: [0, 2, 4], default: 2 },
-              { prop: "active", label: "active step", type: "select", options: [0, 1, 2], default: 1 },
+              { prop: "variant", label: "variant", type: "select", options: ["thinking", "thought"], default: "thinking" },
+              { prop: "autoplay", label: "auto-play", type: "boolean", default: true, visibleIf: (v) => v.variant === "thinking" },
+              { prop: "active", label: "active step", type: "select", options: [0, 1, 2], default: 1, visibleIf: (v) => v.variant === "thinking" && !v.autoplay },
+              { prop: "seconds", label: "seconds", type: "select", options: [0, 2, 4], default: 2, visibleIf: (v) => v.variant === "thought" },
+              { prop: "sources", label: "sources", type: "boolean", default: false },
             ]}
             render={(v) => (
               <PlaygroundDemo
-                heading={Boolean(v.heading)}
+                variant={v.variant as "thinking" | "thought"}
                 seconds={Number(v.seconds)}
                 active={Number(v.active)}
+                sources={Boolean(v.sources)}
+                autoplay={Boolean(v.autoplay)}
               />
             )}
           />
@@ -156,12 +204,12 @@ export default function ThinkingStepsDocs() {
               parts={[
                 { n: 1, part: "Card — the container holding the whole trace.", tokens: "rounded-xl · border-border · bg-muted/40 · data-slot=thinking-steps" },
                 { n: 2, part: "Header — an optional pulsing phrase + elapsed seconds.", tokens: "font-mono · uppercase · text-muted-foreground · animate-pulse" },
-                { n: 3, part: "Step row — icon, label, and a right-aligned status.", tokens: "rounded-lg · bg-muted · data-status" },
-                { n: 4, part: "Status — a pulsing dot (running) or a filled checkmark (done).", tokens: "bg-foreground · text-background" },
+                { n: 3, part: "Step — an icon node threaded by a vertical connector line, with the label to its right (no per-step box).", tokens: "timeline · data-status · label truncate" },
+                { n: 4, part: "Node — the source icon while pending/active (pulsing when active), a checkmark when done.", tokens: "CheckGlyph · animate-pulse · connector w-px bg-current/20" },
               ]}
             >
               <div className="w-full max-w-md">
-                <ThinkingSteps heading="Riding the break 🏄‍♂️" seconds={3} steps={runningSteps} />
+                <ThinkingSteps steps={runningSteps} />
               </div>
             </Anatomy>
             <Guidelines
@@ -220,7 +268,7 @@ export default function ThinkingStepsDocs() {
                       <ThinkingSteps steps={[{ label: "Searching…", icon: MagnifyingGlassIcon, status: "active" }]} />
                     </div>
                   ),
-                  tokens: "pulsing dot · bg-current opacity-40 · animate-pulse",
+                  tokens: "source icon node · animate-pulse · opacity-80",
                 },
                 {
                   name: "Done (complete)",
@@ -229,7 +277,7 @@ export default function ThinkingStepsDocs() {
                       <ThinkingSteps steps={[{ label: "Searching…", icon: MagnifyingGlassIcon, status: "done" }]} />
                     </div>
                   ),
-                  tokens: "filled checkmark · bg-foreground · text-background · opacity-50 row",
+                  tokens: "checkmark node · row opacity-50",
                 },
               ]}
             />
@@ -267,8 +315,10 @@ export default function ThinkingStepsDocs() {
                   interfaceName: "ThinkingSteps",
                   rows: [
                     { name: "steps", type: "ThinkingStep[]", desc: "The steps to render, in order." },
-                    { name: "heading?", type: "ReactNode", desc: "Optional header phrase shown above the steps (pulses)." },
+                    { name: "heading?", type: "ReactNode", desc: "Optional header phrase shown above the steps (pulses). Live state only; ignored when `summary` is set." },
                     { name: "seconds?", type: "number", desc: "Optional elapsed seconds shown next to the heading; hidden when 0." },
+                    { name: "summary?", type: "ReactNode", desc: 'Renders the COLLAPSED state: a clickable summary row (e.g. "Thought for 4s") with a chevron that discloses the steps. Use after the trace completes.' },
+                    { name: "defaultOpen?", type: "boolean", default: "false", desc: "In collapsed (summary) mode, whether the steps start expanded." },
                     { name: "…div", type: "HTMLDivProps", desc: "Extends <div> (className, etc.)." },
                   ],
                 },
@@ -277,18 +327,30 @@ export default function ThinkingStepsDocs() {
                   rows: [
                     { name: "label", type: "string", desc: "The step's text (a present-participle phrase)." },
                     { name: "icon", type: "React.ElementType", desc: "A leading icon component (e.g. a Heroicon), rendered at size-3.5." },
-                    { name: "status", type: '"pending" | "active" | "done"', desc: "Drives the row: active = pulsing dot, done = checkmark + dimmed. Set via data-status." },
+                    { name: "status", type: '"pending" | "active" | "done"', desc: "Drives the row: active = breathing, done = checkmark + dimmed. Set via data-status." },
+                    { name: "sources?", type: "ThinkingStepSource[]", desc: "Sources this step consulted, listed beneath it (search-results style)." },
+                  ],
+                },
+                {
+                  interfaceName: "ThinkingStepSource",
+                  rows: [
+                    { name: "title", type: "string", desc: "The source's primary label (e.g. a case study title)." },
+                    { name: "subtitle?", type: "string", desc: "Muted secondary line (e.g. a category, org, or path)." },
+                    { name: "href?", type: "string", desc: "When set, the source row links here." },
                   ],
                 },
               ]}
             />
             <Accessibility
               keyboard={[
-                { keys: ["—"], does: "Non-interactive — a status display with no focusable controls or keyboard behavior." },
+                { keys: ["Tab"], does: "In collapsed (summary) mode, focuses the disclosure toggle. The live trace is non-interactive." },
+                { keys: ["↵", "Space"], does: "Toggles the collapsed summary open/closed." },
               ]}
               aria={[
                 { attr: "data-slot", on: "Card", purpose: 'Style/target hook ("thinking-steps").' },
+                { attr: "data-collapsed", on: "Card", purpose: "Present when in collapsed (summary) mode." },
                 { attr: "data-status", on: "Each step row", purpose: 'Reflects the step status ("pending" | "active" | "done") for styling.' },
+                { attr: "aria-expanded", on: "Summary toggle", purpose: "Reflects whether the collapsed steps are open." },
               ]}
               notes={[
                 "Presentational and controlled — it renders exactly the statuses you pass and owns no timers; the consumer drives the reveal + completion.",
@@ -299,6 +361,9 @@ export default function ThinkingStepsDocs() {
             />
             <Changelog
               entries={[
+                { version: "0.4", changes: ["Steps can now list `sources` beneath them (search-results style) — e.g. the case studies a step scraped, each linking to its page."] },
+                { version: "0.3", changes: ["Redesigned steps as a Claude-style timeline: icon nodes threaded by a vertical connector line, no per-step boxes.", "The active step now \"breathes\" (fades in/out) while running, replacing the pulsing heading."] },
+                { version: "0.2", changes: ["Added the collapsed summary mode (summary + defaultOpen) — a \"Thought for Xs\" disclosure that re-reveals the completed steps."] },
                 { version: "0.1", changes: ["Initial extraction from Box AI — presentational card + sequential steps with pulsing-dot / checkmark statuses."] },
               ]}
             />
