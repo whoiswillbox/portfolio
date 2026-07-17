@@ -25,29 +25,33 @@ export type SkillGroup = {
 
 export const EXPERIENCE: ResumeJob[] = [
   {
-    company: "Technergetics",
-    role: "Lead UX Designer",
-    period: "Aug 2023 – Aug 2024",
-    location: "Utica, NY",
+    company: "Nice Logic Systems",
+    role: "Founding Designer",
+    period: "Jul 2026 – Oct 2026",
+    location: "Atlanta, GA",
     bullets: [
-      "Sole contributor on the mobile logistics team; led end-to-end design processes for web, mobile, and PWA enterprise platforms that modernized daily operations for over 250,000+ airmen.",
-      "Partnered closely with UX engineer; curated component and pattern reusability that reduced technical debt for 70+ engineers and streamlined experience cohesion across all platforms.",
-      "Spearheaded back-end driven design framework; partnered with engineering leads to annotate UI iterations of data sourced query and mutation calls to enhance development workflows.",
-      "Partnered with ML engineers to refine feedback loops; leveraging large language models, multi-modal models, deep neural networks, and semantic networks for recommendation systems, knowledge graphs, and predictive analysis.",
-      "Partnered closely with military subject matter experts throughout agile product cycles; translated contract product requirement documentation, conducted user interviews, and architected interdependent military persona workflows.",
-      "Drove collaboration with cross-functional partners (product management, engineering, subject matter experts, product owners, stakeholders, and leadership) to enable milestone completion.",
-      "Responsible for Rawhide, Merlin, Upgrade, Manifast, JetDash, Hyperkit, JIJOE, DPC, and LogTrax.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    ],
+  },
+  {
+    company: "BARBRI",
+    role: "UX Designer",
+    period: "Jan 2025 – Current",
+    location: "Dallas, TX",
+    bullets: [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     ],
   },
   {
     company: "Technergetics",
     role: "UX Designer",
-    period: "Aug 2022 – Aug 2023",
+    period: "Aug 2022 – Aug 2024",
     location: "Utica, NY",
     bullets: [
-      "Designed solutions that automated and optimized hundreds of archaic military processes; reducing manual logs, paperwork, and excessive communication through process visualizations, data discovery, and real-time tracking to identify process breakdowns.",
-      "Conducted interactive prototype walkthroughs for product owners and stakeholders during bi-weekly sprint reviews to acquire feedback and demonstrate deliverable status.",
-      "Designed early stage concepts for contract proposals; 3+ SBIR Phase II contracts won based off of demonstrated feasibility, desirability, and applicability.",
+      "Sole designer on the mobile logistics team, owning end-to-end design for platforms that modernized daily operations for 250,000+ airmen. Partnered with engineering and military SMEs & product owners from research to production, and worked closely with a UX engineer to standardize components and patterns across platforms — cutting technical debt for 70+ engineers.",
     ],
   },
   {

@@ -16,13 +16,11 @@ import {
 // Comma-joined skills grouped by category, e.g. "Design: … · Stack: …".
 const skillsByCategory = SKILLS.map((g) => `${g.category}: ${g.items.join(", ")}`).join(" · ");
 
-// A compact, résumé-style dump built from the shared data. BARBRI (the current
-// role) isn't in the résumé arrays (privacy/in-progress), so it's prepended.
+// A compact, résumé-style dump built from the shared data.
 const resumeDump = [
   "Here's the full picture:",
   "",
   "EXPERIENCE:",
-  "• BARBRI — Product Designer (current, remote LA). Leading design for Bar Prep and SQE across two teams, partnering with UK teams on SQE.",
   ...EXPERIENCE.map(
     (j) => `• ${j.company} — ${j.role} (${j.period}, ${j.location}).`,
   ),
@@ -72,7 +70,7 @@ export const bioEntries: QAEntry[] = [
       "before", "prior", "what have you done", "what has he done",
     ],
     answer:
-      "Besides my current role at BARBRI, I spent two years at Technergetics — starting as UX Designer and getting promoted to Lead UX Designer after a year, driven by my hunger to shape processes. I was the sole designer on the mobile logistics team, shipping web, mobile, and PWA platforms used by 250,000+ airmen, partnering with engineers and SMEs from research all the way to shipped product. Before that I was a UX/UI design intern at Lightcert. All of it remote. (And way back, a stunt double — ask me. 🎬)",
+      "Besides my current role at BARBRI, I spent two years at Technergetics as a UX Designer — sole designer on the mobile logistics team, shipping web, mobile, and PWA platforms used by 250,000+ airmen, partnering with engineers and SMEs from research all the way to shipped product. Before that I was a UX/UI design intern at Lightcert. All of it remote. (And way back, a stunt double — ask me. 🎬)",
   },
   {
     id: "location",
