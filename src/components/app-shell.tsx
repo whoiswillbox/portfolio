@@ -143,18 +143,18 @@ export function AppShell({
               )}
             </Suspense>
             <SidebarInset
-              className="min-h-0 flex-1 m-5 mt-1.5 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
+              className="min-h-0 flex-1 m-5 mt-0 mb-0 max-sm:m-0 bg-transparent max-sm:bg-sidebar"
               // Landing: the top AND bottom margins ease from m-5 (1.25rem) on
-              // the splash down to ~m-1 (0.25rem) as you scroll into the Box
-              // product, driven by --enter-progress (0→1) — same signal as the
-              // nav reveal. The reduced bottom margin lets the card meet the
-              // footer closely once Box AI lands. Sides stay m-5. Non-landing
-              // keeps the static mt-1.5.
+              // the splash down to 0 as you scroll into the Box product,
+              // driven by --enter-progress (0→1) — same signal as the nav
+              // reveal. Non-landing keeps the static mt-0/mb-0 so the card
+              // sits flush against both the nav above and the footer below on
+              // every page, landing or not.
               style={
                 isLanding
                   ? {
-                      marginTop: "calc(1.25rem - 1rem * var(--enter-progress, 0))",
-                      marginBottom: "calc(1.25rem - 1rem * var(--enter-progress, 0))",
+                      marginTop: "calc(1.25rem * (1 - var(--enter-progress, 0)))",
+                      marginBottom: "calc(1.25rem * (1 - var(--enter-progress, 0)))",
                     }
                   : undefined
               }
