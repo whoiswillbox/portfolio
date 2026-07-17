@@ -30,7 +30,7 @@ export const personalEntries: QAEntry[] = [
       "learn to surf", "learned to surf",
     ],
     answer:
-      "I learned to surf when I was 12 but didn't really start surfing regularly until I was 15–16. I competed on the UCSD Surf Team in 2018–2019 — I surf for the love of it though, not competition. That chapter was just a fun bonus.",
+      "I learned to surf when I was 12 but didn't really start surfing regularly until I was 15–16. I competed on the UCSD Surf Team in 2018–2019 — I surf for the love of it though, not competition. That chapter was just a fun bonus. [[case-study:surfing]]",
   },
   {
     id: "where-surf",
@@ -40,7 +40,7 @@ export const personalEntries: QAEntry[] = [
       "surf where", "breaks", "local spot", "home break",
     ],
     answer:
-      "I grew up surfing all over North County San Diego, got to surf the points in Santa Barbara during community college, then really learned the breaks of South County San Diego during my undergrad at UCSD. These days I'm based in LA, hunting for waves in North and South LA — far and few between, but worth it 😄 My favorite beach break is Oceanside — either the harbor or the pier. Favorite reef break is Suckouts, a Cardiff gem that only breaks on low tide. But the spot that really shaped how I surf is Terramar — the reef break I learned and grew up on.",
+      "I grew up surfing all over North County San Diego, got to surf the points in Santa Barbara during community college, then really learned the breaks of South County San Diego during my undergrad at UCSD. These days I'm based in LA, hunting for waves in North and South LA — far and few between, but worth it 😄 My favorite beach break is Oceanside — either the harbor or the pier. Favorite reef break is Suckouts, a Cardiff gem that only breaks on low tide. But the spot that really shaped how I surf is Terramar — the reef break I learned and grew up on. [[case-study:surfing]]",
   },
   {
     id: "goat",

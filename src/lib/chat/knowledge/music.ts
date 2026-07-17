@@ -64,6 +64,6 @@ export const musicEntries: QAEntry[] = [
       "track", "tracks", "album", "albums", "into music", "music taste",
     ],
     answer:
-      "I'm a serious music nerd — my taste is non-linear and cross-disciplinary, moving across genres the way I move across disciplines. Each one exposes me to a different way of thinking, so it genuinely shapes how I design.",
+      "I'm a serious music nerd — my taste is non-linear and cross-disciplinary, moving across genres the way I move across disciplines. Dig into what I'm listening to 👇 [[case-study:music]]",
   },
 ];
