@@ -8,10 +8,12 @@ export const personalEntries: QAEntry[] = [
     id: "hobbies",
     question: "What does he do for fun?",
     keywords: [
+      // "music"/"movies" removed — they have (or will have) their own entries;
+      // keeping them here hijacked music/movie questions into the generic
+      // hobbies answer.
       "hobbies", "hobby", "for fun", "free time", "outside work", "interests",
       "surf", "surfing", "surfs", "snowboard", "snowboarding", "snowboards",
-      "video games", "gaming", "games", "gamer", "music", "movies", "movie",
-      "films", "film", "what does he do",
+      "video games", "gaming", "games", "gamer", "what does he do",
     ],
     answer: [
       "Plenty! I surf 🏄, snowboard 🏂, game a lot 🎮, and I'm a serious music nerd and movie buff.",
