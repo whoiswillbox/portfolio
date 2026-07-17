@@ -9,7 +9,15 @@
 export const STORAGE_KEY = "will-chat-conversations";
 const CHAT_EVENT = "chat:conversations";
 
-export type Message = { id: string; role: "user" | "bot"; text: string };
+export type Message = {
+  id: string;
+  role: "user" | "bot";
+  text: string;
+  /** The completed "thinking" trace for a bot answer — step labels + elapsed
+      seconds. Persisted (labels are strings; icons are re-derived on render by
+      keyword) so the collapsed "Thought for Xs" survives navigation + reload. */
+  trace?: { seconds: number; steps: string[] };
+};
 
 export type Conversation = {
   id: string;
