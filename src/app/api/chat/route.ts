@@ -112,12 +112,20 @@ export async function POST(request: Request) {
           try {
             const suggestionMsg = await client.messages.create({
               model: MODEL,
-              max_tokens: 100,
-              system: "Reply with ONLY a JSON array of 2-3 short follow-up questions (under 8 words each) the visitor might ask next. Output only the raw JSON array, nothing else.",
+              max_tokens: 120,
+              system: [
+                "You generate the visitor's NEXT questions for a portfolio chat with Will Box.",
+                "Return ONLY a raw JSON array of 2-3 short questions (each under 8 words), nothing else.",
+                "Rules:",
+                "- Each must BUILD ON the conversation so far — dig deeper into what was JUST discussed, or a natural next thread it opened. Reference specifics from Will's last answer (a project, tool, role, or detail he mentioned).",
+                "- Write them in the VISITOR's first-person voice (\"Tell me about…\", \"How did you…\", \"What was…\").",
+                "- Curious and conversational, not a generic menu. Avoid restating anything already asked in this thread.",
+                "- Vary the angle across the 2-3 (e.g. one deeper on the topic, one adjacent).",
+              ].join("\n"),
               messages: [
                 ...messages,
                 { role: "assistant", content: fullText },
-                { role: "user", content: "JSON array of 2-3 follow-up questions:" },
+                { role: "user", content: "Give the JSON array of 2-3 follow-up questions that build on what we just discussed:" },
               ],
             });
             const raw = suggestionMsg.content[0].type === "text" ? suggestionMsg.content[0].text.trim() : "[]";

@@ -1,6 +1,40 @@
 /* Bio & professional background — who Will is, what he does, skills,
-   experience, education, location. */
+   experience, education, location.
+
+   The SKILLS and RESUME answers are DERIVED from the shared résumé data
+   (src/lib/resume-data.ts) — the same source the résumé page renders — so
+   editing the résumé updates Box AI's answers automatically (no drift). */
 import type { QAEntry } from "./types";
+import {
+  EXPERIENCE,
+  EDUCATION,
+  CERTIFICATIONS,
+  SKILLS,
+  ALL_SKILLS,
+} from "@/lib/resume-data";
+
+// Comma-joined skills grouped by category, e.g. "Design: … · Stack: …".
+const skillsByCategory = SKILLS.map((g) => `${g.category}: ${g.items.join(", ")}`).join(" · ");
+
+// A compact, résumé-style dump built from the shared data. BARBRI (the current
+// role) isn't in the résumé arrays (privacy/in-progress), so it's prepended.
+const resumeDump = [
+  "Here's the full picture:",
+  "",
+  "EXPERIENCE:",
+  "• BARBRI — Product Designer (current, remote LA). Leading design for Bar Prep and SQE across two teams, partnering with UK teams on SQE.",
+  ...EXPERIENCE.map(
+    (j) => `• ${j.company} — ${j.role} (${j.period}, ${j.location}).`,
+  ),
+  "",
+  "EDUCATION:",
+  ...EDUCATION.map((e) => `• ${e.institution} — ${e.details.join(", ")} (${e.period})`),
+  "",
+  "CERTIFICATIONS:",
+  ...CERTIFICATIONS.map((c) => `• ${c.institution} — ${c.details.join(", ")} (${c.period})`),
+  "",
+  `SKILLS: ${ALL_SKILLS.join(", ")}.`,
+].join("\n");
 
 export const bioEntries: QAEntry[] = [
   {
@@ -25,7 +59,7 @@ export const bioEntries: QAEntry[] = [
       "good at", "figma", "design systems", "prototyping",
     ],
     answer:
-      "My core is UX — persona mapping, information architecture, interaction design, wireframing, prototyping, and design systems. I live in Figma (plus Figjam, Webflow, Framer, and Storybook), and I'm fluent in design handoff: tokenization, naming conventions, annotations, and changelogs. I also code, so I can carry work from research all the way to shipped front-end.",
+      `My skills, grouped — ${skillsByCategory}. I also code, so I can carry work from research all the way to shipped front-end.`,
   },
   {
     id: "experience",
@@ -64,8 +98,7 @@ export const bioEntries: QAEntry[] = [
       "resume", "cv", "curriculum vitae", "work history", "full experience",
       "all roles", "every job", "timeline", "career timeline",
     ],
-    answer:
-      "Here's the full picture:\n\nEXPERIENCE:\n• BARBRI — Product Designer (current, remote LA). Leading design for Bar Prep and SQE across two teams, partnering with UK teams on SQE.\n• Technergetics — Lead UX Designer (Aug 2023–Aug 2024, remote). Sole designer on the mobile logistics team; led end-to-end design for web, mobile, and PWA platforms used by 250,000+ airmen. Partnered with ML engineers on recommendation systems. Responsible for Rawhide, Merlin, Upgrade, Manifast, JetDash, Hyperkit, JIJOE, DPC, and LogTrax.\n• Technergetics — UX Designer (Aug 2022–Aug 2023, remote). Automated and optimized military processes; won 3+ SBIR Phase II contracts through early-stage design feasibility work. Promoted to Lead after one year.\n• Lightcert — UX/UI Design Intern (Jan–Jun 2022, LA). Revamped the mobile design system; designed save/share feature for MVP v.2 that reached 40k+ fandoms.\n\nEDUCATION:\n• UC San Diego — Psychology B.A., Cognitive Science (Design + Interaction) Minor (2018–2022)\n• Santa Barbara City College — Communication A.A. (2017–2018)\n\nCERTIFICATIONS:\n• ELVTR — Intro to AI Product Design with Robert Redmond (2023–2024)\n\nSKILLS: Persona mapping, IA, interaction design, wireframing, prototyping, design systems, design ops, Figma, Figjam, Webflow, Framer, Storybook, agile methodologies.",
+    answer: resumeDump,
   },
   {
     id: "overview",
