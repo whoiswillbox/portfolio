@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   PencilSquareIcon,
   XMarkIcon,
@@ -381,6 +381,7 @@ export function BoxAI({
   seed?: CaseStudy | null;
 } = {}) {
   const router = useRouter();
+  const pathname = usePathname();
   const seedRef = React.useRef(seed);
   React.useEffect(() => { seedRef.current = seed; }, [seed]);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
@@ -991,7 +992,12 @@ export function BoxAI({
     // that split. The conversation is bound below + carried via ?box=, so it
     // reopens beside the study (same as reopening from the conversations page).
     const cs = findCaseStudy(reply.text);
-    if (cs && embedded) setOpenCaseStudy(cs);
+    // Open the panel in-place when embedded — but NOT if we're already viewing
+    // that same page (would stack a nested panel on top of the current split,
+    // e.g. asking about music while on the Music page). On the home page the
+    // navigate below handles it instead.
+    const alreadyOnPage = !!cs?.href && pathname === cs.href;
+    if (cs && embedded && !alreadyOnPage) setOpenCaseStudy(cs);
 
     // Only paid (API) replies count toward the daily limit — unless the dev
     // preview toggle is on, which also counts free local replies.
@@ -1028,8 +1034,9 @@ export function BoxAI({
     setSending(false);
 
     // Home page: route to the case study's own page (with the conversation) once
-    // the reply is saved, so it opens as the proper floating split there.
-    if (cs && !embedded) router.push(`${cs.href}?box=${convoId}`);
+    // the reply is saved, so it opens as the proper floating split there. Skip
+    // if we're somehow already on that page (guard against a redundant nav).
+    if (cs && !embedded && !alreadyOnPage) router.push(`${cs.href}?box=${convoId}`);
   };
 
   const goHome = () => {
