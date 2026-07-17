@@ -36,6 +36,31 @@ CASE STUDIES (full detail for all projects):
 
 ${buildCaseStudyNotes()}`;
 
+/* Auto-generate one Q&A entry per built case study (so every project can be
+   asked about by name and renders its card). Keywords come from the title words
+   + slug; the answer leads with the summary and ends with the marker. This keeps
+   the local matcher in sync with the registry — new case studies are covered
+   automatically. Design Standards is excluded (it's the favorite-project entry).
+   The BARBRI project (next-gen-bar) is also excluded — BARBRI details are
+   private (see the persona's BARBRI PRIVACY rule). */
+const EXCLUDED_CASE_STUDY_SLUGS = new Set(["design-standards", "next-gen-bar"]);
+
+const caseStudyEntries: QAEntry[] = Object.values(caseStudies)
+  .filter((cs) => cs.sections.length > 0 && cs.href && !EXCLUDED_CASE_STUDY_SLUGS.has(cs.slug))
+  .map((cs) => {
+    // Keywords: the slug, the lowercased title, and each meaningful title word.
+    const titleWords = cs.title.toLowerCase().replace(/[^a-z0-9\s.]/g, " ").split(/\s+/).filter((w) => w.length > 2);
+    const keywords = Array.from(
+      new Set([cs.slug, cs.slug.replace(/-/g, " "), cs.title.toLowerCase(), ...titleWords]),
+    );
+    return {
+      id: `case-study-${cs.slug}`,
+      question: `Tell me about ${cs.title}`,
+      keywords,
+      answer: `${cs.summary} Here's the case study 👇 [[case-study:${cs.slug}]]`,
+    };
+  });
+
 export const projectEntries: QAEntry[] = [
   {
     id: "favorite-project",
@@ -43,7 +68,7 @@ export const projectEntries: QAEntry[] = [
     keywords: [
       "favorite project", "favourite project", "favorite", "favourite",
       "best project", "proudest", "favorite work", "favorite thing",
-      "case study", "design standards",
+      "design standards",
     ],
     answer:
       "My favorite is Design Standards — I was responsible for shaping the internal design language at Technergetics that benefited customers externally through curated patterns. Check it out 👇 [[case-study:design-standards]]",
@@ -71,4 +96,7 @@ export const projectEntries: QAEntry[] = [
     ],
     answer: "Here are some ways you can reach me! 👇 [[contact]]",
   },
+  // One entry per built case study (jetdash, upgrade, reusable-table, lightcert,
+  // swiperight-ai, …), auto-generated from the registry — see caseStudyEntries.
+  ...caseStudyEntries,
 ];

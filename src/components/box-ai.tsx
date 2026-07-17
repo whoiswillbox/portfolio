@@ -285,7 +285,11 @@ const REASONING_STEPS: { keywords: string[]; steps: ReasoningStep[] }[] = [
     ],
   },
   {
-    keywords: ["experience", "job", "role", "career", "resume", "cv", "hire", "recruiter", "work at"],
+    keywords: [
+      "experience", "job", "role", "career", "resume", "cv", "hire", "recruiter",
+      "work at", "school", "education", "study", "studied", "college",
+      "university", "degree", "background",
+    ],
     steps: [
       { label: "Reviewing work experience…", Icon: BuildingOffice2Icon },
       { label: "Reading the CV…", Icon: DocumentTextIcon },

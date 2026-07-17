@@ -85,8 +85,11 @@ export const bioEntries: QAEntry[] = [
     id: "education",
     question: "Where did you study?",
     keywords: [
-      "education", "school", "degree", "study", "studied", "college", "university",
-      "ucsd", "uc san diego", "major", "graduate", "certification", "certified",
+      // NOTE: no bare "study" — it collides with "case study" and would hijack
+      // project questions. Use the education-specific forms instead.
+      "education", "school", "degree", "studied", "where did you study",
+      "college", "university", "ucsd", "uc san diego", "major", "graduate",
+      "certification", "certified",
     ],
     answer:
       "I studied Psychology with a Cognitive Science (Design + Interaction) minor at UC San Diego (2018–2022), after an AA in Communication at Santa Barbara City College. My UCSD coursework covered interaction design, prototyping, usability, and programming in Python and Java. I'm also certified in AI Product Design through ELVTR (Intro to AI Product Design with Robert Redmond, 2024).",

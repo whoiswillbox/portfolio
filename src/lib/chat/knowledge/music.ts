@@ -54,4 +54,16 @@ The story behind my playlists:
 
 Use these for the back-story and personality behind my music; pair them with the live MY MUSIC data for specifics.`;
 
-export const musicEntries: QAEntry[] = [];
+export const musicEntries: QAEntry[] = [
+  {
+    id: "music",
+    question: "What music are you into?",
+    keywords: [
+      "music", "song", "songs", "artist", "artists", "band", "bands", "genre",
+      "genres", "listening", "listen to", "spotify", "playlist", "playlists",
+      "track", "tracks", "album", "albums", "into music", "music taste",
+    ],
+    answer:
+      "I'm a serious music nerd — my taste is non-linear and cross-disciplinary, moving across genres the way I move across disciplines. Dig into what I'm listening to 👇 [[case-study:music]]",
+  },
+];
