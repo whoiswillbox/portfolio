@@ -64,8 +64,8 @@ export const personalEntries: QAEntry[] = [
       "like as a person",
     ],
     answer: [
-      "Oh, I'm cool 😎 — a product designer turned vibe coder with a sense of humor. Ask me anything.",
-      "Cool? Certified. 😎 Designer turned coder, low ego, high curiosity.",
+      "Oh, I'm cool 😎 — a product designer who ships front-end code with AI, and has a sense of humor. Ask me anything.",
+      "Cool? Certified. 😎 Design-led, AI-fluent, low ego, high curiosity.",
     ],
   },
   {

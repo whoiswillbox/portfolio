@@ -18,6 +18,7 @@ import {
   AcademicCapIcon,
   MagnifyingGlassIcon,
   SparklesIcon,
+  ArrowRightIcon,
   Cog6ToothIcon,
   MoonIcon,
   SunIcon,
@@ -208,8 +209,8 @@ const HEADINGS = [
   "Ask me where I'm headed",
   "Ask me about my north star",
   "Ask me why I design",
-  "Ask me why I code too",
-  "Ask me about being a design engineer",
+  "Ask me how I build with AI",
+  "Ask me about shipping with AI",
   "Ask me about designing with AI",
   "Ask me how AI changed my work",
   "So… what's your first question?",
@@ -882,6 +883,7 @@ export function BoxAI({
             messages: [botMsg],
             shown: [],
             caseStudySlug: study.slug,
+            createdAt: Date.now(),
           },
           ...loadedConvos,
         ]);
@@ -1086,7 +1088,7 @@ export function BoxAI({
       convoId = uid();
       setActiveId(convoId);
       setConversations((prev) => [
-        { id: convoId!, title: titleFrom(trimmed), messages: [userMsg], shown: [] },
+        { id: convoId!, title: titleFrom(trimmed), messages: [userMsg], shown: [], createdAt: Date.now() },
         ...prev,
       ]);
     }
@@ -1108,10 +1110,23 @@ export function BoxAI({
       await new Promise((r) => setTimeout(r, MIN_THINK_MS - elapsed));
     }
 
+    // Resolve the referenced study + whether this is a context switch NOW (the
+    // reply has resolved), so the trace can ANNOUNCE the page change before it
+    // happens — turning the "content swapped under me" moment into an explicit,
+    // intentional step ("Opening the Upgrade case study →").
+    const cs = findCaseStudy(reply.text);
+    const onCsPage = !!cs?.href && pathname === cs.href;
+    const contextSwitch = !!cs && !!active?.caseStudySlug && cs.slug !== active.caseStudySlug;
+    const willNavigate = !!cs?.href && !onCsPage;
+    const displaySteps: ReasoningStep[] =
+      willNavigate && cs
+        ? [...steps, { label: `Opening the ${cs.title} ${contextSwitch ? "case study" : "page"} →`, Icon: ArrowRightIcon }]
+        : steps;
+
     // Reply is ready: reveal ALL steps and flip every one (incl. the final
     // "Drafting…") to a checkmark, then hold briefly so the completed trace is
     // seen BEFORE the answer replaces it.
-    setVisibleSteps(steps);
+    setVisibleSteps(displaySteps);
     setAllStepsDone(true);
     await new Promise((r) => setTimeout(r, 500));
 
@@ -1129,22 +1144,7 @@ export function BoxAI({
     const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
     // Keep the completed trace so it can render collapsed ("Thought for Xs")
     // above this answer for the rest of the session.
-    setLastTrace({ messageId: botMsg.id, steps, seconds: Math.max(1, Math.round((Date.now() - startedAt) / 1000)) });
-
-    // If the reply references a case study, show it. When embedded (already on a
-    // case-study page) open the in-place side panel. On the home page (non-
-    // embedded) NAVIGATE to the study's own page instead — its ContentWorkspace
-    // renders the split with proper floating panels; the landing card can't host
-    // that split. The conversation is bound below + carried via ?box=, so it
-    // reopens beside the study (same as reopening from the conversations page).
-    const cs = findCaseStudy(reply.text);
-    const onCsPage = !!cs?.href && pathname === cs.href;
-    // Only open the in-place panel when the referenced study IS the page we're
-    // already on (the normal case-study-page flow shows it beside the content).
-    // Referencing a DIFFERENT study while embedded must NOT stack a third panel
-    // on top of the current split — navigate to that study's page instead (see
-    // the navigate branch below). onCsPage=true → its own content already shows,
-    // so nothing to open.
+    setLastTrace({ messageId: botMsg.id, steps: displaySteps, seconds: Math.max(1, Math.round((Date.now() - startedAt) / 1000)) });
 
     // Only paid (API) replies count toward the daily limit — unless the dev
     // preview toggle is on, which also counts free local replies.
@@ -1157,14 +1157,11 @@ export function BoxAI({
       });
     }
 
-    // CONTEXT SWITCH: the active thread is already bound to a DIFFERENT case
-    // study/topic and this reply is about a new one. Branch — move this exchange
-    // (the switching question + its answer) OUT of the current thread and INTO a
-    // NEW conversation bound to the new study, so each thread stays on-topic and
-    // is cleanly separable in the Conversations page.
-    const contextSwitch =
-      !!cs && !!active?.caseStudySlug && cs.slug !== active.caseStudySlug;
-
+    // CONTEXT SWITCH (cs / onCsPage / contextSwitch computed above): the active
+    // thread is already bound to a DIFFERENT study and this reply is about a new
+    // one. Branch — move this exchange (the switching question + its answer) OUT
+    // of the current thread and INTO a NEW conversation bound to the new study,
+    // so each thread stays on-topic and is separable in the Conversations page.
     let targetConvoId = convoId;
     if (contextSwitch && active) {
       const newId = uid();
@@ -1172,7 +1169,7 @@ export function BoxAI({
       setActiveId(newId);
       setConversations((prev) => [
         // New thread: this question + answer, bound to the new study.
-        { id: newId, title: titleFrom(trimmed), messages: [userMsg, botMsg], shown: [], caseStudySlug: cs!.slug },
+        { id: newId, title: titleFrom(trimmed), messages: [userMsg, botMsg], shown: [], caseStudySlug: cs!.slug, createdAt: Date.now() },
         // Old thread: drop the switching question we optimistically appended.
         ...prev.map((c) =>
           c.id === active.id ? { ...c, messages: c.messages.filter((m) => m.id !== userMsg.id) } : c

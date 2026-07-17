@@ -20,6 +20,10 @@ export type Conversation = {
   /** Set when the conversation is framed around a case study, so reopening it
       restores that project's side-by-side card. */
   caseStudySlug?: string;
+  /** Epoch ms when the conversation was started — used to group the
+      Conversations page by date (Today / Yesterday / …). Optional: legacy
+      conversations predate it and fall into an "Earlier" bucket. */
+  createdAt?: number;
 };
 
 export function loadConversations(): Conversation[] {
