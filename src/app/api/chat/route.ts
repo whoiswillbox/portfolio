@@ -74,7 +74,9 @@ export async function POST(request: Request) {
 
     const stream = await client.messages.stream({
       model: MODEL,
-      max_tokens: 400,
+      // Hard ceiling that backs the persona's brevity rule — enough for a couple
+      // of tight sentences, short enough to discourage rambling paragraphs.
+      max_tokens: 200,
       system,
       messages,
     });
