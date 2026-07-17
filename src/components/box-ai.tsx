@@ -445,6 +445,23 @@ function getReasoningSteps(query: string): ReasoningStep[] {
   return [...base, DRAFTING_STEP];
 }
 
+// Re-derive a step icon from its label (persisted traces store only the label
+// string). Keyword match with a sensible default.
+function iconForLabel(label: string): React.ElementType {
+  const l = label.toLowerCase();
+  if (l.includes("opening")) return ArrowRightIcon;
+  if (l.includes("drafting")) return SparklesIcon;
+  if (l.includes("cv") || l.includes("resume") || l.includes("experience")) return DocumentTextIcon;
+  if (l.includes("technergetics") || l.includes("military")) return BuildingOffice2Icon;
+  if (l.includes("music") || l.includes("spotify")) return MusicalNoteIcon;
+  if (l.includes("surf")) return LifebuoyIcon;
+  if (l.includes("interest") || l.includes("personal")) return PuzzlePieceIcon;
+  if (l.includes("school")) return AcademicCapIcon;
+  if (l.includes("cardboard") || l.includes("design system")) return CubeIcon;
+  if (l.includes("case stud") || l.includes("pulling")) return BoltIcon;
+  return MagnifyingGlassIcon;
+}
+
 // The real case studies (built projects, not resume/surfing/playlist seeds),
 // as ThinkingSteps sources — title + org·timeline subtitle, linking to the page.
 const CASE_STUDY_SOURCES: ThinkingStepSource[] = Object.values(caseStudies)
@@ -680,10 +697,6 @@ export function BoxAI({
   // checkmark and holds a beat BEFORE the output reveals — so the trace reads as
   // fully complete first.
   const [allStepsDone, setAllStepsDone] = React.useState(false);
-  // The completed trace for the LATEST answer this session — rendered collapsed
-  // ("Thought for Xs") above that bot message. In-session only (not persisted),
-  // so it's absent after reload / in history. Keyed by the bot message id.
-  const [lastTrace, setLastTrace] = React.useState<{ messageId: string; steps: ReasoningStep[]; seconds: number } | null>(null);
   const [streamingText, setStreamingText] = React.useState("");
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
 
@@ -1118,9 +1131,12 @@ export function BoxAI({
     const onCsPage = !!cs?.href && pathname === cs.href;
     const contextSwitch = !!cs && !!active?.caseStudySlug && cs.slug !== active.caseStudySlug;
     const willNavigate = !!cs?.href && !onCsPage;
+    // "case study" only for real case studies (they have sections); topic seeds
+    // (music, surfing, gaming — empty sections) are just PAGES.
+    const csNoun = cs && cs.sections.length > 0 ? "case study" : "page";
     const displaySteps: ReasoningStep[] =
       willNavigate && cs
-        ? [...steps, { label: `Opening the ${cs.title} ${contextSwitch ? "case study" : "page"} →`, Icon: ArrowRightIcon }]
+        ? [...steps, { label: `Opening the ${cs.title} ${csNoun}…`, Icon: ArrowRightIcon }]
         : steps;
 
     // Reply is ready: reveal ALL steps and flip every one (incl. the final
@@ -1141,10 +1157,16 @@ export function BoxAI({
         seedPrompts?.length ? seedPrompts.slice(0, 3) : pickRandom(FALLBACK_SUGGESTION_POOL, 3),
       );
     }
-    const botMsg: Message = { id: uid(), role: "bot", text: reply.text };
-    // Keep the completed trace so it can render collapsed ("Thought for Xs")
-    // above this answer for the rest of the session.
-    setLastTrace({ messageId: botMsg.id, steps: displaySteps, seconds: Math.max(1, Math.round((Date.now() - startedAt) / 1000)) });
+    // Persist the completed trace ON the bot message (labels + seconds) so the
+    // collapsed "Thought for Xs" survives navigation + reload — it's rendered
+    // from m.trace per message, not ephemeral state.
+    const traceSeconds = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+    const botMsg: Message = {
+      id: uid(),
+      role: "bot",
+      text: reply.text,
+      trace: { seconds: traceSeconds, steps: displaySteps.map((s) => s.label) },
+    };
 
     // Only paid (API) replies count toward the daily limit — unless the dev
     // preview toggle is on, which also counts free local replies.
@@ -1459,16 +1481,17 @@ export function BoxAI({
             {messages.map((m, idx) =>
               m.role === "bot" ? (
                 <div key={m.id} className="flex flex-col gap-2">
-                  {/* Collapsed "Thought for Xs" trace for the latest answer this
-                      session (in-session only; absent after reload). */}
-                  {lastTrace?.messageId === m.id && (
+                  {/* Collapsed "Thought for Xs" trace — persisted on the message,
+                      so it survives navigation + reload. Icons re-derived from
+                      the labels by keyword. */}
+                  {m.trace && m.trace.steps.length > 0 && (
                     <ThinkingSteps
-                      summary={`Thought for ${lastTrace.seconds}s`}
-                      steps={lastTrace.steps.map((step) => ({
-                        label: step.label,
-                        icon: step.Icon,
+                      summary={`Thought for ${m.trace.seconds}s`}
+                      steps={m.trace.steps.map((label) => ({
+                        label,
+                        icon: iconForLabel(label),
                         status: "done",
-                        sources: sourcesForStep(step.label),
+                        sources: sourcesForStep(label),
                       }))}
                     />
                   )}
