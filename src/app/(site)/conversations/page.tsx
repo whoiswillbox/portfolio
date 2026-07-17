@@ -48,6 +48,22 @@ function previewOf(c: Conversation): string {
   return stripCaseStudyMarker(stripContactMarker(text));
 }
 
+/** Bucket a conversation by when it was started, so the list reads by session
+    (Today / Yesterday / Previous 7 Days / Older). Legacy conversations have no
+    createdAt → "Earlier". */
+const DATE_GROUPS = ["Today", "Yesterday", "Previous 7 Days", "Older", "Earlier"] as const;
+type DateGroup = (typeof DATE_GROUPS)[number];
+
+function groupOf(c: Conversation, now: number): DateGroup {
+  if (c.createdAt == null) return "Earlier";
+  const startOfToday = new Date(now).setHours(0, 0, 0, 0);
+  const dayMs = 86_400_000;
+  if (c.createdAt >= startOfToday) return "Today";
+  if (c.createdAt >= startOfToday - dayMs) return "Yesterday";
+  if (c.createdAt >= startOfToday - 7 * dayMs) return "Previous 7 Days";
+  return "Older";
+}
+
 export default function ConversationsPage() {
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [query, setQuery] = React.useState("");
@@ -78,6 +94,23 @@ export default function ConversationsPage() {
       c.messages.some((m) => m.text.toLowerCase().includes(q))
     );
   });
+
+  // Group the filtered list by date bucket. `now` is set on mount (avoids an
+  // SSR/CSR mismatch from Date.now() during render). Order within a group is the
+  // stored order (newest-first).
+  const [now, setNow] = React.useState<number | null>(null);
+  React.useEffect(() => setNow(Date.now()), []);
+  const grouped = React.useMemo(() => {
+    const map = new Map<DateGroup, Conversation[]>();
+    if (now == null) return map;
+    for (const c of filtered) {
+      const g = groupOf(c, now);
+      const arr = map.get(g);
+      if (arr) arr.push(c);
+      else map.set(g, [c]);
+    }
+    return map;
+  }, [filtered, now]);
 
   const toggleSelect = (id: string) =>
     setSelected((prev) => {
@@ -188,8 +221,8 @@ export default function ConversationsPage() {
           </div>
         )}
 
-        {/* List */}
-        <div className="mt-6 flex flex-col gap-1">
+        {/* List — grouped by date (Today / Yesterday / …). */}
+        <div className="mt-6 flex flex-col gap-6">
           {filtered.length === 0 ? (
             <p className="py-12 text-center text-body-sm text-muted-foreground">
               {conversations.length === 0
@@ -197,47 +230,58 @@ export default function ConversationsPage() {
                 : "No conversations match your filters."}
             </p>
           ) : (
-            filtered.map((c) => {
-              const rowBody = (
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5 px-3 py-2.5">
-                  <span className="truncate font-mono text-body-xs uppercase tracking-wide text-foreground">
-                    {c.title}
-                  </span>
-                  <span className="truncate text-body-sm text-muted-foreground">
-                    {previewOf(c)}
-                  </span>
-                </div>
-              );
+            DATE_GROUPS.map((group) => {
+              const rows = grouped.get(group);
+              if (!rows?.length) return null;
               return (
-                <div
-                  key={c.id}
-                  className="group flex items-center rounded-lg transition-colors hover:bg-muted/60"
-                >
-                  {selectMode ? (
-                    <button
-                      type="button"
-                      onClick={() => toggleSelect(c.id)}
-                      className="flex min-w-0 flex-1 items-center gap-3 pl-3 text-left"
-                    >
-                      <Checkbox on={selected.has(c.id)} />
-                      {rowBody}
-                    </button>
-                  ) : (
-                    <>
-                      <Link href={hrefFor(c)} className="flex min-w-0 flex-1">
-                        {rowBody}
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => persist(conversations.filter((x) => x.id !== c.id))}
-                        aria-label="Delete conversation"
-                        className="mr-2 shrink-0 rounded p-1.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+                <section key={group} className="flex flex-col gap-1">
+                  <h2 className="px-3 pb-1 font-mono text-body-xs uppercase tracking-wide text-muted-foreground">
+                    {group}
+                  </h2>
+                  {rows.map((c) => {
+                    const rowBody = (
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5 px-3 py-2.5">
+                        <span className="truncate font-mono text-body-xs uppercase tracking-wide text-foreground">
+                          {c.title}
+                        </span>
+                        <span className="truncate text-body-sm text-muted-foreground">
+                          {previewOf(c)}
+                        </span>
+                      </div>
+                    );
+                    return (
+                      <div
+                        key={c.id}
+                        className="group flex items-center rounded-lg transition-colors hover:bg-muted/60"
                       >
-                        <XMarkIcon className="size-4" />
-                      </button>
-                    </>
-                  )}
-                </div>
+                        {selectMode ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleSelect(c.id)}
+                            className="flex min-w-0 flex-1 items-center gap-3 pl-3 text-left"
+                          >
+                            <Checkbox on={selected.has(c.id)} />
+                            {rowBody}
+                          </button>
+                        ) : (
+                          <>
+                            <Link href={hrefFor(c)} className="flex min-w-0 flex-1">
+                              {rowBody}
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => persist(conversations.filter((x) => x.id !== c.id))}
+                              aria-label="Delete conversation"
+                              className="mr-2 shrink-0 rounded p-1.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+                            >
+                              <XMarkIcon className="size-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </section>
               );
             })
           )}

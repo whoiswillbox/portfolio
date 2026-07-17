@@ -42,14 +42,14 @@ export const bioEntries: QAEntry[] = [
     question: "Who is Will?",
     keywords: ["who", "who are you", "who is will", "introduce", "about will", "yourself"],
     answer:
-      "I'm Will — a product designer turned vibe coder due to the world takeover of robots.",
+      "I'm Will — a product designer who ships front-end code, building it with AI tools. Design-led, AI-fluent.",
   },
   {
     id: "what-do-you-do",
     question: "What do you do?",
     keywords: ["what do you do", "job", "role", "work", "profession", "title", "occupation"],
     answer:
-      "I'm a product designer at BARBRI, working remotely from LA. I lead design across two teams — Bar Prep and SQE (partnering with UK teams on SQE). I work closely with stakeholders, product owners, and engineering to take experiences from research to polished UI — and I ship the front-end code too.",
+      "I'm a product designer at BARBRI, working remotely from LA. I lead design across two teams — Bar Prep and SQE (partnering with UK teams on SQE). I work closely with stakeholders, product owners, and engineering to take experiences from research to polished UI — and I ship front-end code too, building it with AI tools.",
   },
   {
     id: "skills",
@@ -59,7 +59,7 @@ export const bioEntries: QAEntry[] = [
       "good at", "figma", "design systems", "prototyping",
     ],
     answer:
-      `My skills, grouped — ${skillsByCategory}. I also code, so I can carry work from research all the way to shipped front-end.`,
+      `My skills, grouped — ${skillsByCategory}. I'm design-led but AI-fluent, so I can carry work from research all the way to shipped front-end code — building it with AI tools.`,
   },
   {
     id: "experience",
@@ -125,9 +125,9 @@ export const bioEntries: QAEntry[] = [
       "his deal", "whats his deal", "what's his deal",
     ],
     answer: [
-      "I'm a product designer turned vibe coder (blame the robots 🤖). I design and build web things. Want the details on my work, my projects, or how to reach me?",
-      "Short version: designer brain, coder hands. Ask me about my skills, what I've built, or how to get in touch and I'll go deeper.",
-      "I'm a designer who learned to ship code. There's a lot to cover — pick a lane: my work, my projects, or contact info?",
+      "I'm a product designer who ships front-end code, building it with AI tools (blame the robots 🤖). I design and build web things. Want the details on my work, my projects, or how to reach me?",
+      "Short version: design-led, AI-fluent — I ship front-end code built with AI. Ask me about my skills, what I've built, or how to get in touch and I'll go deeper.",
+      "I'm a designer who ships real front-end code, built with AI tools. There's a lot to cover — pick a lane: my work, my projects, or contact info?",
     ],
   },
 ];
