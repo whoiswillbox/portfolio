@@ -109,7 +109,8 @@ const shuffle = <T,>(arr: readonly T[]): T[] => {
   return a;
 };
 
-/* Fun, first-person headings for the empty state — picked at random. */
+/* Fun, first-person headings for the empty state — served from a shuffle-bag
+   (randomHeading), so you see a new one each time until the whole pool cycles. */
 const HEADINGS = [
   "Get to know the designer behind the work",
   "Curious about my design journey?",
@@ -133,9 +134,111 @@ const HEADINGS = [
   "Ask me about my day-to-day",
   "Ask me where I've worked",
   "Ask me what drives my craft",
+  "Ask me anything about my work",
+  "What do you want to know?",
+  "Let's get into it",
+  "Ask me about a project",
+  "Curious what I've built?",
+  "Want to see my best work?",
+  "Ask me about my process",
+  "How do I approach a problem?",
+  "Ask about my favorite project",
+  "What's my proudest ship?",
+  "Ask me about design systems",
+  "Curious about my design philosophy?",
+  "Ask me how I ship",
+  "Want to hear about my craft?",
+  "Ask me about my career so far",
+  "Where did my path start?",
+  "Ask me about my school days",
+  "Curious where I studied?",
+  "Ask me about Technergetics",
+  "Ask me about BARBRI",
+  "Ask me about my internship",
+  "Ask me about my side projects",
+  "Ask me about this site",
+  "How did I build this?",
+  "Ask me about my tools",
+  "What's in my stack?",
+  "Ask me how I prototype",
+  "Ask me about my research",
+  "Curious how I handle handoff?",
+  "Ask me about my collaborators",
+  "Ask what my teammates say",
+  "Ask me about my design values",
+  "What do I care about in design?",
+  "Ask me about a hard problem I solved",
+  "Ask me about my wins",
+  "Ask me what I learned along the way",
+  "Ask me about my design taste",
+  "Ask me what inspires me",
+  "Ask me about my creative fuel",
+  "Curious what's on my playlist?",
+  "Ask me about my music taste",
+  "Ask me if I surf",
+  "Ask me where I surf",
+  "Ask me about my hobbies",
+  "Ask me what I do for fun",
+  "Ask me about life outside work",
+  "Ask me about my adventures",
+  "Ask me something unexpected",
+  "Ask me a curveball",
+  "Ask me anything — really",
+  "Test my knowledge of myself",
+  "Put me on the spot",
+  "Quiz me about my work",
+  "Ask me the hard questions",
+  "Ask me about my strengths",
+  "Ask me what I'm great at",
+  "Ask me about my superpower",
+  "Ask me how I'd help your team",
+  "Ask me if I'm hiring-ready",
+  "Ask me how to reach me",
+  "Want to get in touch?",
+  "Ask me about working together",
+  "Ask me about my remote setup",
+  "Ask me about my day-to-day flow",
+  "Ask me what a good day looks like",
+  "Ask me about my design origin story",
+  "Ask me what shaped my craft",
+  "Ask me about a turning point",
+  "Ask me about my growth",
+  "Ask me what I'd do differently",
+  "Ask me about my dream project",
+  "Ask me what's next for me",
+  "Ask me where I'm headed",
+  "Ask me about my north star",
+  "Ask me why I design",
+  "Ask me why I code too",
+  "Ask me about being a design engineer",
+  "Ask me about designing with AI",
+  "Ask me how AI changed my work",
+  "So… what's your first question?",
 ];
 
-const randomHeading = () => HEADINGS[Math.floor(Math.random() * HEADINGS.length)];
+// Shuffle-bag over the headings: hands out every heading once (in random order)
+// before any repeats, so scrolling back and forth shows a genuinely NEW phrase
+// each time until the whole pool is exhausted, then reshuffles. Module-level so
+// the bag persists across the component's re-randomize calls.
+let headingBag: string[] = [];
+const shuffleBag = (arr: readonly string[]): string[] => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+const randomHeading = (current?: string) => {
+  if (headingBag.length === 0) {
+    headingBag = shuffleBag(HEADINGS);
+    // Don't let a fresh bag lead with the current heading (repeat across refill).
+    if (current && headingBag[headingBag.length - 1] === current && headingBag.length > 1) {
+      headingBag.unshift(headingBag.pop()!);
+    }
+  }
+  return headingBag.pop()!;
+};
 
 /* Surf-themed "thinking" verbs, shown while a reply is generating. */
 const SURF_PHRASES = [
@@ -675,20 +778,41 @@ export function BoxAI({
   // and each scroll back into Box AI shows a new one.
   React.useEffect(() => {
     const root = document.documentElement;
-    let wasRest = root.hasAttribute("data-splash-rest");
-    const obs = new MutationObserver(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    // Fire the re-randomize at most ONCE per rest: only when rest is newly
+    // entered (was not-rest, now rest). Without this, multiple mutations per
+    // settle fired it twice with a stale `cur` (double flip).
+    let firedForThisRest = root.hasAttribute("data-splash-rest");
+    const sync = () => {
       const isRest = root.hasAttribute("data-splash-rest");
-      if (isRest && !wasRest) setHeading(randomHeading());
-      wasRest = isRest;
-    });
+      // Reset when leaving rest so the NEXT rest can fire again.
+      if (!isRest) { firedForThisRest = false; if (timer) { clearTimeout(timer); timer = null; } return; }
+      if (firedForThisRest) return;
+      firedForThisRest = true;
+      // Fire once per rest entry, on a short delay so it's picked while the
+      // splash is settled (avoids the mid-scroll flip). Don't re-check rest in
+      // the timer — the once-per-rest guard already prevents doubles, and by
+      // firing regardless the heading updates even if you immediately scroll
+      // back in (it's hidden during the transition either way).
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        setHeading((cur) => randomHeading(cur)); // exclude current — no repeat
+      }, 120);
+    };
+    const obs = new MutationObserver(sync);
     obs.observe(root, { attributes: true, attributeFilter: ["data-splash-rest"] });
-    return () => obs.disconnect();
+    return () => { obs.disconnect(); if (timer) clearTimeout(timer); };
   }, []);
 
   // Load persisted conversations on mount, and (launcher use) seed a fresh
   // project-framed conversation: a bot opener + that project's follow-up chips.
   // Load + seed live in one guarded effect so StrictMode's double-invoke can't
   // re-run load and wipe the seed, and so it only seeds once.
+  // The conversation to reopen, carried from wherever Box AI navigated from
+  // (home question → study/topic page uses `${href}?box=<id>`). When present it
+  // wins over seeding a fresh "About <topic>" — so the panel shows the SAME
+  // conversation you were just having, not a fresh opener.
+  const boxConvoId = useSearchParams().get("box");
   const initRef = React.useRef(false);
   React.useEffect(() => {
     if (initRef.current) return;
@@ -711,8 +835,17 @@ export function BoxAI({
       return true;
     });
 
+    // Carried a specific conversation via ?box=<id> (navigated here from a Box
+    // AI question) — reopen THAT, not a fresh seed. This is why opening a page
+    // THROUGH Box AI shows the conversation you were having, while opening Box
+    // AI FROM the page (no ?box=) seeds a fresh opener.
+    const carried = boxConvoId ? loadedConvos.find((c) => c.id === boxConvoId) : undefined;
     const study = seed ?? undefined;
-    if (study) {
+    if (carried) {
+      setConversations(loadedConvos);
+      setActiveId(carried.id);
+      if (study) setContextStudy(study);
+    } else if (study) {
       // Reuse an existing conversation about this project if the visitor already
       // has one; otherwise seed a single fresh one. Either way there's only ever
       // one "About <project>".
@@ -1368,8 +1501,20 @@ export function BoxAI({
                   const asked = new Set(
                     messages.filter((m) => m.role === "user").map((m) => m.text.trim().toLowerCase()),
                   );
-                  const pool = suggestions.length > 0 ? suggestions : (openCaseStudy ?? contextStudy)?.prompts ?? [];
-                  return pool.filter((p) => !asked.has(p.trim().toLowerCase()));
+                  const primary = suggestions.length > 0 ? suggestions : (openCaseStudy ?? contextStudy)?.prompts ?? [];
+                  const seen = new Set(asked);
+                  const chips: string[] = [];
+                  // Take from the primary pool (API suggestions or seed prompts),
+                  // then TOP UP from the varied fallback pool so chips never run
+                  // out as a conversation goes on. Skip anything asked/duplicated.
+                  for (const p of [...primary, ...FALLBACK_SUGGESTION_POOL]) {
+                    const key = p.trim().toLowerCase();
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    chips.push(p);
+                    if (chips.length >= 3) break;
+                  }
+                  return chips;
                 })().map((p) => (
                   <button
                     key={p}
