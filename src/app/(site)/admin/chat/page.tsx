@@ -187,7 +187,7 @@ function mapUrl(lat: string, lon: string): string {
   return `https://www.google.com/maps?q=${lat},${lon}`;
 }
 
-function Meta({ thread, visitCount }: { thread: Thread; visitCount: number }) {
+function Meta({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-2 text-body-xs text-muted-foreground">
       <span>{new Date(thread.latest).toLocaleString()}</span>
@@ -209,10 +209,16 @@ function Meta({ thread, visitCount }: { thread: Thread; visitCount: number }) {
         </>
       )}
       {thread.ip && <span>· {thread.ip}</span>}
-      {visitCount > 1 && (
-        <span className="rounded-full bg-surface-info px-1.5 py-0.5 text-info" title="Same visitor has messaged before">
-          Returning · {visitCount} visits
+      {isOwner ? (
+        <span className="rounded-full bg-muted px-1.5 py-0.5 text-foreground" title="Matches your own IP — likely you testing">
+          It&rsquo;s me
         </span>
+      ) : (
+        visitCount > 1 && (
+          <span className="rounded-full bg-surface-info px-1.5 py-0.5 text-info" title="Same visitor has messaged before">
+            Returning · {visitCount} visits
+          </span>
+        )
       )}
     </div>
   );
@@ -229,7 +235,7 @@ function TopicPill({ topic }: { topic: TopicId }) {
   );
 }
 
-function SoloRow({ thread, visitCount }: { thread: Thread; visitCount: number }) {
+function SoloRow({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
   const [open, setOpen] = React.useState(false);
   const entry = thread.entries[0];
   const flagged = isHedge(entry.a);
@@ -251,10 +257,16 @@ function SoloRow({ thread, visitCount }: { thread: Thread; visitCount: number })
             {flagged && (
               <ExclamationTriangleIcon className="size-3.5 shrink-0 text-caution" aria-label="Bot may not have answered this well" />
             )}
-            {visitCount > 1 && (
-              <span className="shrink-0 rounded-full bg-surface-info px-1.5 py-0.5 text-body-xs text-info" title="Same visitor has messaged before">
-                Returning
+            {isOwner ? (
+              <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-body-xs text-foreground" title="Matches your own IP — likely you testing">
+                It&rsquo;s me
               </span>
+            ) : (
+              visitCount > 1 && (
+                <span className="shrink-0 rounded-full bg-surface-info px-1.5 py-0.5 text-body-xs text-info" title="Same visitor has messaged before">
+                  Returning
+                </span>
+              )
             )}
             <p className="truncate text-body-sm text-foreground">{entry.q}</p>
           </div>
@@ -272,7 +284,7 @@ function SoloRow({ thread, visitCount }: { thread: Thread; visitCount: number })
 /* A real conversation (2+ messages) — the highest-signal rows, so they keep
    the fuller card treatment: depth pips + message count up front, first
    question as the collapsed title, full transcript on expand. */
-function ThreadCard({ thread, visitCount }: { thread: Thread; visitCount: number }) {
+function ThreadCard({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
   const [open, setOpen] = React.useState(false);
   const first = thread.entries[0];
   const flagged = threadNeedsReview(thread);
@@ -297,7 +309,7 @@ function ThreadCard({ thread, visitCount }: { thread: Thread; visitCount: number
             className={cn("ml-auto size-3.5 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")}
           />
         </div>
-        <Meta thread={thread} visitCount={visitCount} />
+        <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} />
         {!open && (
           <p className="truncate text-body-sm font-medium text-foreground">{first.q}</p>
         )}
@@ -319,6 +331,7 @@ function ThreadCard({ thread, visitCount }: { thread: Thread; visitCount: number
 export default function ChatLogPage() {
   const router = useRouter();
   const [entries, setEntries] = React.useState<Entry[] | null>(null);
+  const [ownerIps, setOwnerIps] = React.useState<string[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   const [reviewOnly, setReviewOnly] = React.useState(false);
@@ -342,11 +355,16 @@ export default function ChatLogPage() {
         }
         const data = await res.json();
         setEntries(data.log ?? []);
+        setOwnerIps(data.ownerIps ?? []);
       } catch {
         setError("Network error.");
       }
     })();
   }, [router]);
+  const isOwnerThread = React.useCallback(
+    (t: Thread) => Boolean(t.ip && ownerIps.includes(t.ip)),
+    [ownerIps]
+  );
 
   const allThreads = React.useMemo(() => (entries ? groupThreads(entries) : []), [entries]);
   const conversationCount = React.useMemo(
@@ -357,15 +375,16 @@ export default function ChatLogPage() {
   // Returning-visitor detection — the IP is a one-way hash (never the raw
   // address, see lib/chat/log.ts), but the SAME hash showing up across
   // multiple distinct threads means the same person came back, which is a
-  // much stronger engagement signal than message count alone.
+  // much stronger engagement signal than message count alone. Owner traffic
+  // (ownerIps) is excluded — that's just testing, not a real visitor.
   const visitCountByIp = React.useMemo(() => {
     const counts = new Map<string, number>();
     for (const t of allThreads) {
-      if (!t.ip) continue;
+      if (!t.ip || ownerIps.includes(t.ip)) continue;
       counts.set(t.ip, (counts.get(t.ip) ?? 0) + 1);
     }
     return counts;
-  }, [allThreads]);
+  }, [allThreads, ownerIps]);
   const returningCount = React.useMemo(
     () => [...visitCountByIp.values()].filter((n) => n > 1).length,
     [visitCountByIp]
@@ -525,6 +544,7 @@ export default function ChatLogPage() {
                         key={thread.key}
                         thread={thread}
                         visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                        isOwner={isOwnerThread(thread)}
                       />
                     ))}
                   </div>
@@ -536,6 +556,7 @@ export default function ChatLogPage() {
                         key={thread.key}
                         thread={thread}
                         visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                        isOwner={isOwnerThread(thread)}
                       />
                     ))}
                   </div>

@@ -16,5 +16,13 @@ export async function GET() {
   if (!cookie || cookie !== (await adminToken(adminKey))) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
-  return Response.json({ log: await getChatLog(200) });
+  // Comma-separated hashed IPs (see hashIp in lib/chat/log.ts) that belong to
+  // the site owner, testing the assistant — lets the log tell "it's me"
+  // apart from an actual returning visitor. Optional; empty if unset.
+  const ownerIps = (process.env.OWNER_IP_HASHES ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  return Response.json({ log: await getChatLog(200), ownerIps });
 }
