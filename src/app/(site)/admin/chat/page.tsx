@@ -270,7 +270,16 @@ function SoloRow({ thread, visitCount, isOwner }: { thread: Thread; visitCount: 
             )}
             <p className="truncate text-body-sm text-foreground">{entry.q}</p>
           </div>
-          {open && <p className="text-body-sm text-muted-foreground">{entry.a}</p>}
+          {open && (
+            <div className="flex flex-col gap-1">
+              <p className="text-body-sm text-muted-foreground">{entry.a}</p>
+              {(thread.city || thread.country) && (
+                <span className="text-body-xs text-muted-foreground">
+                  {[thread.city, thread.country].filter(Boolean).join(", ")}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <TopicPill topic={topicOf(entry.q)} />
         <span className="shrink-0 text-body-xs text-muted-foreground">
