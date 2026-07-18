@@ -327,7 +327,7 @@ export default function ChatLogPage() {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/chat-log");
+        const res = await fetch("/api/chat-log", { cache: "no-store" });
         if (res.status === 401) {
           router.replace("/admin/login?next=/admin/chat");
           return;

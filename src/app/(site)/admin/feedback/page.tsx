@@ -25,7 +25,7 @@ export default function FeedbackPage() {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/feedback-log");
+        const res = await fetch("/api/feedback-log", { cache: "no-store" });
         if (res.status === 401) {
           router.replace("/admin/login?next=/admin/feedback");
           return;
