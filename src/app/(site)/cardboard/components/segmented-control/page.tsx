@@ -323,45 +323,12 @@ export default function SegmentedControlDocs() {
             />
             <DoDont
               dos={[
-                {
-                  caption: "Keep labels short and parallel so segments stay even.",
-                  example: <TwoOption />,
-                },
-                {
-                  caption: "On narrow / mobile layouts, use fullWidth so segments fill and share the width.",
-                  example: (
-                    <div className="w-full max-w-64">
-                      <SegmentedControl fullWidth value="1" onValueChange={() => {}}>
-                        <SegmentedControlItem value="1">Item</SegmentedControlItem>
-                        <SegmentedControlItem value="2">Item</SegmentedControlItem>
-                        <SegmentedControlItem value="3">Item</SegmentedControlItem>
-                      </SegmentedControl>
-                    </div>
-                  ),
-                },
+                { caption: "Keep labels short and parallel so segments stay even." },
+                { caption: "On narrow / mobile layouts, use fullWidth so segments fill and share the width." },
               ]}
               donts={[
-                {
-                  caption: "Don't cram long, uneven labels into segments.",
-                  example: (
-                    <SegmentedControl value="a" onValueChange={() => {}}>
-                      <SegmentedControlItem value="a">Primitives</SegmentedControlItem>
-                      <SegmentedControlItem value="b">Semantic tokens &amp; roles</SegmentedControlItem>
-                    </SegmentedControl>
-                  ),
-                },
-                {
-                  caption: "Don't exceed ~5 options — switch to a Select at that point.",
-                  example: (
-                    <SegmentedControl value="1" onValueChange={() => {}}>
-                      {["1", "2", "3", "4", "5", "6", "7"].map((n) => (
-                        <SegmentedControlItem key={n} value={n}>
-                          {n}
-                        </SegmentedControlItem>
-                      ))}
-                    </SegmentedControl>
-                  ),
-                },
+                { caption: "Don't cram long, uneven labels into segments." },
+                { caption: "Don't exceed ~5 options — switch to a Select at that point." },
               ]}
             />
             <States

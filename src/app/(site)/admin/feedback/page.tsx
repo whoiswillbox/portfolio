@@ -4,7 +4,6 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { HandThumbUpIcon, HandThumbDownIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
-import { AdminTabs } from "@/components/admin-tabs";
 
 type Entry = {
   t: string;
@@ -52,7 +51,6 @@ export default function FeedbackPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <AdminTabs />
       <h1 className="text-h3 tracking-tight">Feedback</h1>
       <p className="mt-1 text-body-sm text-muted-foreground">
         Thumbs up/down visitors gave AI answers (most recent first).

@@ -2,12 +2,13 @@
 
 import { Suspense } from "react"
 import { usePathname } from "next/navigation"
-import { NavBar, NavBarLogo, NavBarPanel, NavBarMenuProvider } from "@/components/cardboard/nav-bar"
+import { NavBar, NavBarLogo, NavBarPanel, NavBarMenuProvider, useNavBarMenuClose } from "@/components/cardboard/nav-bar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { CardboardSidebar } from "@/components/cardboard-sidebar"
 import { BoxNavItems } from "@/components/box-nav-items"
 import { CardboardNavItems } from "@/components/cardboard-nav-items"
+import { AdminNavItems } from "@/components/admin-nav-items"
 import { ProductSwitcher } from "@/components/product-switcher"
 import { BoxLogo } from "@/components/box-logo"
 import { ContentWorkspace } from "@/components/content-workspace"
@@ -23,6 +24,7 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const inCardboard = pathname.startsWith("/cardboard")
+  const inAdmin = pathname.startsWith("/admin")
   // Cardboard's sidebar is CONTROLLED by the route: collapsed on the Getting
   // Started landing (/cardboard), expanded in a section. Deriving it from the
   // pathname (identical on server + client) avoids the hydration mismatch a
@@ -41,7 +43,9 @@ export function AppShell({
   // splash); "/" strips the marker after reading it.
   const home = inCardboard
     ? { name: "Cardboard", href: "/cardboard" }
-    : { name: "Box", href: "/?box-home=1" }
+    : inAdmin
+      ? { name: "Admin", href: "/admin/chat" }
+      : { name: "Box", href: "/?box-home=1" }
 
   return (
     // --topbar-h is consumed by ContentWorkspace/BoxAI, which need an explicit
@@ -84,16 +88,7 @@ export function AppShell({
               : undefined
           }
         >
-          <NavBarLogo
-            href={home.href}
-            aria-label={home.name}
-            // Clicking the Box logo returns to a fresh Box AI home. Navigation
-            // alone doesn't reset an already-mounted Box AI (you're already on
-            // "/"), so signal it to clear its active conversation too.
-            onClick={() => { if (!inCardboard) window.dispatchEvent(new Event("box:home")); }}
-          >
-            <BoxLogo className="size-6" />
-          </NavBarLogo>
+          <HomeLogo href={home.href} name={home.name} isBox={!inCardboard && !inAdmin} />
           <ProductSwitcher />
           {/* Box nav lives in the top bar instead of the left sidebar.
               Cardboard keeps its own sidebar. Suspense: BoxNavItems reads
@@ -101,6 +96,8 @@ export function AppShell({
               boundary to avoid a static-render CSR bailout at build. */}
           {inCardboard ? (
             <CardboardNavItems />
+          ) : inAdmin ? (
+            <AdminNavItems />
           ) : (
             <Suspense fallback={null}>
               <BoxNavItems />
@@ -187,5 +184,38 @@ export function AppShell({
         </div>
       </NavBarMenuProvider>
     </div>
+  )
+}
+
+/* Split out so it can call useNavBarMenuClose — that hook needs a descendant
+   of NavBarMenuProvider, which AppShell's own body isn't (the provider is an
+   element it returns, not an ancestor of its render). Clicking the logo
+   navigates home AND collapses any open nav disclosure — without this it
+   would navigate but leave e.g. Experience's panel visibly open underneath. */
+function HomeLogo({
+  href,
+  name,
+  isBox,
+}: {
+  href: string
+  name: string
+  isBox: boolean
+}) {
+  const closeNavMenu = useNavBarMenuClose()
+  return (
+    <NavBarLogo
+      href={href}
+      aria-label={name}
+      // Clicking the Box logo returns to a fresh Box AI home. Navigation
+      // alone doesn't reset an already-mounted Box AI (you're already on
+      // "/"), so signal it to clear its active conversation too. Not fired
+      // for Cardboard/Admin — their logo goes elsewhere, not to Box AI.
+      onClick={() => {
+        closeNavMenu()
+        if (isBox) window.dispatchEvent(new Event("box:home"))
+      }}
+    >
+      <BoxLogo className="size-6" />
+    </NavBarLogo>
   )
 }

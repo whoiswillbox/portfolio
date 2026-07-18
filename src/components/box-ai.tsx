@@ -1503,7 +1503,8 @@ export function BoxAI({
                       the labels by keyword. */}
                   {m.trace && m.trace.steps.length > 0 && (
                     <ThinkingSteps
-                      summary={`Thought for ${m.trace.seconds}s`}
+                      summary="Thought for"
+                      seconds={m.trace.seconds}
                       steps={m.trace.steps.map((label) => ({
                         label,
                         icon: iconForLabel(label),
@@ -1554,9 +1555,15 @@ export function BoxAI({
                 ) : null}
                 {allStepsDone && streamingText && (
                   <p className="font-sans text-body-sm text-foreground">
-                    {streamingText.split(" ").map((word, i) => (
-                      <span key={i} className="animate-in fade-in duration-300">{i > 0 ? " " : ""}{word}</span>
-                    ))}
+                    {/* Strip markers as they stream in too — otherwise a
+                        trailing [[case-study:…]]/[[contact]]/[[imdb]] token
+                        is briefly visible as raw text before the settled
+                        BotBubble (which already strips them) replaces this. */}
+                    {stripCaseStudyMarker(stripContactMarker(stripImdbMarker(streamingText)))
+                      .split(" ")
+                      .map((word, i) => (
+                        <span key={i} className="animate-in fade-in duration-300">{i > 0 ? " " : ""}{word}</span>
+                      ))}
                   </p>
                 )}
                 <AnimatedBoxIcon className="size-20 text-muted-foreground -ml-6" />

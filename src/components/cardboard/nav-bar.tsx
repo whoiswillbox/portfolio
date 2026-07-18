@@ -4,7 +4,6 @@ import * as React from "react"
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/cardboard/badge"
 
 /* Cardboard NavBar — owned (new, not forked). The top application bar: a thin,
    fixed strip that holds the product logo (a home link), a product switcher,
@@ -51,8 +50,25 @@ type NavBarMenuContextValue = {
 
 const NavBarMenuContext = React.createContext<NavBarMenuContextValue | null>(null)
 
-function NavBarMenuProvider({ children }: { children: React.ReactNode }) {
-  const [openKey, setOpenKey] = React.useState<string | null>(null)
+function NavBarMenuProvider({
+  children,
+  defaultOpenKey = null,
+  isolated = false,
+}: {
+  children: React.ReactNode
+  /** Seed a disclosure open on mount (e.g. for a static doc-page preview that
+      wants to show the panel already expanded). Uninitialized state otherwise
+      — this is NOT a controlled `open` prop, just an initial value. */
+  defaultOpenKey?: string | null
+  /** Skip the global window-level scroll-lock (wheel/touchmove preventDefault).
+      Set this on any provider that ISN'T the real page-level nav — e.g. a
+      doc-page preview seeded open via defaultOpenKey. Without it, a preview
+      that mounts already-open immediately locks scroll on the ENTIRE page
+      (the listener is on window, not scoped to the preview's own box) with no
+      user action to ever unlock it. */
+  isolated?: boolean
+}) {
+  const [openKey, setOpenKey] = React.useState<string | null>(defaultOpenKey)
   const [openLeft, setOpenLeft] = React.useState<number | null>(null)
   // Registered groups per menuKey, in STATE so the panel re-renders when a
   // disclosure (re)registers — a ref wouldn't notify the panel and it rendered
@@ -101,8 +117,9 @@ function NavBarMenuProvider({ children }: { children: React.ReactNode }) {
   // beneath the panel can't scroll out from under it. A non-passive wheel/touch
   // blocker stops native scrolling of the page and any inner scroll container.
   // (The landing page has its own scrub gate too; this covers everything else.)
+  // Skipped when isolated — see the prop doc above.
   React.useEffect(() => {
-    if (!openKey) return
+    if (!openKey || isolated) return
     const block = (e: Event) => e.preventDefault()
     window.addEventListener("wheel", block, { passive: false })
     window.addEventListener("touchmove", block, { passive: false })
@@ -110,7 +127,7 @@ function NavBarMenuProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener("wheel", block)
       window.removeEventListener("touchmove", block)
     }
-  }, [openKey])
+  }, [openKey, isolated])
 
   return (
     <NavBarMenuContext.Provider value={{ openKey, toggle, close, openLeft, register, groupsFor }}>
@@ -177,13 +194,72 @@ function NavBarLogo({
   )
 }
 
-/* Optional top-level nav, right-aligned via ml-auto. Holds NavBarNavItem links. */
-function NavBarNav({ className, ...props }: React.ComponentProps<"nav">) {
+/* Optional top-level nav. Holds NavBarNavItem links.
+
+   `position="right"` (default) — sits after the logo/switcher and centers
+   itself in the bar on larger viewports (with a narrow-container fallback,
+   see below).
+
+   `position="left"` — sits immediately after the logo/switcher, left-aligned,
+   no centering. Use when the bar has right-aligned content of its own (e.g.
+   actions, a switcher on the right) that the nav shouldn't compete with for
+   the center. */
+function NavBarNav({
+  className,
+  style,
+  position = "right",
+  ...props
+}: React.ComponentProps<"nav"> & {
+  position?: "left" | "right"
+}) {
+  // Centers itself in the bar via `left: 50%` — correct at the bar's real
+  // width (always the full viewport, min ~1024px, since it's max-sm:hidden).
+  // But in a NARROW bar (e.g. a doc-page preview box), the bar's horizontal
+  // center can fall under the leading siblings (logo + switcher) if they're
+  // wide enough, overlapping them. Measure the bar and its leading siblings;
+  // when centering would overlap, fall back to sitting right after the
+  // leading content instead (left-aligned-after-content, not centered).
+  // Only relevant for position="right" — "left" never centers.
+  const ref = React.useRef<HTMLElement>(null)
+  const [fallbackLeft, setFallbackLeft] = React.useState<number | null>(null)
+  React.useLayoutEffect(() => {
+    if (position !== "right") return
+    const el = ref.current
+    const bar = el?.parentElement
+    if (!el || !bar) return
+    const GAP = 24 // ~1.5rem breathing room after the leading content
+    const update = () => {
+      let leadingWidth = 0
+      for (const sib of Array.from(bar.children)) {
+        if (sib === el) break
+        leadingWidth += (sib as HTMLElement).getBoundingClientRect().width
+      }
+      const barWidth = bar.getBoundingClientRect().width
+      const navWidth = el.getBoundingClientRect().width
+      const centeredLeftEdge = barWidth / 2 - navWidth / 2
+      setFallbackLeft(centeredLeftEdge < leadingWidth + GAP ? leadingWidth + GAP : null)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(bar)
+    return () => ro.disconnect()
+  }, [position])
+
   return (
     <nav
+      ref={ref}
       data-slot="nav-bar-nav"
+      data-position={position}
+      style={{
+        ...(fallbackLeft != null
+          ? { left: `${fallbackLeft}px`, transform: "translateX(0)" }
+          : undefined),
+        ...style,
+      }}
       className={cn(
-        "ml-auto flex items-center gap-1 sm:absolute sm:left-1/2 sm:ml-0 sm:-translate-x-1/2",
+        position === "left"
+          ? "flex items-center gap-1"
+          : "ml-auto flex items-center gap-1 sm:absolute sm:left-1/2 sm:ml-0 sm:-translate-x-1/2",
         className
       )}
       {...props}
@@ -206,8 +282,6 @@ type NavBarNavMenuItem = {
   href: string
   /** Marks the current child (medium weight + foreground). */
   active?: boolean
-  /** Optional trailing status badge (e.g. a "PACKAGING" coming-soon tag). */
-  badge?: { label: string; variant?: React.ComponentProps<typeof Badge>["variant"] }
 }
 
 /* A labelled category of items within a disclosure panel. An empty label
@@ -342,7 +416,18 @@ function NavBarDisclosureItem({
    page content down when a disclosure item is open. Place it as a sibling
    directly after <NavBar>, inside the same <NavBarMenuProvider>. Styling is
    intentionally minimal here (a hairline + padding); the app tunes the rest. */
-function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
+function NavBarPanel({
+  className,
+  isolated = false,
+  ...props
+}: React.ComponentProps<"div"> & {
+  /** Skip publishing --navpanel-h to document.documentElement. Set this on any
+      NavBarPanel that ISN'T the real page-level nav (e.g. a doc-page preview
+      mounted alongside the real one) — otherwise its open/close would reach
+      past its own sandboxed preview box and slide the REAL Cardboard sidebar,
+      since the CSS var is inherited from the shared page root. */
+  isolated?: boolean
+}) {
   const { openKey, groupsFor, close, openLeft } = useNavBarMenu()
   const openItems = groupsFor(openKey)
   const open = !!openKey && !!openItems && openItems.length > 0
@@ -365,20 +450,19 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
 
 
   // Groups render as TABS: a row of clickable category labels, with the selected
-  // category's items below. Reset to the first tab (or the one holding the active
-  // route) whenever the menu changes. Single-group menus skip the tab row.
+  // category's items below. Single-group menus skip the tab row.
   const groups = openItems ?? []
   const labelledGroups = groups.filter((g) => g.label)
   const asTabs = labelledGroups.length > 1
-  // No tab is selected on open — the user picks one to reveal its items. If the
-  // current route lives in one of the tabs, pre-select that (so the open panel
-  // reflects where you are); otherwise start with nothing selected.
+  // No tab is ever pre-selected on open — even when the current route lives
+  // in one of the tabs. Opening a level-1 item always shows level-2 tabs
+  // ONLY; level-3 items require an explicit tab click. Consistent two-step
+  // reveal every time, rather than sometimes jumping straight to level-3
+  // depending on where you currently are.
   const [activeTab, setActiveTab] = React.useState<number | null>(null)
   React.useEffect(() => {
     if (!asTabs) return
-    // Skip link-tabs (href) — they navigate, they're never the "shown items" tab.
-    const activeIdx = groups.findIndex((g) => !g.href && g.items.some((i) => i.active))
-    setActiveTab(activeIdx >= 0 ? activeIdx : null)
+    setActiveTab(null)
   }, [openKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const shownItems = asTabs
@@ -403,12 +487,15 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
   // fixed/floating siblings that AREN'T in the flex flow (e.g. the Cardboard
   // sidebar, pinned at top-14) can offset themselves to sit BELOW the expanded
   // panel instead of being overlapped by it. In-flow content is pushed by the
-  // panel's own height and ignores this var.
+  // panel's own height and ignores this var. Skipped when isolated (a doc-page
+  // preview instance) — it has no real sidebar depending on it, and writing to
+  // the shared root would reach past its sandboxed preview box.
   React.useEffect(() => {
+    if (isolated) return
     const root = document.documentElement
     root.style.setProperty("--navpanel-h", `${open ? contentH : 0}px`)
     return () => { root.style.setProperty("--navpanel-h", "0px") }
-  }, [open, contentH])
+  }, [open, contentH, isolated])
 
   return (
     <div
@@ -451,12 +538,12 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
                   : "text-quaternary hover:text-secondary"
               )
               return group.href ? (
-                <Link key={group.label ?? gi} href={group.href} onClick={close} className={tabClass}>
+                <Link key={gi} href={group.href} onClick={close} className={tabClass}>
                   {group.label}
                 </Link>
               ) : (
                 <button
-                  key={group.label ?? gi}
+                  key={gi}
                   type="button"
                   onClick={() => setActiveTab(gi)}
                   data-active={gi === activeTab || undefined}
@@ -493,11 +580,6 @@ function NavBarPanel({ className, ...props }: React.ComponentProps<"div">) {
                 )}
               >
                 {item.label}
-                {item.badge && (
-                  <Badge variant={item.badge.variant ?? "default"}>
-                    {item.badge.label}
-                  </Badge>
-                )}
               </Link>
             ))}
           </div>

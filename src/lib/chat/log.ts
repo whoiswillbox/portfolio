@@ -20,6 +20,8 @@ export type ChatLogEntry = {
   a: string; // bot's reply
   country?: string;
   city?: string;
+  lat?: string; // x-vercel-ip-latitude — approximate (ISP-node precision), for a map link
+  lon?: string; // x-vercel-ip-longitude
   ip?: string; // short hash, not the raw IP
   c?: string; // conversation id — groups a visitor's back-and-forth into a thread
 };

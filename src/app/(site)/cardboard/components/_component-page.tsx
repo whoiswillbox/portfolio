@@ -291,7 +291,7 @@ const checkerStyle: React.CSSProperties = {
   backgroundSize: "20px 20px",
 };
 
-function PreviewSurface({ children }: { children: React.ReactNode }) {
+export function PreviewSurface({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={checkerStyle}
@@ -503,7 +503,7 @@ function highlightCode(code: string, lang = "tsx"): React.ReactNode[] {
   return out;
 }
 
-const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
+export const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
 
 // GitHub-light syntax palette (works on a white surface), with light-on-dark
 // overrides scoped under .dark so the block matches the page theme.
@@ -619,7 +619,13 @@ export function Variants({
       {current?.caption && (
         <p className="text-body-sm text-muted-foreground">{current.caption}</p>
       )}
-      {preview && <PreviewSurface>{current?.preview}</PreviewSurface>}
+      {/* key={active} forces a remount on every tab switch — without it, React
+          reconciles same-shaped preview trees (e.g. two <NavBar> variants) as
+          an UPDATE to the same instance rather than a fresh mount, so any
+          state seeded only on mount (like NavBarMenuProvider's
+          defaultOpenKey) silently carries over from the previous variant
+          instead of re-seeding. */}
+      {preview && <PreviewSurface key={active}>{current?.preview}</PreviewSurface>}
       {showCode && current?.code && (
         <CodeBlock
           tabs={[
@@ -807,7 +813,18 @@ export type StateSpec = {
 // Documents a component's interaction states: a visual row showing each state
 // forced (so you SEE rest/hover/selected/focus/disabled without interacting),
 // plus a State → tokens spec table beneath it.
-export function States({ title = "States", states }: { title?: string; states: StateSpec[] }) {
+export function States({
+  title = "States",
+  states,
+  fullWidth = false,
+}: {
+  title?: string;
+  states: StateSpec[];
+  /** Stack states full-width instead of the narrow grid — for states whose
+      node is a wide element (e.g. a whole NavBar), where the default grid
+      (sized for small chips like a single nav item) would cram it. */
+  fullWidth?: boolean;
+}) {
   return (
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">{title}</h2>
@@ -817,18 +834,25 @@ export function States({ title = "States", states }: { title?: string; states: S
           instead of leaving an empty column when a component has < 5 states. */}
       <div
         className={cn(
-          "grid grid-cols-2 gap-3 sm:grid-cols-3",
-          { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4", 5: "lg:grid-cols-5" }[
-            Math.min(states.length, 5)
-          ] ?? "lg:grid-cols-5"
+          fullWidth
+            ? "flex flex-col gap-3"
+            : cn(
+                "grid grid-cols-2 gap-3 sm:grid-cols-3",
+                { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4", 5: "lg:grid-cols-5" }[
+                  Math.min(states.length, 5)
+                ] ?? "lg:grid-cols-5"
+              )
         )}
       >
         {states.map((s) => (
           <div
             key={s.name}
-            className="flex flex-col items-center gap-3 border border-border bg-background p-5"
+            className={cn(
+              "flex flex-col items-center gap-3 border border-border bg-background p-5",
+              fullWidth && "w-full"
+            )}
           >
-            <div className="flex flex-1 items-center justify-center">{s.node}</div>
+            <div className={cn("flex flex-1 items-center justify-center", fullWidth && "w-full")}>{s.node}</div>
             <span className="text-body-xs font-medium text-tertiary">{s.name}</span>
           </div>
         ))}
@@ -899,36 +923,44 @@ export function Guidelines({ use, avoid }: { use: string[]; avoid: string[] }) {
   );
 }
 
-export type DoDontItem = { caption: string; example: React.ReactNode };
+export type DoDontItem = { caption: string | string[] };
 
-// Side-by-side Do / Don't examples with a live sample in each.
+// Do / Don't guidance — two bulleted columns, styled to match Usage's
+// Use-when / Avoid-when layout. Text-only (no live example render): a
+// component-shaped example box tends to get cramped/overlap in a narrow
+// column, and the caption text alone already carries the guidance.
 export function DoDont({ dos, donts }: { dos: DoDontItem[]; donts: DoDontItem[] }) {
-  const Card = ({ ok, item }: { ok: boolean; item: DoDontItem }) => (
-    <div className="flex flex-col overflow-hidden border border-border">
-      <div className="flex min-h-32 items-center justify-center bg-background p-6">
-        {item.example}
-      </div>
-      <div
-        className={cn(
-          "flex items-start gap-1.5 border-t px-4 py-3 text-body-sm",
-          ok ? "border-success/30 text-foreground" : "border-critical/30 text-foreground"
-        )}
-      >
-        {ok ? (
-          <CheckCircleIcon className="mt-0.5 size-4 shrink-0 text-success" />
-        ) : (
-          <XCircleIcon className="mt-0.5 size-4 shrink-0 text-critical" />
-        )}
-        <span>{item.caption}</span>
-      </div>
-    </div>
-  );
+  const captionsOf = (items: DoDontItem[]) => items.flatMap((i) => (Array.isArray(i.caption) ? i.caption : [i.caption]));
+  const doCaptions = captionsOf(dos);
+  const dontCaptions = captionsOf(donts);
   return (
     <section className="mb-12 flex flex-col gap-4">
       <h2 className="text-h3">Best practices</h2>
       <div className="grid gap-4 sm:grid-cols-2">
-        {dos.map((d, i) => <Card key={`do${i}`} ok item={d} />)}
-        {donts.map((d, i) => <Card key={`dont${i}`} ok={false} item={d} />)}
+        <div className="flex flex-col gap-2 border border-border p-4">
+          <div className="flex items-center gap-1.5 text-body-sm font-medium text-success">
+            <CheckCircleIcon className="size-4" /> Do
+          </div>
+          <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+            {doCaptions.map((c) => (
+              <li key={c} className="flex gap-2">
+                <span className="text-tertiary">•</span> {c}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex flex-col gap-2 border border-border p-4">
+          <div className="flex items-center gap-1.5 text-body-sm font-medium text-critical">
+            <XCircleIcon className="size-4" /> Don't
+          </div>
+          <ul className="flex flex-col gap-1.5 text-body-sm text-muted-foreground">
+            {dontCaptions.map((c) => (
+              <li key={c} className="flex gap-2">
+                <span className="text-tertiary">•</span> {c}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

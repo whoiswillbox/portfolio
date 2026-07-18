@@ -40,24 +40,38 @@ import {
 function NavBar({
   children,
   logo = true,
+  defaultOpenKey = null,
 }: {
   children?: React.ReactNode;
   logo?: boolean;
+  /** Show a disclosure panel already expanded (e.g. for a static Variant
+      preview) — see NavBarMenuProvider. */
+  defaultOpenKey?: string | null;
 }) {
   return (
     <div className="w-full overflow-hidden">
-      <NavBarMenuProvider>
-        <NavBarRoot>
+      {/* isolated: this whole NavBar is always a doc-page PREVIEW instance —
+          without it, a defaultOpenKey-seeded demo (or any click here) would
+          scroll-lock the ENTIRE real page via NavBarMenuProvider's
+          window-level listeners. */}
+      <NavBarMenuProvider defaultOpenKey={defaultOpenKey} isolated>
+        {/* border-b-0: matches the real app shell, which strips NavBar's
+            default bottom border (see app-shell.tsx) — kept truthful here. */}
+        <NavBarRoot className="border-b-0">
           {logo && (
             <NavBarLogo href="#">
               <BoxLogo className="size-6" />
             </NavBarLogo>
           )}
-          <ProductSwitcher demo />
+          <ProductSwitcher demo demoLabel="Product" />
           {children}
         </NavBarRoot>
-        {/* Disclosure items expand this full-width panel below the bar. */}
-        <NavBarPanel />
+        {/* Disclosure items expand this full-width panel below the bar.
+            isolated: this is a doc-page PREVIEW instance, not the real
+            page-level nav — without it, opening a disclosure here would also
+            slide the real Cardboard sidebar (--navpanel-h is inherited from
+            the shared page root). */}
+        <NavBarPanel isolated />
       </NavBarMenuProvider>
     </div>
   );
@@ -76,28 +90,33 @@ function StateNavItem({ active = false, force = "" }: { active?: boolean; force?
   );
 }
 
-// Trailing nav items — the real NavBarNav / NavBarNavItem, right-aligned.
-function NavItems() {
+// Trailing nav items — the real NavBarNav / NavBarNavItem, right-aligned. 3
+// top-level items — 2 plain links + 1 disclosure — with generic labels
+// ("Item", "2nd level item", "3rd level item") so this reads as a
+// shape/structure demo rather than real-looking copy someone might mistake
+// for actual product content. Opening the disclosure always shows just its
+// level-2 tabs — level-3 items only appear after an explicit tab click (no
+// auto-select).
+function NavItems({ position }: { position?: "left" | "right" }) {
   return (
-    <NavBarNav>
-      <NavBarNavItem href="#" active>Docs</NavBarNavItem>
+    <NavBarNav position={position}>
+      <NavBarNavItem href="#item-1" active>Item</NavBarNavItem>
+      <NavBarNavItem href="#item-2">Item</NavBarNavItem>
       <NavBarNavItem
         disclosure
-        menuKey="components"
+        menuKey="item-3"
         items={[
-          { label: "Get started", items: [
-            { label: "Overview", href: "#", active: true },
-            { label: "Foundations", href: "#" },
+          { label: "2nd level item", items: [
+            { label: "3rd level item", href: "#3rd-level-item-1" },
+            { label: "3rd level item", href: "#3rd-level-item-2" },
           ]},
-          { label: "Library", items: [
-            { label: "Nav Bar", href: "#" },
-            { label: "Badge", href: "#", badge: { label: "NEW", variant: "warning" } },
+          { label: "2nd level item", items: [
+            { label: "3rd level item", href: "#3rd-level-item-3" },
           ]},
         ]}
       >
-        Components
+        Item
       </NavBarNavItem>
-      <NavBarNavItem href="#">Changelog</NavBarNavItem>
     </NavBarNav>
   );
 }
@@ -109,7 +128,7 @@ export default function NavBarDocs() {
     <ComponentPage
       title="Nav Bar"
       status="stable"
-      version="2.0"
+      version="1.1"
       description="The top application bar: a logo that links home, plus a product switcher for moving between products. A thin, fixed strip above the sidebar (desktop only — mobile uses the mobile nav)."
     >
       <AudienceTabs
@@ -118,10 +137,11 @@ export default function NavBarDocs() {
             controls={[
               { prop: "logo", label: "logo", type: "boolean", default: true },
               { prop: "navItems", label: "nav items", type: "boolean", default: true },
+              { prop: "position", label: "nav items position", type: "select", options: ["right", "left"], default: "right" },
             ]}
             render={(v) => (
               <NavBar logo={Boolean(v.logo)}>
-                {v.navItems ? <NavItems /> : null}
+                {v.navItems ? <NavItems position={v.position as "left" | "right"} /> : null}
               </NavBar>
             )}
           />
@@ -130,7 +150,7 @@ export default function NavBarDocs() {
           <>
             <Anatomy
               parts={[
-                { n: 1, part: "Bar — the fixed strip; sits above the SidebarProvider so the provider's row layout / height is unchanged.", tokens: "NavBar · h-14 · border-b border-divider" },
+                { n: 1, part: "Bar — the fixed strip; sits above the SidebarProvider so the provider's row layout / height is unchanged. Bordered by default; the app shell strips it (border-b-0), as shown below.", tokens: "NavBar · h-14 · border-b border-divider" },
                 { n: 2, part: "Logo — the product mark; links home.", tokens: "NavBarLogo · size-6" },
                 { n: 3, part: "Product switcher — the ProductSwitcher, a disclosure nav item: clicking the current product name opens the full-width panel with the product(s) you can switch to.", tokens: "ProductSwitcher · NavBarNavItem[disclosure]" },
                 { n: 4, part: "Nav items — optional top-level links, right-aligned; the current one is active.", tokens: "NavBarNav · NavBarNavItem[active]" },
@@ -159,25 +179,10 @@ export default function NavBarDocs() {
             />
             <DoDont
               dos={[
-                {
-                  caption: "Logo, switcher, and a few top-level nav items.",
-                  example: <NavBar><NavItems /></NavBar>,
-                },
+                { caption: "Logo, switcher, and a few top-level nav items." },
               ]}
               donts={[
-                {
-                  caption: "Don't cram the bar with a dense toolbar of controls.",
-                  example: (
-                    <NavBar>
-                      <div className="ml-auto flex items-center gap-2">
-                        <div className="h-7 w-16 rounded-md bg-muted" />
-                        <div className="h-7 w-16 rounded-md bg-muted" />
-                        <div className="h-7 w-20 rounded-md bg-muted" />
-                        <div className="size-7 rounded-full bg-muted" />
-                      </div>
-                    </NavBar>
-                  ),
-                },
+                { caption: "Don't cram the bar with a dense toolbar of controls." },
               ]}
             />
             <States
@@ -227,8 +232,7 @@ export default function NavBarDocs() {
         }
         dev={
           <>
-            <Install code={`import { NavBar, NavBarLogo, NavBarNav, NavBarNavItem } from "@cardboard";
-import { BoxLogo } from "@/components/box-logo";`} />
+            <Install code={`import { NavBar, NavBarLogo, NavBarNav, NavBarNavItem } from "@cardboard";`} />
             <Variants
               variants={[
                 {
@@ -236,7 +240,6 @@ import { BoxLogo } from "@/components/box-logo";`} />
                   caption: "The assembled bar — logo, product switcher, and top-level nav items.",
                   preview: <NavBar><NavItems /></NavBar>,
                   code: `import { NavBar, NavBarLogo, NavBarNav, NavBarNavItem } from "@cardboard";
-import { BoxLogo } from "@/components/box-logo";
 import { ProductSwitcher } from "@/components/product-switcher";
 
 function AppNavBar() {
@@ -244,7 +247,7 @@ function AppNavBar() {
     <NavBar className="max-sm:hidden">
       {/* Logo → home */}
       <NavBarLogo href="/" aria-label="Home">
-        <BoxLogo className="size-6" />
+        <YourLogo className="size-6" />
       </NavBarLogo>
 
       {/* Product switcher — a disclosure nav item; opening it reveals the
@@ -289,24 +292,35 @@ function AppNavBar() {
                   ],
                 },
                 {
+                  interfaceName: "NavBarNav",
+                  rows: [
+                    { name: "position?", type: "\"left\" | \"right\"", default: "\"right\"", desc: "\"right\" sits after the logo/switcher and centers in the bar on wider viewports (falls back to left-aligned-after-content if centering would overlap the leading content). \"left\" sits immediately after the logo/switcher, left-aligned, never centers." },
+                    { name: "children", type: "ReactNode", desc: "NavBarNavItem links." },
+                    { name: "…nav", type: "HTMLElementProps", desc: "Extends <nav> (className, etc.)." },
+                  ],
+                },
+                {
                   interfaceName: "NavBarNavItem",
                   rows: [
                     { name: "active?", type: "boolean", default: "false", desc: "Marks the current section (foreground + medium weight)." },
                     { name: "href", type: "string", desc: "The item's route (extends next/link). Not needed when disclosure is set." },
                     { name: "disclosure?", type: "boolean", default: "false", desc: "Render as a trigger (a <button> with a rotating chevron) that expands NavBarPanel — a full-width strip below the bar that pushes page content down. Requires a NavBarMenuProvider ancestor. At most one disclosure is open at a time." },
                     { name: "menuKey?", type: "string", desc: "Stable identifier for this disclosure's panel (defaults to the children text). Set it explicitly when children aren't a plain string." },
-                    { name: "items?", type: "NavBarNavMenuItem[] | NavBarNavMenuGroup[]", desc: "The child links shown in the panel — a flat list, or grouped categories ({ label?, items }). Each item is { label, href, active?, badge? }; badge is an optional trailing status tag { label, variant? } (e.g. a 'PACKAGING' Badge)." },
+                    { name: "items?", type: "NavBarNavMenuItem[] | NavBarNavMenuGroup[]", desc: "The child links shown in the panel — a flat list, or grouped categories ({ label?, items }). Each item is { label, href, active? }." },
                   ],
                 },
                 {
                   interfaceName: "NavBarMenuProvider",
                   rows: [
                     { name: "children", type: "ReactNode", desc: "Wrap the NavBar AND the NavBarPanel. Coordinates which disclosure menu is open (at most one) and closes on Escape." },
+                    { name: "defaultOpenKey?", type: "string | null", default: "null", desc: "Seed a disclosure open on mount — e.g. for a static preview that wants to show the panel already expanded. Not a controlled `open` prop, just an initial value; the usual click/Escape/outside-click behavior still applies after mount." },
+                    { name: "isolated?", type: "boolean", default: "false", desc: "Skip the global window-level scroll-lock (wheel/touchmove preventDefault) while a menu is open. Set this on any provider that ISN'T the real page-level nav — the listener is on window, not scoped to the provider's own box, so an unisolated preview (especially one seeded open via defaultOpenKey) would lock scroll on the entire real page." },
                   ],
                 },
                 {
                   interfaceName: "NavBarPanel",
                   rows: [
+                    { name: "isolated?", type: "boolean", default: "false", desc: "Skip publishing --navpanel-h to document.documentElement. Set this on any instance that ISN'T the real page-level nav (e.g. a doc-page preview) — otherwise its open/close state would reach past its own sandboxed preview box and move real fixed/floating page elements (like the Cardboard sidebar) that read the var." },
                     { name: "…div", type: "HTMLDivProps", desc: "The full-width disclosure panel; render as a sibling right after <NavBar>, inside the same provider, so it pushes page content down. Extends <div> (className, etc.)." },
                   ],
                 },
@@ -330,7 +344,7 @@ function AppNavBar() {
                   name: "NavBarNav",
                   type: "NavBarNavItem[]",
                   optional: true,
-                  desc: "Optional top-level nav, right-aligned (ml-auto). Holds NavBarNavItem links; mark the current section with `active`.",
+                  desc: "Optional top-level nav. Holds NavBarNavItem links; mark the current section with `active`. position=\"right\" (default) sits after the logo/switcher and centers in the bar; position=\"left\" sits left-aligned right after the logo/switcher.",
                 },
               ]}
             />
@@ -353,13 +367,14 @@ function AppNavBar() {
             />
             <Changelog
               entries={[
-                { version: "2.0", changes: [
-                  "Disclosure menus now expand a full-width NavBarPanel BELOW the bar that pushes page content down, instead of a floating dropdown. Requires wrapping the bar + panel in NavBarMenuProvider; at most one menu is open at a time (Esc / outside click closes).",
-                  "items now accepts grouped categories (NavBarNavMenuGroup[]) as well as a flat list, so a menu can show labelled sections.",
-                  "Added menuKey to NavBarNavItem to identify a disclosure's panel.",
+                { version: "1.1", changes: [
+                  "Disclosure nav items: NavBarNavItem accepts disclosure + menuKey + items, opening a full-width NavBarPanel BELOW the bar that pushes page content down (not a floating dropdown). Requires wrapping the bar + panel in NavBarMenuProvider; at most one menu is open at a time (Esc / outside click closes). items accepts a flat list or grouped categories (NavBarNavMenuGroup[]) with labelled tabs.",
+                  "Opening a disclosure always shows just its level-2 category tabs, even when the current route lives under one of them — level-3 items only appear after an explicit tab click (no auto-select jump).",
+                  "Added isolated to both NavBarMenuProvider and NavBarPanel — set on any instance that isn't the real page-level nav (e.g. a doc preview) so its scroll-lock and --navpanel-h writes stay scoped to itself instead of leaking onto the real page.",
+                  "Added NavBarMenuProvider's defaultOpenKey — seeds a disclosure open on mount, for static previews that want to show the panel already expanded.",
+                  "Added NavBarNav's position prop (\"left\" | \"right\", default \"right\") — \"right\" centers the nav in the bar (falling back to left-aligned-after-content when centering would overlap the logo/switcher in a narrow bar); \"left\" sits immediately after the logo/switcher, left-aligned, never centering.",
+                  "Product switcher moved from a Select dropdown to a disclosure nav item (ProductSwitcher), composed as a plain child rather than a fixed NavBar slot.",
                 ] },
-                { version: "1.2", changes: ["Disclosure items now accept an optional badge — a trailing status tag (e.g. a coming-soon 'PACKAGING' Badge) on a child row."] },
-                { version: "1.1", changes: ["Added the disclosure prop to NavBarNavItem — a menu-trigger item that opens a dropdown of child items (via items), mirroring the Box sidebar's expandable items."] },
                 { version: "1.0", changes: ["Initial release — NavBar with NavBarLogo, product switcher, and NavBarNav items."] },
               ]}
             />

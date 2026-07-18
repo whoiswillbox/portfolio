@@ -66,26 +66,26 @@ const steps: ThinkingStep[] = [
   { label: "Drafting an answer…", icon: SparklesIcon, status: "active" },
 ];
 
-// Thinking: pass steps. (An optional heading is also supported.)
+// Thinking: pass steps.
 <ThinkingSteps steps={steps} />`,
   },
   {
     label: "Thought",
-    caption: "Once complete, pass a `summary` to collapse it into an expandable \"Thought for Xs\" card — click to re-reveal the steps. Show above the answer.",
+    caption: "Once complete, pass a `summary` label (+ optional `seconds`, appended automatically) to collapse it into an expandable \"Thought for 4s\" row — click to re-reveal the steps. Show above the answer.",
     preview: (
       <div className="w-full max-w-md">
-        <ThinkingSteps summary="Thought for 4s" steps={completeSteps} />
+        <ThinkingSteps summary="Thought for" seconds={4} steps={completeSteps} />
       </div>
     ),
-    code: `// Thought: pass a summary (every step done) to render the collapsed card.
-<ThinkingSteps summary="Thought for 4s" steps={completeSteps} />
+    code: `// Thought: pass summary + seconds (every step done) — the component appends " 4s".
+<ThinkingSteps summary="Thought for" seconds={4} steps={completeSteps} />
 
 // Start expanded with defaultOpen:
-<ThinkingSteps summary="Thought for 4s" steps={completeSteps} defaultOpen />`,
+<ThinkingSteps summary="Thought for" seconds={4} steps={completeSteps} defaultOpen />`,
   },
   {
     label: "Thinking · single step",
-    caption: "A Thinking trace with one step and no header — the header is optional.",
+    caption: "A Thinking trace with a single step.",
     preview: (
       <div className="w-full max-w-md">
         <ThinkingSteps steps={singleStep} />
@@ -159,7 +159,7 @@ function PlaygroundDemo({
   return (
     <div className="w-full max-w-md">
       {variant === "thought" ? (
-        <ThinkingSteps summary={`Thought for ${seconds || 4}s`} steps={steps} />
+        <ThinkingSteps summary="Thought for" seconds={seconds || 4} steps={steps} />
       ) : (
         <ThinkingSteps steps={steps} />
       )}
@@ -173,9 +173,9 @@ export default function ThinkingStepsDocs() {
   return (
     <ComponentPage
       title="Thinking Steps"
-      status="experimental"
-      version="0.4"
-      description="A reasoning trace card with two variants: Thinking (live — steps visible, the active one pulsing, finished ones checked) and Thought (done — a collapsible 'Thought for Xs' card that re-reveals the steps on click). Presentational and controlled: pass the step statuses; the consumer (e.g. Box AI) drives the timing."
+      status="stable"
+      version="1.0"
+      description="A reasoning trace with two variants: Thinking (live — steps visible, the active one pulsing, finished ones checked) and Thought (done — a collapsible 'Thought for Xs' summary that re-reveals the steps on click). No visible container — it sits directly on the page. Presentational and controlled: pass the step statuses; the consumer (e.g. Box AI) drives the timing."
     >
       <AudienceTabs
         playground={
@@ -234,29 +234,10 @@ export default function ThinkingStepsDocs() {
             />
             <DoDont
               dos={[
-                {
-                  caption: "Name the specific source each step consults.",
-                  example: (
-                    <div className="w-full max-w-sm">
-                      <ThinkingSteps steps={completeSteps} />
-                    </div>
-                  ),
-                },
+                { caption: "Name the specific source each step consults." },
               ]}
               donts={[
-                {
-                  caption: "Don't use vague, generic labels — they read as filler.",
-                  example: (
-                    <div className="w-full max-w-sm">
-                      <ThinkingSteps
-                        steps={[
-                          { label: "Thinking…", icon: SparklesIcon, status: "done" },
-                          { label: "Still thinking…", icon: SparklesIcon, status: "active" },
-                        ]}
-                      />
-                    </div>
-                  ),
-                },
+                { caption: "Don't use vague, generic labels — they read as filler." },
               ]}
             />
             <States
@@ -315,9 +296,8 @@ export default function ThinkingStepsDocs() {
                   interfaceName: "ThinkingSteps",
                   rows: [
                     { name: "steps", type: "ThinkingStep[]", desc: "The steps to render, in order." },
-                    { name: "heading?", type: "ReactNode", desc: "Optional header phrase shown above the steps (pulses). Live state only; ignored when `summary` is set." },
-                    { name: "seconds?", type: "number", desc: "Optional elapsed seconds shown next to the heading; hidden when 0." },
-                    { name: "summary?", type: "ReactNode", desc: 'Renders the COLLAPSED state: a clickable summary row (e.g. "Thought for 4s") with a chevron that discloses the steps. Use after the trace completes.' },
+                    { name: "summary?", type: "ReactNode", desc: 'Renders the COLLAPSED state: a clickable summary row (e.g. "Thought for") with a chevron that discloses the steps. Use after the trace completes.' },
+                    { name: "seconds?", type: "number", desc: 'Appended to `summary` as " Xs" (e.g. "Thought for" + 4 → "Thought for 4s"). Thought (collapsed) mode only.' },
                     { name: "defaultOpen?", type: "boolean", default: "false", desc: "In collapsed (summary) mode, whether the steps start expanded." },
                     { name: "…div", type: "HTMLDivProps", desc: "Extends <div> (className, etc.)." },
                   ],
@@ -347,8 +327,8 @@ export default function ThinkingStepsDocs() {
                 { keys: ["↵", "Space"], does: "Toggles the collapsed summary open/closed." },
               ]}
               aria={[
-                { attr: "data-slot", on: "Card", purpose: 'Style/target hook ("thinking-steps").' },
-                { attr: "data-collapsed", on: "Card", purpose: "Present when in collapsed (summary) mode." },
+                { attr: "data-slot", on: "Wrapper", purpose: 'Style/target hook ("thinking-steps").' },
+                { attr: "data-collapsed", on: "Wrapper", purpose: "Present when in collapsed (summary) mode." },
                 { attr: "data-status", on: "Each step row", purpose: 'Reflects the step status ("pending" | "active" | "done") for styling.' },
                 { attr: "aria-expanded", on: "Summary toggle", purpose: "Reflects whether the collapsed steps are open." },
               ]}
@@ -361,6 +341,7 @@ export default function ThinkingStepsDocs() {
             />
             <Changelog
               entries={[
+                { version: "0.5", changes: ["Dropped the card container (border/bg/rounded) — the trace now sits directly on the page background with no visible wrapper.", "Widened the gap between the summary row and the steps below it (gap-2 → gap-3).", "Removed `heading` (the live-state pulsing phrase was unused) — `seconds` moves to Thought mode, appended to `summary` instead of shown in a separate live-state header."] },
                 { version: "0.4", changes: ["Steps can now list `sources` beneath them (search-results style) — e.g. the case studies a step scraped, each linking to its page."] },
                 { version: "0.3", changes: ["Redesigned steps as a Claude-style timeline: icon nodes threaded by a vertical connector line, no per-step boxes.", "The active step now \"breathes\" (fades in/out) while running, replacing the pulsing heading."] },
                 { version: "0.2", changes: ["Added the collapsed summary mode (summary + defaultOpen) — a \"Thought for Xs\" disclosure that re-reveals the completed steps."] },

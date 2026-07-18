@@ -107,8 +107,35 @@ export async function POST(request: Request) {
             input_tokens: finalMessage.usage.input_tokens,
             output_tokens: finalMessage.usage.output_tokens,
           });
+        } catch (err) {
+          console.error("stream error:", err);
+        }
 
-          // Generate follow-up suggestions based on the conversation
+        // Logging must survive even if the reply streamed fine but something
+        // downstream (suggestions, an early client disconnect) throws — it's
+        // the only record of what was asked, so it gets its own try/catch
+        // instead of sharing one with the streaming loop above.
+        if (fullText) {
+          try {
+            await logChat({
+              t: new Date().toISOString(),
+              q: question,
+              a: fullText.slice(0, 300),
+              country: request.headers.get("x-vercel-ip-country") ?? undefined,
+              city: city ? decodeURIComponent(city) : undefined,
+              lat: request.headers.get("x-vercel-ip-latitude") ?? undefined,
+              lon: request.headers.get("x-vercel-ip-longitude") ?? undefined,
+              ip: ipRaw ? await hashIp(ipRaw) : undefined,
+              c: conversationId,
+            });
+          } catch (err) {
+            console.error("chat log write failed:", err);
+          }
+        }
+
+        // Generate follow-up suggestions based on the conversation — best
+        // effort, never blocks or breaks logging above.
+        if (fullText) {
           try {
             const suggestionMsg = await client.messages.create({
               model: MODEL,
@@ -138,20 +165,12 @@ export async function POST(request: Request) {
           } catch {
             // suggestions are best-effort
           }
+        }
 
-          await logChat({
-            t: new Date().toISOString(),
-            q: question,
-            a: fullText.slice(0, 300),
-            country: request.headers.get("x-vercel-ip-country") ?? undefined,
-            city: city ? decodeURIComponent(city) : undefined,
-            ip: ipRaw ? await hashIp(ipRaw) : undefined,
-            c: conversationId,
-          });
-        } catch (err) {
-          console.error("stream error:", err);
-        } finally {
+        try {
           controller.close();
+        } catch {
+          // already closed (e.g. client disconnected mid-stream) — fine.
         }
       },
     });

@@ -5,12 +5,12 @@ import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 
-/* Cardboard ThinkingSteps — owned (new). A reasoning trace card with TWO
-   variants:
-     • "Thinking" (live) — pass `heading` + `steps`: the steps are visible, the
-       active one pulses, finished ones dim with a checkmark.
-     • "Thought" (done) — pass `summary` (e.g. "Thought for 4s"): the same steps
-       collapse into an expandable disclosure card, re-revealed on click.
+/* Cardboard ThinkingSteps — owned (new). A reasoning trace with TWO variants:
+     • "Thinking" (live) — pass `steps`: they're visible, the active one
+       pulses, finished ones dim with a checkmark.
+     • "Thought" (done) — pass `summary` (+ optional `seconds`, e.g.
+       summary="Thought for" seconds={4} → "Thought for 4s"): the same steps
+       collapse into an expandable disclosure row, re-revealed on click.
 
    Presentational / CONTROLLED: it renders exactly the step statuses you pass and
    owns no timers. The consumer (e.g. Box AI) drives the reveal + completion.
@@ -144,23 +144,20 @@ function SourceList({ sources }: { sources: ThinkingStepSource[] }) {
 
 export function ThinkingSteps({
   steps,
-  heading,
-  seconds,
   summary,
+  seconds,
   defaultOpen = false,
   className,
   ...props
 }: React.ComponentProps<"div"> & {
   steps: ThinkingStep[]
-  /** Optional header phrase shown above the steps (e.g. "Riding the break").
-      Used in the live (in-progress) state. Ignored when `summary` is set. */
-  heading?: React.ReactNode
-  /** Optional elapsed seconds shown next to the heading. */
-  seconds?: number
   /** When set, renders the COLLAPSED state instead of the live trace: a
-      clickable "summary" row (e.g. "Thought for 4s") with a chevron that
+      clickable "summary" row (e.g. "Thought for") with a chevron that
       discloses the steps. Use this after the trace completes. */
   summary?: React.ReactNode
+  /** Elapsed seconds, appended to `summary` as " Xs" (e.g. "Thought for" + 4 →
+      "Thought for 4s"). Thought (collapsed) mode only — ignored otherwise. */
+  seconds?: number
   /** In collapsed (summary) mode, whether the steps start expanded. */
   defaultOpen?: boolean
 }) {
@@ -194,7 +191,7 @@ export function ThinkingSteps({
             aria-expanded={open}
             className="flex items-center gap-2 px-1 text-left transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
           >
-            <span>{summary}</span>
+            <span>{summary}{seconds != null && ` ${seconds}s`}</span>
             <ChevronGlyph className={cn("ml-auto shrink-0 transition-transform duration-200", open ? "rotate-0" : "-rotate-90")} />
           </button>
           {/* Grid-rows collapse so the steps animate open/closed. */}
@@ -203,15 +200,7 @@ export function ThinkingSteps({
           </div>
         </>
       ) : (
-        <>
-          {(heading != null || seconds != null) && (
-            <div className="flex items-center gap-2 px-1">
-              {heading != null && <span className="animate-pulse">{heading}</span>}
-              {seconds != null && seconds > 0 && <span>{seconds}s</span>}
-            </div>
-          )}
-          {stepsList}
-        </>
+        stepsList
       )}
     </div>
   )

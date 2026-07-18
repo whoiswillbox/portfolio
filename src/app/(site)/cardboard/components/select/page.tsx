@@ -355,22 +355,11 @@ export default function SelectDocs() {
             />
             <DoDont
               dos={[
-                {
-                  caption: "Give the field a visible label and a descriptive placeholder.",
-                  example: <LabeledSelect />,
-                },
-                {
-                  caption: "Group long lists with labels and a separator.",
-                  example: <GroupedSelect />,
-                },
+                { caption: "Give the field a visible label and a descriptive placeholder." },
+                { caption: "Group long lists with labels and a separator." },
               ]}
               donts={[
-                {
-                  caption: "Don't use a Select for just 2–3 always-visible choices.",
-                  example: (
-                    <BasicSelect />
-                  ),
-                },
+                { caption: "Don't use a Select for just 2–3 always-visible choices." },
               ]}
             />
             <States
