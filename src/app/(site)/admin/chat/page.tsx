@@ -92,9 +92,9 @@ function groupThreads(entries: Entry[]): Thread[] {
 }
 
 /* Bucket a thread by when its latest message landed, so the log reads by
-   session (Today / Yesterday / Previous 7 Days / Older) — same convention as
-   the public Conversations page. */
-const DATE_GROUPS = ["Today", "Yesterday", "Previous 7 Days", "Older"] as const;
+   session (Today / Yesterday / Past 7 Days / Older). Fixed day-count windows
+   (not calendar periods), hence "Past N Days" rather than "This Week/Month". */
+const DATE_GROUPS = ["Today", "Yesterday", "Past 7 Days", "Older"] as const;
 type DateGroup = (typeof DATE_GROUPS)[number];
 
 function groupOf(t: Thread, now: number): DateGroup {
@@ -102,13 +102,13 @@ function groupOf(t: Thread, now: number): DateGroup {
   const dayMs = 86_400_000;
   if (t.latest >= startOfToday) return "Today";
   if (t.latest >= startOfToday - dayMs) return "Yesterday";
-  if (t.latest >= startOfToday - 7 * dayMs) return "Previous 7 Days";
+  if (t.latest >= startOfToday - 7 * dayMs) return "Past 7 Days";
   return "Older";
 }
 
 /* Within "Older" (> 7 days), anything more than a month back gets nested
    under a month-year header (e.g. "June 2026") instead of piling into one
-   flat list forever — 7 days to a month ago renders as a flat "This Month"
+   flat list forever — 7 days to a month ago renders as a flat "Past 30 Days"
    list since that span is still small enough to scan directly. */
 function isOlderThanAMonth(t: Thread, now: number): boolean {
   return now - t.latest >= 30 * 86_400_000;
@@ -856,7 +856,7 @@ export default function ChatLogPage() {
                   <React.Fragment key={g}>
                     {recentOlder.length > 0 && (
                       <ThreadGroupList
-                        label="This Month"
+                        label="Past 30 Days"
                         threads={recentOlder}
                         visitCountByIp={visitCountByIp}
                         isOwnerThread={isOwnerThread}
