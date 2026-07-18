@@ -428,33 +428,22 @@ function ThreadDetail({
                 <p className={cn("font-sans text-body-sm", isHedge(e.a) ? "text-caution" : "text-foreground")}>
                   {e.a}
                 </p>
-                <div className="flex items-center gap-2 pl-1">
-                  {!rating && (
-                    <div className="flex items-center gap-0.5">
-                      <span className="rounded-md p-1.5 text-muted-foreground">
-                        <HandThumbUpIcon className="size-3.5" />
+                {rating && (
+                  <div className="flex items-center gap-2 pl-1">
+                    {rating === "up" ? (
+                      <span className="rounded-md p-1.5 text-success">
+                        <HandThumbUpSolid className="size-3.5" />
                       </span>
-                      <span className="rounded-md p-1.5 text-muted-foreground">
-                        <HandThumbDownIcon className="size-3.5" />
+                    ) : (
+                      <span className="rounded-md p-1.5 text-critical">
+                        <HandThumbDownSolid className="size-3.5" />
                       </span>
-                    </div>
-                  )}
-                  {rating === "up" && (
-                    <span className="rounded-md p-1.5 text-success">
-                      <HandThumbUpSolid className="size-3.5" />
-                    </span>
-                  )}
-                  {rating === "down" && (
-                    <span className="rounded-md p-1.5 text-critical">
-                      <HandThumbDownSolid className="size-3.5" />
-                    </span>
-                  )}
-                  {rating && (
+                    )}
                     <span className={cn("text-body-xs font-medium", rating === "up" ? "text-success" : "text-critical")}>
                       {rating === "up" ? "Helpful" : "Not helpful"}
                     </span>
-                  )}
-                </div>
+                  </div>
+                )}
                 {fb?.feedback && (
                   <p className="mt-1 border-l-2 border-border pl-2 text-body-sm italic text-muted-foreground">
                     &ldquo;{fb.feedback}&rdquo;
@@ -465,26 +454,6 @@ function ThreadDetail({
           );
         })}
       </div>
-    </div>
-  );
-}
-
-/* 14-day message-volume bar chart — a quick trend read (is traffic picking
-   up, did a change spike/kill engagement) without leaving the log for
-   Vercel Analytics, which can't see WHAT was asked. */
-function VolumeChart({ data }: { data: { date: Date; count: number }[] }) {
-  const max = Math.max(1, ...data.map((d) => d.count));
-  return (
-    <div className="flex items-end gap-1 rounded-lg border border-border px-3 py-3" style={{ height: 96 }}>
-      {data.map((d, i) => (
-        <div key={i} className="flex flex-1 flex-col items-center justify-end gap-1" style={{ height: "100%" }}>
-          <div
-            className={cn("w-full rounded-sm", d.count > 0 ? "bg-foreground" : "bg-border")}
-            style={{ height: `${Math.max(2, (d.count / max) * 100)}%` }}
-            title={`${d.date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}: ${d.count} message${d.count === 1 ? "" : "s"}`}
-          />
-        </div>
-      ))}
     </div>
   );
 }
@@ -540,11 +509,6 @@ export default function ChatLogPage() {
   );
 
   const allThreads = React.useMemo(() => (entries ? groupThreads(entries) : []), [entries]);
-  const conversationCount = React.useMemo(
-    () => allThreads.filter((t) => t.entries.length > 1).length,
-    [allThreads]
-  );
-  const soloCount = allThreads.length - conversationCount;
   // Returning-visitor detection — the IP is a one-way hash (never the raw
   // address, see lib/chat/log.ts), but the SAME hash showing up across
   // multiple distinct threads means the same person came back, which is a
@@ -558,10 +522,6 @@ export default function ChatLogPage() {
     }
     return counts;
   }, [allThreads, ownerIps]);
-  const returningCount = React.useMemo(
-    () => [...visitCountByIp.values()].filter((n) => n > 1).length,
-    [visitCountByIp]
-  );
   const reviewCount = React.useMemo(
     () => allThreads.filter(threadNeedsReview).length,
     [allThreads]
@@ -605,23 +565,6 @@ export default function ChatLogPage() {
     for (const t of threads) map.get(groupOf(t, now))!.push(t);
     return map;
   }, [threads, now]);
-  // Volume trend — message count per day, last 14 days, for the sparkline-style
-  // bar chart. Built from raw entries (not threads) since it's tracking
-  // messages sent, not conversations started.
-  const dailyVolume = React.useMemo(() => {
-    const DAYS = 14;
-    const dayMs = 86_400_000;
-    const startOfToday = new Date(now).setHours(0, 0, 0, 0);
-    const counts = new Array(DAYS).fill(0);
-    for (const e of entries ?? []) {
-      const dayIndex = Math.floor((startOfToday - new Date(e.t).setHours(0, 0, 0, 0)) / dayMs);
-      if (dayIndex >= 0 && dayIndex < DAYS) counts[DAYS - 1 - dayIndex]++;
-    }
-    return counts.map((count, i) => ({
-      date: new Date(startOfToday - (DAYS - 1 - i) * dayMs),
-      count,
-    }));
-  }, [entries, now]);
   const selectedThread = React.useMemo(
     () => allThreads.find((t) => t.key === selectedKey) ?? null,
     [allThreads, selectedKey]
@@ -638,63 +581,46 @@ export default function ChatLogPage() {
       </div>
 
       {entries && (
-        <div className="mt-6 flex min-h-0 flex-1 gap-4">
-          {/* Left pane — filters + selectable list. */}
-          <div className="flex w-full max-w-sm shrink-0 flex-col gap-3 overflow-y-auto pr-1">
-            <p className="text-body-xs text-muted-foreground">
-              {conversationCount} conversation{conversationCount === 1 ? "" : "s"} ·{" "}
-              {soloCount} one-off{soloCount === 1 ? "" : "s"} · {entries.length} msg total
-              {returningCount > 0 && (
-                <>
-                  {" "}·{" "}
-                  <span className="text-info">{returningCount} returning</span>
-                </>
-              )}
-              {reviewCount > 0 && (
-                <>
-                  {" "}·{" "}
-                  <span className="text-caution">{reviewCount} flagged</span>
-                </>
-              )}
-            </p>
+        <div className="mt-6 flex min-h-0 flex-1 flex-col gap-4">
+          {/* Shared header — search and all filters apply to both panes (they
+              narrow the left list; the right pane just shows whatever's
+              selected from that narrowed list). */}
+          <div className="flex shrink-0 flex-col gap-3 px-1">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 max-w-sm flex-1 items-center gap-2 rounded-lg border border-input bg-background px-3 dark:bg-input/30">
+                <MagnifyingGlassIcon className="size-4 shrink-0 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search…"
+                  className="w-full bg-transparent text-body-sm outline-none placeholder:text-muted-foreground"
+                />
+              </div>
 
-            <VolumeChart data={dailyVolume} />
+              <button
+                type="button"
+                onClick={() => setReviewOnly((v) => !v)}
+                disabled={reviewCount === 0}
+                className={cn(
+                  "flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
+                  reviewOnly
+                    ? "border-caution/50 bg-surface-caution text-caution"
+                    : "border-input bg-background text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <ExclamationTriangleIcon className="size-3.5 shrink-0" />
+                Needs review{reviewCount > 0 ? ` (${reviewCount})` : ""}
+              </button>
 
-            <div className="flex h-8 items-center gap-2 rounded-lg border border-input bg-background px-3 dark:bg-input/30">
-              <MagnifyingGlassIcon className="size-4 shrink-0 text-muted-foreground" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search…"
-                className="w-full bg-transparent text-body-sm outline-none placeholder:text-muted-foreground"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setReviewOnly((v) => !v)}
-              disabled={reviewCount === 0}
-              className={cn(
-                "flex h-8 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
-                reviewOnly
-                  ? "border-caution/50 bg-surface-caution text-caution"
-                  : "border-input bg-background text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <ExclamationTriangleIcon className="size-3.5 shrink-0" />
-              Needs review{reviewCount > 0 ? ` (${reviewCount})` : ""}
-            </button>
-
-            {/* Rating filter — Helpful / Not helpful, from the separate
-                feedback log joined in via feedbackFor. */}
-            <div className="flex items-center gap-1.5">
+              {/* Rating filter — Helpful / Not helpful, from the separate
+                  feedback log joined in via feedbackFor. */}
               <button
                 type="button"
                 onClick={() => setRatingFilter((v) => (v === "up" ? "all" : "up"))}
                 disabled={helpfulCount === 0}
                 className={cn(
-                  "flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
+                  "flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
                   ratingFilter === "up"
                     ? "border-success/50 bg-surface-success text-success"
                     : "border-input bg-background text-muted-foreground hover:text-foreground"
@@ -708,7 +634,7 @@ export default function ChatLogPage() {
                 onClick={() => setRatingFilter((v) => (v === "down" ? "all" : "down"))}
                 disabled={notHelpfulCount === 0}
                 className={cn(
-                  "flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
+                  "flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
                   ratingFilter === "down"
                     ? "border-critical/50 bg-surface-critical text-critical"
                     : "border-input bg-background text-muted-foreground hover:text-foreground"
@@ -751,82 +677,87 @@ export default function ChatLogPage() {
                 </button>
               ))}
             </div>
-
-            {threads.length === 0 && (
-              <p className="text-body-sm text-muted-foreground">
-                {reviewOnly
-                  ? "No flagged conversations."
-                  : ratingFilter !== "all"
-                    ? ratingFilter === "up"
-                      ? "No conversations rated helpful."
-                      : "No conversations rated not helpful."
-                    : query
-                      ? "No conversations match your search."
-                      : "No messages yet."}
-              </p>
-            )}
-
-            {DATE_GROUPS.map((g) => {
-              const threadsInGroup = grouped.get(g) ?? [];
-              if (threadsInGroup.length === 0) return null;
-              // Conversations (2+ messages) carry the most signal — lead with
-              // them as full cards. One-off single questions follow as a dense
-              // list, since there's nothing more to discover in them beyond the
-              // one answer.
-              const conversations = threadsInGroup.filter((t) => t.entries.length > 1);
-              const soloes = threadsInGroup.filter((t) => t.entries.length === 1);
-              return (
-                <div key={g} className="flex flex-col gap-2">
-                  <h2 className="text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {g}
-                  </h2>
-                  {conversations.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                      {conversations.map((thread) => (
-                        <ThreadCard
-                          key={thread.key}
-                          thread={thread}
-                          visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                          isOwner={isOwnerThread(thread)}
-                          selected={thread.key === selectedKey}
-                          onSelect={() => setSelectedKey(thread.key)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {soloes.length > 0 && (
-                    <div className="rounded-lg border px-2">
-                      {soloes.map((thread) => (
-                        <SoloRow
-                          key={thread.key}
-                          thread={thread}
-                          visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                          isOwner={isOwnerThread(thread)}
-                          selected={thread.key === selectedKey}
-                          onSelect={() => setSelectedKey(thread.key)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
           </div>
 
-          {/* Right pane — the selected thread's full transcript. */}
-          <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-border">
-            {selectedThread ? (
-              <ThreadDetail
-                thread={selectedThread}
-                visitCount={selectedThread.ip ? visitCountByIp.get(selectedThread.ip) ?? 1 : 1}
-                isOwner={isOwnerThread(selectedThread)}
-                feedbackFor={feedbackFor}
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">
-                Select a conversation to view it
-              </div>
-            )}
+          <div className="flex min-h-0 flex-1 gap-4">
+            {/* Left pane — selectable list, narrowed by the shared filters above. */}
+            <div className="flex w-full max-w-sm shrink-0 flex-col gap-3 overflow-y-auto pr-1">
+              {threads.length === 0 && (
+                <p className="text-body-sm text-muted-foreground">
+                  {reviewOnly
+                    ? "No flagged conversations."
+                    : ratingFilter !== "all"
+                      ? ratingFilter === "up"
+                        ? "No conversations rated helpful."
+                        : "No conversations rated not helpful."
+                      : query
+                        ? "No conversations match your search."
+                        : "No messages yet."}
+                </p>
+              )}
+
+              {DATE_GROUPS.map((g) => {
+                const threadsInGroup = grouped.get(g) ?? [];
+                if (threadsInGroup.length === 0) return null;
+                // Conversations (2+ messages) carry the most signal — lead with
+                // them as full cards. One-off single questions follow as a dense
+                // list, since there's nothing more to discover in them beyond the
+                // one answer.
+                const conversations = threadsInGroup.filter((t) => t.entries.length > 1);
+                const soloes = threadsInGroup.filter((t) => t.entries.length === 1);
+                return (
+                  <div key={g} className="flex flex-col gap-2">
+                    <h2 className="text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      {g}
+                    </h2>
+                    {conversations.length > 0 && (
+                      <div className="flex flex-col gap-2">
+                        {conversations.map((thread) => (
+                          <ThreadCard
+                            key={thread.key}
+                            thread={thread}
+                            visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                            isOwner={isOwnerThread(thread)}
+                            selected={thread.key === selectedKey}
+                            onSelect={() => setSelectedKey(thread.key)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    {soloes.length > 0 && (
+                      <div className="rounded-lg border px-2">
+                        {soloes.map((thread) => (
+                          <SoloRow
+                            key={thread.key}
+                            thread={thread}
+                            visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                            isOwner={isOwnerThread(thread)}
+                            selected={thread.key === selectedKey}
+                            onSelect={() => setSelectedKey(thread.key)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right pane — the selected thread's full transcript. */}
+            <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-border">
+              {selectedThread ? (
+                <ThreadDetail
+                  thread={selectedThread}
+                  visitCount={selectedThread.ip ? visitCountByIp.get(selectedThread.ip) ?? 1 : 1}
+                  isOwner={isOwnerThread(selectedThread)}
+                  feedbackFor={feedbackFor}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">
+                  Select a conversation to view it
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
