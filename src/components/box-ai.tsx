@@ -1000,6 +1000,7 @@ export function BoxAI({
         body: JSON.stringify({
           conversationId,
           pageContext,
+          page: pathname,
           messages: history.map((m) => ({
             role: m.role === "bot" ? "assistant" : "user",
             content: m.text,

@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { buildSystemPrompt } from "@/lib/chat/knowledge";
-import { logChat, hashIp } from "@/lib/chat/log";
+import { logChat, hashIp, parseUserAgent } from "@/lib/chat/log";
 import { getMusicSummary } from "@/lib/spotify";
 
 /* ============================================================================
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
   }
 
-  let body: { messages?: ClientMessage[]; conversationId?: string; pageContext?: string };
+  let body: { messages?: ClientMessage[]; conversationId?: string; pageContext?: string; page?: string };
   try {
     body = await request.json();
   } catch {
@@ -84,6 +84,8 @@ export async function POST(request: Request) {
     const ipRaw = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
     const city = request.headers.get("x-vercel-ip-city");
     const region = request.headers.get("x-vercel-ip-country-region");
+    const { device, os } = parseUserAgent(request.headers.get("user-agent"));
+    const page = typeof body.page === "string" ? body.page.slice(0, 200) : undefined;
     const question = messages[messages.length - 1].content.slice(0, 300);
 
     const readable = new ReadableStream({
@@ -129,6 +131,9 @@ export async function POST(request: Request) {
               lon: request.headers.get("x-vercel-ip-longitude") ?? undefined,
               ip: ipRaw ? await hashIp(ipRaw) : undefined,
               c: conversationId,
+              page,
+              device,
+              os,
             });
           } catch (err) {
             console.error("chat log write failed:", err);

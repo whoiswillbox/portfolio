@@ -2,7 +2,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { MagnifyingGlassIcon, ChevronDownIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import {
+  MagnifyingGlassIcon,
+  ChevronDownIcon,
+  ExclamationTriangleIcon,
+  ComputerDesktopIcon,
+  DevicePhoneMobileIcon,
+  DeviceTabletIcon,
+} from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 
 type Entry = {
@@ -16,6 +23,9 @@ type Entry = {
   lon?: string;
   ip?: string;
   c?: string;
+  page?: string;
+  device?: "Desktop" | "Mobile" | "Tablet";
+  os?: string;
 };
 
 type Thread = {
@@ -28,6 +38,9 @@ type Thread = {
   lat?: string;
   lon?: string;
   ip?: string;
+  page?: string;
+  device?: "Desktop" | "Mobile" | "Tablet";
+  os?: string;
 };
 
 /* Group entries into conversation threads (by conversation id; entries with no
@@ -55,6 +68,9 @@ function groupThreads(entries: Entry[]): Thread[] {
       lat: first.lat,
       lon: first.lon,
       ip: first.ip,
+      page: first.page,
+      device: first.device,
+      os: first.os,
     });
   }
   return threads.sort((a, b) => b.latest - a.latest);
@@ -197,11 +213,34 @@ function mapUrl(lat: string, lon: string): string {
   return `https://www.google.com/maps?q=${lat},${lon}`;
 }
 
+const DEVICE_ICON: Record<NonNullable<Thread["device"]>, React.ComponentType<{ className?: string }>> = {
+  Desktop: ComputerDesktopIcon,
+  Mobile: DevicePhoneMobileIcon,
+  Tablet: DeviceTabletIcon,
+};
+
+function DeviceBadge({ device, os }: { device?: Thread["device"]; os?: string }) {
+  if (!device) return null;
+  const Icon = DEVICE_ICON[device];
+  return (
+    <span className="inline-flex items-center gap-1" title={[device, os].filter(Boolean).join(" · ")}>
+      <Icon className="size-3.5 shrink-0" />
+      {os && <span>{os}</span>}
+    </span>
+  );
+}
+
 function Meta({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-2 text-body-xs text-muted-foreground">
       <span>{new Date(thread.latest).toLocaleString()}</span>
       {(thread.city || thread.country) && <span>· {locationOf(thread)}</span>}
+      {thread.device && (
+        <>
+          · <DeviceBadge device={thread.device} os={thread.os} />
+        </>
+      )}
+      {thread.page && <span>· {thread.page}</span>}
       {thread.lat && thread.lon && (
         <>
           ·{" "}
@@ -343,6 +382,26 @@ function ThreadCard({ thread, visitCount, isOwner }: { thread: Thread; visitCoun
   );
 }
 
+/* 14-day message-volume bar chart — a quick trend read (is traffic picking
+   up, did a change spike/kill engagement) without leaving the log for
+   Vercel Analytics, which can't see WHAT was asked. */
+function VolumeChart({ data }: { data: { date: Date; count: number }[] }) {
+  const max = Math.max(1, ...data.map((d) => d.count));
+  return (
+    <div className="flex items-end gap-1 rounded-lg border border-border px-3 py-3" style={{ height: 96 }}>
+      {data.map((d, i) => (
+        <div key={i} className="flex flex-1 flex-col items-center justify-end gap-1" style={{ height: "100%" }}>
+          <div
+            className={cn("w-full rounded-sm", d.count > 0 ? "bg-foreground" : "bg-border")}
+            style={{ height: `${Math.max(2, (d.count / max) * 100)}%` }}
+            title={`${d.date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}: ${d.count} message${d.count === 1 ? "" : "s"}`}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ChatLogPage() {
   const router = useRouter();
   const [entries, setEntries] = React.useState<Entry[] | null>(null);
@@ -434,6 +493,23 @@ export default function ChatLogPage() {
     for (const t of threads) map.get(groupOf(t, now))!.push(t);
     return map;
   }, [threads, now]);
+  // Volume trend — message count per day, last 14 days, for the sparkline-style
+  // bar chart. Built from raw entries (not threads) since it's tracking
+  // messages sent, not conversations started.
+  const dailyVolume = React.useMemo(() => {
+    const DAYS = 14;
+    const dayMs = 86_400_000;
+    const startOfToday = new Date(now).setHours(0, 0, 0, 0);
+    const counts = new Array(DAYS).fill(0);
+    for (const e of entries ?? []) {
+      const dayIndex = Math.floor((startOfToday - new Date(e.t).setHours(0, 0, 0, 0)) / dayMs);
+      if (dayIndex >= 0 && dayIndex < DAYS) counts[DAYS - 1 - dayIndex]++;
+    }
+    return counts.map((count, i) => ({
+      date: new Date(startOfToday - (DAYS - 1 - i) * dayMs),
+      count,
+    }));
+  }, [entries, now]);
 
   return (
     <div className="mx-auto w-full max-w-3xl">
@@ -467,6 +543,8 @@ export default function ChatLogPage() {
               </>
             )}
           </p>
+
+          <VolumeChart data={dailyVolume} />
 
           <div className="flex items-center gap-2">
             <div className="flex h-8 flex-1 items-center gap-2 rounded-lg border border-input bg-background px-3 dark:bg-input/30">

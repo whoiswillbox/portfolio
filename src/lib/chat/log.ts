@@ -25,6 +25,9 @@ export type ChatLogEntry = {
   lon?: string; // x-vercel-ip-longitude
   ip?: string; // short hash, not the raw IP
   c?: string; // conversation id — groups a visitor's back-and-forth into a thread
+  page?: string; // pathname the visitor was on when they sent this message
+  device?: "Desktop" | "Mobile" | "Tablet";
+  os?: string; // coarse OS name (e.g. "iOS", "Mac", "Windows", "Android")
 };
 
 /** SHA-256 the IP so we can count unique visitors without storing the raw IP. */
@@ -35,6 +38,24 @@ export async function hashIp(ip: string): Promise<string> {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("")
     .slice(0, 12);
+}
+
+/** Coarse device/OS classification from the User-Agent header — enough to
+    bucket like Vercel Analytics' Devices/OS panels, not a full UA parse. */
+export function parseUserAgent(ua: string | null): { device: ChatLogEntry["device"]; os?: string } {
+  if (!ua) return { device: undefined, os: undefined };
+  const isTablet = /iPad|Tablet(?!.*Mobile)/i.test(ua);
+  const isMobile = !isTablet && /Mobi|iPhone|Android.*Mobile/i.test(ua);
+  const device = isTablet ? "Tablet" : isMobile ? "Mobile" : "Desktop";
+
+  let os: string | undefined;
+  if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS";
+  else if (/Mac OS X/i.test(ua)) os = "Mac";
+  else if (/Android/i.test(ua)) os = "Android";
+  else if (/Windows/i.test(ua)) os = "Windows";
+  else if (/Linux/i.test(ua)) os = "Linux";
+
+  return { device, os };
 }
 
 export async function logChat(entry: ChatLogEntry): Promise<void> {
