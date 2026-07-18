@@ -11,7 +11,17 @@ import {
   HandThumbUpIcon,
   HandThumbDownIcon,
 } from "@heroicons/react/24/outline";
+import { HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from "@heroicons/react/24/solid";
 import { cn } from "@/lib/utils";
+
+type FeedbackEntry = {
+  t: string;
+  c?: string;
+  q?: string;
+  a?: string;
+  rating: "up" | "down";
+  feedback?: string;
+};
 
 type Entry = {
   t: string;
@@ -385,38 +395,75 @@ function ThreadCard({
 }
 
 /* Right pane — the full transcript + all metadata for the selected thread.
-   Shown in place of the list on mobile-narrow layouts; side-by-side on wider
-   ones (see the page's flex row). */
-/* Mirrors the real Box AI transcript styling (BotBubble / user bubble in
+   Mirrors the real Box AI transcript styling (BotBubble / user bubble in
    box-ai.tsx) so a logged conversation reads exactly like it did live —
    right-aligned dark pill for the question, plain text + thumbs row for the
-   answer. Thumbs are display-only here (no click handler) since this is a
-   read-only historical view, not a place to re-rate an old answer. */
-function ThreadDetail({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
+   answer. Thumbs reflect the ACTUAL recorded rating (solid + colored icon)
+   when feedback exists for that message, joined from the separate feedback
+   log by conversation id + answer text; otherwise shown outlined/inert. */
+function ThreadDetail({
+  thread,
+  visitCount,
+  isOwner,
+  feedbackFor,
+}: {
+  thread: Thread;
+  visitCount: number;
+  isOwner: boolean;
+  feedbackFor: (conversationId: string | undefined, answer: string) => FeedbackEntry | undefined;
+}) {
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
       <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} />
       <div className="flex flex-col gap-4">
-        {thread.entries.map((e, i) => (
-          <div key={i} className="flex flex-col gap-3">
-            <div className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-body-sm text-primary-foreground">
-              {e.q}
-            </div>
-            <div className="flex w-full flex-col gap-1">
-              <p className={cn("font-sans text-body-sm", isHedge(e.a) ? "text-caution" : "text-foreground")}>
-                {e.a}
-              </p>
-              <div className="flex items-center gap-0.5 pl-1">
-                <span className="rounded-md p-1.5 text-muted-foreground">
-                  <HandThumbUpIcon className="size-3.5" />
-                </span>
-                <span className="rounded-md p-1.5 text-muted-foreground">
-                  <HandThumbDownIcon className="size-3.5" />
-                </span>
+        {thread.entries.map((e, i) => {
+          const fb = feedbackFor(thread.key, e.a);
+          const rating = fb?.rating;
+          return (
+            <div key={i} className="flex flex-col gap-3">
+              <div className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-body-sm text-primary-foreground">
+                {e.q}
+              </div>
+              <div className="flex w-full flex-col gap-1">
+                <p className={cn("font-sans text-body-sm", isHedge(e.a) ? "text-caution" : "text-foreground")}>
+                  {e.a}
+                </p>
+                <div className="flex items-center gap-2 pl-1">
+                  {!rating && (
+                    <div className="flex items-center gap-0.5">
+                      <span className="rounded-md p-1.5 text-muted-foreground">
+                        <HandThumbUpIcon className="size-3.5" />
+                      </span>
+                      <span className="rounded-md p-1.5 text-muted-foreground">
+                        <HandThumbDownIcon className="size-3.5" />
+                      </span>
+                    </div>
+                  )}
+                  {rating === "up" && (
+                    <span className="rounded-md p-1.5 text-success">
+                      <HandThumbUpSolid className="size-3.5" />
+                    </span>
+                  )}
+                  {rating === "down" && (
+                    <span className="rounded-md p-1.5 text-critical">
+                      <HandThumbDownSolid className="size-3.5" />
+                    </span>
+                  )}
+                  {rating && (
+                    <span className={cn("text-body-xs font-medium", rating === "up" ? "text-success" : "text-critical")}>
+                      {rating === "up" ? "Helpful" : "Not helpful"}
+                    </span>
+                  )}
+                </div>
+                {fb?.feedback && (
+                  <p className="mt-1 border-l-2 border-border pl-2 text-body-sm italic text-muted-foreground">
+                    &ldquo;{fb.feedback}&rdquo;
+                  </p>
+                )}
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -445,10 +492,12 @@ function VolumeChart({ data }: { data: { date: Date; count: number }[] }) {
 export default function ChatLogPage() {
   const router = useRouter();
   const [entries, setEntries] = React.useState<Entry[] | null>(null);
+  const [feedback, setFeedback] = React.useState<FeedbackEntry[]>([]);
   const [ownerIps, setOwnerIps] = React.useState<string[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   const [reviewOnly, setReviewOnly] = React.useState(false);
+  const [ratingFilter, setRatingFilter] = React.useState<"all" | "up" | "down">("all");
   const [topicFilter, setTopicFilter] = React.useState<TopicId | "all">("all");
   const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
 
@@ -470,6 +519,7 @@ export default function ChatLogPage() {
         }
         const data = await res.json();
         setEntries(data.log ?? []);
+        setFeedback(data.feedback ?? []);
         setOwnerIps(data.ownerIps ?? []);
       } catch {
         setError("Network error.");
@@ -479,6 +529,14 @@ export default function ChatLogPage() {
   const isOwnerThread = React.useCallback(
     (t: Thread) => Boolean(t.ip && ownerIps.includes(t.ip)),
     [ownerIps]
+  );
+  // Feedback is a SEPARATE log (own Redis list), joined here by conversation
+  // id + answer text — both are truncated to the same 300 chars server-side
+  // (see logChat/logFeedback), so an exact match is reliable.
+  const feedbackFor = React.useCallback(
+    (conversationId: string | undefined, answer: string): FeedbackEntry | undefined =>
+      feedback.find((f) => f.c === conversationId && f.a === answer),
+    [feedback]
   );
 
   const allThreads = React.useMemo(() => (entries ? groupThreads(entries) : []), [entries]);
@@ -508,6 +566,14 @@ export default function ChatLogPage() {
     () => allThreads.filter(threadNeedsReview).length,
     [allThreads]
   );
+  const helpfulCount = React.useMemo(
+    () => allThreads.filter((t) => t.entries.some((e) => feedbackFor(t.key, e.a)?.rating === "up")).length,
+    [allThreads, feedbackFor]
+  );
+  const notHelpfulCount = React.useMemo(
+    () => allThreads.filter((t) => t.entries.some((e) => feedbackFor(t.key, e.a)?.rating === "down")).length,
+    [allThreads, feedbackFor]
+  );
   // Topic breakdown — how many threads land in each category, sorted busiest
   // first, so a glance at the counts tells you where visitors' interest (and
   // the knowledge base's gaps) actually concentrate.
@@ -519,13 +585,18 @@ export default function ChatLogPage() {
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1]);
   }, [allThreads]);
+  const threadHasRating = React.useCallback(
+    (t: Thread, rating: "up" | "down") => t.entries.some((e) => feedbackFor(t.key, e.a)?.rating === rating),
+    [feedbackFor]
+  );
   const threads = React.useMemo(
     () =>
       allThreads
         .filter((t) => matches(t, query))
         .filter((t) => !reviewOnly || threadNeedsReview(t))
+        .filter((t) => ratingFilter === "all" || threadHasRating(t, ratingFilter))
         .filter((t) => topicFilter === "all" || topicOfThread(t) === topicFilter),
-    [allThreads, query, reviewOnly, topicFilter]
+    [allThreads, query, reviewOnly, ratingFilter, topicFilter, threadHasRating]
   );
   const now = React.useMemo(() => Date.now(), []);
   const grouped = React.useMemo(() => {
@@ -615,6 +686,39 @@ export default function ChatLogPage() {
               Needs review{reviewCount > 0 ? ` (${reviewCount})` : ""}
             </button>
 
+            {/* Rating filter — Helpful / Not helpful, from the separate
+                feedback log joined in via feedbackFor. */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setRatingFilter((v) => (v === "up" ? "all" : "up"))}
+                disabled={helpfulCount === 0}
+                className={cn(
+                  "flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
+                  ratingFilter === "up"
+                    ? "border-success/50 bg-surface-success text-success"
+                    : "border-input bg-background text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <HandThumbUpIcon className="size-3.5 shrink-0" />
+                Helpful{helpfulCount > 0 ? ` (${helpfulCount})` : ""}
+              </button>
+              <button
+                type="button"
+                onClick={() => setRatingFilter((v) => (v === "down" ? "all" : "down"))}
+                disabled={notHelpfulCount === 0}
+                className={cn(
+                  "flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
+                  ratingFilter === "down"
+                    ? "border-critical/50 bg-surface-critical text-critical"
+                    : "border-input bg-background text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <HandThumbDownIcon className="size-3.5 shrink-0" />
+                Not helpful{notHelpfulCount > 0 ? ` (${notHelpfulCount})` : ""}
+              </button>
+            </div>
+
             {/* Topic breakdown — busiest first. Click a pill to filter the list
                 to that topic; click again (or All) to clear. Directly answers
                 "what should I add more knowledge-base content about". */}
@@ -652,9 +756,13 @@ export default function ChatLogPage() {
               <p className="text-body-sm text-muted-foreground">
                 {reviewOnly
                   ? "No flagged conversations."
-                  : query
-                    ? "No conversations match your search."
-                    : "No messages yet."}
+                  : ratingFilter !== "all"
+                    ? ratingFilter === "up"
+                      ? "No conversations rated helpful."
+                      : "No conversations rated not helpful."
+                    : query
+                      ? "No conversations match your search."
+                      : "No messages yet."}
               </p>
             )}
 
@@ -712,6 +820,7 @@ export default function ChatLogPage() {
                 thread={selectedThread}
                 visitCount={selectedThread.ip ? visitCountByIp.get(selectedThread.ip) ?? 1 : 1}
                 isOwner={isOwnerThread(selectedThread)}
+                feedbackFor={feedbackFor}
               />
             ) : (
               <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">

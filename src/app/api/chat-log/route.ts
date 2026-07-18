@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getChatLog } from "@/lib/chat/log";
+import { getChatLog, getFeedback } from "@/lib/chat/log";
 import { ADMIN_COOKIE, adminToken } from "@/lib/auth";
 
 // Always evaluate per-request (reads live from Redis); never cache the log.
@@ -24,5 +24,8 @@ export async function GET() {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  return Response.json({ log: await getChatLog(200), ownerIps });
+  // Feedback (thumbs up/down) is a separate log, keyed loosely by
+  // conversation id + question/answer text — joined client-side so the
+  // transcript view can show whether each answer was rated.
+  return Response.json({ log: await getChatLog(200), feedback: await getFeedback(200), ownerIps });
 }
