@@ -4,11 +4,12 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
   MagnifyingGlassIcon,
-  ChevronDownIcon,
   ExclamationTriangleIcon,
   ComputerDesktopIcon,
   DevicePhoneMobileIcon,
   DeviceTabletIcon,
+  HandThumbUpIcon,
+  HandThumbDownIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 
@@ -271,9 +272,6 @@ function Meta({ thread, visitCount, isOwner }: { thread: Thread; visitCount: num
   );
 }
 
-/* A one-off (single message) thread — the least signal in the log, so it
-   renders as a dense single row: question as the title, no card padding, no
-   answer preview. Click to reveal the answer inline. */
 function TopicPill({ topic }: { topic: TopicId }) {
   return (
     <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-body-xs text-muted-foreground">
@@ -282,102 +280,144 @@ function TopicPill({ topic }: { topic: TopicId }) {
   );
 }
 
-function SoloRow({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
-  const [open, setOpen] = React.useState(false);
+/* A one-off (single message) thread — the least signal in the log, so it's a
+   dense single row: question as the title, no answer preview. Selecting it
+   shows the full detail (question + answer + metadata) in the right pane. */
+function SoloRow({
+  thread,
+  visitCount,
+  isOwner,
+  selected,
+  onSelect,
+}: {
+  thread: Thread;
+  visitCount: number;
+  isOwner: boolean;
+  selected: boolean;
+  onSelect: () => void;
+}) {
   const entry = thread.entries[0];
   const flagged = isHedge(entry.a);
   return (
-    <div className="border-b border-border/60 last:border-b-0">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-start gap-3 py-2 text-left"
-      >
-        <ChevronDownIcon
-          className={cn(
-            "mt-1 size-3 shrink-0 text-muted-foreground transition-transform",
-            open && "rotate-180"
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "flex w-full items-start gap-3 border-b border-border/60 px-2 py-2 text-left transition-colors last:border-b-0",
+        selected ? "bg-muted" : "hover:bg-muted/50"
+      )}
+    >
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <div className="flex items-center gap-1.5">
+          {flagged && (
+            <ExclamationTriangleIcon className="size-3.5 shrink-0 text-caution" aria-label="Bot may not have answered this well" />
           )}
-        />
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <div className="flex items-center gap-1.5">
-            {flagged && (
-              <ExclamationTriangleIcon className="size-3.5 shrink-0 text-caution" aria-label="Bot may not have answered this well" />
-            )}
-            {isOwner ? (
-              <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-body-xs text-foreground" title="Matches your own IP — likely you testing">
-                It&rsquo;s me
+          {isOwner ? (
+            <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-body-xs text-foreground" title="Matches your own IP — likely you testing">
+              It&rsquo;s me
+            </span>
+          ) : (
+            visitCount > 1 && (
+              <span className="shrink-0 rounded-full bg-surface-info px-1.5 py-0.5 text-body-xs text-info" title="Same visitor has messaged before">
+                Returning
               </span>
-            ) : (
-              visitCount > 1 && (
-                <span className="shrink-0 rounded-full bg-surface-info px-1.5 py-0.5 text-body-xs text-info" title="Same visitor has messaged before">
-                  Returning
-                </span>
-              )
-            )}
-            <p className="truncate text-body-sm text-foreground">{entry.q}</p>
-          </div>
-          {open && (
-            <div className="flex flex-col gap-2">
-              <p className="text-body-sm text-muted-foreground">{entry.a}</p>
-              {(thread.city || thread.country) && (
-                <span className="text-body-xs text-muted-foreground">{locationOf(thread)}</span>
-              )}
-            </div>
+            )
           )}
+          <p className="truncate text-body-sm text-foreground">{entry.q}</p>
         </div>
-        <TopicPill topic={topicOf(entry.q)} />
-        <span className="shrink-0 text-body-xs text-muted-foreground">
-          {new Date(thread.latest).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-        </span>
-      </button>
-    </div>
+      </div>
+      <TopicPill topic={topicOf(entry.q)} />
+      <span className="shrink-0 text-body-xs text-muted-foreground">
+        {new Date(thread.latest).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+      </span>
+    </button>
   );
 }
 
 /* A real conversation (2+ messages) — the highest-signal rows, so they keep
-   the fuller card treatment: depth pips + message count up front, first
-   question as the collapsed title, full transcript on expand. */
-function ThreadCard({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
-  const [open, setOpen] = React.useState(false);
+   the fuller card treatment: depth pips + message count + first question.
+   Selecting it shows the full transcript in the right pane. */
+function ThreadCard({
+  thread,
+  visitCount,
+  isOwner,
+  selected,
+  onSelect,
+}: {
+  thread: Thread;
+  visitCount: number;
+  isOwner: boolean;
+  selected: boolean;
+  onSelect: () => void;
+}) {
   const first = thread.entries[0];
   const flagged = threadNeedsReview(thread);
 
   return (
-    <div className={cn("rounded-lg border", flagged && "border-caution/50")}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full flex-col gap-2 px-3 py-2.5 text-left"
-      >
-        <div className="flex items-center gap-2">
-          <DepthPips count={thread.entries.length} />
-          <span className="text-body-xs font-medium text-foreground">
-            {thread.entries.length} messages
-          </span>
-          {flagged && (
-            <ExclamationTriangleIcon className="size-3.5 shrink-0 text-caution" aria-label="Bot may not have answered well somewhere in this thread" />
-          )}
-          <TopicPill topic={topicOfThread(thread)} />
-          <ChevronDownIcon
-            className={cn("ml-auto size-3.5 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")}
-          />
-        </div>
-        <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} />
-        {!open && (
-          <p className="truncate text-body-sm font-medium text-foreground">{first.q}</p>
-        )}
-      </button>
-      {open && (
-        <div className="flex flex-col gap-3 border-t px-3 py-3">
-          {thread.entries.map((e, i) => (
-            <div key={i} className="flex flex-col gap-1">
-              <p className="text-body-sm font-medium">{e.q}</p>
-              <p className={cn("text-body-sm", isHedge(e.a) ? "text-caution" : "text-muted-foreground")}>{e.a}</p>
-            </div>
-          ))}
-        </div>
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "flex w-full flex-col gap-2 rounded-lg border px-3 py-2.5 text-left transition-colors",
+        flagged && "border-caution/50",
+        selected ? "bg-muted" : "hover:bg-muted/50"
       )}
+    >
+      <div className="flex items-center gap-2">
+        <DepthPips count={thread.entries.length} />
+        <span className="text-body-xs font-medium text-foreground">
+          {thread.entries.length} messages
+        </span>
+        {flagged && (
+          <ExclamationTriangleIcon className="size-3.5 shrink-0 text-caution" aria-label="Bot may not have answered well somewhere in this thread" />
+        )}
+        <TopicPill topic={topicOfThread(thread)} />
+      </div>
+      <p className="truncate text-body-sm font-medium text-foreground">{first.q}</p>
+      <p className="truncate text-body-xs text-muted-foreground">
+        {new Date(thread.latest).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+        {(thread.city || thread.country) && ` · ${locationOf(thread)}`}
+        {isOwner && " · It's me"}
+        {!isOwner && visitCount > 1 && " · Returning"}
+      </p>
+    </button>
+  );
+}
+
+/* Right pane — the full transcript + all metadata for the selected thread.
+   Shown in place of the list on mobile-narrow layouts; side-by-side on wider
+   ones (see the page's flex row). */
+/* Mirrors the real Box AI transcript styling (BotBubble / user bubble in
+   box-ai.tsx) so a logged conversation reads exactly like it did live —
+   right-aligned dark pill for the question, plain text + thumbs row for the
+   answer. Thumbs are display-only here (no click handler) since this is a
+   read-only historical view, not a place to re-rate an old answer. */
+function ThreadDetail({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
+  return (
+    <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
+      <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} />
+      <div className="flex flex-col gap-4">
+        {thread.entries.map((e, i) => (
+          <div key={i} className="flex flex-col gap-3">
+            <div className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-body-sm text-primary-foreground">
+              {e.q}
+            </div>
+            <div className="flex w-full flex-col gap-1">
+              <p className={cn("font-sans text-body-sm", isHedge(e.a) ? "text-caution" : "text-foreground")}>
+                {e.a}
+              </p>
+              <div className="flex items-center gap-0.5 pl-1">
+                <span className="rounded-md p-1.5 text-muted-foreground">
+                  <HandThumbUpIcon className="size-3.5" />
+                </span>
+                <span className="rounded-md p-1.5 text-muted-foreground">
+                  <HandThumbDownIcon className="size-3.5" />
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -410,6 +450,7 @@ export default function ChatLogPage() {
   const [query, setQuery] = React.useState("");
   const [reviewOnly, setReviewOnly] = React.useState(false);
   const [topicFilter, setTopicFilter] = React.useState<TopicId | "all">("all");
+  const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     (async () => {
@@ -510,59 +551,61 @@ export default function ChatLogPage() {
       count,
     }));
   }, [entries, now]);
+  const selectedThread = React.useMemo(
+    () => allThreads.find((t) => t.key === selectedKey) ?? null,
+    [allThreads, selectedKey]
+  );
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
-      <h1 className="text-h3 tracking-tight">Chat log</h1>
-      <p className="mt-1 text-body-sm text-muted-foreground">
-        What visitors have asked the AI assistant (most recent first).
-      </p>
-
-      {error && <p className="mt-4 text-body-sm text-critical">{error}</p>}
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col">
+      <div className="shrink-0 px-1">
+        <h1 className="text-h3 tracking-tight">Chat log</h1>
+        <p className="mt-1 text-body-sm text-muted-foreground">
+          What visitors have asked the AI assistant (most recent first).
+        </p>
+        {error && <p className="mt-4 text-body-sm text-critical">{error}</p>}
+      </div>
 
       {entries && (
-        <div className="mt-6 flex flex-col gap-4">
-          <p className="text-body-xs text-muted-foreground">
-            {conversationCount} conversation{conversationCount === 1 ? "" : "s"} ·{" "}
-            {soloCount} one-off question{soloCount === 1 ? "" : "s"} ·{" "}
-            {entries.length} message{entries.length === 1 ? "" : "s"} total
-            {returningCount > 0 && (
-              <>
-                {" "}·{" "}
-                <span className="text-info">
-                  {returningCount} returning visitor{returningCount === 1 ? "" : "s"}
-                </span>
-              </>
-            )}
-            {reviewCount > 0 && (
-              <>
-                {" "}·{" "}
-                <span className="text-caution">
-                  {reviewCount} may need review
-                </span>
-              </>
-            )}
-          </p>
+        <div className="mt-6 flex min-h-0 flex-1 gap-4">
+          {/* Left pane — filters + selectable list. */}
+          <div className="flex w-full max-w-sm shrink-0 flex-col gap-3 overflow-y-auto pr-1">
+            <p className="text-body-xs text-muted-foreground">
+              {conversationCount} conversation{conversationCount === 1 ? "" : "s"} ·{" "}
+              {soloCount} one-off{soloCount === 1 ? "" : "s"} · {entries.length} msg total
+              {returningCount > 0 && (
+                <>
+                  {" "}·{" "}
+                  <span className="text-info">{returningCount} returning</span>
+                </>
+              )}
+              {reviewCount > 0 && (
+                <>
+                  {" "}·{" "}
+                  <span className="text-caution">{reviewCount} flagged</span>
+                </>
+              )}
+            </p>
 
-          <VolumeChart data={dailyVolume} />
+            <VolumeChart data={dailyVolume} />
 
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 flex-1 items-center gap-2 rounded-lg border border-input bg-background px-3 dark:bg-input/30">
+            <div className="flex h-8 items-center gap-2 rounded-lg border border-input bg-background px-3 dark:bg-input/30">
               <MagnifyingGlassIcon className="size-4 shrink-0 text-muted-foreground" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search questions, answers, location…"
+                placeholder="Search…"
                 className="w-full bg-transparent text-body-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
+
             <button
               type="button"
               onClick={() => setReviewOnly((v) => !v)}
               disabled={reviewCount === 0}
               className={cn(
-                "flex h-8 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
+                "flex h-8 items-center justify-center gap-1.5 rounded-lg border px-3 text-body-sm transition-colors disabled:opacity-40",
                 reviewOnly
                   ? "border-caution/50 bg-surface-caution text-caution"
                   : "border-input bg-background text-muted-foreground hover:text-foreground"
@@ -571,92 +614,111 @@ export default function ChatLogPage() {
               <ExclamationTriangleIcon className="size-3.5 shrink-0" />
               Needs review{reviewCount > 0 ? ` (${reviewCount})` : ""}
             </button>
-          </div>
 
-          {/* Topic breakdown — busiest first. Click a pill to filter the list
-              to that topic; click again (or All) to clear. Directly answers
-              "what should I add more knowledge-base content about". */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setTopicFilter("all")}
-              className={cn(
-                "rounded-full px-2.5 py-1 text-body-xs transition-colors",
-                topicFilter === "all"
-                  ? "bg-foreground text-background"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
-              )}
-            >
-              All ({allThreads.length})
-            </button>
-            {topicCounts.map(([topic, count]) => (
+            {/* Topic breakdown — busiest first. Click a pill to filter the list
+                to that topic; click again (or All) to clear. Directly answers
+                "what should I add more knowledge-base content about". */}
+            <div className="flex flex-wrap items-center gap-1.5">
               <button
-                key={topic}
                 type="button"
-                onClick={() => setTopicFilter((v) => (v === topic ? "all" : topic))}
+                onClick={() => setTopicFilter("all")}
                 className={cn(
                   "rounded-full px-2.5 py-1 text-body-xs transition-colors",
-                  topicFilter === topic
+                  topicFilter === "all"
                     ? "bg-foreground text-background"
                     : "bg-muted text-muted-foreground hover:text-foreground"
                 )}
               >
-                {TOPIC_LABELS[topic]} ({count})
+                All ({allThreads.length})
               </button>
-            ))}
+              {topicCounts.map(([topic, count]) => (
+                <button
+                  key={topic}
+                  type="button"
+                  onClick={() => setTopicFilter((v) => (v === topic ? "all" : topic))}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-body-xs transition-colors",
+                    topicFilter === topic
+                      ? "bg-foreground text-background"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {TOPIC_LABELS[topic]} ({count})
+                </button>
+              ))}
+            </div>
+
+            {threads.length === 0 && (
+              <p className="text-body-sm text-muted-foreground">
+                {reviewOnly
+                  ? "No flagged conversations."
+                  : query
+                    ? "No conversations match your search."
+                    : "No messages yet."}
+              </p>
+            )}
+
+            {DATE_GROUPS.map((g) => {
+              const threadsInGroup = grouped.get(g) ?? [];
+              if (threadsInGroup.length === 0) return null;
+              // Conversations (2+ messages) carry the most signal — lead with
+              // them as full cards. One-off single questions follow as a dense
+              // list, since there's nothing more to discover in them beyond the
+              // one answer.
+              const conversations = threadsInGroup.filter((t) => t.entries.length > 1);
+              const soloes = threadsInGroup.filter((t) => t.entries.length === 1);
+              return (
+                <div key={g} className="flex flex-col gap-2">
+                  <h2 className="text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {g}
+                  </h2>
+                  {conversations.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      {conversations.map((thread) => (
+                        <ThreadCard
+                          key={thread.key}
+                          thread={thread}
+                          visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                          isOwner={isOwnerThread(thread)}
+                          selected={thread.key === selectedKey}
+                          onSelect={() => setSelectedKey(thread.key)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {soloes.length > 0 && (
+                    <div className="rounded-lg border px-2">
+                      {soloes.map((thread) => (
+                        <SoloRow
+                          key={thread.key}
+                          thread={thread}
+                          visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                          isOwner={isOwnerThread(thread)}
+                          selected={thread.key === selectedKey}
+                          onSelect={() => setSelectedKey(thread.key)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {threads.length === 0 && (
-            <p className="text-body-sm text-muted-foreground">
-              {reviewOnly
-                ? "No flagged conversations."
-                : query
-                  ? "No conversations match your search."
-                  : "No messages yet."}
-            </p>
-          )}
-
-          {DATE_GROUPS.map((g) => {
-            const threadsInGroup = grouped.get(g) ?? [];
-            if (threadsInGroup.length === 0) return null;
-            // Conversations (2+ messages) carry the most signal — lead with
-            // them as full cards. One-off single questions follow as a dense
-            // list, since there's nothing more to discover in them beyond the
-            // one answer.
-            const conversations = threadsInGroup.filter((t) => t.entries.length > 1);
-            const soloes = threadsInGroup.filter((t) => t.entries.length === 1);
-            return (
-              <div key={g} className="flex flex-col gap-3">
-                <h2 className="text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {g}
-                </h2>
-                {conversations.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    {conversations.map((thread) => (
-                      <ThreadCard
-                        key={thread.key}
-                        thread={thread}
-                        visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                        isOwner={isOwnerThread(thread)}
-                      />
-                    ))}
-                  </div>
-                )}
-                {soloes.length > 0 && (
-                  <div className="rounded-lg border px-3">
-                    {soloes.map((thread) => (
-                      <SoloRow
-                        key={thread.key}
-                        thread={thread}
-                        visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                        isOwner={isOwnerThread(thread)}
-                      />
-                    ))}
-                  </div>
-                )}
+          {/* Right pane — the selected thread's full transcript. */}
+          <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-border">
+            {selectedThread ? (
+              <ThreadDetail
+                thread={selectedThread}
+                visitCount={selectedThread.ip ? visitCountByIp.get(selectedThread.ip) ?? 1 : 1}
+                isOwner={isOwnerThread(selectedThread)}
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">
+                Select a conversation to view it
               </div>
-            );
-          })}
+            )}
+          </div>
         </div>
       )}
     </div>
