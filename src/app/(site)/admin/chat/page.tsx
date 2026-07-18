@@ -10,6 +10,7 @@ import {
   DeviceTabletIcon,
   HandThumbUpIcon,
   HandThumbDownIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from "@heroicons/react/24/solid";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ type Entry = {
   page?: string;
   device?: "Desktop" | "Mobile" | "Tablet";
   os?: string;
+  referrer?: string;
 };
 
 type Thread = {
@@ -52,6 +54,7 @@ type Thread = {
   page?: string;
   device?: "Desktop" | "Mobile" | "Tablet";
   os?: string;
+  referrer?: string;
 };
 
 /* Group entries into conversation threads (by conversation id; entries with no
@@ -82,6 +85,7 @@ function groupThreads(entries: Entry[]): Thread[] {
       page: first.page,
       device: first.device,
       os: first.os,
+      referrer: first.referrer,
     });
   }
   return threads.sort((a, b) => b.latest - a.latest);
@@ -100,6 +104,18 @@ function groupOf(t: Thread, now: number): DateGroup {
   if (t.latest >= startOfToday - dayMs) return "Yesterday";
   if (t.latest >= startOfToday - 7 * dayMs) return "Previous 7 Days";
   return "Older";
+}
+
+/* Within "Older" (> 7 days), anything more than a month back gets nested
+   under a month-year header (e.g. "June 2026") instead of piling into one
+   flat list forever — 7 days to a month ago renders as a flat "This Month"
+   list since that span is still small enough to scan directly. */
+function isOlderThanAMonth(t: Thread, now: number): boolean {
+  return now - t.latest >= 30 * 86_400_000;
+}
+
+function monthYearOf(t: Thread): string {
+  return new Date(t.latest).toLocaleDateString(undefined, { month: "long", year: "numeric" });
 }
 
 /* Heuristic: does this answer read like the bot hedging or admitting it
@@ -196,27 +212,6 @@ function matches(t: Thread, query: string): boolean {
   );
 }
 
-/* A small filled-pill depth indicator — darker/bolder the deeper the thread,
-   so a 10-message conversation visually outweighs a 1-message drive-by
-   without needing to open either. Capped at 5 dots so it doesn't grow
-   unboundedly for very long threads. */
-function DepthPips({ count }: { count: number }) {
-  const filled = Math.min(count, 5);
-  return (
-    <span className="flex items-center gap-0.5" aria-hidden>
-      {Array.from({ length: 5 }, (_, i) => (
-        <span
-          key={i}
-          className={cn(
-            "size-1.5 rounded-full",
-            i < filled ? "bg-foreground" : "bg-border"
-          )}
-        />
-      ))}
-    </span>
-  );
-}
-
 /* Vercel's geo headers give lat/long at roughly ISP-node precision (not an
    exact address) — enough to see the metro/neighborhood a visitor is
    routing from. Opens in the browser's default map handler when clicked. */
@@ -241,7 +236,17 @@ function DeviceBadge({ device, os }: { device?: Thread["device"]; os?: string })
   );
 }
 
-function Meta({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
+function Meta({
+  thread,
+  visitCount,
+  isOwner,
+  onFilterByIp,
+}: {
+  thread: Thread;
+  visitCount: number;
+  isOwner: boolean;
+  onFilterByIp?: (ip: string) => void;
+}) {
   return (
     <div className="flex flex-wrap items-center gap-2 text-body-xs text-muted-foreground">
       <span>{new Date(thread.latest).toLocaleString()}</span>
@@ -252,6 +257,9 @@ function Meta({ thread, visitCount, isOwner }: { thread: Thread; visitCount: num
         </>
       )}
       {thread.page && <span>· {thread.page}</span>}
+      {thread.referrer && thread.referrer !== "Direct" && (
+        <span>· via {thread.referrer}</span>
+      )}
       {thread.lat && thread.lon && (
         <>
           ·{" "}
@@ -266,16 +274,43 @@ function Meta({ thread, visitCount, isOwner }: { thread: Thread; visitCount: num
           </a>
         </>
       )}
-      {thread.ip && <span>· {thread.ip}</span>}
+      {thread.ip && (
+        <span>
+          ·{" "}
+          {onFilterByIp ? (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onFilterByIp(thread.ip!); }}
+              className="underline decoration-dotted underline-offset-2 hover:text-foreground"
+              title="Show all conversations from this visitor"
+            >
+              {thread.ip}
+            </button>
+          ) : (
+            thread.ip
+          )}
+        </span>
+      )}
       {isOwner ? (
         <span className="rounded-full bg-muted px-1.5 py-0.5 text-foreground" title="Matches your own IP — likely you testing">
           It&rsquo;s me
         </span>
       ) : (
         visitCount > 1 && (
-          <span className="rounded-full bg-surface-info px-1.5 py-0.5 text-info" title="Same visitor has messaged before">
-            Returning · {visitCount} visits
-          </span>
+          onFilterByIp ? (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onFilterByIp(thread.ip!); }}
+              className="rounded-full bg-surface-info px-1.5 py-0.5 text-info transition-opacity hover:opacity-80"
+              title="Show all conversations from this visitor"
+            >
+              Returning · {visitCount} visits
+            </button>
+          ) : (
+            <span className="rounded-full bg-surface-info px-1.5 py-0.5 text-info" title="Same visitor has messaged before">
+              Returning · {visitCount} visits
+            </span>
+          )
         )
       )}
     </div>
@@ -374,7 +409,6 @@ function ThreadCard({
       )}
     >
       <div className="flex items-center gap-2">
-        <DepthPips count={thread.entries.length} />
         <span className="text-body-xs font-medium text-foreground">
           {thread.entries.length} messages
         </span>
@@ -394,6 +428,78 @@ function ThreadCard({
   );
 }
 
+/* A labelled group of threads — conversations (2+ messages) lead as full
+   cards, one-offs follow as a dense list. Shared between the top-level date
+   groups and the nested month-year sub-groups under "Older". */
+function ThreadGroupList({
+  label,
+  threads,
+  visitCountByIp,
+  isOwnerThread,
+  selectedKey,
+  onSelect,
+  defaultOpen = true,
+}: {
+  label: string;
+  threads: Thread[];
+  visitCountByIp: Map<string, number>;
+  isOwnerThread: (t: Thread) => boolean;
+  selectedKey: string | null;
+  onSelect: (key: string) => void;
+  /** Month-year sub-groups under "Older" start collapsed — the recent date
+      groups (Today/Yesterday/etc.) stay open since they're usually small. */
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = React.useState(defaultOpen);
+  const conversations = threads.filter((t) => t.entries.length > 1);
+  const soloes = threads.filter((t) => t.entries.length === 1);
+  return (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1 text-body-xs font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
+      >
+        <ChevronDownIcon className={cn("size-3 shrink-0 transition-transform", !open && "-rotate-90")} />
+        {label}
+        <span className="normal-case tracking-normal text-muted-foreground/70">({threads.length})</span>
+      </button>
+      {open && (
+        <>
+          {conversations.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {conversations.map((thread) => (
+                <ThreadCard
+                  key={thread.key}
+                  thread={thread}
+                  visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                  isOwner={isOwnerThread(thread)}
+                  selected={thread.key === selectedKey}
+                  onSelect={() => onSelect(thread.key)}
+                />
+              ))}
+            </div>
+          )}
+          {soloes.length > 0 && (
+            <div className="rounded-lg border px-2">
+              {soloes.map((thread) => (
+                <SoloRow
+                  key={thread.key}
+                  thread={thread}
+                  visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+                  isOwner={isOwnerThread(thread)}
+                  selected={thread.key === selectedKey}
+                  onSelect={() => onSelect(thread.key)}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 /* Right pane — the full transcript + all metadata for the selected thread.
    Mirrors the real Box AI transcript styling (BotBubble / user bubble in
    box-ai.tsx) so a logged conversation reads exactly like it did live —
@@ -406,15 +512,17 @@ function ThreadDetail({
   visitCount,
   isOwner,
   feedbackFor,
+  onFilterByIp,
 }: {
   thread: Thread;
   visitCount: number;
   isOwner: boolean;
   feedbackFor: (conversationId: string | undefined, answer: string) => FeedbackEntry | undefined;
+  onFilterByIp: (ip: string) => void;
 }) {
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
-      <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} />
+      <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} onFilterByIp={onFilterByIp} />
       <div className="flex flex-col gap-4">
         {thread.entries.map((e, i) => {
           const fb = feedbackFor(thread.key, e.a);
@@ -468,6 +576,7 @@ export default function ChatLogPage() {
   const [reviewOnly, setReviewOnly] = React.useState(false);
   const [ratingFilter, setRatingFilter] = React.useState<"all" | "up" | "down">("all");
   const [topicFilter, setTopicFilter] = React.useState<TopicId | "all">("all");
+  const [ipFilter, setIpFilter] = React.useState<string | null>(null);
   const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -555,8 +664,9 @@ export default function ChatLogPage() {
         .filter((t) => matches(t, query))
         .filter((t) => !reviewOnly || threadNeedsReview(t))
         .filter((t) => ratingFilter === "all" || threadHasRating(t, ratingFilter))
-        .filter((t) => topicFilter === "all" || topicOfThread(t) === topicFilter),
-    [allThreads, query, reviewOnly, ratingFilter, topicFilter, threadHasRating]
+        .filter((t) => topicFilter === "all" || topicOfThread(t) === topicFilter)
+        .filter((t) => !ipFilter || t.ip === ipFilter),
+    [allThreads, query, reviewOnly, ratingFilter, topicFilter, ipFilter, threadHasRating]
   );
   const now = React.useMemo(() => Date.now(), []);
   const grouped = React.useMemo(() => {
@@ -645,6 +755,22 @@ export default function ChatLogPage() {
               </button>
             </div>
 
+            {/* Active visitor filter — set by clicking a visitor's IP hash or
+                "Returning" badge in the detail pane, so their whole history
+                is browsable instead of just a count. */}
+            {ipFilter && (
+              <div className="flex items-center gap-1.5 rounded-lg bg-surface-info px-3 py-1.5 text-body-sm text-info">
+                <span>Showing conversations from {ipFilter}</span>
+                <button
+                  type="button"
+                  onClick={() => setIpFilter(null)}
+                  className="ml-auto text-body-xs underline decoration-dotted underline-offset-2 hover:opacity-80"
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+
             {/* Topic breakdown — busiest first. Click a pill to filter the list
                 to that topic; click again (or All) to clear. Directly answers
                 "what should I add more knowledge-base content about". */}
@@ -699,46 +825,58 @@ export default function ChatLogPage() {
               {DATE_GROUPS.map((g) => {
                 const threadsInGroup = grouped.get(g) ?? [];
                 if (threadsInGroup.length === 0) return null;
-                // Conversations (2+ messages) carry the most signal — lead with
-                // them as full cards. One-off single questions follow as a dense
-                // list, since there's nothing more to discover in them beyond the
-                // one answer.
-                const conversations = threadsInGroup.filter((t) => t.entries.length > 1);
-                const soloes = threadsInGroup.filter((t) => t.entries.length === 1);
+
+                if (g !== "Older") {
+                  return (
+                    <ThreadGroupList
+                      key={g}
+                      label={g}
+                      threads={threadsInGroup}
+                      visitCountByIp={visitCountByIp}
+                      isOwnerThread={isOwnerThread}
+                      selectedKey={selectedKey}
+                      onSelect={setSelectedKey}
+                    />
+                  );
+                }
+
+                // "Older" (> 7 days): anything within the last month stays a
+                // flat list; beyond that, nest under a month-year header so
+                // the list doesn't turn into one endless pile over time.
+                const recentOlder = threadsInGroup.filter((t) => !isOlderThanAMonth(t, now));
+                const monthsAgo = threadsInGroup.filter((t) => isOlderThanAMonth(t, now));
+                const byMonth = new Map<string, Thread[]>();
+                for (const t of monthsAgo) {
+                  const label = monthYearOf(t);
+                  const arr = byMonth.get(label) ?? [];
+                  arr.push(t);
+                  byMonth.set(label, arr);
+                }
                 return (
-                  <div key={g} className="flex flex-col gap-2">
-                    <h2 className="text-body-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {g}
-                    </h2>
-                    {conversations.length > 0 && (
-                      <div className="flex flex-col gap-2">
-                        {conversations.map((thread) => (
-                          <ThreadCard
-                            key={thread.key}
-                            thread={thread}
-                            visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                            isOwner={isOwnerThread(thread)}
-                            selected={thread.key === selectedKey}
-                            onSelect={() => setSelectedKey(thread.key)}
-                          />
-                        ))}
-                      </div>
+                  <React.Fragment key={g}>
+                    {recentOlder.length > 0 && (
+                      <ThreadGroupList
+                        label="This Month"
+                        threads={recentOlder}
+                        visitCountByIp={visitCountByIp}
+                        isOwnerThread={isOwnerThread}
+                        selectedKey={selectedKey}
+                        onSelect={setSelectedKey}
+                      />
                     )}
-                    {soloes.length > 0 && (
-                      <div className="rounded-lg border px-2">
-                        {soloes.map((thread) => (
-                          <SoloRow
-                            key={thread.key}
-                            thread={thread}
-                            visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                            isOwner={isOwnerThread(thread)}
-                            selected={thread.key === selectedKey}
-                            onSelect={() => setSelectedKey(thread.key)}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                    {[...byMonth.entries()].map(([label, monthThreads]) => (
+                      <ThreadGroupList
+                        key={label}
+                        label={label}
+                        threads={monthThreads}
+                        visitCountByIp={visitCountByIp}
+                        isOwnerThread={isOwnerThread}
+                        selectedKey={selectedKey}
+                        onSelect={setSelectedKey}
+                        defaultOpen={false}
+                      />
+                    ))}
+                  </React.Fragment>
                 );
               })}
             </div>
@@ -751,6 +889,7 @@ export default function ChatLogPage() {
                   visitCount={selectedThread.ip ? visitCountByIp.get(selectedThread.ip) ?? 1 : 1}
                   isOwner={isOwnerThread(selectedThread)}
                   feedbackFor={feedbackFor}
+                  onFilterByIp={setIpFilter}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">

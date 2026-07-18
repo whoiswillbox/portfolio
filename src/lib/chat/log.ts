@@ -28,6 +28,7 @@ export type ChatLogEntry = {
   page?: string; // pathname the visitor was on when they sent this message
   device?: "Desktop" | "Mobile" | "Tablet";
   os?: string; // coarse OS name (e.g. "iOS", "Mac", "Windows", "Android")
+  referrer?: string; // where the visitor came from — a hostname (e.g. "linkedin.com"), "Direct", or "Search" for known search engines
 };
 
 /** SHA-256 the IP so we can count unique visitors without storing the raw IP. */
@@ -56,6 +57,22 @@ export function parseUserAgent(ua: string | null): { device: ChatLogEntry["devic
   else if (/Linux/i.test(ua)) os = "Linux";
 
   return { device, os };
+}
+
+const SEARCH_ENGINES = ["google.", "bing.", "duckduckgo.", "yahoo.", "baidu.", "yandex."];
+
+/** Coarse referrer classification — a bare hostname for external sites (e.g.
+    "linkedin.com"), "Search" for known search engines, "Direct" when there's
+    no referrer at all (typed URL, bookmark, or a link that stripped it). */
+export function parseReferrer(referrer: string | undefined): string | undefined {
+  if (!referrer) return "Direct";
+  try {
+    const host = new URL(referrer).hostname.replace(/^www\./, "");
+    if (SEARCH_ENGINES.some((s) => host.includes(s))) return "Search";
+    return host;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function logChat(entry: ChatLogEntry): Promise<void> {

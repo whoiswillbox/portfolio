@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { buildSystemPrompt } from "@/lib/chat/knowledge";
-import { logChat, hashIp, parseUserAgent } from "@/lib/chat/log";
+import { logChat, hashIp, parseUserAgent, parseReferrer } from "@/lib/chat/log";
 import { getMusicSummary } from "@/lib/spotify";
 
 /* ============================================================================
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
   }
 
-  let body: { messages?: ClientMessage[]; conversationId?: string; pageContext?: string; page?: string };
+  let body: { messages?: ClientMessage[]; conversationId?: string; pageContext?: string; page?: string; referrer?: string };
   try {
     body = await request.json();
   } catch {
@@ -86,6 +86,17 @@ export async function POST(request: Request) {
     const region = request.headers.get("x-vercel-ip-country-region");
     const { device, os } = parseUserAgent(request.headers.get("user-agent"));
     const page = typeof body.page === "string" ? body.page.slice(0, 200) : undefined;
+    // A same-origin referrer (navigating between the site's own pages) isn't
+    // an external source — only classify it when it points elsewhere.
+    const rawReferrer = typeof body.referrer === "string" ? body.referrer : undefined;
+    let referrerOrigin: string | null = null;
+    try {
+      if (rawReferrer) referrerOrigin = new URL(rawReferrer).origin;
+    } catch {
+      /* malformed referrer — treated as no referrer below */
+    }
+    const isExternalReferrer = referrerOrigin !== null && referrerOrigin !== new URL(request.url).origin;
+    const referrer = isExternalReferrer ? parseReferrer(rawReferrer) : "Direct";
     const question = messages[messages.length - 1].content.slice(0, 300);
 
     const readable = new ReadableStream({
@@ -134,6 +145,7 @@ export async function POST(request: Request) {
               page,
               device,
               os,
+              referrer,
             });
           } catch (err) {
             console.error("chat log write failed:", err);

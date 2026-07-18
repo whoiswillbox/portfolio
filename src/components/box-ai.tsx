@@ -1001,6 +1001,7 @@ export function BoxAI({
           conversationId,
           pageContext,
           page: pathname,
+          referrer: typeof document !== "undefined" ? document.referrer || undefined : undefined,
           messages: history.map((m) => ({
             role: m.role === "bot" ? "assistant" : "user",
             content: m.text,
