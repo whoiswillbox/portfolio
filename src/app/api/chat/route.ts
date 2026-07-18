@@ -83,6 +83,7 @@ export async function POST(request: Request) {
 
     const ipRaw = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
     const city = request.headers.get("x-vercel-ip-city");
+    const region = request.headers.get("x-vercel-ip-country-region");
     const question = messages[messages.length - 1].content.slice(0, 300);
 
     const readable = new ReadableStream({
@@ -123,6 +124,7 @@ export async function POST(request: Request) {
               a: fullText.slice(0, 300),
               country: request.headers.get("x-vercel-ip-country") ?? undefined,
               city: city ? decodeURIComponent(city) : undefined,
+              region: region ?? undefined,
               lat: request.headers.get("x-vercel-ip-latitude") ?? undefined,
               lon: request.headers.get("x-vercel-ip-longitude") ?? undefined,
               ip: ipRaw ? await hashIp(ipRaw) : undefined,

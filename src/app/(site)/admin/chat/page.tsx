@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { MagnifyingGlassIcon, ChevronDownIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, ChevronDownIcon, ExclamationTriangleIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 
 type Entry = {
@@ -11,6 +11,7 @@ type Entry = {
   a: string;
   country?: string;
   city?: string;
+  region?: string;
   lat?: string;
   lon?: string;
   ip?: string;
@@ -23,6 +24,7 @@ type Thread = {
   latest: number; // ms of most recent entry
   country?: string;
   city?: string;
+  region?: string;
   lat?: string;
   lon?: string;
   ip?: string;
@@ -49,6 +51,7 @@ function groupThreads(entries: Entry[]): Thread[] {
       latest: +new Date(sorted[sorted.length - 1].t),
       country: first.country,
       city: first.city,
+      region: first.region,
       lat: first.lat,
       lon: first.lon,
       ip: first.ip,
@@ -147,6 +150,13 @@ function topicOfThread(t: Thread): TopicId {
   return best;
 }
 
+/* "Los Angeles, CA, US" — region (state/province) between city and country
+   when available; Vercel only sends it for some countries (notably the US),
+   so it silently drops out elsewhere rather than leaving a stray comma. */
+function locationOf(t: Pick<Thread, "city" | "region" | "country">): string {
+  return [t.city, t.region, t.country].filter(Boolean).join(", ");
+}
+
 function matches(t: Thread, query: string): boolean {
   if (!query.trim()) return true;
   const q = query.toLowerCase();
@@ -182,32 +192,71 @@ function DepthPips({ count }: { count: number }) {
 
 /* Vercel's geo headers give lat/long at roughly ISP-node precision (not an
    exact address) — enough to see the metro/neighborhood a visitor is
-   routing from. Opens in the browser's default map handler. */
+   routing from. Opens in the browser's default map handler when clicked. */
 function mapUrl(lat: string, lon: string): string {
   return `https://www.google.com/maps?q=${lat},${lon}`;
+}
+
+/* Static pin preview — no API key, no third-party "static map" service (none
+   of the free no-key ones proved reliably reachable). Instead: fetch ONE real
+   OpenStreetMap tile at a fixed zoom (the raw tile server has no marker
+   support but is a plain, dependable image endpoint) and draw a pin on top
+   with CSS, centered on the tile. Good enough for "roughly where" at a
+   glance; click through to mapUrl for a real interactive map. */
+const TILE_ZOOM = 11;
+const TILE_PX = 256;
+
+function lonToTileX(lon: number, zoom: number): number {
+  return ((lon + 180) / 360) * 2 ** zoom;
+}
+function latToTileY(lat: number, zoom: number): number {
+  const rad = (lat * Math.PI) / 180;
+  return ((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * 2 ** zoom;
+}
+
+function MapPin({ lat, lon }: { lat: string; lon: string }) {
+  const latNum = Number(lat);
+  const lonNum = Number(lon);
+  const xFrac = lonToTileX(lonNum, TILE_ZOOM);
+  const yFrac = latToTileY(latNum, TILE_ZOOM);
+  const tileX = Math.floor(xFrac);
+  const tileY = Math.floor(yFrac);
+  // Pin's position within the tile image, as a percentage — the fractional
+  // part of the tile coordinate is exactly where the point falls inside it.
+  const pinLeftPct = (xFrac - tileX) * 100;
+  const pinTopPct = (yFrac - tileY) * 100;
+
+  return (
+    <a
+      href={mapUrl(lat, lon)}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+      className="relative block overflow-hidden rounded-md border border-border"
+      style={{ width: TILE_PX, height: TILE_PX }}
+      title="Open in Google Maps"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- a single raw OSM tile, not a Next-optimizable local/remote asset */}
+      <img
+        src={`https://tile.openstreetmap.org/${TILE_ZOOM}/${tileX}/${tileY}.png`}
+        alt="Approximate visitor location"
+        width={TILE_PX}
+        height={TILE_PX}
+        className="block"
+      />
+      <MapPinIcon
+        className="absolute size-6 -translate-x-1/2 -translate-y-full text-critical drop-shadow"
+        style={{ left: `${pinLeftPct}%`, top: `${pinTopPct}%` }}
+      />
+    </a>
+  );
 }
 
 function Meta({ thread, visitCount, isOwner }: { thread: Thread; visitCount: number; isOwner: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-2 text-body-xs text-muted-foreground">
       <span>{new Date(thread.latest).toLocaleString()}</span>
-      {(thread.city || thread.country) && (
-        <span>· {[thread.city, thread.country].filter(Boolean).join(", ")}</span>
-      )}
-      {thread.lat && thread.lon && (
-        <>
-          ·{" "}
-          <a
-            href={mapUrl(thread.lat, thread.lon)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="underline decoration-dotted underline-offset-2 hover:text-foreground"
-          >
-            View on map
-          </a>
-        </>
-      )}
+      {(thread.city || thread.country) && <span>· {locationOf(thread)}</span>}
       {thread.ip && <span>· {thread.ip}</span>}
       {isOwner ? (
         <span className="rounded-full bg-muted px-1.5 py-0.5 text-foreground" title="Matches your own IP — likely you testing">
@@ -271,13 +320,12 @@ function SoloRow({ thread, visitCount, isOwner }: { thread: Thread; visitCount: 
             <p className="truncate text-body-sm text-foreground">{entry.q}</p>
           </div>
           {open && (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               <p className="text-body-sm text-muted-foreground">{entry.a}</p>
               {(thread.city || thread.country) && (
-                <span className="text-body-xs text-muted-foreground">
-                  {[thread.city, thread.country].filter(Boolean).join(", ")}
-                </span>
+                <span className="text-body-xs text-muted-foreground">{locationOf(thread)}</span>
               )}
+              {thread.lat && thread.lon && <MapPin lat={thread.lat} lon={thread.lon} />}
             </div>
           )}
         </div>
@@ -331,6 +379,7 @@ function ThreadCard({ thread, visitCount, isOwner }: { thread: Thread; visitCoun
               <p className={cn("text-body-sm", isHedge(e.a) ? "text-caution" : "text-muted-foreground")}>{e.a}</p>
             </div>
           ))}
+          {thread.lat && thread.lon && <MapPin lat={thread.lat} lon={thread.lon} />}
         </div>
       )}
     </div>

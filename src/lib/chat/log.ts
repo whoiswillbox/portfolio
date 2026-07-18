@@ -20,6 +20,7 @@ export type ChatLogEntry = {
   a: string; // bot's reply
   country?: string;
   city?: string;
+  region?: string; // x-vercel-ip-country-region — state/province code (e.g. "CA")
   lat?: string; // x-vercel-ip-latitude — approximate (ISP-node precision), for a map link
   lon?: string; // x-vercel-ip-longitude
   ip?: string; // short hash, not the raw IP
