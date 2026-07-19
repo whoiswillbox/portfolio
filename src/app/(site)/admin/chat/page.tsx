@@ -275,23 +275,6 @@ function Meta({
           </a>
         </>
       )}
-      {thread.ip && (
-        <span>
-          ·{" "}
-          {onFilterByIp ? (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onFilterByIp(thread.ip!); }}
-              className="underline decoration-dotted underline-offset-2 hover:text-foreground"
-              title="Show all conversations from this visitor"
-            >
-              {thread.ip}
-            </button>
-          ) : (
-            thread.ip
-          )}
-        </span>
-      )}
       {isOwner ? (
         <span className="rounded-full bg-muted px-1.5 py-0.5 text-foreground" title="Matches your own IP — likely you testing">
           It&rsquo;s me
