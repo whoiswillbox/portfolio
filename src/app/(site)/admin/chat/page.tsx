@@ -213,13 +213,6 @@ function matches(t: Thread, query: string): boolean {
   );
 }
 
-/* Vercel's geo headers give lat/long at roughly ISP-node precision (not an
-   exact address) — enough to see the metro/neighborhood a visitor is
-   routing from. Opens in the browser's default map handler when clicked. */
-function mapUrl(lat: string, lon: string): string {
-  return `https://www.google.com/maps?q=${lat},${lon}`;
-}
-
 const DEVICE_ICON: Record<NonNullable<Thread["device"]>, React.ComponentType<{ className?: string }>> = {
   Desktop: ComputerDesktopIcon,
   Mobile: DevicePhoneMobileIcon,
@@ -260,20 +253,6 @@ function Meta({
       {thread.page && <span>· {thread.page}</span>}
       {thread.referrer && thread.referrer !== "Direct" && (
         <span>· via {thread.referrer}</span>
-      )}
-      {thread.lat && thread.lon && (
-        <>
-          ·{" "}
-          <a
-            href={mapUrl(thread.lat, thread.lon)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="underline decoration-dotted underline-offset-2 hover:text-foreground"
-          >
-            View on map
-          </a>
-        </>
       )}
       {isOwner ? (
         <span className="rounded-full bg-muted px-1.5 py-0.5 text-foreground" title="Matches your own IP — likely you testing">
