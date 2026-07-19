@@ -328,60 +328,10 @@ function TopicPill({ topic }: { topic: TopicId }) {
 /* A one-off (single message) thread — the least signal in the log, so it's a
    dense single row: question as the title, no answer preview. Selecting it
    shows the full detail (question + answer + metadata) in the right pane. */
-function SoloRow({
-  thread,
-  visitCount,
-  isOwner,
-  selected,
-  onSelect,
-}: {
-  thread: Thread;
-  visitCount: number;
-  isOwner: boolean;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const entry = thread.entries[0];
-  const flagged = isHedge(entry.a);
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={cn(
-        "flex w-full items-start gap-3 border-b border-border/60 px-2 py-2 text-left transition-colors last:border-b-0",
-        selected ? "bg-muted" : "hover:bg-muted/50"
-      )}
-    >
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex items-center gap-1.5">
-          {flagged && (
-            <ExclamationTriangleIcon className="size-3.5 shrink-0 text-caution" aria-label="Bot may not have answered this well" />
-          )}
-          {isOwner ? (
-            <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-body-xs text-foreground" title="Matches your own IP — likely you testing">
-              It&rsquo;s me
-            </span>
-          ) : (
-            visitCount > 1 && (
-              <span className="shrink-0 rounded-full bg-surface-info px-1.5 py-0.5 text-body-xs text-info" title="Same visitor has messaged before">
-                Returning
-              </span>
-            )
-          )}
-          <p className="truncate text-body-sm text-foreground">{entry.q}</p>
-        </div>
-      </div>
-      <TopicPill topic={topicOf(entry.q)} />
-      <span className="shrink-0 text-body-xs text-muted-foreground">
-        {new Date(thread.latest).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-      </span>
-    </button>
-  );
-}
-
-/* A real conversation (2+ messages) — the highest-signal rows, so they keep
-   the fuller card treatment: depth pips + message count + first question.
-   Selecting it shows the full transcript in the right pane. */
+/* A thread's card in the left-pane list — one message or many, same
+   treatment (message count, flag, topic, first question, metadata line) so
+   the list reads consistently regardless of depth. Selecting it shows the
+   full transcript in the right pane. */
 function ThreadCard({
   thread,
   visitCount,
@@ -451,8 +401,6 @@ function ThreadGroupList({
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
-  const conversations = threads.filter((t) => t.entries.length > 1);
-  const soloes = threads.filter((t) => t.entries.length === 1);
   return (
     <div className="flex flex-col gap-2">
       <button
@@ -465,36 +413,18 @@ function ThreadGroupList({
         <span className="normal-case tracking-normal text-muted-foreground/70">({threads.length})</span>
       </button>
       {open && (
-        <>
-          {conversations.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {conversations.map((thread) => (
-                <ThreadCard
-                  key={thread.key}
-                  thread={thread}
-                  visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                  isOwner={isOwnerThread(thread)}
-                  selected={thread.key === selectedKey}
-                  onSelect={() => onSelect(thread.key)}
-                />
-              ))}
-            </div>
-          )}
-          {soloes.length > 0 && (
-            <div className="rounded-lg border px-2">
-              {soloes.map((thread) => (
-                <SoloRow
-                  key={thread.key}
-                  thread={thread}
-                  visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
-                  isOwner={isOwnerThread(thread)}
-                  selected={thread.key === selectedKey}
-                  onSelect={() => onSelect(thread.key)}
-                />
-              ))}
-            </div>
-          )}
-        </>
+        <div className="flex flex-col gap-2">
+          {threads.map((thread) => (
+            <ThreadCard
+              key={thread.key}
+              thread={thread}
+              visitCount={thread.ip ? visitCountByIp.get(thread.ip) ?? 1 : 1}
+              isOwner={isOwnerThread(thread)}
+              selected={thread.key === selectedKey}
+              onSelect={() => onSelect(thread.key)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -683,7 +613,7 @@ export default function ChatLogPage() {
   return (
     <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col">
       <div className="shrink-0 px-1">
-        <h1 className="text-h3 tracking-tight">Chat log</h1>
+        <h1 className="text-h3 tracking-tight">Chat history</h1>
         <p className="mt-1 text-body-sm text-muted-foreground">
           What visitors have asked the AI assistant (most recent first).
         </p>

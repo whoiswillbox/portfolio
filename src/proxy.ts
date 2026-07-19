@@ -12,8 +12,7 @@ export const ENTERED_TTL_MS = 4 * 60 * 60 * 1000;
      redirect to / so the landing page is shown again. */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const isAdminArea =
-    path.startsWith("/admin") || path === "/api/chat-log" || path === "/api/feedback-log";
+  const isAdminArea = path.startsWith("/admin") || path === "/api/chat-log";
 
   if (isAdminArea) {
     const adminKey = process.env.ADMIN_KEY;
