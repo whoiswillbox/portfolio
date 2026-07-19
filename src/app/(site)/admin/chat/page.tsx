@@ -396,8 +396,9 @@ function ThreadGroupList({
   isOwnerThread: (t: Thread) => boolean;
   selectedKey: string | null;
   onSelect: (key: string) => void;
-  /** Month-year sub-groups under "Older" start collapsed — the recent date
-      groups (Today/Yesterday/etc.) stay open since they're usually small. */
+  /** Only Today / Yesterday / Past 7 Days start open — everything older
+      (Past 30 Days, month-year groups) starts collapsed since it's usually
+      the bulk of the list and not what you're scanning for by default. */
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
@@ -792,6 +793,7 @@ export default function ChatLogPage() {
                         isOwnerThread={isOwnerThread}
                         selectedKey={selectedKey}
                         onSelect={setSelectedKey}
+                        defaultOpen={false}
                       />
                     )}
                     {[...byMonth.entries()].map(([label, monthThreads]) => (
