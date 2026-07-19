@@ -94,6 +94,34 @@ export async function getChatLog(limit = 200): Promise<ChatLogEntry[]> {
   }
 }
 
+/** Delete one thread from the log — either every entry sharing a
+    conversation id (a real multi-message conversation), or a single entry
+    identified by its exact timestamp (a one-off "solo" message, which has no
+    conversation id of its own).
+
+    Redis lists have no delete-by-index that's safe under concurrent writers,
+    so this reads the whole list, filters out the target thread, and
+    rewrites it in one transaction. Safe here because chat-log has exactly
+    one writer (logChat, append-only) besides this — no risk of a push racing
+    the rewrite and getting silently dropped mid-transaction is acceptable at
+    this log's scale (capped at MAX entries, admin-only, low frequency). */
+export async function deleteChatThread(target: { conversationId: string } | { timestamp: string }): Promise<void> {
+  if (!redis) return;
+  try {
+    const all = await redis.lrange<ChatLogEntry>(KEY, 0, -1);
+    const kept = all.filter((e) =>
+      "conversationId" in target ? e.c !== target.conversationId : e.t !== target.timestamp
+    );
+    if (kept.length === all.length) return; // nothing matched, don't touch the list
+    const tx = redis.multi();
+    tx.del(KEY);
+    if (kept.length > 0) tx.rpush(KEY, ...kept);
+    await tx.exec();
+  } catch {
+    /* best-effort — a failed delete just leaves the thread in place */
+  }
+}
+
 export type FeedbackEntry = {
   t: string; // ISO timestamp
   c?: string; // conversation id

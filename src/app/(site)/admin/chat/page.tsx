@@ -11,6 +11,7 @@ import {
   HandThumbUpIcon,
   HandThumbDownIcon,
   ChevronDownIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import { HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from "@heroicons/react/24/solid";
 import { cn } from "@/lib/utils";
@@ -431,6 +432,36 @@ function ThreadGroupList({
   );
 }
 
+/* Delete requires an explicit second click (Delete → Confirm?) rather than a
+   modal — fewer moving parts for a single destructive action, and the
+   confirm state auto-resets if you click elsewhere (onBlur) or navigate. */
+function DeleteThreadButton({ onDelete }: { onDelete: () => void }) {
+  const [confirming, setConfirming] = React.useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (confirming) {
+          onDelete();
+          setConfirming(false);
+        } else {
+          setConfirming(true);
+        }
+      }}
+      onBlur={() => setConfirming(false)}
+      className={cn(
+        "ml-auto flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1 text-body-xs transition-colors",
+        confirming
+          ? "border-critical/50 bg-surface-critical text-critical"
+          : "border-input bg-background text-muted-foreground hover:border-critical/50 hover:text-critical"
+      )}
+    >
+      <TrashIcon className="size-3.5 shrink-0" />
+      {confirming ? "Confirm delete?" : "Delete"}
+    </button>
+  );
+}
+
 /* Right pane — the full transcript + all metadata for the selected thread.
    Mirrors the real Box AI transcript styling (BotBubble / user bubble in
    box-ai.tsx) so a logged conversation reads exactly like it did live —
@@ -444,16 +475,21 @@ function ThreadDetail({
   isOwner,
   feedbackFor,
   onFilterByIp,
+  onDelete,
 }: {
   thread: Thread;
   visitCount: number;
   isOwner: boolean;
   feedbackFor: (conversationId: string | undefined, answer: string) => FeedbackEntry | undefined;
   onFilterByIp: (ip: string) => void;
+  onDelete: () => void;
 }) {
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
-      <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} onFilterByIp={onFilterByIp} />
+      <div className="flex items-start gap-2">
+        <Meta thread={thread} visitCount={visitCount} isOwner={isOwner} onFilterByIp={onFilterByIp} />
+        <DeleteThreadButton onDelete={onDelete} />
+      </div>
       <div className="flex flex-col gap-4">
         {thread.entries.map((e, i) => {
           const fb = feedbackFor(thread.key, e.a);
@@ -610,6 +646,34 @@ export default function ChatLogPage() {
     () => allThreads.find((t) => t.key === selectedKey) ?? null,
     [allThreads, selectedKey]
   );
+
+  // A real conversation's key IS its conversation id (see groupThreads); a
+  // one-off "solo" thread's key is a synthetic solo:<timestamp>:<index>
+  // string with no server-side id, so its single entry's own timestamp is
+  // what identifies it to the delete endpoint instead.
+  const handleDeleteThread = React.useCallback(async (thread: Thread) => {
+    const body = thread.key.startsWith("solo:")
+      ? { timestamp: thread.entries[0].t }
+      : { conversationId: thread.key };
+    try {
+      const res = await fetch("/api/chat-log", {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) return;
+    } catch {
+      return;
+    }
+    // Optimistic local removal — drop every entry that belonged to this
+    // thread instead of re-fetching the whole log.
+    setEntries((prev) =>
+      prev?.filter((e) =>
+        thread.key.startsWith("solo:") ? e.t !== thread.entries[0].t : e.c !== thread.key
+      ) ?? null
+    );
+    setSelectedKey((k) => (k === thread.key ? null : k));
+  }, []);
 
   return (
     <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col">
@@ -822,6 +886,7 @@ export default function ChatLogPage() {
                   isOwner={isOwnerThread(selectedThread)}
                   feedbackFor={feedbackFor}
                   onFilterByIp={setIpFilter}
+                  onDelete={() => handleDeleteThread(selectedThread)}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">
